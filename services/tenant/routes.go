@@ -1,0 +1,40 @@
+package tenant
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/tiket-wisata-alam/backend/internal/middleware"
+	"github.com/tiket-wisata-alam/backend/internal/models"
+)
+
+// RegisterRoutes registers tenant service endpoints with authentication and authorization middleware
+func RegisterRoutes(router *gin.RouterGroup, handler *TenantHandler, jwtSecret string) {
+	protected := router.Group("")
+	protected.Use(middleware.AuthMiddleware(jwtSecret))
+	protected.Use(middleware.RoleMiddleware(models.RoleSuperAdmin, models.RoleTenantAdmin))
+
+	// Tenants CRUD routes under /tenants
+	tenants := protected.Group("/tenants")
+	{
+		tenants.POST("", handler.HandleCreateTenant)
+		tenants.GET("", handler.HandleListTenants)
+		tenants.GET("/:id", handler.HandleGetTenant)
+		tenants.PUT("/:id", handler.HandleUpdateTenant)
+		tenants.DELETE("/:id", handler.HandleDeleteTenant)
+
+		// Settings routes under /tenants/:tenant_id/settings
+		tenants.PUT("/:tenant_id/settings", handler.HandleUpsertSetting)
+		tenants.GET("/:tenant_id/settings", handler.HandleGetSettings)
+
+		// Nested Destinations routes under /tenants
+		tenants.POST("/:tenant_id/destinations", handler.HandleCreateDestination)
+		tenants.GET("/:tenant_id/destinations", handler.HandleListDestinations)
+	}
+
+	// Destinations direct by ID routes under /destinations
+	destinations := protected.Group("/destinations")
+	{
+		destinations.GET("/:id", handler.HandleGetDestination)
+		destinations.PUT("/:id", handler.HandleUpdateDestination)
+		destinations.DELETE("/:id", handler.HandleDeleteDestination)
+	}
+}
