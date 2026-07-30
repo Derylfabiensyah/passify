@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
+
+// Public Portal Components
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Catalog from './components/Catalog';
@@ -9,7 +12,16 @@ import FeaturesSection from './components/FeaturesSection';
 import Footer from './components/Footer';
 import { DESTINATIONS } from './data/destinations';
 
-export default function App() {
+// Admin Dashboard Components
+import AdminLayout from './components/admin/AdminLayout';
+import DashboardOverview from './pages/admin/DashboardOverview';
+import DestinationsPage from './pages/admin/DestinationsPage';
+import QuotasPage from './pages/admin/QuotasPage';
+import GatesPage from './pages/admin/GatesPage';
+import FinancePage from './pages/admin/FinancePage';
+
+// ─── Public Portal (Landing Page) ────────────────────────────────
+function PublicPortal() {
   const [walletBalance, setWalletBalance] = useState(250000);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDestination, setSelectedDestination] = useState(null);
@@ -41,14 +53,11 @@ export default function App() {
 
   const handleScrollToCatalog = () => {
     const catalog = document.getElementById('catalog-section');
-    if (catalog) {
-      catalog.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (catalog) catalog.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
-      {/* Navigation Bar */}
       <Navbar
         walletBalance={walletBalance}
         onOpenWallet={() => setIsWalletOpen(true)}
@@ -56,44 +65,39 @@ export default function App() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
-
-      {/* Main Content */}
       <main className="flex-1">
         <Hero onExploreClick={handleScrollToCatalog} />
-        <Catalog
-          destinations={DESTINATIONS}
-          searchQuery={searchQuery}
-          onSelectDestination={(dest) => setSelectedDestination(dest)}
-        />
+        <Catalog destinations={DESTINATIONS} searchQuery={searchQuery} onSelectDestination={(dest) => setSelectedDestination(dest)} />
         <FeaturesSection />
       </main>
-
-      {/* Footer */}
       <Footer />
 
-      {/* Modals */}
       {selectedDestination && (
-        <BookingModal
-          destination={selectedDestination}
-          onClose={() => setSelectedDestination(null)}
-          onBookingSuccess={handleBookingSuccess}
-        />
+        <BookingModal destination={selectedDestination} onClose={() => setSelectedDestination(null)} onBookingSuccess={handleBookingSuccess} />
       )}
-
       {isWalletOpen && (
-        <WalletModal
-          walletBalance={walletBalance}
-          onTopUp={handleTopUpWallet}
-          onClose={() => setIsWalletOpen(false)}
-        />
+        <WalletModal walletBalance={walletBalance} onTopUp={handleTopUpWallet} onClose={() => setIsWalletOpen(false)} />
       )}
-
       {isTicketModalOpen && (
-        <ETicketModal
-          order={activeOrder}
-          onClose={() => setIsTicketModalOpen(false)}
-        />
+        <ETicketModal order={activeOrder} onClose={() => setIsTicketModalOpen(false)} />
       )}
     </div>
+  );
+}
+
+// ─── Main App with Routing ───────────────────────────────────────
+export default function App() {
+  return (
+    <Routes>
+      {/* Public Portal */}
+      <Route path="/" element={<PublicPortal />} />
+
+      {/* Admin Dashboard */}
+      <Route path="/admin" element={<AdminLayout><DashboardOverview /></AdminLayout>} />
+      <Route path="/admin/destinations" element={<AdminLayout><DestinationsPage /></AdminLayout>} />
+      <Route path="/admin/quotas" element={<AdminLayout><QuotasPage /></AdminLayout>} />
+      <Route path="/admin/gates" element={<AdminLayout><GatesPage /></AdminLayout>} />
+      <Route path="/admin/finance" element={<AdminLayout><FinancePage /></AdminLayout>} />
+    </Routes>
   );
 }
