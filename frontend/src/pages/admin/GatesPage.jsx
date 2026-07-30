@@ -281,6 +281,14 @@ export default function GatesPage() {
         </button>
       </div>
 
+      {/* Security Info Banner */}
+      <div className="flex items-center justify-between bg-emerald-950/20 border border-emerald-500/20 rounded-xl px-4 py-2.5 text-xs text-emerald-400">
+        <span className="font-semibold flex items-center gap-1.5">
+          <Shield className="w-4 h-4" /> Offline-First Security Ready — Validasi tiket di gunung tanpa sinyal internet menggunakan HMAC SHA-256
+        </span>
+        <span className="text-slate-300 font-medium">Validasi Gate: <strong className="text-white">&lt; 0.5 detik</strong></span>
+      </div>
+
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="glass-panel p-4 text-center">
