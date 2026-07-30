@@ -60,6 +60,15 @@ export default function DashboardOverview() {
 
   return (
     <div className="space-y-6">
+      {/* Top Banner Status */}
+      <div className="flex items-center justify-between bg-emerald-950/20 border border-emerald-500/20 rounded-xl px-4 py-2 text-xs text-emerald-400">
+        <span className="flex items-center gap-2 font-medium">
+          <span className="pulse-dot" style={{ width: 6, height: 6 }} />
+          Live Monitoring Dashboard — Data real-time tersinkronisasi dari gate scanner dan payment gateway
+        </span>
+        <span className="text-slate-400 font-mono text-[11px]">Sync: {new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+      </div>
+
       {/* Top Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
