@@ -85,6 +85,14 @@ export default function FinancePage() {
         </div>
       </div>
 
+      {/* Settlement Info Banner */}
+      <div className="flex items-center justify-between bg-sky-950/20 border border-sky-500/20 rounded-xl px-4 py-2.5 text-xs text-sky-400">
+        <span className="font-semibold flex items-center gap-1.5">
+          <CheckCircle2 className="w-4 h-4" /> Pencairan Otomatis (Auto-Payout) Aktif — Diteruskan setiap Senin pukul 10:00 WIB
+        </span>
+        <span className="text-slate-300 font-medium">Rekening: <strong className="text-white">BCA - ****4821</strong> (Dinas Pariwisata)</span>
+      </div>
+
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
