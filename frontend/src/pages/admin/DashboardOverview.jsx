@@ -59,7 +59,7 @@ export default function DashboardOverview() {
   const quotaUsedPct = Math.round(((stats.today.total_capacity - stats.today.remaining_quota) / stats.today.total_capacity) * 100);
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
       {/* Top Banner Status */}
       <div className="flex items-center justify-between bg-emerald-950/20 border border-emerald-500/20 rounded-xl px-4 py-2 text-xs text-emerald-400">
         <span className="flex items-center gap-2 font-medium">

@@ -22,10 +22,9 @@ export default function AdminLayout({ children }) {
     <div className="flex min-h-screen bg-[#090d16]">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen z-40 flex flex-col transition-all duration-300 ease-in-out ${
-          collapsed ? 'w-[72px]' : 'w-[260px]'
-        }`}
+        className="fixed top-0 left-0 h-screen z-40 flex flex-col transition-all duration-300 ease-in-out"
         style={{
+          width: collapsed ? 72 : 260,
           background: 'linear-gradient(180deg, #0c1220 0%, #0a0f1a 100%)',
           borderRight: '1px solid rgba(255,255,255,0.06)'
         }}
@@ -93,7 +92,10 @@ export default function AdminLayout({ children }) {
       </aside>
 
       {/* Main Content Area */}
-      <div className={`flex-1 transition-all duration-300 ${collapsed ? 'ml-[72px]' : 'ml-[260px]'}`}>
+      <div
+        className="flex-1 transition-all duration-300 min-w-0"
+        style={{ marginLeft: collapsed ? 72 : 260 }}
+      >
         {/* Top Header Bar */}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-4 px-6 py-3 border-b border-slate-800/50 bg-[#090d16]/90 backdrop-blur-md">
           <div>
