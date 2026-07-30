@@ -290,6 +290,14 @@ export default function QuotasPage() {
         </select>
       </div>
 
+      {/* Quota Occupancy Bar */}
+      <div className="flex items-center justify-between bg-emerald-950/20 border border-emerald-500/20 rounded-xl px-4 py-2.5 text-xs text-emerald-400">
+        <span className="font-semibold flex items-center gap-1.5">
+          <ShieldCheck className="w-4 h-4" /> Perlindungan Carrying Capacity Aktif — Mencegah over-tourism & menjaga ekosistem wisata alam
+        </span>
+        <span className="text-slate-300 font-medium">Batas Maksimal Harian: <strong className="text-white">{selectedDest.max_daily_capacity.toLocaleString('id-ID')}</strong> pengunjung</span>
+      </div>
+
       {/* Quota Calendar Grid */}
       <div className="glass-panel p-5">
         <div className="flex items-center justify-between mb-4">
