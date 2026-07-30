@@ -381,6 +381,15 @@ export default function DestinationsPage() {
         </button>
       </div>
 
+      {/* Summary Info Banner */}
+      <div className="flex items-center justify-between bg-slate-900/60 border border-slate-800/80 rounded-xl px-4 py-2.5 text-xs text-slate-300">
+        <div className="flex items-center gap-4">
+          <span>Total Destinasi: <strong className="text-white">{destinations.length}</strong></span>
+          <span>Destinasi Aktif: <strong className="text-emerald-400">{destinations.filter(d => d.is_active).length}</strong></span>
+          <span>Total Kategori Tiket: <strong className="text-sky-400">{destinations.reduce((s, d) => s + d.ticket_categories.length, 0)}</strong></span>
+        </div>
+      </div>
+
       {/* Search */}
       <div className="relative max-w-md">
         <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
