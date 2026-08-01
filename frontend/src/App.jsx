@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 // Public Portal Components
@@ -8,6 +8,7 @@ import Catalog from './components/Catalog';
 import BookingModal from './components/BookingModal';
 import WalletModal from './components/WalletModal';
 import ETicketModal from './components/ETicketModal';
+import AuthModal from './components/AuthModal';
 import FeaturesSection from './components/FeaturesSection';
 import Footer from './components/Footer';
 import { DESTINATIONS } from './data/destinations';
@@ -22,10 +23,20 @@ import FinancePage from './pages/admin/FinancePage';
 
 // ─── Public Portal (Landing Page) ────────────────────────────────
 function PublicPortal() {
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('passify_user');
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [walletBalance, setWalletBalance] = useState(250000);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeOrder, setActiveOrder] = useState({
     orderNumber: 'TWA-20260729-8832',
     destinationName: 'Taman Nasional Gunung Bromo',
@@ -56,30 +67,66 @@ function PublicPortal() {
     if (catalog) catalog.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleAuthSuccess = (userData) => {
+    setUser(userData);
+    setIsAuthModalOpen(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('passify_user');
+    localStorage.removeItem('passify_token');
+    setUser(null);
+  };
+
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col selection:bg-emerald-500 selection:text-white">
       <Navbar
         walletBalance={walletBalance}
         onOpenWallet={() => setIsWalletOpen(true)}
         onOpenTicketModal={() => setIsTicketModalOpen(true)}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        user={user}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onLogout={handleLogout}
       />
       <main className="flex-1">
         <Hero onExploreClick={handleScrollToCatalog} />
-        <Catalog destinations={DESTINATIONS} searchQuery={searchQuery} onSelectDestination={(dest) => setSelectedDestination(dest)} />
+        <Catalog
+          destinations={DESTINATIONS}
+          searchQuery={searchQuery}
+          onSelectDestination={(dest) => setSelectedDestination(dest)}
+        />
         <FeaturesSection />
       </main>
       <Footer />
 
       {selectedDestination && (
-        <BookingModal destination={selectedDestination} onClose={() => setSelectedDestination(null)} onBookingSuccess={handleBookingSuccess} />
+        <BookingModal
+          destination={selectedDestination}
+          onClose={() => setSelectedDestination(null)}
+          onBookingSuccess={handleBookingSuccess}
+        />
       )}
       {isWalletOpen && (
-        <WalletModal walletBalance={walletBalance} onTopUp={handleTopUpWallet} onClose={() => setIsWalletOpen(false)} />
+        <WalletModal
+          walletBalance={walletBalance}
+          onTopUp={handleTopUpWallet}
+          onClose={() => setIsWalletOpen(false)}
+        />
       )}
       {isTicketModalOpen && (
-        <ETicketModal order={activeOrder} onClose={() => setIsTicketModalOpen(false)} />
+        <ETicketModal
+          order={activeOrder}
+          onClose={() => setIsTicketModalOpen(false)}
+        />
+      )}
+      {isAuthModalOpen && (
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
       )}
     </div>
   );
