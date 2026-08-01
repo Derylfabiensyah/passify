@@ -85,9 +85,9 @@ export const RECENT_TRANSACTIONS = [
 ];
 
 export const GATE_SCAN_STATS = [
-  { device: "Gate A - Pintu Utama", scans_today: 148, valid: 145, invalid: 3, status: "online" },
-  { device: "Gate B - Pintu Selatan", scans_today: 96, valid: 94, invalid: 2, status: "online" },
-  { device: "Gate C - Exit Kawah", scans_today: 45, valid: 45, invalid: 0, status: "offline" },
+  { id: "g-01", gate_name: "Gate A - Pintu Utama", device: "Gate A - Pintu Utama", total_scanned: 148, scans_today: 148, valid: 145, invalid: 3, last_scan: "10:35 WIB", status: "ONLINE" },
+  { id: "g-02", gate_name: "Gate B - Pintu Selatan", device: "Gate B - Pintu Selatan", total_scanned: 96, scans_today: 96, valid: 94, invalid: 2, last_scan: "10:30 WIB", status: "ONLINE" },
+  { id: "g-03", gate_name: "Gate C - Exit Kawah", device: "Gate C - Exit Kawah", total_scanned: 45, scans_today: 45, valid: 45, invalid: 0, last_scan: "09:15 WIB", status: "OFFLINE" },
 ];
 
 export const ADMIN_DESTINATIONS = [
