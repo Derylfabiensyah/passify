@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Catalog from './components/Catalog';
+import CashlessEcosystemSection from './components/CashlessEcosystemSection';
 import BookingModal from './components/BookingModal';
 import WalletModal from './components/WalletModal';
 import ETicketModal from './components/ETicketModal';
@@ -96,6 +97,9 @@ function PublicPortal() {
           destinations={DESTINATIONS}
           searchQuery={searchQuery}
           onSelectDestination={(dest) => setSelectedDestination(dest)}
+        />
+        <CashlessEcosystemSection
+          onOpenWallet={() => setIsWalletOpen(true)}
         />
         <FeaturesSection />
       </main>
