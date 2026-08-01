@@ -1,356 +1,485 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
-  TrendingUp, TrendingDown, Ticket, Users, DollarSign, Wallet,
-  ArrowUpRight, ArrowDownRight, Clock, BarChart3, Activity,
-  ShieldCheck, AlertTriangle, RefreshCw
+  TrendingUp,
+  Ticket,
+  Users,
+  DollarSign,
+  Wallet,
+  Clock,
+  Activity,
+  AlertTriangle,
+  RefreshCw,
+  ShieldCheck,
+  BarChart3
 } from 'lucide-react';
 import {
-  DASHBOARD_STATS, HOURLY_VISITORS, REVENUE_WEEKLY,
-  TICKET_CATEGORY_SALES, RECENT_TRANSACTIONS, GATE_SCAN_STATS
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
+
+import AdminStatCard from '../../components/admin/AdminStatCard';
+import DataTable from '../../components/admin/DataTable';
+import {
+  DASHBOARD_STATS,
+  HOURLY_VISITORS,
+  REVENUE_WEEKLY,
+  TICKET_CATEGORY_SALES,
+  RECENT_TRANSACTIONS,
+  GATE_SCAN_STATS
 } from '../../data/adminData';
 
-function StatCard({ icon: Icon, label, value, subValue, trend }) {
-  const trendUp = trend > 0;
-  return (
-    <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl">
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-zinc-800">
-          <Icon className="w-5 h-5 text-zinc-100" />
-        </div>
-        {trend !== undefined && (
-          <div className={`flex items-center gap-1 text-xs font-medium ${
-            trendUp ? 'text-emerald-500' : 'text-rose-500'
-          }`}>
-            {trendUp ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-            <span>{Math.abs(trend)}%</span>
-          </div>
-        )}
-      </div>
-      <div className="text-2xl font-semibold text-zinc-100 mb-1">{value}</div>
-      <div className="text-xs text-zinc-400">{label}</div>
-      {subValue && <div className="text-[10px] text-zinc-500 mt-1.5">{subValue}</div>}
-    </div>
-  );
-}
+// Register Chart.js modules
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 export default function DashboardOverview() {
   const stats = DASHBOARD_STATS;
-  const revGrowth = Math.round(((stats.today.revenue - stats.yesterday.revenue) / stats.yesterday.revenue) * 100);
-  const ticketGrowth = Math.round(((stats.today.tickets_sold - stats.yesterday.tickets_sold) / stats.yesterday.tickets_sold) * 100);
+  const revGrowth = Math.round(
+    ((stats.today.revenue - stats.yesterday.revenue) / stats.yesterday.revenue) * 100
+  );
+  const ticketGrowth = Math.round(
+    ((stats.today.tickets_sold - stats.yesterday.tickets_sold) /
+      stats.yesterday.tickets_sold) *
+      100
+  );
+  const quotaUsedPct = Math.round(
+    ((stats.today.total_capacity - stats.today.remaining_quota) /
+      stats.today.total_capacity) *
+      100
+  );
 
-  const quotaUsedPct = Math.round(((stats.today.total_capacity - stats.today.remaining_quota) / stats.today.total_capacity) * 100);
+  // ─── Chart.js Configuration: Hourly Visitors ──────────────────
+  const hourlyChartData = {
+    labels: HOURLY_VISITORS.map((h) => h.hour),
+    datasets: [
+      {
+        label: 'Masuk (Entered)',
+        data: HOURLY_VISITORS.map((h) => h.entered),
+        backgroundColor: '#10b981', // emerald-500
+        hoverBackgroundColor: '#34d399',
+        borderRadius: 4,
+        barPercentage: 0.7
+      },
+      {
+        label: 'Keluar (Exited)',
+        data: HOURLY_VISITORS.map((h) => h.exited),
+        backgroundColor: '#3f3f46', // zinc-700
+        hoverBackgroundColor: '#52525b',
+        borderRadius: 4,
+        barPercentage: 0.7
+      }
+    ]
+  };
+
+  const hourlyChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        align: 'end',
+        labels: {
+          color: '#a1a1aa', // zinc-400
+          font: { size: 11, family: 'Outfit' },
+          boxWidth: 10,
+          usePointStyle: true
+        }
+      },
+      tooltip: {
+        backgroundColor: '#18181b', // zinc-900
+        titleColor: '#f4f4f5',
+        bodyColor: '#d4d4d8',
+        borderColor: '#27272a',
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 8
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: '#71717a', font: { size: 10 } }
+      },
+      y: {
+        grid: { color: '#27272a' },
+        ticks: { color: '#71717a', font: { size: 10 } }
+      }
+    }
+  };
+
+  // ─── Chart.js Configuration: Weekly Revenue ───────────────────
+  const revenueChartData = {
+    labels: REVENUE_WEEKLY.map((d) => d.day),
+    datasets: [
+      {
+        label: 'Pendapatan (Rp)',
+        data: REVENUE_WEEKLY.map((d) => d.revenue),
+        backgroundColor: '#10b981',
+        hoverBackgroundColor: '#34d399',
+        borderRadius: 6
+      }
+    ]
+  };
+
+  const revenueChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#18181b',
+        titleColor: '#f4f4f5',
+        bodyColor: '#d4d4d8',
+        borderColor: '#27272a',
+        borderWidth: 1,
+        padding: 10,
+        cornerRadius: 8,
+        callbacks: {
+          label: (context) => {
+            return `Rp ${Number(context.raw).toLocaleString('id-ID')}`;
+          }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: '#71717a', font: { size: 10 } }
+      },
+      y: {
+        grid: { color: '#27272a' },
+        ticks: {
+          color: '#71717a',
+          font: { size: 10 },
+          callback: (value) => `Rp ${(value / 1000000).toFixed(0)}jt`
+        }
+      }
+    }
+  };
+
+  // ─── TanStack React Table: Recent Transactions Columns ─────────
+  const transactionColumns = useMemo(
+    () => [
+      {
+        accessorKey: 'id',
+        header: 'ID Transaksi',
+        cell: (info) => (
+          <span className="font-mono font-bold text-emerald-400">
+            {info.getValue()}
+          </span>
+        )
+      },
+      {
+        accessorKey: 'visitor_name',
+        header: 'Wisatawan / Pemesan',
+        cell: (info) => (
+          <div>
+            <div className="font-semibold text-zinc-200">{info.getValue()}</div>
+            <div className="text-[10px] text-zinc-500">
+              {info.row.original.category}
+            </div>
+          </div>
+        )
+      },
+      {
+        accessorKey: 'amount',
+        header: 'Nominal',
+        cell: (info) => (
+          <span className="font-bold text-zinc-200">
+            Rp {info.getValue().toLocaleString('id-ID')}
+          </span>
+        )
+      },
+      {
+        accessorKey: 'time',
+        header: 'Waktu Transaksi',
+        cell: (info) => (
+          <span className="text-zinc-400 text-xs">{info.getValue()}</span>
+        )
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: (info) => {
+          const status = info.getValue();
+          return (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                status === 'success'
+                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                  : status === 'pending'
+                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+              }`}
+            >
+              <span className="status-dot" />
+              <span>
+                {status === 'success'
+                  ? 'Berhasil'
+                  : status === 'pending'
+                  ? 'Proses'
+                  : 'Gagal'}
+              </span>
+            </span>
+          );
+        }
+      }
+    ],
+    []
+  );
+
+  // ─── TanStack React Table: Gate Scans Columns ──────────────────
+  const gateColumns = useMemo(
+    () => [
+      {
+        accessorKey: 'gate_name',
+        header: 'Gerbang Akses',
+        cell: (info) => (
+          <span className="font-bold text-zinc-200">{info.getValue()}</span>
+        )
+      },
+      {
+        accessorKey: 'total_scanned',
+        header: 'Total Pindai (Scan)',
+        cell: (info) => (
+          <span className="font-semibold text-zinc-200">
+            {info.getValue().toLocaleString('id-ID')} pax
+          </span>
+        )
+      },
+      {
+        accessorKey: 'last_scan',
+        header: 'Aktivitas Terakhir',
+        cell: (info) => (
+          <span className="text-zinc-400 text-xs">{info.getValue()}</span>
+        )
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status Terminal',
+        cell: (info) => {
+          const st = info.getValue();
+          return (
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+                st === 'online'
+                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+              }`}
+            >
+              <span className="status-dot" />
+              <span>{st.toUpperCase()}</span>
+            </span>
+          );
+        }
+      }
+    ],
+    []
+  );
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Top Stats Grid */}
+      {/* Top Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
+        <div>
+          <div className="text-xs text-emerald-500 uppercase tracking-widest font-semibold flex items-center gap-2 mb-1">
+            <span className="status-dot" />
+            <span>Passify Admin Control Tower • Tremor UI & Chart.js Powered</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 font-['Outfit']">
+            Dasbor Analitik Real-Time
+          </h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-zinc-400 bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-emerald-500" />
+            <span>Sinkronisasi Otomatis Tiap 60s</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Top Stats Grid (Tremor UI-inspired KPI Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
+        <AdminStatCard
           icon={DollarSign}
           label="Pendapatan Hari Ini"
           value={`Rp ${(stats.today.revenue / 1000000).toFixed(1)}jt`}
           subValue={`Kemarin: Rp ${(stats.yesterday.revenue / 1000000).toFixed(1)}jt`}
           trend={revGrowth}
+          badgeText="FINANCE"
         />
-        <StatCard
+        <AdminStatCard
           icon={Ticket}
           label="Tiket Terjual Hari Ini"
           value={stats.today.tickets_sold.toLocaleString('id-ID')}
           subValue={`Kemarin: ${stats.yesterday.tickets_sold} tiket`}
           trend={ticketGrowth}
+          badgeText="SALES"
         />
-        <StatCard
+        <AdminStatCard
           icon={Users}
-          label="Pengunjung Masuk"
-          value={stats.today.visitors_entered.toLocaleString('id-ID')}
-          subValue={`Sisa kuota: ${stats.today.remaining_quota} dari ${stats.today.total_capacity}`}
+          label="Pengunjung Di Dalam Kawasan"
+          value={stats.today.active_visitors.toLocaleString('id-ID')}
+          subValue={`Kapasitas Maks: ${stats.today.total_capacity.toLocaleString('id-ID')}`}
+          progress={quotaUsedPct}
+          badgeText="CROWD"
         />
-        <StatCard
+        <AdminStatCard
           icon={Wallet}
-          label="Top-Up Cashless Wallet"
-          value={`Rp ${(stats.today.wallet_topups / 1000000).toFixed(1)}jt`}
-          subValue={`Transaksi vendor: Rp ${(stats.today.vendor_transactions / 1000000).toFixed(1)}jt`}
+          label="Transaksi Cashless (NFC/QR)"
+          value={`Rp ${(stats.today.cashless_volume / 1000000).toFixed(1)}jt`}
+          subValue={`${stats.today.cashless_tx_count} transaksi merchant`}
+          badgeText="VENUE"
         />
       </div>
 
-      {/* Carrying Capacity Gauge + Hourly Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Carrying Capacity Progress */}
-        <div className="card p-5 lg:col-span-1 bg-zinc-950 border border-zinc-800 rounded-xl">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-zinc-400" />
-              Carrying Capacity
+      {/* Main Chart Section: Hourly Visitors Traffic (Chart.js) */}
+      <div className="card p-5 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+          <div>
+            <h3 className="text-base font-bold text-zinc-100 font-['Outfit'] flex items-center gap-2">
+              <BarChart3 className="w-4.5 h-4.5 text-emerald-500" />
+              <span>Arus Wisatawan Hari Ini (Per Jam)</span>
             </h3>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Powered by Chart.js — Pemantauan pintu masuk & keluar real-time
+            </p>
           </div>
-
-          {/* Circular Progress */}
-          <div className="flex justify-center mb-6">
-            <div className="relative w-32 h-32">
-              <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="#27272a"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke={quotaUsedPct > 85 ? '#ef4444' : quotaUsedPct > 65 ? '#f59e0b' : '#10b981'}
-                  strokeWidth="3"
-                  strokeDasharray={`${quotaUsedPct}, 100`}
-                  strokeLinecap="round"
-                  className="transition-all duration-1000"
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-2xl font-bold text-zinc-100">{quotaUsedPct}%</span>
-                <span className="text-[10px] text-zinc-500">Terisi</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-2.5 text-xs">
-            <div className="flex justify-between items-center text-zinc-500">
-              <span>Kapasitas Harian</span>
-              <span className="text-zinc-100 font-medium">{stats.today.total_capacity.toLocaleString('id-ID')}</span>
-            </div>
-            <div className="flex justify-between items-center text-zinc-500">
-              <span>Sudah Masuk</span>
-              <span className="text-zinc-100 font-medium">{stats.today.visitors_entered.toLocaleString('id-ID')}</span>
-            </div>
-            <div className="flex justify-between items-center text-zinc-500">
-              <span>Sisa Kuota</span>
-              <span className="text-zinc-100 font-medium">{stats.today.remaining_quota.toLocaleString('id-ID')}</span>
-            </div>
-          </div>
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start sm:self-auto">
+            <Activity className="w-3.5 h-3.5" />
+            <span>Live Gate Telemetry</span>
+          </span>
         </div>
 
-        {/* Hourly Visitor Chart */}
-        <div className="card p-5 lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-xl flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-zinc-400" />
-              Traffic Pengunjung Per Jam
-            </h3>
-            <span className="text-[10px] text-zinc-500">Hari ini</span>
-          </div>
-
-          {/* Bar Chart */}
-          <div className="flex items-end gap-2 flex-1 min-h-[160px] mb-4 px-1">
-            {HOURLY_VISITORS.map((h, idx) => {
-              const maxH = Math.max(...HOURLY_VISITORS.map(x => Math.max(x.entered, x.exited)));
-              return (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-1" title={`${h.hour}: Masuk ${h.entered}, Keluar ${h.exited}`}>
-                  <div className="w-full flex gap-1 items-end h-full">
-                    {/* Entered Bar */}
-                    <div
-                      className="flex-1 rounded-sm bg-emerald-500 transition-all duration-500"
-                      style={{ height: `${Math.max(3, (h.entered / maxH) * 100)}%` }}
-                    />
-                    {/* Exited Bar */}
-                    <div
-                      className="flex-1 rounded-sm bg-zinc-700 transition-all duration-500"
-                      style={{ height: `${Math.max(3, (h.exited / maxH) * 100)}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex items-center justify-between px-1 border-t border-zinc-800/50 pt-2">
-            {HOURLY_VISITORS.map((h, idx) => (
-              <span key={idx} className="flex-1 text-center text-[10px] text-zinc-500">{h.hour.split(':')[0]}</span>
-            ))}
-          </div>
-
-          {/* Legend */}
-          <div className="flex items-center gap-4 mt-4 text-xs text-zinc-400">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-sm bg-emerald-500"></div>
-              <span>Masuk</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-sm bg-zinc-700"></div>
-              <span>Keluar</span>
-            </div>
-          </div>
+        <div className="h-64 sm:h-72 w-full">
+          <Bar data={hourlyChartData} options={hourlyChartOptions} />
         </div>
       </div>
 
-      {/* Revenue Chart + Ticket Category Sales */}
+      {/* Revenue Weekly (Chart.js) + Ticket Category Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Weekly Revenue */}
-        <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl">
+        {/* Weekly Revenue Chart.js */}
+        <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-zinc-400" />
-              Pendapatan 7 Hari Terakhir
-            </h3>
-            <span className="text-zinc-100 text-sm font-medium">
-              Rp {(stats.this_month.revenue / 1000000).toFixed(0)}jt <span className="text-zinc-500 text-xs font-normal">bulan ini</span>
-            </span>
+            <div>
+              <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2 font-['Outfit']">
+                <TrendingUp className="w-4 h-4 text-emerald-500" />
+                <span>Pendapatan 7 Hari Terakhir</span>
+              </h3>
+              <p className="text-xs text-zinc-400">
+                Total Bulan Ini: Rp {(stats.this_month.revenue / 1000000).toFixed(0)}jt
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-end gap-3 h-40 px-1 mb-4 border-b border-zinc-800/50 pb-2">
-            {REVENUE_WEEKLY.map((d, idx) => {
-              const maxR = Math.max(...REVENUE_WEEKLY.map(x => x.revenue));
-              return (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-1 h-full" title={`${d.day}: Rp ${d.revenue.toLocaleString('id-ID')}`}>
-                  <div
-                    className="w-full rounded-sm bg-emerald-500 transition-all duration-500 hover:bg-emerald-400 cursor-pointer"
-                    style={{ height: `${Math.max(4, (d.revenue / maxR) * 100)}%` }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex items-center gap-3 px-1">
-            {REVENUE_WEEKLY.map((d, idx) => (
-              <span key={idx} className="flex-1 text-center text-[10px] text-zinc-500">{d.day}</span>
-            ))}
+          <div className="h-48 w-full">
+            <Bar data={revenueChartData} options={revenueChartOptions} />
           </div>
         </div>
 
-        {/* Ticket Category Breakdown */}
-        <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <Ticket className="w-4 h-4 text-zinc-400" />
-              Penjualan Per Kategori
-            </h3>
-            <span className="text-zinc-500 text-[10px]">Bulan ini</span>
-          </div>
+        {/* Ticket Category Breakdown Card */}
+        <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2 font-['Outfit']">
+                <Ticket className="w-4 h-4 text-emerald-500" />
+                <span>Penjualan Per Kategori Tiket</span>
+              </h3>
+              <span className="text-xs text-zinc-500">Persentase & Kuota</span>
+            </div>
 
-          <div className="space-y-4">
-            {TICKET_CATEGORY_SALES.map((cat, idx) => {
-              const colors = ['bg-emerald-500', 'bg-sky-500', 'bg-violet-500', 'bg-amber-500'];
-              return (
+            <div className="space-y-4">
+              {TICKET_CATEGORY_SALES.map((cat, idx) => (
                 <div key={idx}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-zinc-300">{cat.name}</span>
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="text-zinc-500">{cat.sold.toLocaleString('id-ID')} tiket</span>
-                      <span className="text-zinc-100 font-medium">Rp {(cat.revenue / 1000000).toFixed(0)}jt</span>
-                    </div>
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-semibold text-zinc-200">{cat.name}</span>
+                    <span className="text-emerald-400 font-bold">
+                      {cat.sold.toLocaleString('id-ID')} tiket ({cat.percentage}%)
+                    </span>
                   </div>
-                  <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-zinc-900 overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-700 ${colors[idx % colors.length]}`}
+                      className="h-full rounded-full bg-emerald-500 transition-all duration-500"
                       style={{ width: `${cat.percentage}%` }}
                     />
                   </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-6 pt-4 border-t border-zinc-900 flex items-center justify-between text-xs text-zinc-400">
+            <span>Total Kategori Terdaftar: 4 Kategori</span>
+            <span className="text-emerald-400 font-medium">100% Validasi Aktif</span>
           </div>
         </div>
       </div>
 
-      {/* Gate Scanner Status + Recent Transactions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Gate Scanner Status */}
-        <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-zinc-400" />
-              Status Gate Scanner
-            </h3>
+      {/* TanStack React Table: Recent Transactions */}
+      <DataTable
+        data={RECENT_TRANSACTIONS}
+        columns={transactionColumns}
+        title="Riwayat Transaksi & Pembelian Terbaru"
+        subtitle="Dukungan sorting, filtering, & pagination oleh TanStack React Table v8"
+        defaultPageSize={5}
+        searchPlaceholder="Cari wisatawan, ID transaksi, atau status..."
+      />
+
+      {/* TanStack React Table: Gate Scan Stats */}
+      <DataTable
+        data={GATE_SCAN_STATS}
+        columns={gateColumns}
+        title="Performa & Terminal Pemindai Gerbang (Gates)"
+        subtitle="Status pemindai e-Ticket & gelang NFC secara waktu nyata"
+        defaultPageSize={5}
+        searchPlaceholder="Cari nama gerbang atau status..."
+      />
+
+      {/* System Health / Alerts Footer Card */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="card p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-start gap-3">
+          <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+            <ShieldCheck className="w-4.5 h-4.5 text-emerald-400" />
           </div>
-          <div className="space-y-3">
-            {GATE_SCAN_STATS.map((gate, idx) => (
-              <div key={idx} className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-zinc-300">{gate.device}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full ${gate.status === 'online' ? 'bg-emerald-500' : 'bg-zinc-600'}`}></span>
-                    <span className="text-[10px] text-zinc-500 capitalize">{gate.status}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1 border-t border-zinc-800">
-                  <span>Total: <span className="text-zinc-300">{gate.scans_today}</span></span>
-                  <span>Valid: <span className="text-zinc-300">{gate.valid}</span></span>
-                  <span>Invalid: <span className="text-zinc-300">{gate.invalid}</span></span>
-                </div>
-              </div>
-            ))}
+          <div>
+            <div className="text-xs font-bold text-zinc-100">
+              Sistem Keamanan & Enkripsi TOTP Normal
+            </div>
+            <p className="text-[11px] text-zinc-400 mt-0.5">
+              Seluruh gerbang e-Ticket Bromo & Rinjani terhubung dengan enkripsi HMAC SHA-256. Sinkronisasi offline-first bekerja optimal.
+            </p>
           </div>
         </div>
 
-        {/* Recent Transactions */}
-        <div className="card p-5 lg:col-span-2 bg-zinc-950 border border-zinc-800 rounded-xl">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-zinc-400" />
-              Transaksi Terbaru
-            </h3>
-            <button className="text-[10px] text-zinc-400 hover:text-zinc-100 flex items-center gap-1.5 transition-colors">
-              <RefreshCw className="w-3.5 h-3.5" /> Refresh
-            </button>
+        <div className="card p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-start gap-3">
+          <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+            <RefreshCw className="w-4.5 h-4.5 text-emerald-400" />
           </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-zinc-500 border-b border-zinc-800">
-                  <th className="py-2 text-left font-medium">Order</th>
-                  <th className="py-2 text-left font-medium">Pengunjung</th>
-                  <th className="py-2 text-left font-medium hidden sm:table-cell">Kategori</th>
-                  <th className="py-2 text-right font-medium">Jumlah</th>
-                  <th className="py-2 text-center font-medium">Status</th>
-                  <th className="py-2 text-right font-medium hidden md:table-cell">Waktu</th>
-                </tr>
-              </thead>
-              <tbody>
-                {RECENT_TRANSACTIONS.map((trx) => (
-                  <tr key={trx.id} className="border-b border-zinc-800/50 hover:bg-zinc-900 transition-colors">
-                    <td className="py-3 text-zinc-400 font-mono text-[10px]">{trx.code}</td>
-                    <td className="py-3 text-zinc-200">{trx.visitor}</td>
-                    <td className="py-3 text-zinc-500 hidden sm:table-cell">{trx.category}</td>
-                    <td className="py-3 text-right text-zinc-100 font-medium">Rp {trx.amount.toLocaleString('id-ID')}</td>
-                    <td className="py-3 text-center">
-                      <span className={`px-2 py-1 rounded-md text-[10px] font-medium ${
-                        trx.status === 'paid'
-                          ? 'text-emerald-500 bg-emerald-500/10'
-                          : 'text-zinc-400 bg-zinc-800'
-                      }`}>
-                        {trx.status === 'paid' ? 'Lunas' : 'Refund'}
-                      </span>
-                    </td>
-                    <td className="py-3 text-right text-zinc-500 hidden md:table-cell">{trx.time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      {/* Monthly Summary */}
-      <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-zinc-100 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-zinc-400" />
-            Ringkasan Bulan Ini
-          </h3>
-          <span className="text-[10px] text-zinc-500">Juli 2026</span>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 text-center">
-            <div className="text-xl font-semibold text-zinc-100">Rp {(stats.this_month.revenue / 1000000).toFixed(0)}jt</div>
-            <div className="text-[10px] text-zinc-500 mt-1">Total Revenue</div>
-          </div>
-          <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 text-center">
-            <div className="text-xl font-semibold text-zinc-100">{stats.this_month.tickets_sold.toLocaleString('id-ID')}</div>
-            <div className="text-[10px] text-zinc-500 mt-1">Tiket Terjual</div>
-          </div>
-          <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 text-center">
-            <div className="text-xl font-semibold text-zinc-100">{stats.this_month.avg_daily_visitors}</div>
-            <div className="text-[10px] text-zinc-500 mt-1">Rata-Rata Harian</div>
-          </div>
-          <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-800 text-center">
-            <div className="text-xl font-semibold text-zinc-100">Rp {(stats.this_month.payout_settled / 1000000).toFixed(0)}jt</div>
-            <div className="text-[10px] text-zinc-500 mt-1">Payout Dicairkan</div>
+          <div>
+            <div className="text-xs font-bold text-zinc-100">
+              Sinkronisasi Merchant NFC & QR Aktif
+            </div>
+            <p className="text-[11px] text-zinc-400 mt-0.5">
+              12 booth tenant F&B & merchandise di posko pengawasan melaporkan latensi transaksi di bawah 250 milidetik.
+            </p>
           </div>
         </div>
       </div>

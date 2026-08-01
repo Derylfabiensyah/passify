@@ -1,54 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
-  Landmark, TrendingUp, DollarSign, Download, Filter, Calendar,
-  CheckCircle2, Clock, AlertCircle, ArrowUpRight, ArrowDownRight,
-  BarChart3, PieChart, Wallet, CreditCard, Banknote, FileText, Search
+  Landmark,
+  TrendingUp,
+  DollarSign,
+  Download,
+  Filter,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+  BarChart3,
+  Wallet,
+  CreditCard,
+  Banknote,
+  FileText
 } from 'lucide-react';
-import { DASHBOARD_STATS, REVENUE_WEEKLY, PAYOUT_HISTORY, TICKET_CATEGORY_SALES } from '../../data/adminData';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
 
-function StatCard({ icon: Icon, label, value, subLabel }) {
-  return (
-    <div className="card p-5 border border-zinc-800">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-zinc-800">
-          <Icon className="w-5 h-5 text-emerald-500" />
-        </div>
-        <span className="text-xs text-zinc-400">{label}</span>
-      </div>
-      <div className="text-2xl font-semibold text-zinc-100">{value}</div>
-      {subLabel && <div className="text-[10px] text-zinc-500 mt-1">{subLabel}</div>}
-    </div>
-  );
-}
+import AdminStatCard from '../../components/admin/AdminStatCard';
+import DataTable from '../../components/admin/DataTable';
+import {
+  DASHBOARD_STATS,
+  REVENUE_WEEKLY,
+  PAYOUT_HISTORY,
+  TICKET_CATEGORY_SALES
+} from '../../data/adminData';
 
-function PayoutRow({ payout }) {
-  const statusConfig = {
-    settled: { label: 'Dicairkan', icon: CheckCircle2, text: 'text-emerald-500' },
-    pending: { label: 'Menunggu', icon: Clock, text: 'text-zinc-400' },
-    failed: { label: 'Gagal', icon: AlertCircle, text: 'text-zinc-400' },
-  };
-  const cfg = statusConfig[payout.status] || statusConfig.pending;
-  const StatusIcon = cfg.icon;
-
-  return (
-    <tr className="border-b border-zinc-800 hover:bg-zinc-900/50 transition-colors">
-      <td className="py-3.5 text-sm text-zinc-100 font-medium">{payout.period}</td>
-      <td className="py-3.5 text-sm text-right text-zinc-300">Rp {payout.gross.toLocaleString('id-ID')}</td>
-      <td className="py-3.5 text-sm text-right text-zinc-400">-Rp {payout.platform_fee.toLocaleString('id-ID')}</td>
-      <td className="py-3.5 text-sm text-right text-zinc-100 font-semibold">Rp {payout.net_payout.toLocaleString('id-ID')}</td>
-      <td className="py-3.5 text-center">
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-zinc-900 border border-zinc-800 ${cfg.text}`}>
-          <StatusIcon className="w-3 h-3" />
-          {cfg.label}
-        </span>
-      </td>
-      <td className="py-3.5 text-xs text-zinc-400">{payout.bank}</td>
-      <td className="py-3.5 text-xs text-zinc-500">
-        {payout.settled_at ? new Date(payout.settled_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
-      </td>
-    </tr>
-  );
-}
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 export default function FinancePage() {
   const stats = DASHBOARD_STATS;
@@ -56,234 +56,260 @@ export default function FinancePage() {
 
   const totalPayout = PAYOUT_HISTORY.reduce((sum, p) => sum + p.net_payout, 0);
   const totalFee = PAYOUT_HISTORY.reduce((sum, p) => sum + p.platform_fee, 0);
-  const pendingPayout = PAYOUT_HISTORY.filter(p => p.status === 'pending').reduce((sum, p) => sum + p.net_payout, 0);
-  const platformFeePct = ((totalFee / PAYOUT_HISTORY.reduce((s, p) => s + p.gross, 0)) * 100).toFixed(1);
+  const pendingPayout = PAYOUT_HISTORY.filter((p) => p.status === 'pending').reduce(
+    (sum, p) => sum + p.net_payout,
+    0
+  );
+
+  // ─── Chart.js: Weekly Revenue & Payout Analysis ────────────────
+  const financeChartData = {
+    labels: REVENUE_WEEKLY.map((r) => r.day),
+    datasets: [
+      {
+        label: 'Pendapatan Kotor (Gross)',
+        data: REVENUE_WEEKLY.map((r) => r.revenue),
+        backgroundColor: '#10b981',
+        hoverBackgroundColor: '#34d399',
+        borderRadius: 4
+      },
+      {
+        label: 'Net Payout Pengelola (95%)',
+        data: REVENUE_WEEKLY.map((r) => Math.round(r.revenue * 0.95)),
+        backgroundColor: '#27272a',
+        hoverBackgroundColor: '#3f3f46',
+        borderRadius: 4
+      }
+    ]
+  };
+
+  const financeChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        align: 'end',
+        labels: { color: '#a1a1aa', font: { size: 11, family: 'Outfit' } }
+      },
+      tooltip: {
+        backgroundColor: '#18181b',
+        titleColor: '#f4f4f5',
+        bodyColor: '#d4d4d8',
+        borderColor: '#27272a',
+        borderWidth: 1,
+        padding: 10,
+        callbacks: {
+          label: (context) => `Rp ${Number(context.raw).toLocaleString('id-ID')}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: '#71717a', font: { size: 10 } }
+      },
+      y: {
+        grid: { color: '#27272a' },
+        ticks: {
+          color: '#71717a',
+          font: { size: 10 },
+          callback: (val) => `Rp ${(val / 1000000).toFixed(0)}jt`
+        }
+      }
+    }
+  };
+
+  // ─── TanStack React Table: Payout History Columns ──────────────
+  const payoutColumns = useMemo(
+    () => [
+      {
+        accessorKey: 'period',
+        header: 'Periode Settlement',
+        cell: (info) => (
+          <span className="font-bold text-zinc-200">{info.getValue()}</span>
+        )
+      },
+      {
+        accessorKey: 'gross',
+        header: 'Pendapatan Kotor',
+        cell: (info) => (
+          <span className="text-zinc-300">
+            Rp {info.getValue().toLocaleString('id-ID')}
+          </span>
+        )
+      },
+      {
+        accessorKey: 'platform_fee',
+        header: 'Biaya Platform (5%)',
+        cell: (info) => (
+          <span className="text-rose-400 font-mono">
+            -Rp {info.getValue().toLocaleString('id-ID')}
+          </span>
+        )
+      },
+      {
+        accessorKey: 'net_payout',
+        header: 'Pencairan Bersih (Net)',
+        cell: (info) => (
+          <span className="font-bold text-emerald-400 font-['Outfit'] text-sm">
+            Rp {info.getValue().toLocaleString('id-ID')}
+          </span>
+        )
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: (info) => {
+          const status = info.getValue();
+          const cfg =
+            status === 'settled'
+              ? {
+                  label: 'Dicairkan',
+                  cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                }
+              : status === 'pending'
+              ? {
+                  label: 'Menunggu',
+                  cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                }
+              : {
+                  label: 'Gagal',
+                  cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                };
+
+          return (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${cfg.cls}`}
+            >
+              <span className="status-dot" />
+              <span>{cfg.label}</span>
+            </span>
+          );
+        }
+      },
+      {
+        accessorKey: 'bank',
+        header: 'Rekening Tujuan',
+        cell: (info) => (
+          <span className="text-zinc-400 text-xs font-mono">
+            {info.getValue()}
+          </span>
+        )
+      },
+      {
+        accessorKey: 'settled_at',
+        header: 'Tanggal Cair',
+        cell: (info) => {
+          const val = info.getValue();
+          return (
+            <span className="text-zinc-500 text-xs">
+              {val
+                ? new Date(val).toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric'
+                  })
+                : '-'}
+            </span>
+          );
+        }
+      }
+    ],
+    []
+  );
 
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
         <div>
-          <h2 className="text-xl font-bold text-zinc-100">Laporan Keuangan & Payout</h2>
-          <p className="text-xs text-zinc-400 mt-1">Ringkasan pendapatan, biaya platform, dan status pencairan dana</p>
+          <div className="text-xs text-emerald-500 uppercase tracking-widest font-semibold flex items-center gap-2 mb-1">
+            <span className="status-dot" />
+            <span>Passify Finance Engine • Tremor UI & Chart.js Powered</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 font-['Outfit']">
+            Keuangan & Pencairan Dana (Settlement)
+          </h1>
         </div>
+
         <div className="flex items-center gap-2">
-          {['week', 'month', 'quarter'].map((range) => (
-            <button
-              key={range}
-              onClick={() => setDateRange(range)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                dateRange === range ? 'bg-zinc-700 text-zinc-100' : 'bg-transparent text-zinc-400 border border-zinc-800 hover:bg-zinc-800'
-              }`}
-            >
-              {range === 'week' ? 'Minggu Ini' : range === 'month' ? 'Bulan Ini' : 'Kuartal'}
-            </button>
-          ))}
-          <button className="px-3 py-1.5 rounded-lg text-xs font-medium bg-transparent text-zinc-400 border border-zinc-800 hover:bg-zinc-800 hover:text-zinc-100 transition-colors flex items-center gap-1.5">
-            <Download className="w-3.5 h-3.5" /> Export CSV
+          <button className="btn-secondary btn-sm">
+            <Download className="w-4 h-4" />
+            <span>Ekspor CSV / PDF</span>
           </button>
         </div>
       </div>
 
-      {/* Summary Stats */}
+      {/* KPI Cards (Tremor UI style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          icon={DollarSign}
-          label="Total Pendapatan Gross"
+        <AdminStatCard
+          icon={Landmark}
+          label="Total Dicairkan (YTD)"
+          value={`Rp ${(totalPayout / 1000000).toFixed(1)}jt`}
+          subValue="Settlement ke rekening bank pengelola"
+          badgeText="SETTLED"
+        />
+        <AdminStatCard
+          icon={Wallet}
+          label="Pendapatan Bulan Ini"
           value={`Rp ${(stats.this_month.revenue / 1000000).toFixed(0)}jt`}
-          subLabel={`${stats.this_month.tickets_sold.toLocaleString('id-ID')} tiket terjual`}
+          subValue="Sebelum dipotong biaya platform"
+          trend={14}
+          badgeText="GROSS"
         />
-        <StatCard
-          icon={Banknote}
-          label="Total Payout Dicairkan"
-          value={`Rp ${(stats.this_month.payout_settled / 1000000).toFixed(0)}jt`}
-          subLabel="Setelah dipotong platform fee"
-        />
-        <StatCard
+        <AdminStatCard
           icon={Clock}
-          label="Payout Pending"
+          label="Menunggu Settlement"
           value={`Rp ${(pendingPayout / 1000000).toFixed(1)}jt`}
-          subLabel="Pencairan periode berjalan"
+          subValue="Pencairan otomatis H+1 jam 06:00 WIB"
+          badgeText="PENDING"
         />
-        <StatCard
-          icon={CreditCard}
-          label="Platform Fee"
-          value={`${platformFeePct}%`}
-          subLabel={`Total: Rp ${(totalFee / 1000000).toFixed(0)}jt bulan ini`}
+        <AdminStatCard
+          icon={TrendingUp}
+          label="Biaya Platform (5%)"
+          value={`Rp ${(totalFee / 1000000).toFixed(1)}jt`}
+          subValue="Untuk infrastruktur server, SMS, & NFC"
+          badgeText="FEE"
         />
       </div>
 
-      {/* Revenue Breakdown Chart + Category Sales */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Revenue Bar Chart */}
-        <div className="card p-5 border border-zinc-800">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-emerald-500" />
-              Grafik Pendapatan Mingguan
-            </h3>
-          </div>
-
-          <div className="flex items-end gap-3 h-36 px-1 mb-3">
-            {REVENUE_WEEKLY.map((d, idx) => {
-              const maxR = Math.max(...REVENUE_WEEKLY.map(x => x.revenue));
-              return (
-                <div key={idx} className="flex-1 flex flex-col items-center gap-1 group cursor-pointer" title={`${d.day}: Rp ${d.revenue.toLocaleString('id-ID')}`}>
-                  <span className="text-[9px] text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                    Rp {(d.revenue / 1000000).toFixed(0)}jt
-                  </span>
-                  <div
-                    className="w-full rounded-t-md bg-emerald-500"
-                    style={{ height: `${Math.max(8, (d.revenue / maxR) * 100)}%` }}
-                  />
-                </div>
-              );
-            })}
-          </div>
-          <div className="flex items-center gap-3 px-1">
-            {REVENUE_WEEKLY.map((d, idx) => (
-              <span key={idx} className="flex-1 text-center text-[10px] text-zinc-500 font-medium">{d.day}</span>
-            ))}
-          </div>
-        </div>
-
-        {/* Revenue by Category */}
-        <div className="card p-5 border border-zinc-800">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
-              <PieChart className="w-4 h-4 text-emerald-500" />
-              Revenue Per Kategori Tiket
-            </h3>
-          </div>
-
-          <div className="space-y-3">
-            {TICKET_CATEGORY_SALES.map((cat, idx) => {
-              return (
-                <div key={idx}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-zinc-300 font-medium">{cat.name}</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-xs">
-                      <span className="text-zinc-500">{cat.sold.toLocaleString('id-ID')} tiket</span>
-                      <span className="text-zinc-100 font-semibold">Rp {(cat.revenue / 1000000).toFixed(0)}jt</span>
-                      <span className="text-zinc-400">{cat.percentage}%</span>
-                    </div>
-                  </div>
-                  <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-emerald-500 rounded-full"
-                      style={{ width: `${cat.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Total Summary */}
-          <div className="mt-4 pt-3 border-t border-zinc-800">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-zinc-400 font-medium">Total Revenue Bulan Ini</span>
-              <span className="text-zinc-100 font-bold text-lg">
-                Rp {(TICKET_CATEGORY_SALES.reduce((s, c) => s + c.revenue, 0) / 1000000).toFixed(0)}jt
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Fee Breakdown */}
-      <div className="card p-5 border border-zinc-800">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
-            <FileText className="w-4 h-4 text-emerald-500" />
-            Rincian Biaya Platform
-          </h3>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800">
-            <div className="text-xs text-zinc-400 mb-1">Gross Revenue</div>
-            <div className="text-xl font-bold text-zinc-100">
-              Rp {(PAYOUT_HISTORY.reduce((s, p) => s + p.gross, 0) / 1000000).toFixed(0)}jt
-            </div>
-            <div className="text-[10px] text-zinc-500 mt-0.5">Total penjualan tiket sebelum potongan</div>
-          </div>
-          <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800">
-            <div className="text-xs text-zinc-400 mb-1">Platform Fee ({platformFeePct}%)</div>
-            <div className="text-xl font-bold text-zinc-400">
-              -Rp {(totalFee / 1000000).toFixed(0)}jt
-            </div>
-            <div className="text-[10px] text-zinc-500 mt-0.5">Biaya SaaS Passify, termasuk Payment Gateway</div>
-          </div>
-          <div className="p-4 rounded-xl bg-zinc-900 border border-zinc-800">
-            <div className="text-xs text-emerald-500 mb-1">Net Payout (Diterima Pengelola)</div>
-            <div className="text-xl font-bold text-emerald-500">
-              Rp {(totalPayout / 1000000).toFixed(0)}jt
-            </div>
-            <div className="text-[10px] text-zinc-500 mt-0.5">Total yang sudah + akan dicairkan ke rekening</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Payout History Table */}
-      <div className="card p-5 border border-zinc-800">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
-            <Landmark className="w-4 h-4 text-emerald-500" />
-            Riwayat Payout (Pencairan Dana)
-          </h3>
-          <span className="text-[10px] text-zinc-500">Pencairan otomatis setiap Senin</span>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="text-zinc-500 border-b border-zinc-800">
-                <th className="py-2.5 text-left font-medium">Periode</th>
-                <th className="py-2.5 text-right font-medium">Gross</th>
-                <th className="py-2.5 text-right font-medium">Platform Fee</th>
-                <th className="py-2.5 text-right font-medium">Net Payout</th>
-                <th className="py-2.5 text-center font-medium">Status</th>
-                <th className="py-2.5 text-left font-medium">Rekening</th>
-                <th className="py-2.5 text-left font-medium">Tanggal Cair</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PAYOUT_HISTORY.map((payout) => (
-                <PayoutRow key={payout.id} payout={payout} />
-              ))}
-            </tbody>
-            <tfoot>
-              <tr className="border-t border-zinc-800">
-                <td className="py-3 text-sm font-semibold text-zinc-100">Total</td>
-                <td className="py-3 text-sm text-right text-zinc-300 font-semibold">
-                  Rp {PAYOUT_HISTORY.reduce((s, p) => s + p.gross, 0).toLocaleString('id-ID')}
-                </td>
-                <td className="py-3 text-sm text-right text-zinc-400 font-semibold">
-                  -Rp {totalFee.toLocaleString('id-ID')}
-                </td>
-                <td className="py-3 text-sm text-right text-emerald-500 font-bold">
-                  Rp {totalPayout.toLocaleString('id-ID')}
-                </td>
-                <td colSpan="3"></td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      </div>
-
-      {/* Bank Account Info */}
-      <div className="card p-4 border border-zinc-800 bg-zinc-900/50">
-        <div className="flex items-start gap-3">
-          <Wallet className="w-5 h-5 text-zinc-400 flex-shrink-0 mt-0.5" />
+      {/* Chart.js Section: Gross vs Net Payout */}
+      <div className="card p-5 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
-            <h4 className="text-sm font-bold text-zinc-100 mb-1">Rekening Pencairan</h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Dana akan dicairkan secara otomatis setiap hari Senin ke rekening: <strong className="text-zinc-100">BCA - ****4821</strong> a.n. <strong className="text-zinc-100">Dinas Pariwisata Kab. Probolinggo</strong>.
-              Hubungi support Passify untuk mengubah informasi rekening.
+            <h3 className="text-base font-bold text-zinc-100 font-['Outfit'] flex items-center gap-2">
+              <BarChart3 className="w-4.5 h-4.5 text-emerald-500" />
+              <span>Analisis Pendapatan vs Pencairan Bersih (7 Hari Terakhir)</span>
+            </h3>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Powered by Chart.js — Rekonsiliasi gross revenue dan net payout (95%)
             </p>
           </div>
+        </div>
+
+        <div className="h-64 sm:h-72 w-full">
+          <Bar data={financeChartData} options={financeChartOptions} />
+        </div>
+      </div>
+
+      {/* TanStack React Table: Payout History */}
+      <DataTable
+        data={PAYOUT_HISTORY}
+        columns={payoutColumns}
+        title="Riwayat Pencairan Dana (Payout Settlement History)"
+        subtitle="Dukungan sorting, searching, & pagination oleh TanStack React Table v8"
+        defaultPageSize={5}
+        searchPlaceholder="Cari periode, nama bank, atau status..."
+      />
+
+      {/* Payout Schedule Policy Banner */}
+      <div className="card p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-start gap-3">
+        <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+          <FileText className="w-4.5 h-4.5 text-emerald-400" />
+        </div>
+        <div className="text-xs text-zinc-400 leading-relaxed">
+          <strong className="text-zinc-200">Kebijakan Automated Settlement (H+1):</strong>{' '}
+          Semua pendapatan tiket masuk dan transaksi Cashless Venue (NFC & QR) direkonsiliasi setiap pukul 23:59 WIB dan dicairkan secara otomatis ke rekening Bank Mandiri / BCA pengelola pada pukul 06:00 WIB hari berikutnya tanpa potongan biaya antarbank.
         </div>
       </div>
     </div>

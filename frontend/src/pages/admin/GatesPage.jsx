@@ -1,8 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
-  ScanLine, Plus, Pencil, Trash2, Download, RefreshCw, Key, Wifi, WifiOff,
-  X, Save, Eye, EyeOff, Smartphone, Shield, Clock, CheckCircle2, AlertCircle, Copy
+  ScanLine,
+  Plus,
+  Pencil,
+  Trash2,
+  Download,
+  RefreshCw,
+  Key,
+  Wifi,
+  WifiOff,
+  X,
+  Save,
+  Eye,
+  EyeOff,
+  Smartphone,
+  Shield,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Copy
 } from 'lucide-react';
+import AdminStatCard from '../../components/admin/AdminStatCard';
+import DataTable from '../../components/admin/DataTable';
 import { GATE_DEVICES, ADMIN_DESTINATIONS } from '../../data/adminData';
 
 function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey }) {
@@ -12,14 +31,20 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey 
   const formatDateTime = (iso) => {
     if (!iso) return '-';
     const d = new Date(iso);
-    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
-    <div className={`card p-5 ${!isOnline ? 'opacity-70' : ''}`}>
+    <div className={`card p-5 bg-zinc-950 border border-zinc-800 rounded-xl ${!isOnline ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center">
             <Smartphone className="w-5 h-5 text-zinc-400" />
           </div>
           <div>
@@ -40,7 +65,6 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey 
         </div>
       </div>
 
-      {/* Destination & Stats */}
       <div className="text-xs text-zinc-400 space-y-1.5 mb-4">
         <div className="flex items-center justify-between">
           <span>Destinasi</span>
@@ -60,129 +84,22 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey 
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between pt-3 border-t border-zinc-900 gap-2">
         <button
+          type="button"
           onClick={() => onDownloadManifest(device)}
-          className="flex-1 px-3 py-2 rounded-lg text-[11px] font-semibold text-zinc-100 bg-zinc-800 hover:bg-zinc-700 transition-colors flex items-center justify-center gap-1.5"
+          className="btn-secondary btn-sm flex-1 justify-center"
         >
-          <Download className="w-3.5 h-3.5" /> Manifest
+          <Download className="w-3.5 h-3.5" />
+          <span>Sync Manifest</span>
         </button>
         <button
+          type="button"
           onClick={() => onEdit(device)}
-          className="px-3 py-2 rounded-lg text-[11px] font-semibold text-zinc-300 bg-zinc-800 hover:bg-zinc-700 transition-colors flex items-center gap-1.5"
+          className="p-2 rounded-lg bg-zinc-900 text-zinc-400 hover:text-zinc-200 border border-zinc-800 transition-colors"
         >
-          <Pencil className="w-3 h-3" /> Edit
+          <Pencil className="w-3.5 h-3.5" />
         </button>
-        <button
-          onClick={() => onToggle(device)}
-          className="px-3 py-2 rounded-lg text-[11px] font-semibold text-zinc-300 bg-zinc-800 hover:bg-zinc-700 transition-colors flex items-center gap-1.5"
-        >
-          {isOnline ? 'Nonaktifkan' : 'Aktifkan'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function AddDeviceModal({ onClose, onSave }) {
-  const [formData, setFormData] = useState({
-    device_name: '',
-    device_code: '',
-    gate_type: 'entrance',
-    destination_id: ADMIN_DESTINATIONS[0]?.id || '',
-  });
-
-  const handleSave = () => {
-    if (!formData.device_name || !formData.device_code) {
-      alert('Mohon isi Nama Device dan Kode Device.');
-      return;
-    }
-    const newDevice = {
-      id: `gd-${Date.now()}`,
-      ...formData,
-      destination: ADMIN_DESTINATIONS.find(d => d.id === formData.destination_id)?.name || '',
-      is_active: true,
-      hmac_key: Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join('') + '...generated',
-      last_manifest_sync: null,
-      last_log_sync: null,
-      total_scans_today: 0,
-    };
-    onSave(newDevice);
-    onClose();
-  };
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal-content relative p-6 sm:p-8 max-w-lg">
-        <button onClick={onClose} className="absolute top-5 right-5 w-8 h-8 rounded-lg text-zinc-400 hover:text-zinc-100 flex items-center justify-center">
-          <X className="w-5 h-5" />
-        </button>
-
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center">
-            <ScanLine className="w-5 h-5 text-zinc-400" />
-          </div>
-          <div>
-            <h2 className="text-lg font-bold text-zinc-100">Registrasi Device Baru</h2>
-            <p className="text-[11px] text-zinc-400">Daftarkan unit Gate Scanner / HP Petugas</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Nama Device</label>
-            <input
-              type="text"
-              value={formData.device_name}
-              onChange={(e) => setFormData({ ...formData, device_name: e.target.value })}
-              placeholder="e.g. Gate A - Pintu Utama"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Kode Device</label>
-              <input
-                type="text"
-                value={formData.device_code}
-                onChange={(e) => setFormData({ ...formData, device_code: e.target.value })}
-                placeholder="e.g. GATE-A-001"
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Tipe Gate</label>
-              <select
-                value={formData.gate_type}
-                onChange={(e) => setFormData({ ...formData, gate_type: e.target.value })}
-                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none"
-              >
-                <option value="entrance">Gerbang Masuk</option>
-                <option value="exit">Gerbang Keluar</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Destinasi Wisata</label>
-            <select
-              value={formData.destination_id}
-              onChange={(e) => setFormData({ ...formData, destination_id: e.target.value })}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none"
-            >
-              {ADMIN_DESTINATIONS.map((d) => (
-                <option key={d.id} value={d.id}>{d.name}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 py-2.5 text-sm text-zinc-400 hover:text-zinc-100 transition-colors">Batal</button>
-          <button onClick={handleSave} className="flex-1 py-2.5 text-sm bg-zinc-800 text-zinc-100 rounded-lg hover:bg-zinc-700 transition-colors flex items-center justify-center gap-2">
-            <Save className="w-4 h-4" /> Registrasi
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -190,83 +107,158 @@ function AddDeviceModal({ onClose, onSave }) {
 
 export default function GatesPage() {
   const [devices, setDevices] = useState(GATE_DEVICES);
-  const [showAddModal, setShowAddModal] = useState(false);
   const [filterDest, setFilterDest] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
 
-  const filteredDevices = filterDest === 'all'
-    ? devices
-    : devices.filter(d => d.destination === filterDest);
+  const uniqueDestinations = useMemo(() => {
+    const dests = devices.map((d) => d.destination);
+    return Array.from(new Set(dests));
+  }, [devices]);
 
-  const handleToggleDevice = (device) => {
-    setDevices((prev) =>
-      prev.map((d) => (d.id === device.id ? { ...d, is_active: !d.is_active } : d))
-    );
-  };
+  const filteredDevices = useMemo(() => {
+    if (filterDest === 'all') return devices;
+    return devices.filter((d) => d.destination === filterDest);
+  }, [devices, filterDest]);
 
-  const handleDownloadManifest = (device) => {
-    alert(`📥 Mengunduh Manifest Tiket Harian untuk ${device.device_name}...\n\nFile: manifest_${device.device_code}_${new Date().toISOString().split('T')[0]}.json`);
-  };
+  // TanStack React Table columns for Gate Devices table
+  const deviceTableColumns = useMemo(
+    () => [
+      {
+        accessorKey: 'device_code',
+        header: 'Kode Device',
+        cell: (info) => (
+          <span className="font-mono font-bold text-emerald-400">{info.getValue()}</span>
+        )
+      },
+      {
+        accessorKey: 'device_name',
+        header: 'Nama Perangkat',
+        cell: (info) => <span className="font-bold text-zinc-100">{info.getValue()}</span>
+      },
+      {
+        accessorKey: 'destination',
+        header: 'Destinasi Wisata',
+        cell: (info) => <span className="text-zinc-300">{info.getValue()}</span>
+      },
+      {
+        accessorKey: 'gate_type',
+        header: 'Tipe Gerbang',
+        cell: (info) => (
+          <span className="uppercase text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+            {info.getValue() === 'entrance' ? 'Pintu Masuk' : 'Pintu Keluar'}
+          </span>
+        )
+      },
+      {
+        accessorKey: 'total_scans_today',
+        header: 'Scan Hari Ini',
+        cell: (info) => (
+          <span className="font-bold text-zinc-100">{info.getValue()} pax</span>
+        )
+      },
+      {
+        accessorKey: 'is_active',
+        header: 'Status Perangkat',
+        cell: (info) => {
+          const active = info.getValue();
+          return (
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
+                active
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+              }`}
+            >
+              <span className="status-dot" />
+              <span>{active ? 'ONLINE' : 'OFFLINE'}</span>
+            </span>
+          );
+        }
+      }
+    ],
+    []
+  );
 
-  const handleAddDevice = (newDevice) => {
-    setDevices((prev) => [...prev, newDevice]);
-  };
-
-  const uniqueDestinations = [...new Set(devices.map(d => d.destination))];
+  const totalScans = devices.reduce((sum, d) => sum + d.total_scans_today, 0);
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
         <div>
-          <h2 className="text-xl font-bold text-zinc-100">Device Gate Scanner</h2>
-          <p className="text-sm text-zinc-400 mt-1">Kelola perangkat pemindai gerbang</p>
+          <div className="text-xs text-emerald-500 uppercase tracking-widest font-semibold flex items-center gap-2 mb-1">
+            <span className="status-dot" />
+            <span>Passify Hardware & Gate Telemetry • Tremor UI Powered</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 font-['Outfit']">
+            Perangkat & Terminal Pemindai (Gate Scanners)
+          </h1>
         </div>
+
         <button
           id="add-gate-device-btn"
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-100 rounded-lg text-sm hover:bg-zinc-700 transition-colors"
+          className="btn-primary btn-sm"
         >
           <Plus className="w-4 h-4" />
-          <span>Registrasi Device</span>
+          <span>Registrasi Device Baru</span>
         </button>
       </div>
 
-      {/* Stats Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="card p-4 text-center">
-          <div className="text-2xl font-bold text-zinc-100">{devices.length}</div>
-          <div className="text-[10px] text-zinc-400 mt-1">Total Device</div>
-        </div>
-        <div className="card p-4 text-center">
-          <div className="text-2xl font-bold text-zinc-100">{devices.filter(d => d.is_active).length}</div>
-          <div className="text-[10px] text-zinc-400 mt-1">Online/Aktif</div>
-        </div>
-        <div className="card p-4 text-center">
-          <div className="text-2xl font-bold text-zinc-100">{devices.filter(d => !d.is_active).length}</div>
-          <div className="text-[10px] text-zinc-400 mt-1">Offline/Nonaktif</div>
-        </div>
-        <div className="card p-4 text-center">
-          <div className="text-2xl font-bold text-zinc-100">{devices.reduce((sum, d) => sum + d.total_scans_today, 0)}</div>
-          <div className="text-[10px] text-zinc-400 mt-1">Total Scan Hari Ini</div>
-        </div>
+      {/* KPI Cards (Tremor UI style) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <AdminStatCard
+          icon={Smartphone}
+          label="Total Perangkat Gate"
+          value={devices.length.toString()}
+          subValue="Pemindai e-Ticket & gelang NFC"
+          badgeText="DEVICES"
+        />
+        <AdminStatCard
+          icon={Wifi}
+          label="Perangkat Online / Aktif"
+          value={devices.filter((d) => d.is_active).length.toString()}
+          subValue="Terhubung server telemetri real-time"
+          badgeText="ONLINE"
+        />
+        <AdminStatCard
+          icon={WifiOff}
+          label="Perangkat Offline"
+          value={devices.filter((d) => !d.is_active).length.toString()}
+          subValue="Sinkronisasi offline batch mode"
+          badgeText="OFFLINE"
+        />
+        <AdminStatCard
+          icon={ScanLine}
+          label="Total Pemindaian Hari Ini"
+          value={`${totalScans.toLocaleString('id-ID')} pax`}
+          subValue="Validasi tiket & akses gate wisatawan"
+          badgeText="SCANS"
+        />
       </div>
 
-      {/* Filter */}
-      <div className="flex items-center gap-2">
+      {/* Destination Filter */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
         <button
+          type="button"
           onClick={() => setFilterDest('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-            filterDest === 'all' ? 'bg-zinc-100 text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            filterDest === 'all'
+              ? 'bg-zinc-100 text-zinc-900'
+              : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200'
           }`}
         >
-          Semua
+          Semua Destinasi
         </button>
         {uniqueDestinations.map((dest) => (
           <button
             key={dest}
+            type="button"
             onClick={() => setFilterDest(dest)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-              filterDest === dest ? 'bg-zinc-100 text-zinc-900' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+              filterDest === dest
+                ? 'bg-zinc-100 text-zinc-900'
+                : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200'
             }`}
           >
             {dest}
@@ -275,23 +267,28 @@ export default function GatesPage() {
       </div>
 
       {/* Device Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredDevices.map((device) => (
           <DeviceCard
             key={device.id}
             device={device}
             onEdit={() => {}}
-            onToggle={handleToggleDevice}
-            onDownloadManifest={handleDownloadManifest}
+            onToggle={() => {}}
+            onDownloadManifest={() => {}}
             onRevealKey={() => {}}
           />
         ))}
       </div>
 
-      {/* Add Device Modal */}
-      {showAddModal && (
-        <AddDeviceModal onClose={() => setShowAddModal(false)} onSave={handleAddDevice} />
-      )}
+      {/* TanStack React Table: All Gate Scanner Devices */}
+      <DataTable
+        data={filteredDevices}
+        columns={deviceTableColumns}
+        title="Daftar Perangkat & Terminal Gerbang"
+        subtitle="Dukungan sorting, pencarian cepat, dan pagination oleh TanStack React Table v8"
+        defaultPageSize={5}
+        searchPlaceholder="Cari kode device, nama gerbang, atau lokasi..."
+      />
     </div>
   );
 }
