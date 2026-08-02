@@ -4,20 +4,23 @@
   --font-heading: 'Outfit', sans-serif;
   --font-body: 'Plus Jakarta Sans', sans-serif;
 
-  --bg-base: #0a0a0b;
-  --bg-card: #111113;
-  --bg-elevated: #18181b;
-  --bg-input: #18181b;
+  /* Light Theme — White-Label SaaS */
+  --bg-base: #ffffff;
+  --bg-card: #ffffff;
+  --bg-elevated: #f9fafb;
+  --bg-input: #f3f4f6;
 
-  --border: #27272a;
-  --border-hover: #3f3f46;
+  --border: #e5e7eb;
+  --border-hover: #d1d5db;
 
-  --text-primary: #fafafa;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
 
+  /* Brand accent — configurable per tenant */
   --accent: #10b981;
-  --accent-muted: rgba(16, 185, 129, 0.12);
+  --accent-hover: #059669;
+  --accent-muted: rgba(16, 185, 129, 0.08);
 
   --radius: 10px;
 }
@@ -40,10 +43,10 @@
   }
 
   /* Scrollbar */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg-base); }
-  ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg-elevated); }
+  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
 
   /* Headings */
   h1, h2, h3, h4, h5, h6 {
@@ -68,7 +71,7 @@
 
   /* Nav */
   .nav-bar {
-    background: rgba(10, 10, 11, 0.9);
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
@@ -79,27 +82,27 @@
     background: var(--accent);
     color: #fff;
     font-weight: 600;
-    padding: 0.6rem 1.25rem;
+    padding: 0.55rem 1.25rem;
     border-radius: 8px;
     border: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    transition: opacity 0.15s ease;
+    transition: background 0.15s ease;
     text-decoration: none;
     font-size: 0.875rem;
   }
 
   .btn-primary:hover {
-    opacity: 0.88;
+    background: var(--accent-hover);
   }
 
   .btn-secondary {
     background: transparent;
     color: var(--text-secondary);
     font-weight: 500;
-    padding: 0.6rem 1.25rem;
+    padding: 0.55rem 1.25rem;
     border-radius: 8px;
     border: 1px solid var(--border);
     cursor: pointer;
@@ -125,7 +128,7 @@
   .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(4px);
     z-index: 100;
     display: flex;
@@ -137,11 +140,12 @@
   .modal-content {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     max-width: 560px;
     width: 100%;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
   /* Status dot */

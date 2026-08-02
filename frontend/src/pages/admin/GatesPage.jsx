@@ -41,17 +41,17 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey 
   };
 
   return (
-    <div className={`card p-5 bg-zinc-950 border border-zinc-800 rounded-xl ${!isOnline ? 'opacity-70' : ''}`}>
+    <div className={`card p-5 bg-white border border-gray-200 rounded-xl shadow-2xs ${!isOnline ? 'opacity-70' : ''}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center">
-            <Smartphone className="w-5 h-5 text-zinc-400" />
+          <div className="w-10 h-10 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center">
+            <Smartphone className="w-5 h-5 text-gray-700" />
           </div>
           <div>
-            <h4 className="text-sm font-bold text-zinc-100">{device.device_name}</h4>
+            <h4 className="text-sm font-bold text-gray-900">{device.device_name}</h4>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[10px] text-zinc-500 font-mono">{device.device_code}</span>
-              <span className="text-[10px] font-semibold text-zinc-400">
+              <span className="text-[10px] text-gray-500 font-mono">{device.device_code}</span>
+              <span className="text-[10px] font-semibold text-gray-500">
                 {device.gate_type === 'entrance' ? '• Masuk' : '• Keluar'}
               </span>
             </div>
@@ -59,36 +59,36 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey 
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-semibold text-zinc-400">
+          <span className="text-[10px] font-semibold text-gray-500">
             {isOnline ? '• Online' : '• Offline'}
           </span>
         </div>
       </div>
 
-      <div className="text-xs text-zinc-400 space-y-1.5 mb-4">
+      <div className="text-xs text-gray-600 space-y-1.5 mb-4">
         <div className="flex items-center justify-between">
           <span>Destinasi</span>
-          <span className="text-zinc-100 font-medium">{device.destination}</span>
+          <span className="text-gray-900 font-medium">{device.destination}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Total Scan Hari Ini</span>
-          <span className="text-zinc-100 font-bold">{device.total_scans_today}</span>
+          <span className="text-gray-900 font-bold">{device.total_scans_today}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Manifest Sync Terakhir</span>
-          <span className="text-zinc-100">{formatDateTime(device.last_manifest_sync)}</span>
+          <span className="text-gray-900">{formatDateTime(device.last_manifest_sync)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span>Log Sync Terakhir</span>
-          <span className="text-zinc-100">{formatDateTime(device.last_log_sync)}</span>
+          <span className="text-gray-900">{formatDateTime(device.last_log_sync)}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-3 border-t border-zinc-900 gap-2">
+      <div className="flex items-center justify-between pt-3 border-t border-gray-100 gap-2">
         <button
           type="button"
           onClick={() => onDownloadManifest(device)}
-          className="btn-secondary btn-sm flex-1 justify-center"
+          className="btn-secondary btn-sm flex-1 justify-center shadow-2xs"
         >
           <Download className="w-3.5 h-3.5" />
           <span>Sync Manifest</span>
@@ -96,7 +96,7 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey 
         <button
           type="button"
           onClick={() => onEdit(device)}
-          className="p-2 rounded-lg bg-zinc-900 text-zinc-400 hover:text-zinc-200 border border-zinc-800 transition-colors"
+          className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:text-gray-900 border border-gray-200 transition-colors shadow-xs"
         >
           <Pencil className="w-3.5 h-3.5" />
         </button>
@@ -127,24 +127,24 @@ export default function GatesPage() {
         accessorKey: 'device_code',
         header: 'Kode Device',
         cell: (info) => (
-          <span className="font-mono font-bold text-emerald-400">{info.getValue()}</span>
+          <span className="font-mono font-bold text-emerald-700">{info.getValue()}</span>
         )
       },
       {
         accessorKey: 'device_name',
         header: 'Nama Perangkat',
-        cell: (info) => <span className="font-bold text-zinc-100">{info.getValue()}</span>
+        cell: (info) => <span className="font-bold text-gray-900">{info.getValue()}</span>
       },
       {
         accessorKey: 'destination',
-        header: 'Destinasi Wisata',
-        cell: (info) => <span className="text-zinc-300">{info.getValue()}</span>
+        header: 'Kawasan Wisata',
+        cell: (info) => <span className="text-gray-700 font-medium">{info.getValue()}</span>
       },
       {
         accessorKey: 'gate_type',
         header: 'Tipe Gerbang',
         cell: (info) => (
-          <span className="uppercase text-[10px] font-bold text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+          <span className="uppercase text-[10px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
             {info.getValue() === 'entrance' ? 'Pintu Masuk' : 'Pintu Keluar'}
           </span>
         )
@@ -153,7 +153,7 @@ export default function GatesPage() {
         accessorKey: 'total_scans_today',
         header: 'Scan Hari Ini',
         cell: (info) => (
-          <span className="font-bold text-zinc-100">{info.getValue()} pax</span>
+          <span className="font-bold text-gray-900">{info.getValue()} pax</span>
         )
       },
       {
@@ -165,8 +165,8 @@ export default function GatesPage() {
             <span
               className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                 active
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                  : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  : 'bg-red-50 text-red-800 border-red-200'
               }`}
             >
               <span className="status-dot" />
@@ -184,13 +184,13 @@ export default function GatesPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
-          <div className="text-xs text-emerald-500 uppercase tracking-widest font-semibold flex items-center gap-2 mb-1">
+          <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
             <span className="status-dot" />
-            <span>Passify Hardware & Gate Telemetry • Tremor UI Powered</span>
+            <span>Passify Hardware & Gate Telemetry • White-Label Cloud Engine</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 font-['Outfit']">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
             Perangkat & Terminal Pemindai (Gate Scanners)
           </h1>
         </div>
@@ -198,14 +198,14 @@ export default function GatesPage() {
         <button
           id="add-gate-device-btn"
           onClick={() => setShowAddModal(true)}
-          className="btn-primary btn-sm"
+          className="btn-primary btn-sm shadow-2xs"
         >
           <Plus className="w-4 h-4" />
-          <span>Registrasi Device Baru</span>
+          <span>Registrasi Device Tenant</span>
         </button>
       </div>
 
-      {/* KPI Cards (Tremor UI style) */}
+      {/* KPI Cards (Minimalist style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminStatCard
           icon={Smartphone}
@@ -232,7 +232,7 @@ export default function GatesPage() {
           icon={ScanLine}
           label="Total Pemindaian Hari Ini"
           value={`${totalScans.toLocaleString('id-ID')} pax`}
-          subValue="Validasi tiket & akses gate wisatawan"
+          subValue="Validasi tiket & akses gate pengunjung"
           badgeText="SCANS"
         />
       </div>
@@ -242,23 +242,23 @@ export default function GatesPage() {
         <button
           type="button"
           onClick={() => setFilterDest('all')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+          className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
             filterDest === 'all'
-              ? 'bg-zinc-100 text-zinc-900'
-              : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+              : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50'
           }`}
         >
-          Semua Destinasi
+          Semua Kawasan
         </button>
         {uniqueDestinations.map((dest) => (
           <button
             key={dest}
             type="button"
             onClick={() => setFilterDest(dest)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
               filterDest === dest
-                ? 'bg-zinc-100 text-zinc-900'
-                : 'bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
             {dest}

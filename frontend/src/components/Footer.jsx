@@ -3,28 +3,29 @@ import { Mountain, Heart } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-zinc-800/80 bg-zinc-950/80 py-12 px-4 lg:px-8 text-zinc-400 text-xs">
+    <footer className="border-t border-gray-100 bg-white py-14 px-4 lg:px-8 text-gray-500 text-xs">
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold">
-            <Mountain className="w-5 h-5" />
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center text-white font-bold">
+            <Mountain className="w-3.5 h-3.5" />
           </div>
           <div>
-            <span className="text-zinc-100 font-extrabold text-lg font-['Outfit']">Passify</span>
-            <p className="text-[11px] text-zinc-500">SaaS E-Tiketing & Cashless Wisata Alam Indonesia</p>
+            <span className="text-gray-900 font-bold text-base font-['Outfit'] tracking-tight">Passify</span>
+            <p className="text-[11px] text-gray-400">White-Label Cloud E-Ticketing & Cashless Engine</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 text-zinc-400">
-          <a href="#catalog-section" className="hover:text-emerald-500 transition-colors">Destinasi</a>
-          <a href="#" className="hover:text-emerald-500 transition-colors">Fitur Platform</a>
-          <a href="#" className="hover:text-emerald-500 transition-colors">Dokumentasi API</a>
-          <a href="#" className="hover:text-emerald-500 transition-colors">Privasi & Ketentuan</a>
+        <div className="flex flex-wrap items-center justify-center gap-6 text-gray-500 font-medium">
+          <a href="#catalog-section" className="hover:text-gray-900 transition-colors">Demo Venue</a>
+          <a href="#" className="hover:text-gray-900 transition-colors">Arsitektur Cloud</a>
+          <a href="#" className="hover:text-gray-900 transition-colors">API & SDK Docs</a>
+          <a href="#" className="hover:text-gray-900 transition-colors">Keamanan Offline</a>
+          <a href="#" className="hover:text-gray-900 transition-colors">Kebijakan Privasi</a>
         </div>
 
-        <div className="text-center md:text-right text-[11px] text-zinc-500">
-          © {new Date().getFullYear()} Passify. All rights reserved. <br />
-          Built with <Heart className="w-3 h-3 text-rose-500 inline fill-rose-500" /> for Indonesia Nature Tourism.
+        <div className="text-center md:text-right text-[11px] text-gray-400">
+          © {new Date().getFullYear()} Passify Cloud OS. All rights reserved. <br />
+          Engineered for White-Label Ecotourism & Conservation.
         </div>
       </div>
     </footer>

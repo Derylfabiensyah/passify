@@ -40,7 +40,7 @@ function PublicPortal() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeOrder, setActiveOrder] = useState({
     orderNumber: 'TWA-20260729-8832',
-    destinationName: 'Taman Nasional Gunung Bromo',
+    destinationName: 'Kawasan Konservasi & Wisata Alam Pegunungan',
     visitDate: '2026-08-01',
     timeSlotLabel: 'Sunrise Session (03:00 - 09:00)',
     totalQty: 2,
@@ -80,7 +80,7 @@ function PublicPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-white text-gray-900 flex flex-col selection:bg-emerald-500 selection:text-white">
       <Navbar
         walletBalance={walletBalance}
         onOpenWallet={() => setIsWalletOpen(true)}

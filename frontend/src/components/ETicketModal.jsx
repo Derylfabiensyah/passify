@@ -15,71 +15,71 @@ export default function ETicketModal({ order, onClose }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content card relative p-6 sm:p-8 max-w-md">
+      <div className="modal-content card relative p-6 sm:p-8 max-w-md bg-white border border-gray-200 rounded-2xl shadow-xl w-full">
         {/* Close Button */}
         <button
           id="close-ticket-modal-btn"
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-lg bg-zinc-800 text-slate-400 hover:text-slate-200 flex items-center justify-center transition-colors"
+          className="absolute top-5 right-5 w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 hover:bg-gray-200 flex items-center justify-center transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-zinc-800 text-slate-300 text-sm font-medium mb-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-            <span>E-Ticket Resmi Wisata</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-2 border border-emerald-200">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>E-Ticket Resmi White-Label Passify</span>
           </div>
-          <h2 className="text-xl font-bold text-white">{order.destinationName}</h2>
-          <p className="text-sm text-slate-400">Order #{order.orderNumber}</p>
+          <h2 className="text-xl font-bold text-gray-900 font-['Outfit']">{order.destinationName}</h2>
+          <p className="text-sm text-gray-500">No. Reservasi #{order.orderNumber}</p>
         </div>
 
         {/* Dynamic TOTP QR Code Card */}
-        <div className="bg-zinc-900 p-6 rounded-lg border border-zinc-800 text-center space-y-4">
-          <div className="w-48 h-48 bg-zinc-800 rounded-lg mx-auto flex items-center justify-center relative">
-            <span className="text-slate-400 text-sm">QR Code Placeholder</span>
-            <div className="absolute bottom-2 bg-zinc-900 border border-zinc-700 text-slate-300 text-xs px-2 py-1 rounded font-semibold">
-              TOTP ACTIVE
+        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 text-center space-y-4 shadow-2xs">
+          <div className="w-48 h-48 bg-white border border-gray-200 rounded-xl mx-auto flex items-center justify-center relative shadow-xs">
+            <QrCode className="w-36 h-36 text-gray-900" />
+            <div className="absolute bottom-2 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+              TOTP SECURED
             </div>
           </div>
 
           {/* TOTP Countdown Timer */}
-          <div className="flex items-center justify-center gap-2 text-sm text-slate-300">
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>QR Refresh Otomatis dalam {totpCountdown}s</span>
+          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-gray-700">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span>QR Refresh Otomatis dalam <span className="text-emerald-700 font-bold">{totpCountdown}s</span></span>
           </div>
 
-          <div className="text-sm text-slate-400">
-            Kode Tiket: <strong className="text-slate-200 font-mono">{order.ticketCode}</strong>
+          <div className="text-xs text-gray-500 leading-relaxed">
+            Kode Tiket: <strong className="text-gray-900 font-mono">{order.ticketCode}</strong>
             <br />
-            <span className="text-slate-400">
-              Mode Anti-Pemalsuan (Dukungan Scan Gate Offline-First)
+            <span>
+              Enkripsi HMAC Anti-Duplikasi (Validasi Gerbang Offline)
             </span>
           </div>
         </div>
 
         {/* Details List */}
-        <div className="my-6 p-4 rounded-lg bg-zinc-900 border border-zinc-800 space-y-2 text-sm">
+        <div className="my-6 p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2.5 text-sm shadow-2xs">
           <div className="flex justify-between">
-            <span className="text-slate-400 flex items-center gap-1">
-              <Calendar className="w-4 h-4" /> Tanggal
+            <span className="text-gray-500 flex items-center gap-1 font-medium">
+              <Calendar className="w-4 h-4 text-emerald-600" /> Tanggal Kunjungan
             </span>
-            <span className="text-slate-300 font-semibold">{order.visitDate}</span>
+            <span className="text-gray-900 font-semibold">{order.visitDate}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400 flex items-center gap-1">
-              <Clock className="w-4 h-4" /> Sesi
+            <span className="text-gray-500 flex items-center gap-1 font-medium">
+              <Clock className="w-4 h-4 text-emerald-600" /> Sesi Kunjungan
             </span>
-            <span className="text-slate-300 font-semibold">{order.timeSlotLabel}</span>
+            <span className="text-gray-900 font-semibold">{order.timeSlotLabel}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-slate-400">Pemesan</span>
-            <span className="text-slate-300 font-semibold">{order.visitorName}</span>
+            <span className="text-gray-500 font-medium">Nama Pemesan</span>
+            <span className="text-gray-900 font-semibold">{order.visitorName}</span>
           </div>
-          <div className="flex justify-between pt-3 mt-3 border-t border-zinc-800">
-            <span className="text-slate-400">Total Pembayaran</span>
-            <span className="text-slate-200 font-bold text-base">
+          <div className="flex justify-between pt-3 mt-3 border-t border-gray-200">
+            <span className="text-gray-700 font-semibold">Total Pembayaran</span>
+            <span className="text-gray-900 font-bold text-base font-['Outfit']">
               Rp {order.grandTotal.toLocaleString('id-ID')}
             </span>
           </div>
@@ -88,10 +88,10 @@ export default function ETicketModal({ order, onClose }) {
         {/* Action Button */}
         <button
           onClick={() => alert(`Mengunduh E-Ticket PDF untuk Order #${order.orderNumber}...`)}
-          className="w-full py-3 flex items-center justify-center gap-2 text-sm font-semibold rounded-lg bg-zinc-800 border border-zinc-700 text-slate-300 hover:bg-zinc-700 transition-colors"
+          className="w-full py-3 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-2xs"
         >
-          <Download className="w-4 h-4" />
-          <span>Unduh E-Ticket (PDF)</span>
+          <Download className="w-4 h-4 text-emerald-600" />
+          <span>Unduh Dokumen E-Ticket (PDF)</span>
         </button>
       </div>
     </div>

@@ -73,16 +73,16 @@ export default function DashboardOverview() {
       {
         label: 'Masuk (Entered)',
         data: HOURLY_VISITORS.map((h) => h.entered),
-        backgroundColor: '#10b981', // emerald-500
-        hoverBackgroundColor: '#34d399',
+        backgroundColor: '#059669', // emerald-600
+        hoverBackgroundColor: '#10b981',
         borderRadius: 4,
         barPercentage: 0.7
       },
       {
         label: 'Keluar (Exited)',
         data: HOURLY_VISITORS.map((h) => h.exited),
-        backgroundColor: '#3f3f46', // zinc-700
-        hoverBackgroundColor: '#52525b',
+        backgroundColor: '#d1d5db', // gray-300
+        hoverBackgroundColor: '#9ca3af',
         borderRadius: 4,
         barPercentage: 0.7
       }
@@ -97,17 +97,17 @@ export default function DashboardOverview() {
         position: 'top',
         align: 'end',
         labels: {
-          color: '#a1a1aa', // zinc-400
+          color: '#4b5563', // gray-600
           font: { size: 11, family: 'Outfit' },
           boxWidth: 10,
           usePointStyle: true
         }
       },
       tooltip: {
-        backgroundColor: '#18181b', // zinc-900
-        titleColor: '#f4f4f5',
-        bodyColor: '#d4d4d8',
-        borderColor: '#27272a',
+        backgroundColor: '#ffffff',
+        titleColor: '#111827',
+        bodyColor: '#374151',
+        borderColor: '#e5e7eb',
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8
@@ -116,11 +116,11 @@ export default function DashboardOverview() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#71717a', font: { size: 10 } }
+        ticks: { color: '#6b7280', font: { size: 10 } }
       },
       y: {
-        grid: { color: '#27272a' },
-        ticks: { color: '#71717a', font: { size: 10 } }
+        grid: { color: '#f3f4f6' },
+        ticks: { color: '#6b7280', font: { size: 10 } }
       }
     }
   };
@@ -132,8 +132,8 @@ export default function DashboardOverview() {
       {
         label: 'Pendapatan (Rp)',
         data: REVENUE_WEEKLY.map((d) => d.revenue),
-        backgroundColor: '#10b981',
-        hoverBackgroundColor: '#34d399',
+        backgroundColor: '#059669',
+        hoverBackgroundColor: '#10b981',
         borderRadius: 6
       }
     ]
@@ -145,10 +145,10 @@ export default function DashboardOverview() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#18181b',
-        titleColor: '#f4f4f5',
-        bodyColor: '#d4d4d8',
-        borderColor: '#27272a',
+        backgroundColor: '#ffffff',
+        titleColor: '#111827',
+        bodyColor: '#374151',
+        borderColor: '#e5e7eb',
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8,
@@ -162,12 +162,12 @@ export default function DashboardOverview() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#71717a', font: { size: 10 } }
+        ticks: { color: '#6b7280', font: { size: 10 } }
       },
       y: {
-        grid: { color: '#27272a' },
+        grid: { color: '#f3f4f6' },
         ticks: {
-          color: '#71717a',
+          color: '#6b7280',
           font: { size: 10 },
           callback: (value) => `Rp ${(value / 1000000).toFixed(0)}jt`
         }
@@ -182,7 +182,7 @@ export default function DashboardOverview() {
         accessorKey: 'id',
         header: 'ID Transaksi',
         cell: (info) => (
-          <span className="font-mono font-bold text-emerald-400">
+          <span className="font-mono font-bold text-emerald-700">
             {info.getValue()}
           </span>
         )
@@ -192,8 +192,8 @@ export default function DashboardOverview() {
         header: 'Wisatawan / Pemesan',
         cell: (info) => (
           <div>
-            <div className="font-semibold text-zinc-200">{info.getValue()}</div>
-            <div className="text-[10px] text-zinc-500">
+            <div className="font-semibold text-gray-900">{info.getValue()}</div>
+            <div className="text-[10px] text-gray-500">
               {info.row.original.category}
             </div>
           </div>
@@ -203,7 +203,7 @@ export default function DashboardOverview() {
         accessorKey: 'amount',
         header: 'Nominal',
         cell: (info) => (
-          <span className="font-bold text-zinc-200">
+          <span className="font-bold text-gray-900">
             Rp {info.getValue().toLocaleString('id-ID')}
           </span>
         )
@@ -212,7 +212,7 @@ export default function DashboardOverview() {
         accessorKey: 'time',
         header: 'Waktu Transaksi',
         cell: (info) => (
-          <span className="text-zinc-400 text-xs">{info.getValue()}</span>
+          <span className="text-gray-500 text-xs">{info.getValue()}</span>
         )
       },
       {
@@ -222,12 +222,12 @@ export default function DashboardOverview() {
           const status = info.getValue();
           return (
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
                 status === 'success'
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                   : status === 'pending'
-                  ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                  ? 'bg-amber-50 text-amber-800 border-amber-200'
+                  : 'bg-red-50 text-red-800 border-red-200'
               }`}
             >
               <span className="status-dot" />
@@ -253,14 +253,14 @@ export default function DashboardOverview() {
         accessorKey: 'gate_name',
         header: 'Gerbang Akses',
         cell: (info) => (
-          <span className="font-bold text-zinc-200">{info.getValue()}</span>
+          <span className="font-bold text-gray-900">{info.getValue()}</span>
         )
       },
       {
         accessorKey: 'total_scanned',
         header: 'Total Pindai (Scan)',
         cell: (info) => (
-          <span className="font-semibold text-zinc-200">
+          <span className="font-semibold text-gray-900">
             {info.getValue().toLocaleString('id-ID')} pax
           </span>
         )
@@ -269,7 +269,7 @@ export default function DashboardOverview() {
         accessorKey: 'last_scan',
         header: 'Aktivitas Terakhir',
         cell: (info) => (
-          <span className="text-zinc-400 text-xs">{info.getValue()}</span>
+          <span className="text-gray-500 text-xs">{info.getValue()}</span>
         )
       },
       {
@@ -279,10 +279,10 @@ export default function DashboardOverview() {
           const st = info.getValue();
           return (
             <span
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold ${
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
                 st === 'online'
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                  : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  : 'bg-red-50 text-red-800 border-red-200'
               }`}
             >
               <span className="status-dot" />
@@ -298,25 +298,25 @@ export default function DashboardOverview() {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
-          <div className="text-xs text-emerald-500 uppercase tracking-widest font-semibold flex items-center gap-2 mb-1">
+          <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
             <span className="status-dot" />
-            <span>Passify Admin Control Tower • Tremor UI & Chart.js Powered</span>
+            <span>Passify Cloud Engine • White-Label SaaS Telemetry</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 font-['Outfit']">
-            Dasbor Analitik Real-Time
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
+            Dasbor Analitik Kawasan Tenant
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-zinc-400 bg-zinc-950 border border-zinc-800 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Sinkronisasi Otomatis Tiap 60s</span>
+          <span className="text-xs text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-2xs">
+            <Clock className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Sinkronisasi Live Tiap 60s</span>
           </span>
         </div>
       </div>
 
-      {/* Top Stats Grid (Tremor UI-inspired KPI Cards) */}
+      {/* Top Stats Grid (Minimalist KPI Cards) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminStatCard
           icon={DollarSign}
@@ -347,24 +347,24 @@ export default function DashboardOverview() {
           label="Transaksi Cashless (NFC/QR)"
           value={`Rp ${((stats.today.wallet_topups || 4250000) / 1000000).toFixed(1)}jt`}
           subValue="45 transaksi merchant"
-          badgeText="VENUE"
+          badgeText="TENANT"
         />
       </div>
 
       {/* Main Chart Section: Hourly Visitors Traffic (Chart.js) */}
-      <div className="card p-5 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm">
+      <div className="card p-5 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
-            <h3 className="text-base font-bold text-zinc-100 font-['Outfit'] flex items-center gap-2">
-              <BarChart3 className="w-4.5 h-4.5 text-emerald-500" />
+            <h3 className="text-base font-bold text-gray-900 font-['Outfit'] flex items-center gap-2">
+              <BarChart3 className="w-4.5 h-4.5 text-emerald-600" />
               <span>Arus Wisatawan Hari Ini (Per Jam)</span>
             </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-gray-500 mt-0.5">
               Powered by Chart.js — Pemantauan pintu masuk & keluar real-time
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 self-start sm:self-auto">
-            <Activity className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 self-start sm:self-auto">
+            <Activity className="w-3.5 h-3.5 text-emerald-600" />
             <span>Live Gate Telemetry</span>
           </span>
         </div>
@@ -377,14 +377,14 @@ export default function DashboardOverview() {
       {/* Revenue Weekly (Chart.js) + Ticket Category Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Weekly Revenue Chart.js */}
-        <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm">
+        <div className="card p-5 bg-white border border-gray-200 rounded-xl shadow-2xs">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2 font-['Outfit']">
-                <TrendingUp className="w-4 h-4 text-emerald-500" />
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
+                <TrendingUp className="w-4 h-4 text-emerald-600" />
                 <span>Pendapatan 7 Hari Terakhir</span>
               </h3>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-gray-500">
                 Total Bulan Ini: Rp {(stats.this_month.revenue / 1000000).toFixed(0)}jt
               </p>
             </div>
@@ -396,28 +396,28 @@ export default function DashboardOverview() {
         </div>
 
         {/* Ticket Category Breakdown Card */}
-        <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm flex flex-col justify-between">
+        <div className="card p-5 bg-white border border-gray-200 rounded-xl shadow-2xs flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2 font-['Outfit']">
-                <Ticket className="w-4 h-4 text-emerald-500" />
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
+                <Ticket className="w-4 h-4 text-emerald-600" />
                 <span>Penjualan Per Kategori Tiket</span>
               </h3>
-              <span className="text-xs text-zinc-500">Persentase & Kuota</span>
+              <span className="text-xs text-gray-500">Persentase & Kuota</span>
             </div>
 
             <div className="space-y-4">
               {TICKET_CATEGORY_SALES.map((cat, idx) => (
                 <div key={idx}>
                   <div className="flex items-center justify-between text-xs mb-1.5">
-                    <span className="font-semibold text-zinc-200">{cat.name}</span>
-                    <span className="text-emerald-400 font-bold">
+                    <span className="font-semibold text-gray-700">{cat.name}</span>
+                    <span className="text-emerald-700 font-bold">
                       {cat.sold.toLocaleString('id-ID')} tiket ({cat.percentage}%)
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-zinc-900 overflow-hidden">
+                  <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                      className="h-full rounded-full bg-emerald-600 transition-all duration-500"
                       style={{ width: `${cat.percentage}%` }}
                     />
                   </div>
@@ -426,9 +426,9 @@ export default function DashboardOverview() {
             </div>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-zinc-900 flex items-center justify-between text-xs text-zinc-400">
+          <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
             <span>Total Kategori Terdaftar: 4 Kategori</span>
-            <span className="text-emerald-400 font-medium">100% Validasi Aktif</span>
+            <span className="text-emerald-700 font-bold">100% Validasi Aktif</span>
           </div>
         </div>
       </div>
@@ -455,30 +455,30 @@ export default function DashboardOverview() {
 
       {/* System Health / Alerts Footer Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-start gap-3">
-          <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-            <ShieldCheck className="w-4.5 h-4.5 text-emerald-400" />
+        <div className="card p-4 bg-white border border-gray-200 rounded-xl flex items-start gap-3 shadow-2xs">
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+            <ShieldCheck className="w-4.5 h-4.5 text-emerald-600" />
           </div>
           <div>
-            <div className="text-xs font-bold text-zinc-100">
+            <div className="text-xs font-bold text-gray-900">
               Sistem Keamanan & Enkripsi TOTP Normal
             </div>
-            <p className="text-[11px] text-zinc-400 mt-0.5">
-              Seluruh gerbang e-Ticket Bromo & Rinjani terhubung dengan enkripsi HMAC SHA-256. Sinkronisasi offline-first bekerja optimal.
+            <p className="text-[11px] text-gray-500 mt-0.5">
+              Seluruh gerbang e-Ticket Kawasan Wisata terhubung dengan enkripsi HMAC SHA-256. Sinkronisasi offline-first bekerja optimal.
             </p>
           </div>
         </div>
 
-        <div className="card p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-start gap-3">
-          <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-            <RefreshCw className="w-4.5 h-4.5 text-emerald-400" />
+        <div className="card p-4 bg-white border border-gray-200 rounded-xl flex items-start gap-3 shadow-2xs">
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+            <RefreshCw className="w-4.5 h-4.5 text-emerald-600" />
           </div>
           <div>
-            <div className="text-xs font-bold text-zinc-100">
+            <div className="text-xs font-bold text-gray-900">
               Sinkronisasi Merchant NFC & QR Aktif
             </div>
-            <p className="text-[11px] text-zinc-400 mt-0.5">
-              12 booth tenant F&B & merchandise di posko pengawasan melaporkan latensi transaksi di bawah 250 milidetik.
+            <p className="text-[11px] text-gray-500 mt-0.5">
+              Seluruh booth tenant F&B & merchandise di posko pengawasan melaporkan latensi transaksi di bawah 250 milidetik.
             </p>
           </div>
         </div>

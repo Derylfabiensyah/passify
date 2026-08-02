@@ -13,14 +13,14 @@ export default function AdminStatCard({
   const trendUp = trend > 0;
 
   return (
-    <div className="card p-5 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm hover:border-zinc-700/80 transition-all">
+    <div className="p-6 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all duration-200">
       <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-zinc-900 border border-zinc-800">
-            {Icon && <Icon className="w-4.5 h-4.5 text-zinc-200" />}
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-gray-100/80 text-gray-900">
+            {Icon && <Icon className="w-4 h-4" />}
           </div>
           {badgeText && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+            <span className="text-[10px] font-medium uppercase tracking-wider text-gray-500 bg-gray-100/80 px-2.5 py-0.5 rounded-full">
               {badgeText}
             </span>
           )}
@@ -28,10 +28,10 @@ export default function AdminStatCard({
 
         {trend !== undefined && (
           <div
-            className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full border ${
+            className={`inline-flex items-center gap-0.5 text-xs font-medium px-2 py-0.5 rounded-full ${
               trendUp
-                ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-                : 'text-rose-400 bg-rose-500/10 border-rose-500/20'
+                ? 'text-emerald-700 bg-emerald-50/70'
+                : 'text-red-600 bg-red-50/70'
             }`}
           >
             {trendUp ? (
@@ -44,25 +44,25 @@ export default function AdminStatCard({
         )}
       </div>
 
-      <div className="text-2xl sm:text-3xl font-extrabold text-zinc-100 font-['Outfit'] tracking-tight mb-1">
+      <div className="text-2xl sm:text-3xl font-bold text-gray-900 font-['Outfit'] tracking-tight mb-1">
         {value}
       </div>
 
-      <div className="text-xs text-zinc-400 font-medium">{label}</div>
+      <div className="text-xs text-gray-500 font-normal">{label}</div>
 
       {subValue && (
-        <div className="text-[11px] text-zinc-500 mt-1.5 flex items-center gap-1.5">
+        <div className="text-[11px] text-gray-400 mt-2">
           <span>{subValue}</span>
         </div>
       )}
 
       {progress !== undefined && (
-        <div className="mt-3 pt-3 border-t border-zinc-900">
-          <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-1.5">
+        <div className="mt-4 pt-3 border-t border-gray-100">
+          <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1.5">
             <span>Keterisian Kuota</span>
-            <span className="font-semibold text-zinc-200">{progress}%</span>
+            <span className="font-semibold text-gray-900">{progress}%</span>
           </div>
-          <div className="w-full h-1.5 rounded-full bg-zinc-900 overflow-hidden">
+          <div className="w-full h-1 rounded-full bg-gray-100 overflow-hidden">
             <div
               className="h-full rounded-full bg-emerald-500 transition-all duration-500"
               style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}

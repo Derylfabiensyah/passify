@@ -68,15 +68,15 @@ export default function FinancePage() {
       {
         label: 'Pendapatan Kotor (Gross)',
         data: REVENUE_WEEKLY.map((r) => r.revenue),
-        backgroundColor: '#10b981',
-        hoverBackgroundColor: '#34d399',
+        backgroundColor: '#059669', // emerald-600
+        hoverBackgroundColor: '#10b981',
         borderRadius: 4
       },
       {
-        label: 'Net Payout Pengelola (95%)',
+        label: 'Net Payout Klien (95%)',
         data: REVENUE_WEEKLY.map((r) => Math.round(r.revenue * 0.95)),
-        backgroundColor: '#27272a',
-        hoverBackgroundColor: '#3f3f46',
+        backgroundColor: '#d1d5db', // gray-300
+        hoverBackgroundColor: '#9ca3af',
         borderRadius: 4
       }
     ]
@@ -89,15 +89,16 @@ export default function FinancePage() {
       legend: {
         position: 'top',
         align: 'end',
-        labels: { color: '#a1a1aa', font: { size: 11, family: 'Outfit' } }
+        labels: { color: '#4b5563', font: { size: 11, family: 'Outfit' } }
       },
       tooltip: {
-        backgroundColor: '#18181b',
-        titleColor: '#f4f4f5',
-        bodyColor: '#d4d4d8',
-        borderColor: '#27272a',
+        backgroundColor: '#ffffff',
+        titleColor: '#111827',
+        bodyColor: '#374151',
+        borderColor: '#e5e7eb',
         borderWidth: 1,
         padding: 10,
+        cornerRadius: 8,
         callbacks: {
           label: (context) => `Rp ${Number(context.raw).toLocaleString('id-ID')}`
         }
@@ -106,12 +107,12 @@ export default function FinancePage() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#71717a', font: { size: 10 } }
+        ticks: { color: '#6b7280', font: { size: 10 } }
       },
       y: {
-        grid: { color: '#27272a' },
+        grid: { color: '#f3f4f6' },
         ticks: {
-          color: '#71717a',
+          color: '#6b7280',
           font: { size: 10 },
           callback: (val) => `Rp ${(val / 1000000).toFixed(0)}jt`
         }
@@ -126,23 +127,23 @@ export default function FinancePage() {
         accessorKey: 'period',
         header: 'Periode Settlement',
         cell: (info) => (
-          <span className="font-bold text-zinc-200">{info.getValue()}</span>
+          <span className="font-bold text-gray-900">{info.getValue()}</span>
         )
       },
       {
         accessorKey: 'gross',
         header: 'Pendapatan Kotor',
         cell: (info) => (
-          <span className="text-zinc-300">
+          <span className="text-gray-700">
             Rp {info.getValue().toLocaleString('id-ID')}
           </span>
         )
       },
       {
         accessorKey: 'platform_fee',
-        header: 'Biaya Platform (5%)',
+        header: 'Biaya Layanan (5%)',
         cell: (info) => (
-          <span className="text-rose-400 font-mono">
+          <span className="text-red-600 font-mono">
             -Rp {info.getValue().toLocaleString('id-ID')}
           </span>
         )
@@ -151,7 +152,7 @@ export default function FinancePage() {
         accessorKey: 'net_payout',
         header: 'Pencairan Bersih (Net)',
         cell: (info) => (
-          <span className="font-bold text-emerald-400 font-['Outfit'] text-sm">
+          <span className="font-bold text-emerald-700 font-['Outfit'] text-sm">
             Rp {info.getValue().toLocaleString('id-ID')}
           </span>
         )
@@ -165,16 +166,16 @@ export default function FinancePage() {
             status === 'settled'
               ? {
                   label: 'Dicairkan',
-                  cls: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  cls: 'bg-emerald-50 text-emerald-800 border-emerald-200'
                 }
               : status === 'pending'
               ? {
                   label: 'Menunggu',
-                  cls: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  cls: 'bg-amber-50 text-amber-800 border-amber-200'
                 }
               : {
                   label: 'Gagal',
-                  cls: 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                  cls: 'bg-red-50 text-red-800 border-red-200'
                 };
 
           return (
@@ -189,9 +190,9 @@ export default function FinancePage() {
       },
       {
         accessorKey: 'bank',
-        header: 'Rekening Tujuan',
+        header: 'Rekening Klien',
         cell: (info) => (
-          <span className="text-zinc-400 text-xs font-mono">
+          <span className="text-gray-600 text-xs font-mono">
             {info.getValue()}
           </span>
         )
@@ -202,7 +203,7 @@ export default function FinancePage() {
         cell: (info) => {
           const val = info.getValue();
           return (
-            <span className="text-zinc-500 text-xs">
+            <span className="text-gray-500 text-xs">
               {val
                 ? new Date(val).toLocaleDateString('id-ID', {
                     day: 'numeric',
@@ -221,39 +222,39 @@ export default function FinancePage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
-          <div className="text-xs text-emerald-500 uppercase tracking-widest font-semibold flex items-center gap-2 mb-1">
+          <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
             <span className="status-dot" />
-            <span>Passify Finance Engine • Tremor UI & Chart.js Powered</span>
+            <span>Passify Finance Engine • White-Label SaaS</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-zinc-100 font-['Outfit']">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
             Keuangan & Pencairan Dana (Settlement)
           </h1>
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="btn-secondary btn-sm">
+          <button className="btn-secondary btn-sm shadow-2xs">
             <Download className="w-4 h-4" />
             <span>Ekspor CSV / PDF</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Cards (Tremor UI style) */}
+      {/* KPI Cards (Minimalist style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminStatCard
           icon={Landmark}
           label="Total Dicairkan (YTD)"
           value={`Rp ${(totalPayout / 1000000).toFixed(1)}jt`}
-          subValue="Settlement ke rekening bank pengelola"
+          subValue="Settlement ke rekening bank klien"
           badgeText="SETTLED"
         />
         <AdminStatCard
           icon={Wallet}
           label="Pendapatan Bulan Ini"
           value={`Rp ${(stats.this_month.revenue / 1000000).toFixed(0)}jt`}
-          subValue="Sebelum dipotong biaya platform"
+          subValue="Sebelum dipotong biaya layanan"
           trend={14}
           badgeText="GROSS"
         />
@@ -266,7 +267,7 @@ export default function FinancePage() {
         />
         <AdminStatCard
           icon={TrendingUp}
-          label="Biaya Platform (5%)"
+          label="Biaya Layanan (5%)"
           value={`Rp ${(totalFee / 1000000).toFixed(1)}jt`}
           subValue="Untuk infrastruktur server, SMS, & NFC"
           badgeText="FEE"
@@ -274,14 +275,14 @@ export default function FinancePage() {
       </div>
 
       {/* Chart.js Section: Gross vs Net Payout */}
-      <div className="card p-5 sm:p-6 bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm">
+      <div className="card p-5 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
-            <h3 className="text-base font-bold text-zinc-100 font-['Outfit'] flex items-center gap-2">
-              <BarChart3 className="w-4.5 h-4.5 text-emerald-500" />
+            <h3 className="text-base font-bold text-gray-900 font-['Outfit'] flex items-center gap-2">
+              <BarChart3 className="w-4.5 h-4.5 text-emerald-600" />
               <span>Analisis Pendapatan vs Pencairan Bersih (7 Hari Terakhir)</span>
             </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-gray-500 mt-0.5">
               Powered by Chart.js — Rekonsiliasi gross revenue dan net payout (95%)
             </p>
           </div>
@@ -303,13 +304,13 @@ export default function FinancePage() {
       />
 
       {/* Payout Schedule Policy Banner */}
-      <div className="card p-4 bg-zinc-950 border border-zinc-800 rounded-xl flex items-start gap-3">
-        <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
-          <FileText className="w-4.5 h-4.5 text-emerald-400" />
+      <div className="card p-4 bg-white border border-gray-200 rounded-xl flex items-start gap-3 shadow-2xs">
+        <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+          <FileText className="w-4.5 h-4.5 text-emerald-600" />
         </div>
-        <div className="text-xs text-zinc-400 leading-relaxed">
-          <strong className="text-zinc-200">Kebijakan Automated Settlement (H+1):</strong>{' '}
-          Semua pendapatan tiket masuk dan transaksi Cashless Venue (NFC & QR) direkonsiliasi setiap pukul 23:59 WIB dan dicairkan secara otomatis ke rekening Bank Mandiri / BCA pengelola pada pukul 06:00 WIB hari berikutnya tanpa potongan biaya antarbank.
+        <div className="text-xs text-gray-600 leading-relaxed">
+          <strong className="text-gray-900">Kebijakan Automated Settlement (H+1):</strong>{' '}
+          Semua pendapatan tiket masuk dan transaksi Cashless Venue (NFC & QR) direkonsiliasi setiap pukul 23:59 WIB dan dicairkan secara otomatis ke rekening bank terdaftar klien pada pukul 06:00 WIB hari berikutnya tanpa potongan biaya antarbank.
         </div>
       </div>
     </div>

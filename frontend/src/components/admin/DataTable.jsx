@@ -42,23 +42,23 @@ export default function DataTable({
   });
 
   return (
-    <div className="card bg-zinc-950 border border-zinc-800 rounded-xl shadow-sm overflow-hidden">
+    <div className="card bg-white border border-gray-200 rounded-xl shadow-2xs overflow-hidden">
       {/* Top Header & Global Search */}
-      <div className="p-4 sm:p-5 border-b border-zinc-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          {title && <h3 className="text-base font-bold text-zinc-100 font-['Outfit']">{title}</h3>}
-          {subtitle && <p className="text-xs text-zinc-400 mt-0.5">{subtitle}</p>}
+          {title && <h3 className="text-base font-bold text-gray-900 font-['Outfit']">{title}</h3>}
+          {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
         </div>
 
         <div className="relative w-full sm:w-64">
-          <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             id="table-global-search-input"
             type="text"
             value={globalFilter ?? ''}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 transition-colors"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-3 py-1.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
           />
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function DataTable({
         <table className="w-full text-left border-collapse">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="bg-zinc-900/60 border-b border-zinc-800">
+              <tr key={headerGroup.id} className="bg-gray-50/80 border-b border-gray-200">
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort();
                   const sorted = header.column.getIsSorted();
@@ -77,8 +77,8 @@ export default function DataTable({
                     <th
                       key={header.id}
                       onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                      className={`px-4 py-3 text-[11px] font-semibold text-zinc-400 uppercase tracking-wider select-none ${
-                        canSort ? 'cursor-pointer hover:text-zinc-200 transition-colors' : ''
+                      className={`px-4 py-3 text-[11px] font-bold text-gray-600 uppercase tracking-wider select-none ${
+                        canSort ? 'cursor-pointer hover:text-gray-900 transition-colors' : ''
                       }`}
                     >
                       <div className="flex items-center gap-1.5">
@@ -87,11 +87,11 @@ export default function DataTable({
                           : flexRender(header.column.columnDef.header, header.getContext())}
 
                         {canSort && (
-                          <span className="text-zinc-500">
+                          <span className="text-gray-400">
                             {sorted === 'asc' ? (
-                              <ArrowUp className="w-3 h-3 text-emerald-400" />
+                              <ArrowUp className="w-3 h-3 text-emerald-600" />
                             ) : sorted === 'desc' ? (
-                              <ArrowDown className="w-3 h-3 text-emerald-400" />
+                              <ArrowDown className="w-3 h-3 text-emerald-600" />
                             ) : (
                               <ArrowUpDown className="w-3 h-3 opacity-50" />
                             )}
@@ -104,15 +104,15 @@ export default function DataTable({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-zinc-800/60">
+          <tbody className="divide-y divide-gray-200">
             {table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="hover:bg-zinc-900/40 transition-colors"
+                  className="hover:bg-gray-50/60 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3.5 text-xs text-zinc-300">
+                    <td key={cell.id} className="px-4 py-3.5 text-xs text-gray-700 font-medium">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -122,7 +122,7 @@ export default function DataTable({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-8 text-center text-xs text-zinc-500"
+                  className="px-4 py-8 text-center text-xs text-gray-500"
                 >
                   Tidak ada data yang sesuai.
                 </td>
@@ -133,7 +133,7 @@ export default function DataTable({
       </div>
 
       {/* Pagination & Row Count Footer */}
-      <div className="p-3 sm:px-5 border-t border-zinc-800/80 bg-zinc-950 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-400">
+      <div className="p-3 sm:px-5 border-t border-gray-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
         <div className="flex items-center gap-2">
           <span>Tampilkan</span>
           <select
@@ -141,7 +141,7 @@ export default function DataTable({
             onChange={(e) => {
               table.setPageSize(Number(e.target.value));
             }}
-            className="bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:border-emerald-500"
+            className="bg-gray-50 border border-gray-200 rounded px-2 py-1 text-xs text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
           >
             {[5, 10, 20, 50].map((pageSize) => (
               <option key={pageSize} value={pageSize}>
@@ -155,11 +155,11 @@ export default function DataTable({
         <div className="flex items-center gap-4">
           <span>
             Halaman{' '}
-            <strong className="text-zinc-200 font-semibold">
+            <strong className="text-gray-900 font-semibold">
               {table.getState().pagination.pageIndex + 1}
             </strong>{' '}
             dari{' '}
-            <strong className="text-zinc-200 font-semibold">
+            <strong className="text-gray-900 font-semibold">
               {table.getPageCount() || 1}
             </strong>
           </span>
@@ -169,7 +169,7 @@ export default function DataTable({
               type="button"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="p-1.5 rounded-lg border border-zinc-800 text-zinc-300 hover:border-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -177,7 +177,7 @@ export default function DataTable({
               type="button"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="p-1.5 rounded-lg border border-zinc-800 text-zinc-300 hover:border-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

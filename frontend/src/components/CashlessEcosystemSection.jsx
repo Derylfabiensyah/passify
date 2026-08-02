@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Radio, QrCode, RotateCcw, ArrowRight, ShieldCheck, CheckCircle2, ShoppingBag, Coffee, Sparkles } from 'lucide-react';
+import { Radio, QrCode, RotateCcw, ArrowRight, CheckCircle2, ShoppingBag, Sparkles } from 'lucide-react';
 
 export default function CashlessEcosystemSection({ onOpenWallet }) {
   const [activeTab, setActiveTab] = useState('nfc'); // 'nfc' | 'fnb' | 'refund'
@@ -13,41 +13,41 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
   const pillars = [
     {
       id: 'nfc',
-      title: 'NFC Wristband Sync',
-      subtitle: 'Ditautkan langsung di gerbang masuk',
-      icon: <Radio className="w-5 h-5 text-emerald-500" />,
+      title: 'NFC Wristband & QR Cloud',
+      subtitle: 'Sinkronisasi identitas pengunjung offline & online',
+      icon: <Radio className="w-4 h-4 text-gray-900" />,
       description:
-        'Setiap pengunjung ditautkan dengan gelang NFC di gerbang masuk untuk akses gate dan identitas cashless yang aman tanpa sinyal seluler.',
+        'Setiap pengunjung ditautkan dengan gelang NFC atau QR dinamis di gerbang masuk untuk akses gate dan identitas cashless yang aman tanpa sinyal seluler.',
       features: [
-        'Sinkronisasi gelang dalam < 0.5 detik saat pemindai e-Ticket',
-        'Tanpa baterai, tahan air (Waterproof IP68) untuk mendaki & basah-basahan',
-        'Enkripsi UID anti-kloning & pengamanan sesi harian'
+        'Sinkronisasi identitas dalam < 0.5 detik saat verifikasi gerbang',
+        'Tanpa baterai, tahan air (Waterproof IP68) untuk alam bebas',
+        'Enkripsi UID anti-kloning & pengamanan sesi multi-tenant'
       ]
     },
     {
       id: 'fnb',
-      title: 'F&B / Merch Payment',
-      subtitle: 'Belanja tanpa uang tunai di lokasi',
-      icon: <ShoppingBag className="w-5 h-5 text-emerald-500" />,
+      title: 'Merchant & F&B Cashless',
+      subtitle: 'Belanja tanpa tunai di seluruh merchant venue',
+      icon: <ShoppingBag className="w-4 h-4 text-gray-900" />,
       description:
-        'Transaksi di booth vendor dilakukan dengan melakukan tap gelang NFC atau scan QR Wallet tanpa memerlukan uang tunai.',
+        'Transaksi di booth vendor atau UMKM kawasan wisata cukup dengan tap gelang NFC atau scan QR Dompet Tanpa Tunai.',
       features: [
-        'Bayar kopi, mi hangat, sewa tenda, atau suvenir dengan sekali tap',
-        'Kasir tenant bekerja offline-first dengan sinkronisasi batch malam hari',
-        'Struk digital tercatat otomatis di akun aplikasi pengunjung'
+        'Pembayaran F&B, penyewaan alat, dan suvenir dalam sekali tap',
+        'Kasir tenant bekerja offline-first dengan sinkronisasi batch otomatis',
+        'Struk digital tercatat di riwayat transaksi pengguna'
       ]
     },
     {
       id: 'refund',
-      title: 'Refund & Payout Otomatis',
-      subtitle: 'Pengembalian sisa saldo pasca-kunjungan',
-      icon: <RotateCcw className="w-5 h-5 text-emerald-500" />,
+      title: 'Automated Refund & Payout',
+      subtitle: 'Pengembalian sisa saldo & pencairan dana transparan',
+      icon: <RotateCcw className="w-4 h-4 text-gray-900" />,
       description:
-        'Sisa saldo wallet pengguna dapat ditarik kembali (refund) secara otomatis setelah event selesai ke rekening bank atau e-Wallet.',
+        'Sisa saldo wallet dapat ditarik kembali (refund) secara otomatis pasca-kunjungan ke rekening bank atau e-Wallet wisatawan.',
       features: [
-        'Zero-fee instant refund ke BCA, Mandiri, BRI, GoPay, OVO, & Dana',
+        'Zero-fee instant refund ke seluruh bank nasional & e-Wallet',
         'Opsi refund otomatis terjadwal H+1 setelah kunjungan berakhir',
-        'Rekonsiliasi saldo transparan untuk wisatawan dan pengelola'
+        'Rekonsiliasi saldo akurat untuk wisatawan dan pengelola kawasan'
       ]
     }
   ];
@@ -55,26 +55,26 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
   const currentPillar = pillars.find((p) => p.id === activeTab);
 
   return (
-    <section className="py-20 px-4 lg:px-8 max-w-7xl mx-auto border-t border-zinc-800/80">
+    <section className="py-24 px-4 lg:px-8 max-w-7xl mx-auto border-t border-gray-100">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
-          <div className="text-emerald-500 font-semibold text-xs uppercase tracking-widest mb-2 flex items-center gap-2">
-            <span className="status-dot" />
-            <span>C. Ekosistem Cashless Venue (NFC & QR Wallet)</span>
+          <div className="text-gray-400 font-medium text-xs uppercase tracking-wider mb-2 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>Modul Cashless & Identitas Digital Kawasan</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-zinc-100 font-['Outfit']">
-            Transaksi Tanpa Tunai di Lokasi Wisata Alam
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 font-['Outfit'] tracking-tight">
+            Ekosistem Transaksi Tanpa Tunai
           </h2>
         </div>
 
         <button
           id="btn-open-wallet-ecosystem"
           onClick={onOpenWallet}
-          className="btn-secondary self-start md:self-auto text-xs sm:text-sm"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200/80 text-gray-900 text-xs font-medium transition-colors self-start md:self-auto"
         >
-          <QrCode className="w-4 h-4 text-emerald-500" />
-          <span>Buka Dompet Cashless & NFC Saya</span>
+          <QrCode className="w-4 h-4 text-gray-700" />
+          <span>Buka Dompet Digital & NFC Saya</span>
           <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
@@ -90,31 +90,33 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
                 key={pillar.id}
                 id={`ecosystem-tab-${pillar.id}`}
                 onClick={() => setActiveTab(pillar.id)}
-                className={`card p-5 cursor-pointer transition-all border ${
+                className={`p-5 rounded-2xl cursor-pointer transition-all duration-200 border ${
                   isActive
-                    ? 'bg-zinc-900 border-emerald-500/60 shadow-lg'
-                    : 'bg-zinc-900/40 border-zinc-800/80 hover:border-zinc-700'
+                    ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
+                    : 'bg-white text-gray-900 border-gray-200/80 hover:border-gray-300 hover:bg-gray-50/50'
                 }`}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isActive ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-zinc-950 border border-zinc-800'
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    isActive ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'
                   }`}>
                     {pillar.icon}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-base font-bold text-zinc-100 font-['Outfit']">
+                      <h3 className="text-base font-bold font-['Outfit']">
                         {pillar.title}
                       </h3>
                       {isActive && (
-                        <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+                        <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
                           Aktif
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-zinc-400 font-medium mb-1.5">{pillar.subtitle}</p>
-                    <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                    <p className={`text-xs mb-1.5 ${isActive ? 'text-gray-300' : 'text-gray-500 font-medium'}`}>
+                      {pillar.subtitle}
+                    </p>
+                    <p className={`text-xs line-clamp-2 leading-relaxed ${isActive ? 'text-gray-400' : 'text-gray-500'}`}>
                       {pillar.description}
                     </p>
                   </div>
@@ -126,55 +128,55 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
 
         {/* Right: Interactive Pillar Preview & Demo Simulator */}
         <div className="lg:col-span-7">
-          <div className="card p-6 sm:p-8 bg-zinc-900/80 border-zinc-800">
+          <div className="p-8 rounded-2xl bg-white border border-gray-200/80 shadow-2xs">
             {/* Top Indicator */}
-            <div className="flex items-center justify-between pb-6 mb-6 border-b border-zinc-800">
+            <div className="flex items-center justify-between pb-6 mb-6 border-b border-gray-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
                   {currentPillar.icon}
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-zinc-100 font-['Outfit']">
+                  <div className="text-sm font-bold text-gray-900 font-['Outfit']">
                     {currentPillar.title}
                   </div>
-                  <div className="text-xs text-zinc-400">{currentPillar.subtitle}</div>
+                  <div className="text-xs text-gray-500">{currentPillar.subtitle}</div>
                 </div>
               </div>
-              <span className="text-xs font-mono text-zinc-500 bg-zinc-950 px-3 py-1 rounded-md border border-zinc-800">
-                PASSIFY-NFC-V2
+              <span className="text-[11px] font-mono text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+                PASSIFY-CLOUD-V2
               </span>
             </div>
 
             {/* Description */}
-            <p className="text-sm text-zinc-300 leading-relaxed mb-6">
+            <p className="text-sm text-gray-600 leading-relaxed mb-6">
               {currentPillar.description}
             </p>
 
             {/* Features Checklist */}
-            <div className="space-y-2.5 mb-8">
+            <div className="space-y-3 mb-8">
               {currentPillar.features.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-zinc-300">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-gray-700">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </div>
               ))}
             </div>
 
             {/* Live Interactive Simulation Banner */}
-            <div className="p-5 rounded-xl bg-zinc-950 border border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                <div className="w-9 h-9 rounded-lg bg-white border border-gray-200/60 flex items-center justify-center shadow-2xs">
+                  <Sparkles className="w-4 h-4 text-gray-900" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-zinc-200">
-                    {activeTab === 'nfc' && 'Simulasi Sinkronisasi Gelang NFC'}
-                    {activeTab === 'fnb' && 'Simulasi Tap Bayar Kedai Kopi Bromo'}
+                  <div className="text-xs font-bold text-gray-900">
+                    {activeTab === 'nfc' && 'Simulasi Sinkronisasi Gelang NFC Klien'}
+                    {activeTab === 'fnb' && 'Simulasi Tap Bayar Merchant Wisata'}
                     {activeTab === 'refund' && 'Simulasi Pengembalian Saldo Otomatis'}
                   </div>
-                  <div className="text-[11px] text-zinc-500">
+                  <div className="text-[11px] text-gray-500">
                     {activeTab === 'nfc' && 'Gelang #NFC-88219 siap dikaitkan ke e-Ticket'}
-                    {activeTab === 'fnb' && 'Kopi Hangat Lembah — Rp 25.000'}
+                    {activeTab === 'fnb' && 'Kopi & Suvenir Alam — Rp 25.000'}
                     {activeTab === 'refund' && 'Refund tanpa potongan biaya ke Rekening/E-Wallet'}
                   </div>
                 </div>
@@ -183,7 +185,7 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
               <button
                 type="button"
                 onClick={handleDemoTap}
-                className="btn-primary btn-sm w-full sm:w-auto justify-center"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gray-900 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-2xs w-full sm:w-auto justify-center"
               >
                 {demoTapSuccess ? (
                   <>
@@ -201,12 +203,12 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
 
             {/* Alert banner on simulation */}
             {demoTapSuccess && (
-              <div className="mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2 animate-in fade-in duration-200">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+              <div className="mt-4 p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200/70 text-emerald-800 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600" />
                 <span>
                   {activeTab === 'nfc' && '✓ Gelang NFC #88219 berhasil ditautkan ke akun pengunjung Deryl Fabiensyah.'}
-                  {activeTab === 'fnb' && '✓ Transaksi F&B Rp 25.000 berhasil! Saldo dompet terpotong otomatis.'}
-                  {activeTab === 'refund' && '✓ Permintaan Instant Refund Rp 250.000 telah diproses ke rekening BCA.'}
+                  {activeTab === 'fnb' && '✓ Transaksi Merchant Rp 25.000 berhasil! Saldo dompet terpotong otomatis.'}
+                  {activeTab === 'refund' && '✓ Permintaan Instant Refund Rp 250.000 telah diproses ke rekening pengelola / pengunjung.'}
                 </span>
               </div>
             )}

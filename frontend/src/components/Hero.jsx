@@ -1,44 +1,54 @@
 import React from 'react';
-import { Compass } from 'lucide-react';
+import { Compass, ArrowUpRight } from 'lucide-react';
 
 export default function Hero({ onExploreClick }) {
   return (
-    <section className="relative pt-28 pb-16 px-4 lg:px-8">
+    <section className="relative pt-24 pb-20 px-4 lg:px-8 bg-white border-b border-gray-100">
       <div className="max-w-4xl mx-auto text-center">
-        <p className="text-emerald-500 text-xs font-medium tracking-widest uppercase mb-4">
-          Platform E-Tiketing Wisata Alam
-        </p>
+        {/* Subtle Pill Badge */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gray-50 border border-gray-200/80 text-gray-700 text-xs font-medium mb-8">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Passify Cloud Engine • White-Label SaaS E-Ticketing</span>
+        </div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-tight font-['Outfit'] text-zinc-100">
-          Jelajahi Wisata Alam Indonesia{' '}
-          <span className="text-emerald-500">Tanpa Antre</span>
+        {/* Clean, High-Contrast Title */}
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight mb-6 leading-[1.12] font-['Outfit'] text-gray-900">
+          Kelola & Pesan Tiket Wisata Alam{' '}
+          <span className="text-emerald-600 font-normal">Terintegrasi Cloud.</span>
         </h1>
 
-        <p className="text-zinc-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-          Pesan tiket dengan proteksi kuota harian, e-Ticket QR anti-pemalsuan, dan transaksi cashless di lokasi wisata.
+        {/* Refined Minimalist Subtitle */}
+        <p className="text-gray-500 text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed font-normal">
+          Platform White-Label untuk pengelola taman nasional dan kawasan konservasi. Dilengkapi proteksi kuota harian, validasi QR offline, serta ekosistem cashless tenant.
         </p>
 
-        <div className="flex justify-center mb-14">
+        {/* Minimalist CTA Button */}
+        <div className="flex justify-center mb-16">
           <button
             id="hero-explore-btn"
             onClick={onExploreClick}
-            className="btn-primary text-sm sm:text-base"
+            className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-gray-900 text-white font-medium text-sm hover:bg-emerald-600 transition-colors duration-200 shadow-2xs"
           >
-            <Compass className="w-4 h-4 sm:w-5 sm:h-5" />
-            Jelajahi Destinasi
+            <span>Jelajahi Venue Destinasi</span>
+            <ArrowUpRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+        {/* Ultra-Minimalist Metrics Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto pt-8 border-t border-gray-100">
           {[
-            { value: '50+', label: 'Destinasi' },
+            { value: 'Multi-Tenant', label: 'White-Label Config' },
             { value: '1.2M+', label: 'Tiket Terverifikasi' },
-            { value: '< 0.5s', label: 'Validasi Gate' },
-            { value: '100%', label: 'Offline-Ready' },
+            { value: '< 0.5s', label: 'Validasi Gate Offline' },
+            { value: '99.9%', label: 'Cloud Uptime SLA' },
           ].map((m, i) => (
-            <div key={i} className="card p-4 text-center bg-zinc-900/60 border-zinc-800">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-zinc-100 font-['Outfit'] mb-0.5">{m.value}</div>
-              <div className="text-xs text-zinc-500">{m.label}</div>
+            <div key={i} className="text-center">
+              <div className="text-xl sm:text-2xl font-bold text-gray-900 font-['Outfit'] tracking-tight">
+                {m.value}
+              </div>
+              <div className="text-xs text-gray-400 font-medium mt-1">
+                {m.label}
+              </div>
             </div>
           ))}
         </div>
