@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-// Public Portal Components
+// Public Portal Components (B2B/B2G SaaS + Tourist Demo)
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import Catalog from './components/Catalog';
+import OfflineInfrastructureSection from './components/OfflineInfrastructureSection';
+import HardwareIntegrationSection from './components/HardwareIntegrationSection';
 import CashlessEcosystemSection from './components/CashlessEcosystemSection';
+import PricingSection from './components/PricingSection';
+import SecurityLegalSection from './components/SecurityLegalSection';
+import TestimonialsSection from './components/TestimonialsSection';
+import Catalog from './components/Catalog';
 import BookingModal from './components/BookingModal';
 import WalletModal from './components/WalletModal';
 import ETicketModal from './components/ETicketModal';
@@ -81,26 +86,59 @@ function PublicPortal() {
 
   return (
     <div className="min-h-screen bg-white text-gray-900 flex flex-col selection:bg-emerald-500 selection:text-white">
+      {/* Navbar Murni SaaS B2B (Tanpa Search/Wallet/E-Ticket B2C) */}
       <Navbar
-        walletBalance={walletBalance}
-        onOpenWallet={() => setIsWalletOpen(true)}
-        onOpenTicketModal={() => setIsTicketModalOpen(true)}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
         user={user}
         onOpenAuth={() => setIsAuthModalOpen(true)}
         onLogout={handleLogout}
       />
       <main className="flex-1">
+        {/* 1. Hero Section: Warna Hidup, Lencana Logo KLHK/Kemenparekraf, & Kontras Tinggi WCAG */}
         <Hero onExploreClick={handleScrollToCatalog} />
+
+        {/* 2. Arsitektur Lapangan: Alternating Zig-Zag Layout (Offline Gate, Kuota, Rentals) */}
+        <OfflineInfrastructureSection />
+
+        {/* 3. Visualisasi Hardware: Alternating Zig-Zag dengan Foto Produk AI Real Mockups */}
+        <HardwareIntegrationSection />
+
+        {/* 4. Simulasi Interaktif Ekosistem Cashless */}
+        <CashlessEcosystemSection
+          onOpenWallet={() => setIsWalletOpen(true)}
+        />
+
+        {/* 5. Paket Harga Khusus & Kalkulator Bagi Hasil Interaktif Slider */}
+        <PricingSection />
+
+        {/* 6. Keamanan, Kepatuhan Regulasi, & Legalitas B2G */}
+        <SecurityLegalSection />
+
+        {/* 7. Human Touch: Testimoni Ketua Pokdarwis & Kepala Balai Taman Nasional */}
+        <TestimonialsSection />
+
+        {/* 8. LIVE DEMO: Portal Wisatawan (Batas Visual Tegas untuk Pemisahan Audiens) */}
+        <div id="tourist-demo-banner" className="bg-gradient-to-r from-emerald-950 via-gray-900 to-emerald-900 border-y border-gray-800 py-16 px-4 text-center text-white">
+          <div className="max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500 text-gray-950 text-xs font-bold uppercase tracking-wider mb-4 shadow-md">
+              <span className="w-2 h-2 rounded-full bg-gray-950 animate-ping" />
+              <span>LIVE INTERACTIVE DEMO — PORTAL WISATAWAN</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-white font-['Outfit'] mb-3">
+              Pengalaman Portal Pemesanan Tiket Wisatawan (B2C Interface)
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-300 max-w-xl mx-auto leading-relaxed">
+              Di bawah ini adalah contoh langsung tampilan pemesanan e-Ticket, pemilihan sesi kuota konservasi, dan sistem penyewaan alat yang akan dinikmati pengunjung kawasan wisata Anda.
+            </p>
+          </div>
+        </div>
+
         <Catalog
           destinations={DESTINATIONS}
           searchQuery={searchQuery}
           onSelectDestination={(dest) => setSelectedDestination(dest)}
         />
-        <CashlessEcosystemSection
-          onOpenWallet={() => setIsWalletOpen(true)}
-        />
+
+        {/* 9. Fitur Lengkap SaaS */}
         <FeaturesSection />
       </main>
       <Footer />
@@ -127,28 +165,33 @@ function PublicPortal() {
       )}
       {isAuthModalOpen && (
         <AuthModal
-          isOpen={isAuthModalOpen}
           onClose={() => setIsAuthModalOpen(false)}
-          onAuthSuccess={handleAuthSuccess}
+          onSuccess={handleAuthSuccess}
         />
       )}
     </div>
   );
 }
 
-// ─── Main App with Routing ───────────────────────────────────────
+// ─── Main App Router ─────────────────────────────────────────────
 export default function App() {
   return (
     <Routes>
-      {/* Public Portal */}
-      <Route path="/" element={<PublicPortal />} />
-
-      {/* Admin Dashboard */}
-      <Route path="/admin" element={<AdminLayout><DashboardOverview /></AdminLayout>} />
-      <Route path="/admin/destinations" element={<AdminLayout><DestinationsPage /></AdminLayout>} />
-      <Route path="/admin/quotas" element={<AdminLayout><QuotasPage /></AdminLayout>} />
-      <Route path="/admin/gates" element={<AdminLayout><GatesPage /></AdminLayout>} />
-      <Route path="/admin/finance" element={<AdminLayout><FinancePage /></AdminLayout>} />
+      <Route path="/*" element={<PublicPortal />} />
+      <Route
+        path="/admin/*"
+        element={
+          <AdminLayout>
+            <Routes>
+              <Route index element={<DashboardOverview />} />
+              <Route path="destinations" element={<DestinationsPage />} />
+              <Route path="quotas" element={<QuotasPage />} />
+              <Route path="gates" element={<GatesPage />} />
+              <Route path="finance" element={<FinancePage />} />
+            </Routes>
+          </AdminLayout>
+        }
+      />
     </Routes>
   );
 }

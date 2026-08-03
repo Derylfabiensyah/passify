@@ -46,8 +46,8 @@ export default function Hero({ onExploreClick }) {
               </span>
             </h1>
 
-            {/* High-Contrast Human-Centric Copywriting (text-gray-800 font-medium / #1f2937) */}
-            <p className="text-gray-800 text-base sm:text-lg leading-relaxed font-medium">
+            {/* High-Contrast Human-Centric Copywriting (#212529) */}
+            <p className="text-[#212529] text-base sm:text-lg leading-relaxed font-medium">
               Solusi terbukti untuk Pengelola Taman Nasional, BKSDA, dan Pokdarwis. Mencegah kebocoran tiket, membatasi kuota konservasi alam secara otomatis, serta bekerja lancar 100% tanpa sinyal internet di pegunungan maupun pedalaman hutan.
             </p>
 

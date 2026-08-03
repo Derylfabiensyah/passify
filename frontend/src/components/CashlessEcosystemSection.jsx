@@ -55,7 +55,7 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
   const currentPillar = pillars.find((p) => p.id === activeTab);
 
   return (
-    <section className="py-24 px-4 lg:px-8 max-w-7xl mx-auto border-t border-gray-100">
+    <section className="py-24 px-4 lg:px-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
@@ -71,7 +71,7 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
         <button
           id="btn-open-wallet-ecosystem"
           onClick={onOpenWallet}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200/80 text-gray-900 text-xs font-medium transition-colors self-start md:self-auto"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-100 hover:bg-gray-200/80 text-gray-900 text-xs font-medium transition-colors self-start md:self-auto shadow-sm"
         >
           <QrCode className="w-4 h-4 text-gray-700" />
           <span>Buka Dompet Digital & NFC Saya</span>
@@ -81,7 +81,7 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
 
       {/* Interactive Ecosystem Switcher Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left: Pillar Selectors */}
+        {/* Left: Pillar Selectors - Tanpa Outline/Border */}
         <div className="lg:col-span-5 space-y-3">
           {pillars.map((pillar) => {
             const isActive = activeTab === pillar.id;
@@ -90,15 +90,15 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
                 key={pillar.id}
                 id={`ecosystem-tab-${pillar.id}`}
                 onClick={() => setActiveTab(pillar.id)}
-                className={`p-5 rounded-2xl cursor-pointer transition-all duration-200 border ${
+                className={`p-5 rounded-2xl cursor-pointer transition-all duration-200 ${
                   isActive
-                    ? 'bg-gray-900 text-white border-gray-900 shadow-sm'
-                    : 'bg-white text-gray-900 border-gray-200/80 hover:border-gray-300 hover:bg-gray-50/50'
+                    ? 'bg-gray-900 text-white shadow-lg'
+                    : 'bg-white text-gray-900 shadow-md hover:shadow-lg hover:bg-gray-50/50'
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isActive ? 'bg-white/10 text-white' : 'bg-gray-100 text-gray-900'
+                    isActive ? 'bg-white/10 text-white shadow-xs' : 'bg-gray-100 text-gray-900 shadow-xs'
                   }`}>
                     {pillar.icon}
                   </div>
@@ -126,13 +126,13 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
           })}
         </div>
 
-        {/* Right: Interactive Pillar Preview & Demo Simulator */}
+        {/* Right: Interactive Pillar Preview & Demo Simulator - Tanpa Outline/Border */}
         <div className="lg:col-span-7">
-          <div className="p-8 rounded-2xl bg-white border border-gray-200/80 shadow-2xs">
+          <div className="p-8 rounded-3xl bg-white shadow-xl">
             {/* Top Indicator */}
-            <div className="flex items-center justify-between pb-6 mb-6 border-b border-gray-100">
+            <div className="flex items-center justify-between pb-6 mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center shadow-xs">
                   {currentPillar.icon}
                 </div>
                 <div>
@@ -142,30 +142,30 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
                   <div className="text-xs text-gray-500">{currentPillar.subtitle}</div>
                 </div>
               </div>
-              <span className="text-[11px] font-mono text-gray-400 bg-gray-50 px-3 py-1 rounded-full">
+              <span className="text-[11px] font-mono text-gray-400 bg-gray-50 px-3 py-1 rounded-full shadow-xs">
                 PASSIFY-CLOUD-V2
               </span>
             </div>
 
             {/* Description */}
-            <p className="text-sm text-gray-600 leading-relaxed mb-6">
+            <p className="text-sm text-[#212529] font-medium leading-relaxed mb-6">
               {currentPillar.description}
             </p>
 
             {/* Features Checklist */}
             <div className="space-y-3 mb-8">
               {currentPillar.features.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-gray-700">
+                <div key={idx} className="flex items-start gap-3 text-xs sm:text-sm text-[#212529] font-medium">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </div>
               ))}
             </div>
 
-            {/* Live Interactive Simulation Banner */}
-            <div className="p-5 rounded-xl bg-gray-50 border border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Live Interactive Simulation Banner - Tanpa Outline */}
+            <div className="p-5 rounded-xl bg-gray-50 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-white border border-gray-200/60 flex items-center justify-center shadow-2xs">
+                <div className="w-9 h-9 rounded-lg bg-white flex items-center justify-center shadow-sm">
                   <Sparkles className="w-4 h-4 text-gray-900" />
                 </div>
                 <div>
@@ -185,7 +185,7 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
               <button
                 type="button"
                 onClick={handleDemoTap}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gray-900 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-2xs w-full sm:w-auto justify-center"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-gray-900 text-white text-xs font-medium hover:bg-emerald-600 transition-colors shadow-md w-full sm:w-auto justify-center"
               >
                 {demoTapSuccess ? (
                   <>
@@ -203,7 +203,7 @@ export default function CashlessEcosystemSection({ onOpenWallet }) {
 
             {/* Alert banner on simulation */}
             {demoTapSuccess && (
-              <div className="mt-4 p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200/70 text-emerald-800 text-xs flex items-center gap-2">
+              <div className="mt-4 p-3.5 rounded-xl bg-emerald-50/90 text-emerald-800 text-xs flex items-center gap-2 shadow-sm">
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-emerald-600" />
                 <span>
                   {activeTab === 'nfc' && '✓ Gelang NFC #88219 berhasil ditautkan ke akun pengunjung Deryl Fabiensyah.'}

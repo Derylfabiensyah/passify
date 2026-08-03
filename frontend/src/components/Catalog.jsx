@@ -135,8 +135,8 @@ export default function Catalog({ destinations, searchQuery, onSelectDestination
                       {dest.name}
                     </h3>
 
-                    {/* High-Contrast Description Text (#1f2937 / text-gray-800 font-medium) */}
-                    <p className="text-xs text-gray-800 font-medium line-clamp-2 leading-relaxed mb-6">
+                    {/* High-Contrast Description Text (#212529) */}
+                    <p className="text-xs text-[#212529] font-medium line-clamp-2 leading-relaxed mb-6">
                       {dest.description}
                     </p>
                   </div>
