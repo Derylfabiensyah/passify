@@ -1,5 +1,5 @@
 import React from 'react';
-import { WifiOff, Trees, Tent, Cpu, RefreshCw, CheckCircle2, BatteryCharging, ShieldAlert, Users, Compass, Shield, HeartHandshake, Zap, Activity, Database, Lock } from 'lucide-react';
+import { WifiOff, Trees, Tent, Cpu, RefreshCw, CheckCircle2, BatteryCharging, ShieldAlert, Users, Compass, Shield, HeartHandshake, Zap, Activity, Database, Lock, Smartphone, Check, ArrowRight } from 'lucide-react';
 
 export default function OfflineInfrastructureSection() {
   return (
@@ -21,7 +21,7 @@ export default function OfflineInfrastructureSection() {
       {/* BENTO GRID ROW 1: GENEROUS GAP (gap-10 lg:gap-12) & INTERNAL PADDING (p-10 sm:p-12 lg:p-14) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 mb-12">
         
-        {/* HERO BENTO CARD 1 (8 cols): Kriptografi HMAC TOTP Offline-First */}
+        {/* HERO BENTO CARD 1 (8 cols): Kriptografi HMAC TOTP + RUGGED HANDHELD SCANNER DEVICE MOCKUP */}
         <div className="lg:col-span-8 p-10 sm:p-12 lg:p-14 rounded-3xl bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950 text-white shadow-2xl flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-8">
@@ -42,30 +42,77 @@ export default function OfflineInfrastructureSection() {
               Jangan biarkan antrean panjang terjadi karena sinyal seluler putus di tengah hutan. Passify menggunakan arsitektur lokal dengan keamanan ganda anti-tiket palsu yang memvalidasi gelang pengunjung tanpa butuh koneksi server pusat.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 my-10">
-              {[
-                {
-                  step: '01',
-                  title: 'Basecamp Sync (Pagi)',
-                  desc: 'Petugas gerbang mengunduh manifes tiket harian terenkripsi saat di basecamp bersinyal/Wi-Fi.'
-                },
-                {
-                  step: '02',
-                  title: 'Validasi < 0.28 Detik',
-                  desc: 'Scanner memeriksa tanda tangan digital NFC & QR secara seketika di pintu hutan tanpa delay.'
-                },
-                {
-                  step: '03',
-                  title: 'Auto-Batch Cloud Upload',
-                  desc: 'Seluruh riwayat check-in otomatis terunggah ke cloud begitu perangkat kembali ke zona sinyal.'
-                }
-              ].map((item, idx) => (
-                <div key={idx} className="p-5 sm:p-6 rounded-2xl bg-white/5 shadow-md">
-                  <span className="text-xs font-mono font-bold text-emerald-400 block mb-2">{item.step} • ALUR KERJA</span>
-                  <h4 className="text-base font-bold text-white mt-1 mb-2">{item.title}</h4>
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-medium">{item.desc}</p>
+            {/* RUGGED HANDHELD SMARTPHONE DEVICE MOCKUP (Replacing dry text table!) */}
+            <div className="my-10 p-6 sm:p-8 rounded-3xl bg-gray-900/90 border border-gray-800 shadow-2xl">
+              <div className="flex items-center justify-between pb-4 mb-5 border-b border-gray-800 text-xs font-mono text-gray-400">
+                <div className="flex items-center gap-2">
+                  <Smartphone className="w-4 h-4 text-emerald-400" />
+                  <span>PASSIFY RANGER TERMINAL OS • RUGGED HANDHELD #01</span>
                 </div>
-              ))}
+                <span className="text-red-400 font-bold flex items-center gap-1">
+                  <WifiOff className="w-3.5 h-3.5" /> 100% OFFLINE MODE
+                </span>
+              </div>
+
+              {/* Device Mockup Screen Body */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+                {/* Left: Interactive Scan Telemetry Screen */}
+                <div className="p-5 rounded-2xl bg-gray-950 border border-emerald-500/30 font-mono text-xs">
+                  <div className="flex justify-between items-center text-[11px] text-gray-400 mb-2">
+                    <span>STATUS POSKO GERBANG</span>
+                    <span className="text-emerald-400 font-bold">READY TO TAP</span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 font-bold text-center mb-3">
+                    [ NFC / QR GATE SCAN ACTIVE ]
+                  </div>
+                  <div className="space-y-1.5 text-[11px]">
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Tiket Terakhir:</span>
+                      <span className="text-white font-bold">#TWA-QR-98214</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Waktu Validasi:</span>
+                      <span className="text-emerald-400 font-bold">0.28 Detik (HMAC OK)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Nama Pendaki:</span>
+                      <span className="text-white font-semibold">Deryl Fabiensyah</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Sesi Kunjungan:</span>
+                      <span className="text-amber-300">Sunrise (06:00 - 11:00)</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Step-by-Step Crypto Alur Kerja */}
+                <div className="space-y-3 font-sans">
+                  {[
+                    {
+                      title: '01. Basecamp Sync (Pagi)',
+                      desc: 'Unduh manifes tiket harian terenkripsi saat di basecamp bersinyal/Wi-Fi.'
+                    },
+                    {
+                      title: '02. Validasi < 0.28 Detik',
+                      desc: 'Scanner memeriksa tanda tangan digital NFC & QR secara lokal di pintu hutan tanpa delay.'
+                    },
+                    {
+                      title: '03. Auto-Batch Upload',
+                      desc: 'Riwayat scan otomatis tersinkron ke cloud saat ranger kembali ke zona sinyal.'
+                    }
+                  ].map((item, idx) => (
+                    <div key={idx} className="p-3.5 rounded-xl bg-white/5 flex items-start gap-3">
+                      <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Check className="w-3.5 h-3.5" />
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-white">{item.title}</div>
+                        <div className="text-[11px] text-gray-300 mt-0.5">{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
