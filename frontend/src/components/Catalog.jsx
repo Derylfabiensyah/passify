@@ -162,7 +162,7 @@ export default function Catalog({ destinations, searchQuery, onSelectDestination
                       <div>
                         <span className="text-[10px] text-gray-700 font-semibold block uppercase">Tiket Mulai</span>
                         <span className="text-base font-extrabold text-gray-900 font-['Outfit']">
-                          Rp {dest.price_per_ticket.toLocaleString('id-ID')}
+                          Rp {(dest.starting_price || dest.price_per_ticket || 0).toLocaleString('id-ID')}
                         </span>
                       </div>
 
