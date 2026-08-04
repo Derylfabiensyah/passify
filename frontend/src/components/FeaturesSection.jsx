@@ -128,7 +128,7 @@ export default function FeaturesSection() {
                 Perangkat scanner gerbang tetap bekerja akurat di area tanpa sinyal dengan protokol kriptografi HMAC TOTP offline. Tidak ada kata sistem down di hutan.
               </p>
 
-              {/* Compact NFC Simulator Box */}
+              {/* Compact Offline Scanner Box */}
               <div className="p-5 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs font-mono space-y-2 my-6">
                 <div className="flex justify-between text-emerald-300">
                   <span>LOCAL SQLITE ENGINE:</span>
@@ -149,30 +149,30 @@ export default function FeaturesSection() {
 
         {/* Row 2: Compact Card (5 cols) + Large Card (7 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
-          {/* Card 3: White-Label Cashless Ecosystem (5 cols) */}
+          {/* Card 3: White-Label Portal & Kios Mandiri (5 cols) */}
           <div className="lg:col-span-5 p-10 sm:p-12 lg:p-14 rounded-3xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white shadow-xl flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-8">
                 <div className="w-14 h-14 rounded-2xl bg-white/10 text-white flex items-center justify-center shadow-xs">
-                  <Wallet className="w-7 h-7 text-emerald-300" />
+                  <Monitor className="w-7 h-7 text-emerald-300" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-200 bg-white/10 px-4 py-2 rounded-full">
-                  MODUL UMKM
+                  MODUL RESERVASI
                 </span>
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-extrabold font-['Outfit'] text-white mb-4 leading-snug">
-                White-Label Cashless Ecosystem
+                White-Label Portal & Kios Mandiri
               </h3>
 
               <p className="text-gray-200 font-medium text-base sm:text-lg leading-relaxed mb-8">
-                Dompet digital terintegrasi untuk transaksi F&B, penyewaan alat, dan suvenir di seluruh merchant kawasan wisata tanpa perantara tunai.
+                Portal pemesanan online bermerek sendiri (white-label) dan dukungan E-Kiosk mandiri di gerbang wisata untuk mengurangi antrean loket hingga 80%.
               </p>
             </div>
 
             <div className="pt-8 mt-8 border-t border-emerald-800 flex items-center justify-between text-xs sm:text-sm font-mono text-emerald-300">
-              <span>EDC & QRIS BI-FAST</span>
-              <span className="font-bold">Zero Leakage</span>
+              <span>QR Code Thermal & Online</span>
+              <span className="font-bold">Zero Queue Delay</span>
             </div>
           </div>
 

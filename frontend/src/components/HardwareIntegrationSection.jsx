@@ -4,32 +4,18 @@ import { Cpu, Radio, Terminal, ScanLine, QrCode, CheckCircle2, ShieldCheck, Arro
 export default function HardwareIntegrationSection() {
   const hardwareShowcases = [
     {
-      id: 'rfid-wristband',
-      name: 'Gelang RFID & NFC Waterproof IP68',
-      tagline: 'Tiket & Dompet Prabayar dalam Satu Gelang',
-      badge: 'IP68 WATERPROOF — ANTI HILANG',
-      image: '/rfid_wristband_mockup.jpg',
-      description: 'Pengunjung menerima Gelang RFID/NFC tahan air saat check-in di gerbang utama. Berfungsi sebagai identitas masuk sekaligus dompet pembayaran kuliner & sewa alat di dalam hutan maupun air terjun tanpa perlu sinyal telepon.',
-      specs: [
-        'Frekuensi: 13.56 MHz (ISO/IEC 14443A) Standar Internasional',
-        'Material: Silicone Medical-Grade Tahan Air, Lumpur, & Cuaca Ekstrem',
-        'Top-up & Refund saldo langsung di Kios atau Kasir tanpa biaya admin'
-      ],
-      imageLeft: true
-    },
-    {
       id: 'handheld-scanner',
       name: 'Handheld Offline Gate Scanner',
       tagline: 'Gawai Pemindai untuk Ranger & Pos Gerbang',
       badge: 'RUGGED ANDROID — BATERAI 6000mAh',
       image: '/handheld_scanner_mockup.jpg',
-      description: 'Perangkat genggam tahan banting yang dirancang untuk petugas gerbang di titik pendakian atau hutan rimba. Mampu memindai QR dan NFC secara lokal tanpa sambungan internet dengan respons super cepat.',
+      description: 'Perangkat genggam tahan banting yang dirancang untuk petugas gerbang di titik pendakian atau hutan rimba. Mampu memindai QR Code e-Ticket secara lokal tanpa sambungan internet dengan respons super cepat.',
       specs: [
         'Baterai tahan hingga 14 jam operasional nonstop di lapangan',
         'Konektivitas offline murni dengan enkripsi lokal ganda HMAC SHA-256',
         'Sertifikasi tahan jatuh (Drop Proof 1.5 Meter) & layar tahan gores'
       ],
-      imageLeft: false
+      imageLeft: true
     },
     {
       id: 'e-kiosk',
@@ -40,10 +26,10 @@ export default function HardwareIntegrationSection() {
       description: 'Kios tiket mandiri untuk mempercepat proses check-in di Taman Nasional atau objek wisata padat. Pengunjung dapat memindai QR code reservasi online atau membeli tiket langsung via QRIS & Kartu Debit.',
       specs: [
         'Layar sentuh anti-gores bersinar tinggi (High Brightness Outdoor display)',
-        'Printer tiket gelang/kertas thermal berkecepatan tinggi',
+        'Printer tiket QR thermal berkecepatan tinggi',
         'Pembayaran otomatis terintegrasi QRIS BI-FAST & EDC Kasir'
       ],
-      imageLeft: true
+      imageLeft: false
     }
   ];
 

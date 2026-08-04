@@ -42,7 +42,7 @@ export default function Hero({ onExploreClick }) {
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] font-['Outfit'] text-gray-900">
               Digitalisasi Wisata Alam: <br />
               <span className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 bg-clip-text text-transparent">
-                Satu Dasbor untuk Tiket, Kuota, & Cashless.
+                Satu Dasbor untuk Tiket, Kuota, & Pos Gerbang.
               </span>
             </h1>
 
@@ -150,7 +150,7 @@ export default function Hero({ onExploreClick }) {
                         HMAC SHA-256 TOTP
                       </div>
                       <div className="text-[11px] text-emerald-300 font-sans mt-0.5">
-                        Kecepatan Tap: 0.28 Detik • Anti-Tiket Palsu
+                        Kecepatan Scan QR: 0.28 Detik • Anti-Tiket Palsu
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 text-[10px] text-gray-400 pt-1">

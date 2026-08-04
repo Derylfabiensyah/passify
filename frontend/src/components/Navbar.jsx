@@ -40,7 +40,7 @@ export default function Navbar({
           {[
             { label: 'Fitur', target: 'features-section' },
             { label: 'Teknologi Offline', target: 'offline-infrastructure' },
-            { label: 'Hardware', target: 'hardware-section' },
+            { label: 'Hardware', target: 'hardware-integration' },
             { label: 'Harga Bagi Hasil', target: 'pricing-section' },
             { label: 'Legalitas B2G', target: 'security-legal' },
             { label: 'Testimoni', target: 'testimonials-section' },

@@ -6,13 +6,11 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import OfflineInfrastructureSection from './components/OfflineInfrastructureSection';
 import HardwareIntegrationSection from './components/HardwareIntegrationSection';
-import CashlessEcosystemSection from './components/CashlessEcosystemSection';
 import PricingSection from './components/PricingSection';
 import SecurityLegalSection from './components/SecurityLegalSection';
 import TestimonialsSection from './components/TestimonialsSection';
 import Catalog from './components/Catalog';
 import BookingModal from './components/BookingModal';
-import WalletModal from './components/WalletModal';
 import ETicketModal from './components/ETicketModal';
 import AuthModal from './components/AuthModal';
 import FeaturesSection from './components/FeaturesSection';
@@ -38,10 +36,8 @@ function PublicPortal() {
     }
   });
 
-  const [walletBalance, setWalletBalance] = useState(250000);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDestination, setSelectedDestination] = useState(null);
-  const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeOrder, setActiveOrder] = useState({
     orderNumber: 'TWA-20260729-8832',
@@ -57,10 +53,6 @@ function PublicPortal() {
     createdAt: new Date().toISOString()
   });
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
-
-  const handleTopUpWallet = (amount) => {
-    setWalletBalance((prev) => prev + amount);
-  };
 
   const handleBookingSuccess = (newOrder) => {
     setActiveOrder(newOrder);
@@ -102,12 +94,7 @@ function PublicPortal() {
         {/* 3. Visualisasi Hardware: Alternating Zig-Zag dengan Foto Produk AI Real Mockups */}
         <HardwareIntegrationSection />
 
-        {/* 4. Simulasi Interaktif Ekosistem Cashless */}
-        <CashlessEcosystemSection
-          onOpenWallet={() => setIsWalletOpen(true)}
-        />
-
-        {/* 5. Paket Harga Khusus & Kalkulator Bagi Hasil Interaktif Slider */}
+        {/* 4. Paket Harga Khusus & Kalkulator Bagi Hasil Interaktif Slider */}
         <PricingSection />
 
         {/* 6. Keamanan, Kepatuhan Regulasi, & Legalitas B2G */}
@@ -148,13 +135,6 @@ function PublicPortal() {
           destination={selectedDestination}
           onClose={() => setSelectedDestination(null)}
           onBookingSuccess={handleBookingSuccess}
-        />
-      )}
-      {isWalletOpen && (
-        <WalletModal
-          walletBalance={walletBalance}
-          onTopUp={handleTopUpWallet}
-          onClose={() => setIsWalletOpen(false)}
         />
       )}
       {isTicketModalOpen && (

@@ -39,7 +39,7 @@ export default function OfflineInfrastructureSection() {
             </h3>
 
             <p className="text-gray-200 text-base sm:text-lg leading-relaxed font-medium max-w-2xl mb-10">
-              Jangan biarkan antrean panjang terjadi karena sinyal seluler putus di tengah hutan. Passify menggunakan arsitektur lokal dengan keamanan ganda anti-tiket palsu yang memvalidasi gelang pengunjung tanpa butuh koneksi server pusat.
+              Jangan biarkan antrean panjang terjadi karena sinyal seluler putus di tengah hutan. Passify menggunakan arsitektur lokal dengan keamanan ganda anti-tiket palsu yang memvalidasi e-Ticket QR pengunjung tanpa butuh koneksi server pusat.
             </p>
 
             {/* RUGGED HANDHELD SMARTPHONE DEVICE MOCKUP (Replacing dry text table!) */}
@@ -60,10 +60,10 @@ export default function OfflineInfrastructureSection() {
                 <div className="p-5 rounded-2xl bg-gray-950 border border-emerald-500/30 font-mono text-xs">
                   <div className="flex justify-between items-center text-[11px] text-gray-400 mb-2">
                     <span>STATUS POSKO GERBANG</span>
-                    <span className="text-emerald-400 font-bold">READY TO TAP</span>
+                    <span className="text-emerald-400 font-bold">READY TO SCAN</span>
                   </div>
                   <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/40 text-emerald-300 font-bold text-center mb-3">
-                    [ NFC / QR GATE SCAN ACTIVE ]
+                    [ QR CODE GATE SCAN ACTIVE ]
                   </div>
                   <div className="space-y-1.5 text-[11px]">
                     <div className="flex justify-between">
@@ -94,7 +94,7 @@ export default function OfflineInfrastructureSection() {
                     },
                     {
                       title: '02. Validasi < 0.28 Detik',
-                      desc: 'Scanner memeriksa tanda tangan digital NFC & QR secara lokal di pintu hutan tanpa delay.'
+                      desc: 'Scanner memeriksa tanda tangan digital QR Code secara lokal di pintu hutan tanpa delay.'
                     },
                     {
                       title: '03. Auto-Batch Upload',
@@ -140,12 +140,12 @@ export default function OfflineInfrastructureSection() {
             </h3>
 
             <p className="text-[#212529] text-sm sm:text-base leading-relaxed font-medium mb-8">
-              Handheld Gate Scanner kami dilengkapi baterai industri 6000 mAh dan chip NFC hemat daya untuk bertugas di posko pendakian tertinggi.
+              Handheld Gate Scanner kami dilengkapi baterai industri 6000 mAh dan kamera pemindai optik hemat daya untuk bertugas di posko pendakian tertinggi.
             </p>
 
             <div className="space-y-4 font-mono text-xs sm:text-sm">
               <div className="p-4 rounded-2xl bg-gray-50 shadow-xs flex items-center justify-between">
-                <span className="text-[#212529] font-medium">Respons Scan NFC:</span>
+                <span className="text-[#212529] font-medium">Respons Scan QR Code:</span>
                 <span className="font-bold text-gray-900">0.28 Detik</span>
               </div>
               <div className="p-4 rounded-2xl bg-gray-50 shadow-xs flex items-center justify-between">

@@ -7,7 +7,7 @@ export default function TestimonialsSection() {
       name: 'Bapak H. Solehuddin',
       role: 'Ketua Pokdarwis Lereng Arjuno & Air Terjun',
       location: 'Jawa Timur',
-      quote: 'Dulu sebelum pakai Passify, kami sering rugi karena tiket gelang kertas mudah dipalsukan dan antrean loket mengular sampai jalan raya. Setelah pasang Gelang RFID dan Kios Mandiri Passify, kebocoran kas turun dari 35% menjadi nol dalam dua bulan pertama.',
+      quote: 'Dulu sebelum pakai Passify, kami sering rugi karena tiket gelang kertas mudah dipalsukan dan antrean loket mengular sampai jalan raya. Setelah pasang E-Ticket QR Code dan Kios Mandiri Passify, kebocoran kas turun dari 35% menjadi nol dalam dua bulan pertama.',
       metric: '0% Kebocoran Tiket',
       avatar: 'H.S.'
     },
@@ -15,7 +15,7 @@ export default function TestimonialsSection() {
       name: 'Ibu Ir. Larasati Wibowo, M.Sc.',
       role: 'Kepala Seksi Konservasi Wilayah BKSDA',
       location: 'Kawasan Taman Nasional',
-      quote: 'Fitur kuota konservasi dan kemampuan offline-first sangat krusial bagi kami. Petugas gerbang di posko ketinggian 1.800 mdpl tetap bisa scan gelang pendaki dengan sangat cepat walau sama sekali tidak ada sinyal operator seluler.',
+      quote: 'Fitur kuota konservasi dan kemampuan offline-first sangat krusial bagi kami. Petugas gerbang di posko ketinggian 1.800 mdpl tetap bisa scan QR e-Ticket pendaki dengan sangat cepat walau sama sekali tidak ada sinyal operator seluler.',
       metric: '0.28 Detik Kecepatan Scan Offline',
       avatar: 'L.W.'
     },

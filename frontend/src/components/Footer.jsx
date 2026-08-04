@@ -11,7 +11,7 @@ export default function Footer() {
           </div>
           <div>
             <span className="text-gray-900 font-bold text-base font-['Outfit'] tracking-tight">Passify</span>
-            <p className="text-[11px] text-gray-400">White-Label Cloud E-Ticketing & Cashless Engine</p>
+            <p className="text-[11px] text-gray-400">White-Label Cloud E-Ticketing & Reservation Engine</p>
           </div>
         </div>
 
