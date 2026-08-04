@@ -184,16 +184,16 @@ export default function Hero({ onExploreClick }) {
                 <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md shadow-lg flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src="/rfid_wristband_mockup.jpg"
-                      alt="Gelang RFID Passify"
+                      src="/handheld_scanner_mockup.jpg"
+                      alt="Handheld Scanner Passify"
                       className="w-12 h-12 rounded-xl object-cover shadow-sm flex-shrink-0"
                     />
                     <div className="font-sans">
                       <div className="text-xs font-bold text-white">
-                        Gelang RFID IP68 & E-Kiosk Ready
+                        Handheld Scanner Offline 14 Jam
                       </div>
                       <div className="text-[11px] text-emerald-300">
-                        Tiket tahan air & dompet cashless untuk alam bebas
+                        Validasi QR e-Ticket tanpa sinyal & tanpa listrik pusat
                       </div>
                     </div>
                   </div>

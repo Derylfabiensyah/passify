@@ -212,7 +212,7 @@ export default function PricingSection() {
             <ul className="space-y-3 my-6 pt-6">
               {[
                 'Semua fitur Paket Bagi Hasil (Tanpa Potongan Tiket)',
-                '1 Unit Mesin E-Kiosk Mandiri Termasuk',
+                'Dukungan White-Label Domain & Portal Resmi',
                 '2 Unit Handheld Rugged Scanner Android',
                 'SLA Uptime 99.9% & Prioritas Support 24/7'
               ].map((item, idx) => (

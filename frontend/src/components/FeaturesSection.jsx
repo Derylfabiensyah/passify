@@ -149,7 +149,7 @@ export default function FeaturesSection() {
 
         {/* Row 2: Compact Card (5 cols) + Large Card (7 cols) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12">
-          {/* Card 3: White-Label Portal & Kios Mandiri (5 cols) */}
+          {/* Card 3: White-Label Portal & E-Ticketing Resmi (5 cols) */}
           <div className="lg:col-span-5 p-10 sm:p-12 lg:p-14 rounded-3xl bg-gradient-to-br from-emerald-900 to-teal-950 text-white shadow-xl flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-8">
@@ -162,11 +162,11 @@ export default function FeaturesSection() {
               </div>
 
               <h3 className="text-2xl sm:text-3xl font-extrabold font-['Outfit'] text-white mb-4 leading-snug">
-                White-Label Portal & Kios Mandiri
+                White-Label Portal & E-Ticketing Resmi
               </h3>
 
               <p className="text-gray-200 font-medium text-base sm:text-lg leading-relaxed mb-8">
-                Portal pemesanan online bermerek sendiri (white-label) dan dukungan E-Kiosk mandiri di gerbang wisata untuk mengurangi antrean loket hingga 80%.
+                Portal pemesanan online bermerek sendiri (white-label) untuk kemudahan wisatawan memesan e-ticket resmi sebelum tiba, mengurangi antrean loket hingga 80%.
               </p>
             </div>
 

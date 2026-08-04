@@ -16,20 +16,6 @@ export default function HardwareIntegrationSection() {
         'Sertifikasi tahan jatuh (Drop Proof 1.5 Meter) & layar tahan gores'
       ],
       imageLeft: true
-    },
-    {
-      id: 'e-kiosk',
-      name: 'E-Kiosk Mandiri (Self-Ticketing Kiosk)',
-      tagline: 'Otomatisasi Loket Tanpa Antrean Panjang',
-      badge: 'LAYAR SENTUH 21.5" & PRINTER THERMAL',
-      image: '/self_ticketing_kiosk_mockup.jpg',
-      description: 'Kios tiket mandiri untuk mempercepat proses check-in di Taman Nasional atau objek wisata padat. Pengunjung dapat memindai QR code reservasi online atau membeli tiket langsung via QRIS & Kartu Debit.',
-      specs: [
-        'Layar sentuh anti-gores bersinar tinggi (High Brightness Outdoor display)',
-        'Printer tiket QR thermal berkecepatan tinggi',
-        'Pembayaran otomatis terintegrasi QRIS BI-FAST & EDC Kasir'
-      ],
-      imageLeft: false
     }
   ];
 
@@ -45,7 +31,7 @@ export default function HardwareIntegrationSection() {
           Perangkat Keras Siap Pakai di Gerbang Wisata
         </h2>
         <p className="text-[#212529] text-base sm:text-lg leading-relaxed font-medium">
-          Tidak sekadar narasi perangkat keras abstrak. Berikut adalah foto produk dan spesifikasi nyata gawai yang siap kami deploy ke kawasan wisata Anda dengan jarak ruang napas eksekutif.
+          Tidak sekadar narasi perangkat keras abstrak. Berikut adalah spesifikasi nyata gawai pemindai offline yang siap kami deploy ke titik loket dan pos gerbang kawasan wisata Anda.
         </p>
       </div>
 

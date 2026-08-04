@@ -7,7 +7,7 @@ export default function TestimonialsSection() {
       name: 'Bapak H. Solehuddin',
       role: 'Ketua Pokdarwis Lereng Arjuno & Air Terjun',
       location: 'Jawa Timur',
-      quote: 'Dulu sebelum pakai Passify, kami sering rugi karena tiket gelang kertas mudah dipalsukan dan antrean loket mengular sampai jalan raya. Setelah pasang E-Ticket QR Code dan Kios Mandiri Passify, kebocoran kas turun dari 35% menjadi nol dalam dua bulan pertama.',
+      quote: 'Dulu sebelum pakai Passify, kami sering rugi karena tiket gelang kertas mudah dipalsukan dan antrean loket mengular sampai jalan raya. Setelah menerapkan sistem E-Ticket QR Code dari Passify, kebocoran kas turun dari 35% menjadi nol dalam dua bulan pertama.',
       metric: '0% Kebocoran Tiket',
       avatar: 'H.S.'
     },
