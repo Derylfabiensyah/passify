@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import { X, Calendar, Clock, User, ShieldCheck, CreditCard, Ticket, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function BookingModal({ destination, onClose, onBookingSuccess }) {
-  if (!destination) return null;
-
   const todayStr = new Date().toISOString().split('T')[0];
   const [visitDate, setVisitDate] = useState(todayStr);
-  const [selectedSlotId, setSelectedSlotId] = useState(destination.time_slots[0]?.id || '');
+  const [selectedSlotId, setSelectedSlotId] = useState(destination?.time_slots?.[0]?.id || '');
   const [quantities, setQuantities] = useState({
-    [destination.ticket_categories[0]?.id || 'cat-1']: 1
+    [destination?.ticket_categories?.[0]?.id || 'cat-1']: 1
   });
 
   const [visitorName, setVisitorName] = useState('');
@@ -16,6 +14,8 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
   const [nationality, setNationality] = useState('WNI');
   const [paymentMethod, setPaymentMethod] = useState('qris');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  if (!destination) return null;
 
   const handleQtyChange = (catId, delta) => {
     setQuantities((prev) => {

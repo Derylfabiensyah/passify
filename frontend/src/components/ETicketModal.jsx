@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { X, QrCode, ShieldCheck, Download, Calendar, Clock, MapPin, CheckCircle2 } from 'lucide-react';
 
 export default function ETicketModal({ order, onClose }) {
-  if (!order) return null;
-
   const [totpCountdown, setTotpCountdown] = useState(30);
 
   useEffect(() => {
@@ -12,6 +10,8 @@ export default function ETicketModal({ order, onClose }) {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
+  if (!order) return null;
 
   return (
     <div className="modal-overlay">
