@@ -180,7 +180,6 @@ export default function LandingPage() {
                 <div className="self-end bg-[#e8ddd0] p-4"><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6f4b32]">Sesi tersisa</p><p className="mt-1 text-2xl font-extrabold text-[#3b2c21]">58</p></div>
               </div>
               <div className="mt-5 flex items-center justify-between text-[11px] font-bold"><span className="text-[var(--ink-soft)]">Rp35.000 / orang</span><span className="rounded-full bg-[#915532] px-4 py-2 text-white">Pilih tanggal</span></div>
-              <div className="absolute -bottom-10 -right-7 h-28 w-28 rounded-full border-[18px] border-[var(--fog)]" />
             </div>
           </div>
         </section>
