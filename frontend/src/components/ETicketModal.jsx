@@ -27,7 +27,7 @@ export default function ETicketModal({ order, onClose }) {
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold mb-2 border border-emerald-200">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-semibold mb-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
             <span>E-Ticket Resmi White-Label Passify</span>
           </div>
