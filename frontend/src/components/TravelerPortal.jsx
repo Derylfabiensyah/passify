@@ -120,7 +120,7 @@ export default function TravelerPortal() {
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <span className="hidden rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-800 sm:inline-flex">
+            <span className="hidden rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-amber-800 sm:inline-flex">
               Data demo
             </span>
             {user ? (
@@ -128,7 +128,7 @@ export default function TravelerPortal() {
                 <span className="hidden text-xs font-medium text-slate-600 sm:inline">
                   Halo, {user.name?.split(' ')[0] || 'Wisatawan'}
                 </span>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-emerald-200 bg-emerald-100 text-xs font-bold text-emerald-900">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-900">
                   {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}
                 </span>
                 <button
@@ -145,7 +145,7 @@ export default function TravelerPortal() {
               <button
                 type="button"
                 onClick={openAuthModal}
-                className="inline-flex items-center gap-1.5 rounded-full border border-stone-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 shadow-sm transition-colors hover:border-emerald-700 hover:text-emerald-800"
+                className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 shadow-sm transition-colors hover:text-emerald-800"
               >
                 <LogIn className="h-3.5 w-3.5" aria-hidden="true" />
                 Masuk
