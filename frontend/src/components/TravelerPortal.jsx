@@ -169,10 +169,7 @@ export default function TravelerPortal() {
 
             <div className="relative grid min-h-[450px] items-end gap-8 px-6 py-8 sm:min-h-[490px] sm:px-10 sm:py-10 lg:grid-cols-[1fr_360px] lg:px-14 lg:py-14">
               <div className="max-w-2xl">
-                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white backdrop-blur-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
-                  Portal wisatawan · mode simulasi
-                </div>
+
                 <p className="mb-3 text-sm font-medium text-emerald-100">{todayLabel}</p>
                 <h1 className="max-w-xl font-serif text-4xl font-semibold leading-[1.02] tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
                   Luangkan waktu untuk kembali ke alam.
