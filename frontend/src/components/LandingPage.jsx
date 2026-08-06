@@ -5,13 +5,7 @@ import { Link } from 'react-router-dom';
 const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1800&q=88';
 const trailImage = 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=85';
 
-function Mark() {
-  return (
-    <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--ink)] text-[var(--sand)]">
-      <Mountain className="h-[18px] w-[18px] stroke-[1.7]" />
-    </span>
-  );
-}
+
 
 function Eyebrow({ children }) {
   return (
@@ -29,12 +23,8 @@ export default function LandingPage() {
     <div className="min-h-screen overflow-x-hidden bg-[var(--canvas)] text-[var(--ink)]">
       <header className="relative z-20 border-b border-[rgba(23,59,50,0.13)] bg-[var(--canvas)]">
         <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-5 sm:px-8 lg:px-10">
-          <Link to="/" className="flex items-center gap-3 text-decoration-none" aria-label="Passify beranda">
-            <Mark />
-            <span className="leading-tight">
-              <span className="block text-[17px] font-extrabold tracking-[-0.04em]">passify</span>
-              <span className="block text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--river)]">field ticketing</span>
-            </span>
+          <Link to="/" className="flex items-center text-decoration-none" aria-label="Passify beranda">
+            <span className="text-[17px] font-extrabold tracking-[-0.04em]">passify</span>
           </Link>
 
           <nav className="hidden items-center gap-7 text-[13px] font-semibold text-[var(--ink-soft)] md:flex">
