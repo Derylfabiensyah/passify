@@ -36,8 +36,8 @@ export default function ETicketModal({ order, onClose }) {
         </div>
 
         {/* Dynamic TOTP QR Code Card */}
-        <div className="bg-gray-50 p-6 rounded-xl border border-gray-200 text-center space-y-4 shadow-2xs">
-          <div className="w-48 h-48 bg-white border border-gray-200 rounded-xl mx-auto flex items-center justify-center relative shadow-xs">
+        <div className="bg-gray-50 p-6 rounded-xl text-center space-y-4 shadow-2xs">
+          <div className="w-48 h-48 bg-white rounded-xl mx-auto flex items-center justify-center relative shadow-xs">
             <QrCode className="w-36 h-36 text-gray-900" />
             <div className="absolute bottom-2 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
               TOTP SECURED
@@ -60,7 +60,7 @@ export default function ETicketModal({ order, onClose }) {
         </div>
 
         {/* Details List */}
-        <div className="my-6 p-4 rounded-xl bg-gray-50 border border-gray-200 space-y-2.5 text-sm shadow-2xs">
+        <div className="my-6 p-4 rounded-xl bg-gray-50 space-y-2.5 text-sm shadow-2xs">
           <div className="flex justify-between">
             <span className="text-gray-500 flex items-center gap-1 font-medium">
               <Calendar className="w-4 h-4 text-emerald-600" /> Tanggal Kunjungan
@@ -88,7 +88,7 @@ export default function ETicketModal({ order, onClose }) {
         {/* Action Button */}
         <button
           onClick={() => alert(`Mengunduh E-Ticket PDF untuk Order #${order.orderNumber}...`)}
-          className="w-full py-3 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-2xs"
+          className="w-full py-3 flex items-center justify-center gap-2 text-sm font-semibold rounded-xl bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors shadow-2xs"
         >
           <Download className="w-4 h-4 text-emerald-600" />
           <span>Unduh Dokumen E-Ticket (PDF)</span>
