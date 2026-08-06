@@ -224,31 +224,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              {/* Quick Demo Access Section */}
-              <div className="pt-4 border-t border-gray-200">
-                <div className="text-[11px] text-gray-500 text-center mb-2.5 font-medium flex items-center justify-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Cepat Uji Coba Tanpa Mengetik (Akses Demo)</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleDemoLogin('wisatawan')}
-                    className="px-3 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 text-xs text-gray-700 transition-all text-center flex flex-col items-center gap-0.5 shadow-2xs"
-                  >
-                    <span className="font-semibold text-gray-900">Wisatawan</span>
-                    <span className="text-[10px] text-gray-500">Deryl Fabiensyah</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleDemoLogin('admin')}
-                    className="px-3 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 hover:border-gray-300 text-xs text-gray-700 transition-all text-center flex flex-col items-center gap-0.5 shadow-2xs"
-                  >
-                    <span className="font-semibold text-emerald-700">Pengelola</span>
-                    <span className="text-[10px] text-gray-500">Admin Venue Klien</span>
-                  </button>
-                </div>
-              </div>
+
             </form>
           ) : (
             <form onSubmit={handleRegisterSubmit} className="space-y-4">
