@@ -60,7 +60,7 @@ export default function Catalog({ destinations, searchQuery, onSelectDestination
             const quotaPercentage = Math.round((destination.booked_today / destination.max_daily_capacity) * 100);
 
             return (
-              <article key={destination.id} className="group overflow-hidden rounded-[1.25rem] border border-stone-200 bg-white transition-colors hover:border-emerald-700">
+              <article key={destination.id} className="group overflow-hidden rounded-[1.25rem] bg-white transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-emerald-900/5">
                 <button
                   id={`card-${destination.id}`}
                   type="button"

@@ -170,7 +170,7 @@ export default function LandingPage() {
               <p className="mt-6 max-w-[500px] text-[15px] leading-7 text-[var(--ink-soft)]">Setiap portal dapat menampilkan nama, warna, konten, dan alur kunjungan yang terasa milik kawasan sendiri—sementara tim Anda tetap memakai operasi yang konsisten di belakangnya.</p>
               <Link to="/jelajah" className="mt-8 inline-flex items-center gap-2 border-b border-[var(--ink)] pb-1 text-[13px] font-extrabold text-[var(--ink)]">Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" /></Link>
             </div>
-            <div className="relative overflow-hidden border border-[rgba(23,59,50,0.17)] bg-white p-6 sm:p-9">
+            <div className="relative overflow-hidden bg-white p-6 sm:p-9 shadow-[0_0_40px_rgba(0,0,0,0.03)]">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#915532] text-white"><Trees className="h-4 w-4" /></span><span><span className="block text-sm font-extrabold">Rimba Senja</span><span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--ink-soft)]">Taman wisata alam</span></span></div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--river)]">Portal contoh</span>

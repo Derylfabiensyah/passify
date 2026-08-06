@@ -184,7 +184,7 @@ export default function TravelerPortal() {
 
               <form
                 onSubmit={handleSearchSubmit}
-                className="rounded-3xl border border-white/25 bg-white p-4 text-slate-900 shadow-2xl shadow-emerald-950/25 sm:p-5"
+                className="rounded-3xl bg-white p-4 text-slate-900 shadow-2xl shadow-emerald-950/25 sm:p-5"
               >
                 <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-emerald-900">
                   <MapPin className="h-4 w-4" aria-hidden="true" />
