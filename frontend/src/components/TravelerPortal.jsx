@@ -167,7 +167,7 @@ export default function TravelerPortal() {
             )}
             <div className="absolute inset-0 bg-emerald-950/45" />
 
-            <div className="relative grid min-h-[450px] items-end gap-8 px-6 py-8 sm:min-h-[490px] sm:px-10 sm:py-10 lg:grid-cols-[1fr_360px] lg:px-14 lg:py-14">
+            <div className="relative grid min-h-[450px] items-center gap-8 px-6 py-8 sm:min-h-[490px] sm:px-10 sm:py-10 lg:grid-cols-[1fr_360px] lg:px-14 lg:py-14">
               <div className="max-w-2xl">
 
                 <p className="mb-3 text-sm font-medium text-emerald-100">{todayLabel}</p>
