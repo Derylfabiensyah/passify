@@ -10,7 +10,6 @@ const trailImage = 'https://images.unsplash.com/photo-1511497584788-876760111969
 function Eyebrow({ children }) {
   return (
     <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.17em] text-[var(--river)]">
-      <span className="h-px w-7 bg-[var(--clay)]" />
       {children}
     </div>
   );
