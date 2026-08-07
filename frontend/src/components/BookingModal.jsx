@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Calendar, Clock, User, ShieldCheck, CreditCard, Ticket, CheckCircle2, ArrowRight } from 'lucide-react';
+import { X, Calendar, User, Ticket, ArrowRight } from 'lucide-react';
 
 export default function BookingModal({ destination, onClose, onBookingSuccess }) {
   const todayStr = new Date().toISOString().split('T')[0];
@@ -11,8 +11,6 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
 
   const [visitorName, setVisitorName] = useState('');
   const [visitorNik, setVisitorNik] = useState('');
-  const [nationality, setNationality] = useState('WNI');
-  const [paymentMethod, setPaymentMethod] = useState('qris');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!destination) return null;
@@ -75,55 +73,56 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content card relative p-6 sm:p-8 bg-white border border-gray-200 shadow-xl max-w-xl w-full">
+      <div className="modal-content card relative max-w-xl w-full rounded-[18px] border border-[#cddac8] bg-[#fffdf8] p-5 shadow-[0_24px_60px_rgba(23,59,50,0.18)] sm:p-7">
         {/* Close Button */}
         <button
           id="close-booking-modal-btn"
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full border border-[#c6d2c2] bg-white text-[#80512f] transition-colors hover:border-[#80512f] hover:bg-[#fff3e8] hover:text-[#5f3622] focus:outline-none focus:ring-2 focus:ring-[#9aae85] sm:right-7 sm:top-7"
+          aria-label="Tutup modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-          <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 text-emerald-600 flex items-center justify-center shadow-2xs">
+        <div className="mb-5 flex items-center gap-3 border-b border-[#cddac8] pb-5 pr-10">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#b8cbb0] bg-[#e7efdf] text-[#173b32] shadow-sm">
             <Ticket className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-gray-900 font-['Outfit']">Pemesanan Tiket Wisata Alam</h2>
-            <p className="text-sm text-gray-500">{destination.name}</p>
+            <h2 className="font-['Outfit'] text-[1.35rem] font-bold leading-tight text-[#173b32]">Pemesanan Tiket Wisata Alam</h2>
+            <p className="mt-1 text-sm leading-snug text-[#52635d]">{destination.name}</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmitBooking} className="space-y-6">
+        <form onSubmit={handleSubmitBooking} className="space-y-5">
           {/* Step 1: Date & Time Slot */}
           <div>
-            <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 text-emerald-600" />
+            <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#173b32]">
+              <Calendar className="w-4 h-4 text-[#80512f]" />
               1. Pilih Tanggal Kunjungan & Sesi
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <div>
-                <span className="text-xs font-medium text-gray-500 block mb-1">Tanggal Kunjungan</span>
+                <span className="mb-1 block text-xs font-semibold text-[#52635d]">Tanggal Kunjungan</span>
                 <input
                   id="booking-date-input"
                   type="date"
                   min={todayStr}
                   value={visitDate}
                   onChange={(e) => setVisitDate(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   required
                 />
               </div>
 
               <div>
-                <span className="text-xs font-medium text-gray-500 block mb-1">Sesi Kunjungan (Time Slot)</span>
+                <span className="mb-1 block text-xs font-semibold text-[#52635d]">Sesi Kunjungan (Time Slot)</span>
                 <select
                   id="booking-timeslot-select"
                   value={selectedSlotId}
                   onChange={(e) => setSelectedSlotId(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                 >
                   {destination.time_slots.map((slot) => (
                     <option key={slot.id} value={slot.id}>
@@ -137,8 +136,8 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
 
           {/* Step 2: Select Ticket Categories */}
           <div>
-            <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-              <Ticket className="w-4 h-4 text-emerald-600" />
+            <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#173b32]">
+              <Ticket className="w-4 h-4 text-[#80512f]" />
               2. Pilih Kategori Tiket
             </label>
             <div className="space-y-2.5">
@@ -147,34 +146,34 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
                 return (
                   <div
                     key={cat.id}
-                    className="p-4 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-between gap-3 shadow-2xs"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-[#cddac8] bg-[#f5f8f2] p-3.5 shadow-sm sm:p-4"
                   >
                     <div>
-                      <div className="font-semibold text-sm text-gray-900">{cat.name}</div>
-                      <div className="text-sm text-emerald-700 font-bold">
+                      <div className="text-sm font-semibold text-[#173b32]">{cat.name}</div>
+                      <div className="mt-0.5 text-sm font-bold text-[#80512f]">
                         Rp {cat.price.toLocaleString('id-ID')}
-                        <span className="text-xs text-gray-500 font-normal ml-2">
+                        <span className="ml-2 text-xs font-normal leading-snug text-[#52635d]">
                           (+Asuransi Rp {cat.insurance.toLocaleString('id-ID')} & Retribusi Rp {cat.retribusi.toLocaleString('id-ID')})
                         </span>
                       </div>
                     </div>
 
                     {/* Qty Controls */}
-                    <div className="flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       <button
                         type="button"
                         id={`btn-dec-${cat.id}`}
                         onClick={() => handleQtyChange(cat.id, -1)}
-                        className="w-8 h-8 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-100 flex items-center justify-center font-bold"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#b8cbb0] bg-white text-base font-bold text-[#173b32] transition-colors hover:bg-[#e7efdf] focus:outline-none focus:ring-2 focus:ring-[#9aae85]"
                       >
                         -
                       </button>
-                      <span className="w-6 text-center text-sm font-semibold text-gray-900">{qty}</span>
+                      <span className="w-6 text-center text-sm font-semibold text-[#173b32]">{qty}</span>
                       <button
                         type="button"
                         id={`btn-inc-${cat.id}`}
                         onClick={() => handleQtyChange(cat.id, 1)}
-                        className="w-8 h-8 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 flex items-center justify-center font-bold shadow-2xs"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#173b32] text-base font-bold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85]"
                       >
                         +
                       </button>
@@ -187,8 +186,8 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
 
           {/* Step 3: Visitor Info */}
           <div>
-            <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1.5">
-              <User className="w-4 h-4 text-emerald-600" />
+            <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#173b32]">
+              <User className="w-4 h-4 text-[#80512f]" />
               3. Data Utama Pemesan
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -199,7 +198,7 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
                   placeholder="Nama Lengkap Sesuai KTP"
                   value={visitorName}
                   onChange={(e) => setVisitorName(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   required
                 />
               </div>
@@ -210,29 +209,29 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
                   placeholder="NIK / No Identitas"
                   value={visitorNik}
                   onChange={(e) => setVisitorNik(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-emerald-600 focus:bg-white focus:outline-none"
+                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                 />
               </div>
             </div>
           </div>
 
           {/* Step 4: Price Summary */}
-          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 space-y-2 text-sm shadow-2xs">
-            <div className="flex justify-between text-gray-600">
+          <div className="space-y-2 rounded-xl border border-[#b8cbb0] bg-[#e7efdf] p-4 text-sm shadow-sm">
+            <div className="flex justify-between gap-4 text-[#52635d]">
               <span>Subtotal Tiket ({totalQty} tiket)</span>
-              <span className="text-gray-900 font-semibold">Rp {totalTicketPrice.toLocaleString('id-ID')}</span>
+              <span className="whitespace-nowrap font-semibold text-[#173b32]">Rp {totalTicketPrice.toLocaleString('id-ID')}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between gap-4 text-[#52635d]">
               <span>Asuransi Jiwa & Retribusi Pemda</span>
-              <span className="text-gray-900 font-semibold">Rp {(totalInsurance + totalRetribusi).toLocaleString('id-ID')}</span>
+              <span className="whitespace-nowrap font-semibold text-[#173b32]">Rp {(totalInsurance + totalRetribusi).toLocaleString('id-ID')}</span>
             </div>
-            <div className="flex justify-between text-gray-600">
+            <div className="flex justify-between gap-4 text-[#52635d]">
               <span>Biaya Sistem Cloud Passify</span>
-              <span className="text-gray-900 font-semibold">Rp {platformFee.toLocaleString('id-ID')}</span>
+              <span className="whitespace-nowrap font-semibold text-[#173b32]">Rp {platformFee.toLocaleString('id-ID')}</span>
             </div>
-            <div className="pt-3 mt-3 border-t border-gray-200 flex justify-between items-center">
-              <span className="font-semibold text-gray-700">Total Pembayaran</span>
-              <span className="font-bold text-gray-900 text-lg">
+            <div className="mt-3 flex items-center justify-between border-t border-[#9aae85] pt-3">
+              <span className="font-semibold text-[#173b32]">Total Pembayaran</span>
+              <span className="text-lg font-bold text-[#80512f]">
                 Rp {grandTotal.toLocaleString('id-ID')}
               </span>
             </div>
@@ -243,7 +242,7 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
             type="submit"
             id="submit-booking-btn"
             disabled={isSubmitting || totalQty === 0}
-            className="w-full btn-primary py-3 justify-center text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50 shadow-sm"
+            className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#173b32] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#7b9680]"
           >
             {isSubmitting ? (
               <span className="flex items-center gap-2">

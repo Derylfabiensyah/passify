@@ -68,15 +68,15 @@ export default function FinancePage() {
       {
         label: 'Pendapatan Kotor (Gross)',
         data: REVENUE_WEEKLY.map((r) => r.revenue),
-        backgroundColor: '#059669', // emerald-600
-        hoverBackgroundColor: '#10b981',
+        backgroundColor: '#1f563f',
+        hoverBackgroundColor: '#356f4c',
         borderRadius: 4
       },
       {
         label: 'Net Payout Klien (95%)',
         data: REVENUE_WEEKLY.map((r) => Math.round(r.revenue * 0.95)),
-        backgroundColor: '#d1d5db', // gray-300
-        hoverBackgroundColor: '#9ca3af',
+        backgroundColor: '#a97857',
+        hoverBackgroundColor: '#8b5b3d',
         borderRadius: 4
       }
     ]
@@ -89,13 +89,13 @@ export default function FinancePage() {
       legend: {
         position: 'top',
         align: 'end',
-        labels: { color: '#4b5563', font: { size: 11, family: 'Outfit' } }
+        labels: { color: '#506452', font: { size: 11, family: 'Outfit' } }
       },
       tooltip: {
-        backgroundColor: '#ffffff',
-        titleColor: '#111827',
-        bodyColor: '#374151',
-        borderColor: '#e5e7eb',
+        backgroundColor: '#fffefa',
+        titleColor: '#4f3425',
+        bodyColor: '#506452',
+        borderColor: '#d2dfcb',
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8,
@@ -107,12 +107,12 @@ export default function FinancePage() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#6b7280', font: { size: 10 } }
+        ticks: { color: '#6d7d6b', font: { size: 10 } }
       },
       y: {
-        grid: { color: '#f3f4f6' },
+        grid: { color: '#e5efdf' },
         ticks: {
-          color: '#6b7280',
+          color: '#6d7d6b',
           font: { size: 10 },
           callback: (val) => `Rp ${(val / 1000000).toFixed(0)}jt`
         }

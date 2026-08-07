@@ -13,8 +13,8 @@ export default function AdminStatCard({
   const trendUp = trend > 0;
 
   return (
-    <div className="p-6 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all duration-200">
-      <div className="flex items-start justify-between mb-4">
+    <div className="p-5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all duration-200">
+      <div className="flex items-start justify-between mb-3.5">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-gray-100/80 text-gray-900">
             {Icon && <Icon className="w-4 h-4" />}
@@ -44,7 +44,7 @@ export default function AdminStatCard({
         )}
       </div>
 
-      <div className="text-2xl sm:text-3xl font-bold text-gray-900 font-['Outfit'] tracking-tight mb-1">
+      <div className="text-2xl font-bold text-gray-900 font-['Outfit'] tracking-tight mb-1">
         {value}
       </div>
 
@@ -57,7 +57,7 @@ export default function AdminStatCard({
       )}
 
       {progress !== undefined && (
-        <div className="mt-4 pt-3 border-t border-gray-100">
+        <div className="mt-3.5 pt-3 border-t border-gray-100">
           <div className="flex items-center justify-between text-[11px] text-gray-500 mb-1.5">
             <span>Keterisian Kuota</span>
             <span className="font-semibold text-gray-900">{progress}%</span>

@@ -73,16 +73,16 @@ export default function DashboardOverview() {
       {
         label: 'Masuk (Entered)',
         data: HOURLY_VISITORS.map((h) => h.entered),
-        backgroundColor: '#059669', // emerald-600
-        hoverBackgroundColor: '#10b981',
+        backgroundColor: '#1f563f',
+        hoverBackgroundColor: '#356f4c',
         borderRadius: 4,
         barPercentage: 0.7
       },
       {
         label: 'Keluar (Exited)',
         data: HOURLY_VISITORS.map((h) => h.exited),
-        backgroundColor: '#d1d5db', // gray-300
-        hoverBackgroundColor: '#9ca3af',
+        backgroundColor: '#a97857',
+        hoverBackgroundColor: '#8b5b3d',
         borderRadius: 4,
         barPercentage: 0.7
       }
@@ -97,17 +97,17 @@ export default function DashboardOverview() {
         position: 'top',
         align: 'end',
         labels: {
-          color: '#4b5563', // gray-600
+          color: '#506452',
           font: { size: 11, family: 'Outfit' },
           boxWidth: 10,
           usePointStyle: true
         }
       },
       tooltip: {
-        backgroundColor: '#ffffff',
-        titleColor: '#111827',
-        bodyColor: '#374151',
-        borderColor: '#e5e7eb',
+        backgroundColor: '#fffefa',
+        titleColor: '#4f3425',
+        bodyColor: '#506452',
+        borderColor: '#d2dfcb',
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8
@@ -116,11 +116,11 @@ export default function DashboardOverview() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#6b7280', font: { size: 10 } }
+        ticks: { color: '#6d7d6b', font: { size: 10 } }
       },
       y: {
-        grid: { color: '#f3f4f6' },
-        ticks: { color: '#6b7280', font: { size: 10 } }
+        grid: { color: '#e5efdf' },
+        ticks: { color: '#6d7d6b', font: { size: 10 } }
       }
     }
   };
@@ -132,8 +132,8 @@ export default function DashboardOverview() {
       {
         label: 'Pendapatan (Rp)',
         data: REVENUE_WEEKLY.map((d) => d.revenue),
-        backgroundColor: '#059669',
-        hoverBackgroundColor: '#10b981',
+        backgroundColor: '#1f563f',
+        hoverBackgroundColor: '#356f4c',
         borderRadius: 6
       }
     ]
@@ -145,10 +145,10 @@ export default function DashboardOverview() {
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: '#ffffff',
-        titleColor: '#111827',
-        bodyColor: '#374151',
-        borderColor: '#e5e7eb',
+        backgroundColor: '#fffefa',
+        titleColor: '#4f3425',
+        bodyColor: '#506452',
+        borderColor: '#d2dfcb',
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8,
@@ -162,12 +162,12 @@ export default function DashboardOverview() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#6b7280', font: { size: 10 } }
+        ticks: { color: '#6d7d6b', font: { size: 10 } }
       },
       y: {
-        grid: { color: '#f3f4f6' },
+        grid: { color: '#e5efdf' },
         ticks: {
-          color: '#6b7280',
+          color: '#6d7d6b',
           font: { size: 10 },
           callback: (value) => `Rp ${(value / 1000000).toFixed(0)}jt`
         }

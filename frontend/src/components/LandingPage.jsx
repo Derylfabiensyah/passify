@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, ArrowUpRight, Check, ChevronRight, CloudOff, Compass, Mountain, ScanLine, TicketCheck, Trees, WalletCards } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, ChevronRight, CloudOff, Compass, ScanLine, TicketCheck, Trees, WalletCards } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1800&q=88';
@@ -21,12 +21,12 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--canvas)] text-[var(--ink)]">
       <header className="relative z-20 border-b border-[rgba(23,59,50,0.13)] bg-[var(--canvas)]">
-        <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-5 sm:px-8 lg:px-10">
+        <div className="mx-auto flex h-[68px] max-w-[1240px] items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="flex items-center text-decoration-none" aria-label="Passify beranda">
             <span className="text-[17px] font-extrabold tracking-[-0.04em]">passify</span>
           </Link>
 
-          <nav className="hidden items-center gap-7 text-[13px] font-semibold text-[var(--ink-soft)] md:flex">
+          <nav className="hidden items-center gap-6 text-[12px] font-semibold text-[var(--ink-soft)] md:flex">
             <button onClick={() => scrollTo('platform')} className="transition-colors hover:text-[var(--ink)]">Platform</button>
             <button onClick={() => scrollTo('field-work')} className="transition-colors hover:text-[var(--ink)]">Di lapangan</button>
             <button onClick={() => scrollTo('white-label')} className="transition-colors hover:text-[var(--ink)]">White-label</button>
@@ -36,7 +36,7 @@ export default function LandingPage() {
             <Link to="/jelajah" className="hidden text-[13px] font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)] sm:inline">
               Coba portal wisatawan
             </Link>
-            <a href="#contact" className="inline-flex items-center gap-2 rounded-full bg-[var(--ink)] px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5">
+            <a href="#contact" className="inline-flex items-center gap-2 rounded-full bg-[var(--forest)] px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[var(--forest-deep)]">
               Jadwalkan demo <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </div>
@@ -45,17 +45,17 @@ export default function LandingPage() {
 
       <main>
         <section className="relative border-b border-[rgba(23,59,50,0.13)]">
-          <div className="mx-auto grid max-w-[1280px] grid-cols-1 gap-10 px-5 pb-14 pt-12 sm:px-8 md:pb-20 md:pt-16 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:gap-16 lg:px-10 lg:py-20">
+          <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-8 px-4 pb-12 pt-10 sm:px-6 md:pb-16 md:pt-14 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:gap-12 lg:px-8 lg:py-16">
             <div className="relative z-10 max-w-[610px]">
               <Eyebrow>Ticketing untuk kawasan yang dijaga</Eyebrow>
-              <h1 className="mt-6 max-w-[590px] font-serif text-[clamp(3.25rem,7vw,6.35rem)] leading-[0.91] tracking-[-0.065em] text-[var(--ink)]">
+              <h1 className="mt-5 max-w-[590px] font-serif text-[clamp(3rem,6vw,5.5rem)] leading-[0.94] tracking-[-0.06em] text-[var(--ink)]">
                 Tiket yang memberi alam ruang bernapas.
               </h1>
-              <p className="mt-7 max-w-[510px] text-[16px] leading-7 text-[var(--ink-soft)] sm:text-[17px]">
+              <p className="mt-6 max-w-[510px] text-[15px] leading-7 text-[var(--ink-soft)] sm:text-[16px]">
                 Passify menyatukan reservasi, batas kunjungan, dan validasi gerbang dalam satu sistem white-label yang tetap siap saat koneksi tidak ada.
               </p>
 
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:items-center">
                 <a href="#contact" className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--clay)] px-6 py-3.5 text-[13px] font-extrabold text-white transition-transform hover:-translate-y-0.5">
                   Mulai percakapan <ArrowRight className="h-4 w-4" />
                 </a>
@@ -64,7 +64,7 @@ export default function LandingPage() {
                 </Link>
               </div>
 
-              <div className="mt-12 grid max-w-[520px] grid-cols-3 border-t border-[rgba(23,59,50,0.18)] pt-5">
+              <div className="mt-10 grid max-w-[520px] grid-cols-3 border-t border-[rgba(23,59,50,0.18)] pt-4">
                 {[
                   ['Reservasi', 'berdasar sesi'],
                   ['Gerbang', 'siap offline'],
@@ -78,7 +78,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="relative min-h-[410px] sm:min-h-[510px] lg:min-h-[640px]">
+            <div className="relative min-h-[380px] sm:min-h-[470px] lg:min-h-[560px]">
               <div className="absolute inset-y-0 right-0 w-[92%] overflow-hidden rounded-tl-[140px] rounded-br-[140px] bg-[var(--fog)] sm:w-[89%]">
                 <img src={heroImage} alt="Lanskap pegunungan Indonesia saat pagi hari" className="h-full w-full object-cover contrast-[.92] saturate-[.75]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,42,35,0.64)] via-transparent to-transparent" />
@@ -105,11 +105,11 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="platform" className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
-          <div className="grid gap-12 lg:grid-cols-[0.77fr_1.23fr] lg:gap-20">
+        <section id="platform" className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[0.77fr_1.23fr] lg:gap-16">
             <div>
               <Eyebrow>Rapi di depan, tangguh di belakang</Eyebrow>
-              <h2 className="mt-5 max-w-[365px] font-serif text-5xl leading-[0.98] tracking-[-0.055em] sm:text-6xl">Satu alur, dari rencana sampai pintu masuk.</h2>
+              <h2 className="mt-4 max-w-[365px] font-serif text-4xl leading-[1] tracking-[-0.05em] sm:text-5xl">Satu alur, dari rencana sampai pintu masuk.</h2>
             </div>
             <div className="grid gap-0 border-t border-[rgba(23,59,50,0.18)] lg:grid-cols-3">
               {[
@@ -122,7 +122,7 @@ export default function LandingPage() {
                     <span className="text-[11px] font-extrabold tracking-[0.1em] text-[var(--clay)]">{number}</span>
                     <Icon className="h-5 w-5 text-[var(--river)] stroke-[1.5]" />
                   </div>
-                  <h3 className="mt-10 text-[16px] font-extrabold tracking-[-0.025em]">{title}</h3>
+                  <h3 className="mt-8 text-[16px] font-extrabold tracking-[-0.025em]">{title}</h3>
                   <p className="mt-3 text-[13px] leading-6 text-[var(--ink-soft)]">{text}</p>
                 </article>
               ))}
@@ -131,14 +131,14 @@ export default function LandingPage() {
         </section>
 
         <section id="field-work" className="border-y border-[rgba(23,59,50,0.13)] bg-[var(--fog)]">
-          <div className="mx-auto grid max-w-[1280px] gap-10 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[1.07fr_.93fr] lg:items-center lg:gap-20 lg:px-10">
+          <div className="mx-auto grid max-w-[1240px] gap-8 px-4 py-14 sm:px-6 sm:py-18 lg:grid-cols-[1.07fr_.93fr] lg:items-center lg:gap-16 lg:px-8">
             <div className="order-2 lg:order-1">
               <Eyebrow>Untuk hari yang sebenarnya</Eyebrow>
-              <h2 className="mt-5 max-w-[545px] font-serif text-5xl leading-[0.97] tracking-[-0.055em] sm:text-6xl">Di lapangan, koneksi bukan satu-satunya yang harus dijaga.</h2>
-              <p className="mt-6 max-w-[560px] text-[15px] leading-7 text-[var(--ink-soft)]">
+              <h2 className="mt-4 max-w-[545px] font-serif text-4xl leading-[1] tracking-[-0.05em] sm:text-5xl">Di lapangan, koneksi bukan satu-satunya yang harus dijaga.</h2>
+              <p className="mt-5 max-w-[560px] text-[14px] leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">
                 Petugas perlu bergerak cepat, pengunjung perlu masuk dengan tenang, dan pengelola perlu tetap punya catatan yang dapat dipercaya. Karena itu, setiap bagian Passify dibangun untuk memperjelas keputusan—bukan menambah layar.
               </p>
-              <ul className="mt-8 grid gap-3 text-[13px] font-semibold text-[var(--ink-soft)] sm:grid-cols-2">
+              <ul className="mt-7 grid gap-3 text-[13px] font-semibold text-[var(--ink-soft)] sm:grid-cols-2">
                 {['Mode validasi yang tetap siap saat offline', 'Kuota disesuaikan dengan aturan kawasan', 'Riwayat transaksi untuk tim pengelola', 'Portal yang membawa identitas destinasi Anda'].map((item) => (
                   <li className="flex gap-2.5" key={item}><Check className="mt-0.5 h-4 w-4 shrink-0 text-[var(--clay)]" />{item}</li>
                 ))}
@@ -162,34 +162,34 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="white-label" className="mx-auto max-w-[1280px] px-5 py-20 sm:px-8 sm:py-28 lg:px-10">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
+        <section id="white-label" className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
               <Eyebrow>Bermerek Anda, dengan fondasi yang sama</Eyebrow>
-              <h2 className="mt-5 max-w-[520px] font-serif text-5xl leading-[0.97] tracking-[-0.055em] sm:text-6xl">Pengunjung datang ke destinasi Anda. Bukan ke platform kami.</h2>
-              <p className="mt-6 max-w-[500px] text-[15px] leading-7 text-[var(--ink-soft)]">Setiap portal dapat menampilkan nama, warna, konten, dan alur kunjungan yang terasa milik kawasan sendiri—sementara tim Anda tetap memakai operasi yang konsisten di belakangnya.</p>
-              <Link to="/jelajah" className="mt-8 inline-flex items-center gap-2 border-b border-[var(--ink)] pb-1 text-[13px] font-extrabold text-[var(--ink)]">Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" /></Link>
+              <h2 className="mt-4 max-w-[520px] font-serif text-4xl leading-[1] tracking-[-0.05em] sm:text-5xl">Pengunjung datang ke destinasi Anda. Bukan ke platform kami.</h2>
+              <p className="mt-5 max-w-[500px] text-[14px] leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">Setiap portal dapat menampilkan nama, warna, konten, dan alur kunjungan yang terasa milik kawasan sendiri—sementara tim Anda tetap memakai operasi yang konsisten di belakangnya.</p>
+              <Link to="/jelajah" className="mt-7 inline-flex items-center gap-2 border-b border-[var(--bark)] pb-1 text-[13px] font-extrabold text-[var(--forest)] hover:text-[var(--bark)]">Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" /></Link>
             </div>
-            <div className="relative overflow-hidden bg-white p-6 sm:p-9 shadow-[0_0_40px_rgba(0,0,0,0.03)]">
+            <div className="relative overflow-hidden border border-[var(--border)] bg-white p-5 shadow-[0_12px_32px_rgba(16,45,32,0.07)] sm:p-7">
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#915532] text-white"><Trees className="h-4 w-4" /></span><span><span className="block text-sm font-extrabold">Rimba Senja</span><span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--ink-soft)]">Taman wisata alam</span></span></div>
+                <div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--bark)] text-white"><Trees className="h-4 w-4" /></span><span><span className="block text-sm font-extrabold">Rimba Senja</span><span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--ink-soft)]">Taman wisata alam</span></span></div>
                 <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--river)]">Portal contoh</span>
               </div>
               <div className="mt-12 grid grid-cols-[1.1fr_.9fr] gap-5 border-y border-[rgba(23,59,50,0.13)] py-5">
                 <div><p className="font-serif text-3xl tracking-[-0.04em]">Kunjungan minggu ini</p><p className="mt-2 text-[11px] leading-5 text-[var(--ink-soft)]">Pilih tanggal dan sesi yang sesuai dengan rencana perjalanan Anda.</p></div>
-                <div className="self-end bg-[#e8ddd0] p-4"><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#6f4b32]">Sesi tersisa</p><p className="mt-1 text-2xl font-extrabold text-[#3b2c21]">58</p></div>
+                <div className="self-end bg-[var(--bark-pale)] p-4"><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--bark)]">Sesi tersisa</p><p className="mt-1 text-2xl font-extrabold text-[var(--forest-deep)]">58</p></div>
               </div>
-              <div className="mt-5 flex items-center justify-between text-[11px] font-bold"><span className="text-[var(--ink-soft)]">Rp35.000 / orang</span><span className="rounded-full bg-[#915532] px-4 py-2 text-white">Pilih tanggal</span></div>
+              <div className="mt-5 flex items-center justify-between text-[11px] font-bold"><span className="text-[var(--ink-soft)]">Rp35.000 / orang</span><span className="rounded-full bg-[var(--bark)] px-4 py-2 text-white">Pilih tanggal</span></div>
             </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-[1280px] px-5 pb-20 sm:px-8 sm:pb-28 lg:px-10">
+        <section className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
           <div className="grid overflow-hidden bg-[var(--ink)] text-white lg:grid-cols-[.8fr_1.2fr]">
-            <div className="p-8 sm:p-12 lg:p-14">
+            <div className="p-7 sm:p-10 lg:p-12">
               <Compass className="h-7 w-7 text-[var(--moss)] stroke-[1.35]" />
-              <h2 className="mt-10 max-w-[390px] font-serif text-5xl leading-[0.96] tracking-[-0.055em]">Mulai dari kebutuhan kawasan Anda.</h2>
-              <p className="mt-5 max-w-[380px] text-[14px] leading-6 text-white/70">Ceritakan cara tiket, kuota, dan gerbang Anda bekerja hari ini. Kami bantu memetakan langkah awal yang relevan.</p>
+              <h2 className="mt-8 max-w-[390px] font-serif text-4xl leading-[1] tracking-[-0.05em] text-white">Mulai dari kebutuhan kawasan Anda.</h2>
+              <p className="mt-4 max-w-[380px] text-[14px] leading-6 text-white/70">Ceritakan cara tiket, kuota, dan gerbang Anda bekerja hari ini. Kami bantu memetakan langkah awal yang relevan.</p>
               <a id="contact" href="mailto:hello@passify.id" className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--sand)] px-5 py-3 text-[13px] font-extrabold text-[var(--ink)] transition-transform hover:-translate-y-0.5">Bicarakan kebutuhan Anda <ArrowUpRight className="h-4 w-4" /></a>
             </div>
             <div className="min-h-[310px] lg:min-h-full"><img src={trailImage} alt="Jalur hutan yang tenang" className="h-full w-full object-cover opacity-80 saturate-[.58]" /></div>
@@ -197,8 +197,8 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-[rgba(23,59,50,0.13)] px-5 py-7 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-3 text-[11px] font-semibold text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between">
+      <footer className="border-t border-[rgba(23,59,50,0.13)] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1240px] flex-col gap-3 text-[11px] font-semibold text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between">
           <span>© 2026 Passify. Ticketing untuk kawasan yang dijaga.</span>
           <div className="flex gap-5"><a href="#platform">Platform</a><Link to="/jelajah">Portal demo</Link><a href="mailto:hello@passify.id">Kontak</a></div>
         </div>

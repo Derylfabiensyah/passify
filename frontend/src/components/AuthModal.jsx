@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Phone, Eye, EyeOff, ShieldCheck, ArrowRight, Sparkles } from 'lucide-react';
+import { X, Mail, Lock, User, Phone, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode); // 'login' or 'register'
@@ -19,36 +19,6 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
   const [regPassword, setRegPassword] = useState('');
 
   if (!isOpen) return null;
-
-  const handleDemoLogin = (role) => {
-    setError('');
-    setLoading(true);
-    setTimeout(() => {
-      const demoUser =
-        role === 'admin'
-          ? {
-              id: 'adm-101',
-              name: 'Admin Venue Passify',
-              email: 'admin@passify-cloud.id',
-              role: 'pengelola',
-              phone: '081122334455',
-              avatar: 'A'
-            }
-          : {
-              id: 'usr-202',
-              name: 'Deryl Fabiensyah',
-              email: 'deryl@passify-cloud.id',
-              role: 'wisatawan',
-              phone: '081234567890',
-              avatar: 'D'
-            };
-
-      localStorage.setItem('passify_user', JSON.stringify(demoUser));
-      localStorage.setItem('passify_token', 'demo-jwt-token-99281');
-      setLoading(false);
-      onAuthSuccess(demoUser);
-    }, 400);
-  };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
@@ -107,37 +77,38 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
 
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-content card relative p-0 max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
+      <div className="modal-content card relative max-w-md w-full overflow-hidden rounded-[18px] border border-[#cddac8] bg-[#fffdf8] p-0 shadow-[0_24px_60px_rgba(23,59,50,0.18)]">
         {/* Header Tabs */}
-        <div className="bg-gray-50 p-6 border-b border-gray-200 flex items-center justify-between">
+        <div className="flex items-start justify-between border-b border-[#28594e] bg-[#173b32] px-6 py-5 sm:px-7 sm:py-6">
           <div>
-            <h2 className="text-lg font-bold text-gray-900 font-['Outfit']">
+            <h2 className="font-['Outfit'] text-[1.25rem] font-bold leading-tight text-white">
               Portal Akses Passify Cloud
             </h2>
-            <p className="text-xs text-gray-500">
+            <p className="mt-1 text-sm leading-snug text-[#dce8d3]">
               {mode === 'login' ? 'Masuk ke akun Anda' : 'Daftarkan akun tenant / pengunjung'}
             </p>
           </div>
           <button
             id="close-auth-modal-btn"
             onClick={onClose}
-            className="w-8 h-8 rounded-lg bg-white border border-gray-200 text-gray-400 hover:text-gray-900 flex items-center justify-center transition-colors shadow-2xs"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-[#9aae85] hover:text-[#173b32] focus:outline-none focus:ring-2 focus:ring-[#dce8d3]"
+            aria-label="Tutup modal"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Mode Switcher */}
-        <div className="px-6 pt-5">
-          <div className="grid grid-cols-2 gap-1 p-1 bg-gray-100 rounded-xl border border-gray-200">
+        <div className="px-6 pt-5 sm:px-7">
+          <div className="grid grid-cols-2 gap-1 rounded-xl border border-[#cddac8] bg-[#e7efdf] p-1">
             <button
               id="auth-tab-login"
               type="button"
               onClick={() => { setMode('login'); setError(''); }}
-              className={`py-2 rounded-lg text-xs font-semibold transition-all ${
+              className={`min-h-10 rounded-lg px-3 py-2 text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
                 mode === 'login'
-                  ? 'bg-white text-gray-900 shadow-xs border border-gray-200'
-                  : 'text-gray-500 hover:text-gray-900'
+                  ? 'border border-[#b8cbb0] bg-white text-[#173b32] shadow-sm'
+                  : 'text-[#52635d] hover:bg-white/60 hover:text-[#173b32]'
               }`}
             >
               Masuk
@@ -146,10 +117,10 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
               id="auth-tab-register"
               type="button"
               onClick={() => { setMode('register'); setError(''); }}
-              className={`py-2 rounded-lg text-xs font-semibold transition-all ${
+              className={`min-h-10 rounded-lg px-3 py-2 text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
                 mode === 'register'
-                  ? 'bg-white text-gray-900 shadow-xs border border-gray-200'
-                  : 'text-gray-500 hover:text-gray-900'
+                  ? 'border border-[#b8cbb0] bg-white text-[#173b32] shadow-sm'
+                  : 'text-[#52635d] hover:bg-white/60 hover:text-[#173b32]'
               }`}
             >
               Daftar Baru
@@ -158,22 +129,22 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
         </div>
 
         {/* Body Content */}
-        <div className="p-6">
+        <div className="px-6 pb-6 pt-5 sm:px-7 sm:pb-7">
           {error && (
-            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between">
+            <div className="mb-5 flex items-center justify-between rounded-xl border border-[#c98c66] bg-[#fff3e8] px-3.5 py-3 text-sm leading-snug text-[#704127]">
               <span>{error}</span>
-              <button onClick={() => setError('')} className="text-red-500 hover:text-red-800">
+              <button onClick={() => setError('')} className="ml-3 text-[#9a5c35] transition-colors hover:text-[#5f3622]" aria-label="Tutup pesan kesalahan">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
           )}
 
           {mode === 'login' ? (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
+            <form onSubmit={handleLoginSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Email Akses</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Email Akses</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
                   <input
                     id="login-email-input"
                     type="email"
@@ -181,20 +152,20 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                     placeholder="nama@email.com"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-gray-700">Kata Sandi</label>
-                  <a href="#forgot" onClick={(e) => e.preventDefault()} className="text-[11px] text-emerald-600 hover:underline font-medium">
+                  <label className="text-sm font-semibold text-[#173b32]">Kata Sandi</label>
+                  <a href="#forgot" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-[#80512f] hover:underline">
                     Lupa sandi?
                   </a>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
                   <input
                     id="login-password-input"
                     type={showPassword ? 'text' : 'password'}
@@ -202,12 +173,13 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                     placeholder="••••••••"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-10 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#80512f] transition-colors hover:text-[#173b32]"
+                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -218,7 +190,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                 id="login-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary justify-center py-3 text-sm font-semibold rounded-xl shadow-sm"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#173b32] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#7b9680]"
               >
                 {loading ? 'Memproses...' : 'Masuk Sekarang'}
                 <ArrowRight className="w-4 h-4" />
@@ -227,11 +199,11 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
 
             </form>
           ) : (
-            <form onSubmit={handleRegisterSubmit} className="space-y-4">
+            <form onSubmit={handleRegisterSubmit} className="space-y-5">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Nama Lengkap *</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Nama Lengkap *</label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
                   <input
                     id="register-name-input"
                     type="text"
@@ -239,15 +211,15 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                     placeholder="Nama lengkap Anda"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Alamat Email *</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Alamat Email *</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
                   <input
                     id="register-email-input"
                     type="email"
@@ -255,60 +227,60 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                     placeholder="nama@email.com"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Nomor WhatsApp / HP</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Nomor WhatsApp / HP</label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Phone className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
                   <input
                     id="register-phone-input"
                     type="tel"
                     placeholder="081234567890"
                     value={regPhone}
                     onChange={(e) => setRegPhone(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Peran Akun *</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Peran Akun *</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setRegRole('wisatawan')}
-                    className={`p-2.5 rounded-xl border text-xs font-medium transition-all text-left flex items-center gap-2 ${
+                    className={`flex min-h-16 items-center gap-2 rounded-xl border p-3 text-left text-xs leading-snug font-medium transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
                       regRole === 'wisatawan'
-                        ? 'bg-emerald-50 border-emerald-600 text-emerald-800 font-semibold shadow-2xs'
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+                        ? 'border-[#173b32] bg-[#e7efdf] font-semibold text-[#173b32] shadow-sm'
+                        : 'border-[#c6d2c2] bg-white text-[#52635d] hover:border-[#9aae85]'
                     }`}
                   >
-                    <User className="w-4 h-4 flex-shrink-0 text-emerald-600" />
+                    <User className="h-4 w-4 shrink-0 text-[#80512f]" />
                     <span>Wisatawan / Pengunjung</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setRegRole('pengelola')}
-                    className={`p-2.5 rounded-xl border text-xs font-medium transition-all text-left flex items-center gap-2 ${
+                    className={`flex min-h-16 items-center gap-2 rounded-xl border p-3 text-left text-xs leading-snug font-medium transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
                       regRole === 'pengelola'
-                        ? 'bg-emerald-50 border-emerald-600 text-emerald-800 font-semibold shadow-2xs'
-                        : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+                        ? 'border-[#173b32] bg-[#e7efdf] font-semibold text-[#173b32] shadow-sm'
+                        : 'border-[#c6d2c2] bg-white text-[#52635d] hover:border-[#9aae85]'
                     }`}
                   >
-                    <ShieldCheck className="w-4 h-4 flex-shrink-0 text-emerald-600" />
+                    <ShieldCheck className="h-4 w-4 shrink-0 text-[#80512f]" />
                     <span>Pengelola / Tenant Admin</span>
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1.5">Kata Sandi *</label>
+                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Kata Sandi *</label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
                   <input
                     id="register-password-input"
                     type={showPassword ? 'text' : 'password'}
@@ -316,12 +288,13 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                     placeholder="Minimal 6 karakter"
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-10 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-10 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#80512f] transition-colors hover:text-[#173b32]"
+                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -332,7 +305,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode 
                 id="register-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="w-full btn-primary justify-center py-3 text-sm font-semibold rounded-xl shadow-sm"
+                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#173b32] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#7b9680]"
               >
                 {loading ? 'Membuat Akun...' : 'Buat Akun Sekarang'}
                 <ArrowRight className="w-4 h-4" />
