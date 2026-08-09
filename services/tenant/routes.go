@@ -21,13 +21,13 @@ func RegisterRoutes(router *gin.RouterGroup, handler *TenantHandler, jwtSecret s
 		tenants.PUT("/:id", handler.HandleUpdateTenant)
 		tenants.DELETE("/:id", handler.HandleDeleteTenant)
 
-		// Settings routes under /tenants/:tenant_id/settings
-		tenants.PUT("/:tenant_id/settings", handler.HandleUpsertSetting)
-		tenants.GET("/:tenant_id/settings", handler.HandleGetSettings)
+		// Settings routes under /tenants/:id/settings
+		tenants.PUT("/:id/settings", handler.HandleUpsertSetting)
+		tenants.GET("/:id/settings", handler.HandleGetSettings)
 
 		// Nested Destinations routes under /tenants
-		tenants.POST("/:tenant_id/destinations", handler.HandleCreateDestination)
-		tenants.GET("/:tenant_id/destinations", handler.HandleListDestinations)
+		tenants.POST("/:id/destinations", handler.HandleCreateDestination)
+		tenants.GET("/:id/destinations", handler.HandleListDestinations)
 	}
 
 	// Destinations direct by ID routes under /destinations

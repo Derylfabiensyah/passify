@@ -147,9 +147,9 @@ func (h *TenantHandler) HandleDeleteTenant(c *gin.Context) {
 	response.OK(c, "Tenant berhasil dihapus", nil)
 }
 
-// HandleCreateDestination handles POST /tenants/:tenant_id/destinations
+// HandleCreateDestination handles POST /tenants/:id/destinations
 func (h *TenantHandler) HandleCreateDestination(c *gin.Context) {
-	tenantIDStr := c.Param("tenant_id")
+	tenantIDStr := c.Param("id")
 	tenantID, err := uuid.Parse(tenantIDStr)
 	if err != nil {
 		response.BadRequest(c, "ID tenant tidak valid", nil)
@@ -193,9 +193,9 @@ func (h *TenantHandler) HandleGetDestination(c *gin.Context) {
 	response.OK(c, "Data destinasi berhasil diambil", dest)
 }
 
-// HandleListDestinations handles GET /tenants/:tenant_id/destinations
+// HandleListDestinations handles GET /tenants/:id/destinations
 func (h *TenantHandler) HandleListDestinations(c *gin.Context) {
-	tenantIDStr := c.Param("tenant_id")
+	tenantIDStr := c.Param("id")
 	tenantID, err := uuid.Parse(tenantIDStr)
 	if err != nil {
 		response.BadRequest(c, "ID tenant tidak valid", nil)
@@ -271,9 +271,9 @@ type UpsertSettingRequest struct {
 	Value string `json:"value" binding:"required"`
 }
 
-// HandleUpsertSetting handles PUT /tenants/:tenant_id/settings
+// HandleUpsertSetting handles PUT /tenants/:id/settings
 func (h *TenantHandler) HandleUpsertSetting(c *gin.Context) {
-	tenantIDStr := c.Param("tenant_id")
+	tenantIDStr := c.Param("id")
 	tenantID, err := uuid.Parse(tenantIDStr)
 	if err != nil {
 		response.BadRequest(c, "ID tenant tidak valid", nil)
@@ -294,9 +294,9 @@ func (h *TenantHandler) HandleUpsertSetting(c *gin.Context) {
 	response.OK(c, "Pengaturan tenant berhasil disimpan", nil)
 }
 
-// HandleGetSettings handles GET /tenants/:tenant_id/settings
+// HandleGetSettings handles GET /tenants/:id/settings
 func (h *TenantHandler) HandleGetSettings(c *gin.Context) {
-	tenantIDStr := c.Param("tenant_id")
+	tenantIDStr := c.Param("id")
 	tenantID, err := uuid.Parse(tenantIDStr)
 	if err != nil {
 		response.BadRequest(c, "ID tenant tidak valid", nil)
