@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   Users
 } from 'lucide-react';
+import { useApiClient } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import { ADMIN_DESTINATIONS } from '../../data/adminData';
 
@@ -172,6 +173,12 @@ function DestinationCard({ dest, onToggleExpand, isExpanded, onEditDest, onEditC
 }
 
 export default function DestinationsPage() {
+  const apiClient = useApiClient(); // API client with automatic tenant header injection
+  // TODO: Fetch destinations from API: const destinations = await apiClient.get('/api/admin/destinations');
+  // TODO: Create: await apiClient.post('/api/admin/destinations', newDestinationData);
+  // TODO: Update: await apiClient.put(`/api/admin/destinations/${id}`, updatedData);
+  // TODO: Delete: await apiClient.delete(`/api/admin/destinations/${id}`);
+  
   const [destinations, setDestinations] = useState(ADMIN_DESTINATIONS);
   const [expandedId, setExpandedId] = useState(ADMIN_DESTINATIONS[0]?.id || null);
   const [searchQuery, setSearchQuery] = useState('');

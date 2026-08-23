@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { X, Calendar, User, Ticket, ArrowRight } from 'lucide-react';
+import { useApiClient } from '../api/client';
 
 export default function BookingModal({ destination, onClose, onBookingSuccess }) {
+  const apiClient = useApiClient(); // API client with automatic tenant header injection
   const todayStr = new Date().toISOString().split('T')[0];
   const [visitDate, setVisitDate] = useState(todayStr);
   const [selectedSlotId, setSelectedSlotId] = useState(destination?.time_slots?.[0]?.id || '');
@@ -58,7 +60,7 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
   const platformFee = totalQty > 0 ? 2500 : 0;
   const grandTotal = totalTicketPrice + totalInsurance + totalRetribusi + platformFee;
 
-  const handleSubmitBooking = (e) => {
+  const handleSubmitBooking = async (e) => {
     e.preventDefault();
     if (totalQty === 0) {
       alert('Pilih minimal 1 tiket untuk melanjutkan.');
@@ -73,8 +75,24 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    
+    try {
+      // Prepare booking data
+      const bookingData = {
+        destination_id: destination.id,
+        visit_date: visitDate,
+        time_slot_id: selectedSlotId,
+        visitors,
+        quantities,
+        total_amount: grandTotal
+      };
+
+      // TODO: Replace with actual API call when backend endpoint is ready
+      // const result = await apiClient.post('/api/bookings', bookingData);
+      
+      // For now, use demo/mock response
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       const newOrder = {
         orderNumber: `TWA-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`,
         destinationName: destination.name,
@@ -87,8 +105,13 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
         totpSecret: 'JBSWY3DPEHPK3PXP',
         createdAt: new Date().toISOString()
       };
+      
       onBookingSuccess(newOrder);
-    }, 1000);
+    } catch (error) {
+      alert(`Booking failed: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

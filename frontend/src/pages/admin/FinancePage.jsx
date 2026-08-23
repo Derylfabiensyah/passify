@@ -29,6 +29,7 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
+import { useApiClient } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
 import {
@@ -51,6 +52,9 @@ ChartJS.register(
 );
 
 export default function FinancePage() {
+  const apiClient = useApiClient(); // API client with automatic tenant header injection
+  // TODO: Fetch financial data from API: const financeData = await apiClient.get('/api/admin/finance');
+  
   const stats = DASHBOARD_STATS;
   const [dateRange, setDateRange] = useState('month');
 

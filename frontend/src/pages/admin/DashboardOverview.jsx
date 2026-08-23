@@ -26,6 +26,7 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
+import { useApiClient } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
 import {
@@ -51,6 +52,9 @@ ChartJS.register(
 );
 
 export default function DashboardOverview() {
+  const apiClient = useApiClient(); // API client with automatic tenant header injection
+  // TODO: Replace static DASHBOARD_STATS with: const stats = await apiClient.get('/api/admin/stats');
+  
   const stats = DASHBOARD_STATS;
   const revGrowth = Math.round(
     ((stats.today.revenue - stats.yesterday.revenue) / stats.yesterday.revenue) * 100

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowUpRight, Layers, MapPin, Star } from 'lucide-react';
 
 export default function Catalog({ destinations, searchQuery, onSelectDestination }) {
+  const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN || 'passify.com';
   const [selectedCategory, setSelectedCategory] = useState('all');
   const categories = [
     { id: 'all', label: 'Semua tempat' },
@@ -56,10 +57,15 @@ export default function Catalog({ destinations, searchQuery, onSelectDestination
           {filteredDestinations.map((destination) => {
             const remainingQuota = destination.max_daily_capacity - destination.booked_today;
             const quotaPercentage = Math.round((destination.booked_today / destination.max_daily_capacity) * 100);
+            const tenantUrl = `https://${destination.slug}.${ROOT_DOMAIN}`;
 
             return (
               <article key={destination.id} className="group overflow-hidden rounded-[1.25rem] border border-[var(--border)] bg-white transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--forest-soft)] hover:shadow-[0_14px_28px_rgba(16,45,32,.08)]">
-                <button id={`card-${destination.id}`} type="button" onClick={() => onSelectDestination(destination)} className="block w-full text-left">
+                <a 
+                  id={`card-${destination.id}`} 
+                  href={tenantUrl}
+                  className="block w-full text-left no-underline"
+                >
                   <div className="relative h-48 overflow-hidden bg-[var(--leaf-pale)]">
                     <img src={destination.cover_image_url} alt={destination.name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.035]" />
                     <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,45,32,.65)] via-transparent to-transparent" />
@@ -80,7 +86,7 @@ export default function Catalog({ destinations, searchQuery, onSelectDestination
                       <div className="mt-5 flex items-end justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">Mulai dari</p><p className="mt-0.5 text-base font-extrabold tracking-tight text-[var(--forest-deep)]">Rp {(destination.starting_price || destination.price_per_ticket || 0).toLocaleString('id-ID')}</p></div><span className="inline-flex items-center gap-1 text-xs font-extrabold text-[var(--bark)]">Pilih tiket <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span></div>
                     </div>
                   </div>
-                </button>
+                </a>
               </article>
             );
           })}
