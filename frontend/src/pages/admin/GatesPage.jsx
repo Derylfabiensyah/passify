@@ -20,6 +20,7 @@ import {
   AlertCircle,
   Copy
 } from 'lucide-react';
+import { useApiClient } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
 import { GATE_DEVICES, ADMIN_DESTINATIONS } from '../../data/adminData';
@@ -106,6 +107,12 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onRevealKey 
 }
 
 export default function GatesPage() {
+  const apiClient = useApiClient(); // API client with automatic tenant header injection
+  // TODO: Fetch gates from API: const gates = await apiClient.get('/api/admin/gates');
+  // TODO: Create gate: await apiClient.post('/api/admin/gates', gateData);
+  // TODO: Update gate: await apiClient.put(`/api/admin/gates/${id}`, updatedData);
+  // TODO: Delete gate: await apiClient.delete(`/api/admin/gates/${id}`);
+  
   const [devices, setDevices] = useState(GATE_DEVICES);
   const [filterDest, setFilterDest] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
