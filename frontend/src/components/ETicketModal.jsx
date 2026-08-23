@@ -15,7 +15,7 @@ export default function ETicketModal({ order, onClose }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content card relative max-w-md w-full overflow-hidden rounded-[18px] border border-[#cddac8] bg-[#fffdf8] p-0 shadow-[0_24px_60px_rgba(23,59,50,0.18)]">
+      <div className="modal-content card relative max-w-md w-full rounded-[18px] border border-[#cddac8] bg-[#fffdf8] p-0 shadow-[0_24px_60px_rgba(23,59,50,0.18)]">
         {/* Close Button */}
         <button
           id="close-ticket-modal-btn"
