@@ -17,6 +17,7 @@ import {
   CalendarCheck,
   CheckCircle2
 } from 'lucide-react';
+import { useApiClient } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import { ADMIN_DESTINATIONS, QUOTA_CALENDAR } from '../../data/adminData';
 
@@ -257,6 +258,10 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
 }
 
 export default function QuotasPage() {
+  const apiClient = useApiClient(); // API client with automatic tenant header injection
+  // TODO: Fetch quotas from API: const quotas = await apiClient.get('/api/admin/quotas');
+  // TODO: Update quota: await apiClient.put(`/api/admin/quotas/${date}`, { max_capacity: newCapacity });
+  
   const [selectedDest, setSelectedDest] = useState(ADMIN_DESTINATIONS[0]);
   const [quotaCalendar, setQuotaCalendar] = useState(QUOTA_CALENDAR);
   const [editingQuota, setEditingQuota] = useState(null);
