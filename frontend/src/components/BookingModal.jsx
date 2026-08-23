@@ -9,8 +9,7 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
     [destination?.ticket_categories?.[0]?.id || 'cat-1']: 1
   });
 
-  const [visitorName, setVisitorName] = useState('');
-  const [visitorNik, setVisitorNik] = useState('');
+  const [visitors, setVisitors] = useState([{ name: '', nik: '' }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!destination) return null;
@@ -20,6 +19,25 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
       const current = prev[catId] || 0;
       const next = Math.max(0, current + delta);
       return { ...prev, [catId]: next };
+    });
+  };
+
+  // Update visitors array when total quantity changes
+  React.useEffect(() => {
+    const newTotalQty = Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
+    if (newTotalQty !== visitors.length) {
+      const newVisitors = Array.from({ length: newTotalQty }, (_, i) => 
+        visitors[i] || { name: '', nik: '' }
+      );
+      setVisitors(newVisitors);
+    }
+  }, [quantities]);
+
+  const handleVisitorChange = (index, field, value) => {
+    setVisitors((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
     });
   };
 
@@ -46,8 +64,11 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
       alert('Pilih minimal 1 tiket untuk melanjutkan.');
       return;
     }
-    if (!visitorName.trim()) {
-      alert('Mohon isi Nama Pemesan.');
+    
+    // Validate all visitor names are filled
+    const allNamesFilled = visitors.every(v => v.name.trim() !== '');
+    if (!allNamesFilled) {
+      alert('Mohon isi Nama Lengkap untuk semua pengunjung.');
       return;
     }
 
@@ -61,8 +82,7 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
         timeSlotLabel: destination.time_slots.find((ts) => ts.id === selectedSlotId)?.label || 'Full Day',
         totalQty,
         grandTotal,
-        visitorName,
-        visitorNik,
+        visitors,
         ticketCode: `TWA-QR-${Math.floor(10000 + Math.random() * 90000)}`,
         totpSecret: 'JBSWY3DPEHPK3PXP',
         createdAt: new Date().toISOString()
@@ -188,31 +208,46 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
           <div>
             <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#173b32]">
               <User className="w-4 h-4 text-[#80512f]" />
-              3. Data Utama Pemesan
+              3. Data Pengunjung
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <input
-                  id="visitor-name-input"
-                  type="text"
-                  placeholder="Nama Lengkap Sesuai KTP"
-                  value={visitorName}
-                  onChange={(e) => setVisitorName(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  required
-                />
+            {totalQty === 0 ? (
+              <div className="rounded-xl border border-[#cddac8] bg-[#f5f8f2] p-4 text-center text-sm text-[#52635d]">
+                Pilih tiket terlebih dahulu untuk mengisi data pengunjung
               </div>
-              <div>
-                <input
-                  id="visitor-nik-input"
-                  type="text"
-                  placeholder="NIK / No Identitas"
-                  value={visitorNik}
-                  onChange={(e) => setVisitorNik(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                />
+            ) : (
+              <div className="space-y-3">
+                {visitors.map((visitor, index) => (
+                  <div key={index} className="rounded-xl border border-[#cddac8] bg-[#f5f8f2] p-4 shadow-sm">
+                    <div className="mb-2.5 text-xs font-semibold text-[#80512f]">
+                      Pengunjung {index + 1}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <input
+                          id={`visitor-name-input-${index}`}
+                          type="text"
+                          placeholder="Nama Lengkap Sesuai KTP"
+                          value={visitor.name}
+                          onChange={(e) => handleVisitorChange(index, 'name', e.target.value)}
+                          className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-white px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          id={`visitor-nik-input-${index}`}
+                          type="text"
+                          placeholder="NIK / No Identitas"
+                          value={visitor.nik}
+                          onChange={(e) => handleVisitorChange(index, 'nik', e.target.value)}
+                          className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-white px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
           </div>
 
           {/* Step 4: Price Summary */}
