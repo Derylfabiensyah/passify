@@ -43,6 +43,53 @@ func calculateTotalPages(total int64, perPage int) int {
 	return int(math.Ceil(float64(total) / float64(perPage)))
 }
 
+// HandleResolveTenant handles POST /public/tenants/resolve
+// Resolves a tenant slug from a custom domain or subdomain hostname.
+func (h *TenantHandler) HandleResolveTenant(c *gin.Context) {
+	var req ResolveTenantRequest
+	if err := c.ShouldBindJSON(&req); err != nil || req.Hostname == "" {
+		response.BadRequest(c, "Hostname wajib diisi", nil)
+		return
+	}
+
+	tenant, err := h.service.ResolveTenantByHostname(req.Hostname)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response.NotFound(c, "Domain tidak terdaftar")
+			return
+		}
+		response.InternalServerError(c, "Gagal me-resolve domain: "+err.Error())
+		return
+	}
+
+	response.OK(c, "Tenant ditemukan", gin.H{
+		"slug": tenant.Slug,
+		"name": tenant.Name,
+	})
+}
+
+// HandleGetPublicDestination handles GET /public/tenants/:slug/destination
+// Returns the first active destination for a tenant slug (public portal data).
+func (h *TenantHandler) HandleGetPublicDestination(c *gin.Context) {
+	slug := c.Param("slug")
+	if slug == "" {
+		response.BadRequest(c, "Slug tenant tidak valid", nil)
+		return
+	}
+
+	dest, err := h.service.GetPublicDestinationByTenantSlug(slug)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			response.NotFound(c, "Destinasi tidak ditemukan")
+			return
+		}
+		response.InternalServerError(c, "Gagal mengambil data destinasi: "+err.Error())
+		return
+	}
+
+	response.OK(c, "Data destinasi berhasil diambil", dest)
+}
+
 // HandleCreateTenant handles POST /tenants
 func (h *TenantHandler) HandleCreateTenant(c *gin.Context) {
 	var req CreateTenantRequest

@@ -14,12 +14,14 @@ type TenantRepository interface {
 	GetTenantByID(id uuid.UUID) (*models.Tenant, error)
 	GetTenantBySubdomain(subdomain string) (*models.Tenant, error)
 	GetTenantBySlug(slug string) (*models.Tenant, error)
+	GetTenantByCustomDomain(domain string) (*models.Tenant, error)
 	ListTenants(page, perPage int) ([]models.Tenant, int64, error)
 	UpdateTenant(tenant *models.Tenant) error
 	DeleteTenant(id uuid.UUID) error
 	CreateDestination(dest *models.Destination) error
 	GetDestinationByID(id uuid.UUID) (*models.Destination, error)
 	GetDestinationBySlug(tenantID uuid.UUID, slug string) (*models.Destination, error)
+	GetFirstActiveDestinationByTenantID(tenantID uuid.UUID) (*models.Destination, error)
 	ListDestinations(tenantID uuid.UUID, page, perPage int) ([]models.Destination, int64, error)
 	UpdateDestination(dest *models.Destination) error
 	DeleteDestination(id uuid.UUID) error
@@ -65,6 +67,25 @@ func (r *repository) GetTenantBySlug(slug string) (*models.Tenant, error) {
 		return nil, err
 	}
 	return &tenant, nil
+}
+
+func (r *repository) GetTenantByCustomDomain(domain string) (*models.Tenant, error) {
+	var tenant models.Tenant
+	if err := r.db.First(&tenant, "custom_domain = ?", domain).Error; err != nil {
+		return nil, err
+	}
+	return &tenant, nil
+}
+
+func (r *repository) GetFirstActiveDestinationByTenantID(tenantID uuid.UUID) (*models.Destination, error) {
+	var dest models.Destination
+	err := r.db.Where("tenant_id = ? AND is_active = ?", tenantID, true).
+		Order("created_at ASC").
+		First(&dest).Error
+	if err != nil {
+		return nil, err
+	}
+	return &dest, nil
 }
 
 func (r *repository) ListTenants(page, perPage int) ([]models.Tenant, int64, error) {

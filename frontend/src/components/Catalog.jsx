@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowUpRight, Layers, MapPin, Star } from 'lucide-react';
 
-export default function Catalog({ destinations, searchQuery, onSelectDestination }) {
+export default function Catalog({ destinations, searchQuery }) {
   const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN || 'passify.com';
   const [selectedCategory, setSelectedCategory] = useState('all');
   const categories = [
@@ -83,7 +83,7 @@ export default function Catalog({ destinations, searchQuery, onSelectDestination
                     <div className="mt-5 border-t border-[var(--border)] pt-4">
                       <div className="flex items-center justify-between text-[11px] font-medium text-[var(--ink-soft)]"><span>Sisa kunjungan hari ini</span><span className="font-bold text-[var(--forest)]">{remainingQuota} orang</span></div>
                       <div className="mt-2 h-1 overflow-hidden rounded-full bg-[var(--leaf-pale)]"><span className="block h-full bg-[var(--leaf)]" style={{ width: `${quotaPercentage}%` }} /></div>
-                      <div className="mt-5 flex items-end justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">Mulai dari</p><p className="mt-0.5 text-base font-extrabold tracking-tight text-[var(--forest-deep)]">Rp {(destination.starting_price || destination.price_per_ticket || 0).toLocaleString('id-ID')}</p></div><span className="inline-flex items-center gap-1 text-xs font-extrabold text-[var(--bark)]">Pilih tiket <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span></div>
+                      <div className="mt-5 flex items-end justify-between gap-3"><div><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--text-muted)]">Mulai dari</p><p className="mt-0.5 text-base font-extrabold tracking-tight text-[var(--forest-deep)]">Rp {(destination.starting_price || destination.price_per_ticket || 0).toLocaleString('id-ID')}</p></div><span className="inline-flex items-center gap-1 text-xs font-extrabold text-[var(--bark)]">Kunjungi Web Wisata <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span></div>
                     </div>
                   </div>
                 </a>

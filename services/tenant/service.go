@@ -5,9 +5,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/tiket-wisata-alam/backend/internal/models"
+	"gorm.io/gorm"
 )
 
 // DTO Requests for Tenant operations
+type ResolveTenantRequest struct {
+	Hostname string `json:"hostname" binding:"required"`
+}
+
 type CreateTenantRequest struct {
 	Name              string `json:"name" binding:"required"`
 	Subdomain         string `json:"subdomain" binding:"required"`
@@ -85,6 +90,10 @@ type TenantService interface {
 	DeleteDestination(id uuid.UUID) error
 	UpsertSetting(tenantID uuid.UUID, key, value string) error
 	GetSettings(tenantID uuid.UUID) ([]models.TenantSetting, error)
+
+	// Public (no auth) operations for tenant portal
+	ResolveTenantByHostname(hostname string) (*models.Tenant, error)
+	GetPublicDestinationByTenantSlug(slug string) (*models.Destination, error)
 }
 
 type service struct {
@@ -338,4 +347,51 @@ func (s *service) UpsertSetting(tenantID uuid.UUID, key, value string) error {
 
 func (s *service) GetSettings(tenantID uuid.UUID) ([]models.TenantSetting, error) {
 	return s.repo.GetTenantSettings(tenantID)
+}
+
+// ResolveTenantByHostname resolves a tenant from a custom domain or subdomain.
+// Only active tenants are returned.
+func (s *service) ResolveTenantByHostname(hostname string) (*models.Tenant, error) {
+	hostname = strings.ToLower(strings.TrimSpace(hostname))
+	hostname = strings.TrimPrefix(hostname, "www.")
+
+	// Try custom domain first
+	tenant, err := s.repo.GetTenantByCustomDomain(hostname)
+	if err == nil && tenant.IsActive {
+		return tenant, nil
+	}
+
+	// Fall back to subdomain (full hostname match)
+	tenant, err = s.repo.GetTenantBySubdomain(hostname)
+	if err == nil && tenant.IsActive {
+		return tenant, nil
+	}
+
+	// Fallback: use the first label as subdomain
+	// e.g. "curug-cibereum.passify.com" -> "curug-cibereum"
+	if labels := strings.SplitN(hostname, ".", 2); len(labels) == 2 {
+		tenant, err = s.repo.GetTenantBySubdomain(labels[0])
+		if err != nil {
+			return nil, err
+		}
+		if !tenant.IsActive {
+			return nil, gorm.ErrRecordNotFound
+		}
+		return tenant, nil
+	}
+
+	return nil, gorm.ErrRecordNotFound
+}
+
+// GetPublicDestinationByTenantSlug returns the first active destination of a
+// tenant identified by its slug. Used by the public tenant portal.
+func (s *service) GetPublicDestinationByTenantSlug(slug string) (*models.Destination, error) {
+	tenant, err := s.repo.GetTenantBySlug(strings.ToLower(strings.TrimSpace(slug)))
+	if err != nil {
+		return nil, err
+	}
+	if !tenant.IsActive {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return s.repo.GetFirstActiveDestinationByTenantID(tenant.ID)
 }

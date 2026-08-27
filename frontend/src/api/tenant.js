@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
 const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN || 'passify.com';
 
 /**
@@ -8,6 +8,19 @@ const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN || 'passify.com';
  * Queries API for custom domain (tickets.curugcibereum.com → API lookup)
  */
 export async function resolveTenantFromHostname(hostname) {
+  // Case 0: Local development hosts - treat as root domain (landing page)
+  // Use ?tenant=<slug> to simulate a tenant subdomain locally, e.g. http://localhost:5173/?tenant=curug-cibereum
+  const isLocal =
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '[::1]' ||
+    hostname === '::1';
+
+  if (isLocal) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('tenant');
+  }
+
   // Case 1: Root domain
   if (hostname === ROOT_DOMAIN || hostname === `www.${ROOT_DOMAIN}`) {
     return null;
@@ -20,7 +33,7 @@ export async function resolveTenantFromHostname(hostname) {
   }
 
   // Case 3: Custom domain - query API
-  const response = await fetch(`${API_BASE_URL}/api/tenants/resolve`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/public/tenants/resolve`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ hostname }),
@@ -33,7 +46,7 @@ export async function resolveTenantFromHostname(hostname) {
     throw new Error('Unable to connect to server');
   }
 
-  const data = await response.json();
+  const { data } = await response.json();
   return data.slug;
 }
 
@@ -41,7 +54,7 @@ export async function resolveTenantFromHostname(hostname) {
  * Fetches destination data by tenant slug
  */
 export async function fetchDestinationBySlug(slug) {
-  const response = await fetch(`${API_BASE_URL}/api/destinations/${slug}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1/public/tenants/${slug}/destination`, {
     headers: { 'X-Tenant-Slug': slug },
   });
 
@@ -52,5 +65,6 @@ export async function fetchDestinationBySlug(slug) {
     throw new Error('Unable to load destination');
   }
 
-  return response.json();
+  const { data } = await response.json();
+  return data;
 }

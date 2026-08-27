@@ -13,9 +13,6 @@ import {
   Ticket,
   UserRound,
 } from 'lucide-react';
-import Catalog from './Catalog';
-import BookingModal from './BookingModal';
-import ETicketModal from './ETicketModal';
 import AuthModal from './AuthModal';
 import { DESTINATIONS } from '../data/destinations';
 
@@ -29,11 +26,7 @@ export default function TravelerPortal() {
     }
   });
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDestination, setSelectedDestination] = useState(null);
-  const [pendingDestination, setPendingDestination] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [activeOrder, setActiveOrder] = useState(null);
-  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
 
   const featuredDestination = DESTINATIONS[0];
   const todayLabel = new Intl.DateTimeFormat('id-ID', {
@@ -44,38 +37,20 @@ export default function TravelerPortal() {
 
   const scrollToCatalog = () => document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const openAuthModal = () => {
-    setPendingDestination(null);
     setIsAuthModalOpen(true);
   };
   const closeAuthModal = () => {
-    setPendingDestination(null);
     setIsAuthModalOpen(false);
   };
-  const handleDestinationSelect = (destination) => {
-    if (!user) {
-      setPendingDestination(destination);
-      setIsAuthModalOpen(true);
-      return;
-    }
-    setSelectedDestination(destination);
-  };
+  
   const handleAuthSuccess = (userData) => {
     setUser(userData);
     setIsAuthModalOpen(false);
-    if (pendingDestination) {
-      setSelectedDestination(pendingDestination);
-      setPendingDestination(null);
-    }
   };
   const handleLogout = () => {
     localStorage.removeItem('passify_user');
     localStorage.removeItem('passify_token');
     setUser(null);
-  };
-  const handleBookingSuccess = (order) => {
-    setActiveOrder(order);
-    setSelectedDestination(null);
-    setIsTicketModalOpen(true);
   };
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -126,8 +101,8 @@ export default function TravelerPortal() {
             <div className="relative grid min-h-[410px] items-end gap-7 px-6 py-7 sm:min-h-[450px] sm:px-9 sm:py-9 lg:grid-cols-[1fr_330px] lg:items-center lg:gap-12 lg:px-12 lg:py-12">
               <div className="max-w-2xl">
                 <p className="mb-3 text-[12px] font-semibold text-[var(--leaf)]">{todayLabel}</p>
-                <h1 className="max-w-xl font-serif text-4xl font-semibold leading-[1] tracking-[-0.05em] text-white sm:text-5xl">Luangkan waktu untuk kembali ke alam.</h1>
-                <p className="mt-5 max-w-lg text-[14px] leading-6 text-white/80 sm:text-[15px] sm:leading-7">Pesan tiket kunjungan dengan ritme yang sederhana—pilih tempat, tentukan sesi, lalu simpan e-ticket sebelum berangkat.</p>
+                <h1 className="max-w-xl font-serif text-4xl font-semibold leading-[1] tracking-[-0.05em] text-white sm:text-5xl">Galeri Klien Passify</h1>
+                <p className="mt-5 max-w-lg text-[14px] leading-6 text-white/80 sm:text-[15px] sm:leading-7">Jelajahi berbagai destinasi wisata alam yang telah mempercayakan sistem e-ticketing dan ekosistem non-tunai mereka kepada platform Passify.</p>
               </div>
 
               <form onSubmit={handleSearchSubmit} className="rounded-[1.25rem] bg-white p-4 text-[var(--text-primary)] shadow-[0_16px_40px_rgba(16,45,32,.25)] sm:p-5">
@@ -137,8 +112,8 @@ export default function TravelerPortal() {
                   <Search className="h-4 w-4 flex-none text-[var(--ink-soft)]" aria-hidden="true" />
                   <input id="traveler-search" type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Gunung, danau, provinsi..." className="min-w-0 flex-1 bg-transparent px-2.5 py-3 text-sm text-[var(--text-primary)] outline-none placeholder:text-[var(--text-muted)]" />
                 </div>
-                <button type="submit" className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--bark)] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[var(--forest)]">Cari tiket <ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
-                <p className="mt-3 text-center text-[11px] leading-relaxed text-[var(--ink-soft)]">Harga, ketersediaan, dan pembayaran pada halaman ini merupakan demonstrasi produk.</p>
+                <button type="submit" className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--bark)] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[var(--forest)]">Cari Destinasi <ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
+                <p className="mt-3 text-center text-[11px] leading-relaxed text-[var(--ink-soft)]">Halaman ini adalah demonstrasi portofolio klien (showcase).</p>
               </form>
             </div>
           </div>
@@ -169,18 +144,15 @@ export default function TravelerPortal() {
           </div>
         </section>
 
-        <Catalog destinations={DESTINATIONS} searchQuery={searchQuery} onSelectDestination={handleDestinationSelect} />
+        <Catalog destinations={DESTINATIONS} searchQuery={searchQuery} />
       </main>
 
       <footer className="border-t border-[var(--border)] bg-white px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between">
-          <span>Jelajah Rimba · portal simulasi wisatawan untuk Passify</span>
-          <span className="inline-flex items-center gap-1.5"><UserRound className="h-3.5 w-3.5" aria-hidden="true" />Masuk untuk melanjutkan ke pemesanan</span>
+          <span>Jelajah Rimba · showcase portofolio klien Passify</span>
         </div>
       </footer>
 
-      {selectedDestination && <BookingModal destination={selectedDestination} onClose={() => setSelectedDestination(null)} onBookingSuccess={handleBookingSuccess} />}
-      {isTicketModalOpen && activeOrder && <ETicketModal order={activeOrder} onClose={() => setIsTicketModalOpen(false)} />}
       <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} onAuthSuccess={handleAuthSuccess} />
     </div>
   );

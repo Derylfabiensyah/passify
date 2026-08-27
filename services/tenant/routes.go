@@ -8,6 +8,13 @@ import (
 
 // RegisterRoutes registers tenant service endpoints with authentication and authorization middleware
 func RegisterRoutes(router *gin.RouterGroup, handler *TenantHandler, jwtSecret string) {
+	// Public routes (no auth) - used by tenant portals & custom domain resolution
+	public := router.Group("/public")
+	{
+		public.POST("/tenants/resolve", handler.HandleResolveTenant)
+		public.GET("/tenants/:slug/destination", handler.HandleGetPublicDestination)
+	}
+
 	protected := router.Group("")
 	protected.Use(middleware.AuthMiddleware(jwtSecret))
 	protected.Use(middleware.RoleMiddleware(models.RoleSuperAdmin, models.RoleTenantAdmin))
