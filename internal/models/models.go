@@ -442,3 +442,77 @@ type ScanLog struct {
 }
 
 func (ScanLog) TableName() string { return "scan_logs" }
+
+// ========================================================================
+// Seat Map & Tiered Seating (Amphitheater / Concert / Event)
+// ========================================================================
+
+// SeatZone represents a section/zone in a venue (e.g. VIP Front, Tribune A, Festival Area)
+type SeatZone struct {
+	BaseModel
+	DestinationID uuid.UUID `json:"destination_id" gorm:"type:uuid;not null"`
+	TenantID      uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
+	Name          string    `json:"name" gorm:"size:100;not null"`
+	CategoryType  string    `json:"category_type" gorm:"size:50;default:'tribune'"` // 'vip', 'tribune', 'festival', 'camping'
+	PriceMultiplier float64 `json:"price_multiplier" gorm:"type:decimal(5,2);default:1.0"`
+	TotalRows     int       `json:"total_rows" gorm:"default:10"`
+	SeatsPerRow   int       `json:"seats_per_row" gorm:"default:20"`
+	IsActive      bool      `json:"is_active" gorm:"default:true"`
+
+	// Relations
+	Seats []Seat `json:"seats,omitempty" gorm:"foreignKey:ZoneID"`
+}
+
+func (SeatZone) TableName() string { return "seat_zones" }
+
+// Seat represents an individual numbered seat within a zone
+type Seat struct {
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	ZoneID    uuid.UUID `json:"zone_id" gorm:"type:uuid;not null"`
+	RowLabel  string    `json:"row_label" gorm:"size:10;not null"`
+	SeatNumber int      `json:"seat_number" gorm:"not null"`
+	SeatCode  string    `json:"seat_code" gorm:"size:50;not null"` // e.g. "VIP-A-12"
+	Status    string    `json:"status" gorm:"size:20;default:'available'"` // 'available', 'locked', 'booked', 'maintenance'
+	Price     float64   `json:"price" gorm:"type:decimal(12,2);not null;default:0"`
+}
+
+func (Seat) TableName() string { return "seats" }
+
+// SeatReservation tracks temporary Redis/DB lock on seats during checkout (e.g. 5-10 minutes lock)
+type SeatReservation struct {
+	ID         uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	SeatID     uuid.UUID `json:"seat_id" gorm:"type:uuid;not null"`
+	UserID     uuid.UUID `json:"user_id" gorm:"type:uuid;not null"`
+	SessionID  string    `json:"session_id" gorm:"size:100;not null"`
+	ExpiresAt  time.Time `json:"expires_at" gorm:"not null"`
+	IsReleased bool      `json:"is_released" gorm:"default:false"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
+func (SeatReservation) TableName() string { return "seat_reservations" }
+
+// ========================================================================
+// NFC Wristband (RFID Sync & Gate Tap)
+// ========================================================================
+
+// NFCWristband links a physical RFID/NFC wristband to a visitor, ticket, and cashless wallet
+type NFCWristband struct {
+	BaseModel
+	TenantID      uuid.UUID  `json:"tenant_id" gorm:"type:uuid;not null"`
+	DestinationID uuid.UUID  `json:"destination_id" gorm:"type:uuid;not null"`
+	WristbandUID  string     `json:"wristband_uid" gorm:"size:64;uniqueIndex;not null"` // NFC chip hardware UID (e.g. 04:A2:3B:4C)
+	UserID        *uuid.UUID `json:"user_id,omitempty" gorm:"type:uuid"`
+	TicketID      *uuid.UUID `json:"ticket_id,omitempty" gorm:"type:uuid"`
+	WalletID      *uuid.UUID `json:"wallet_id,omitempty" gorm:"type:uuid"`
+	Status        string     `json:"status" gorm:"size:20;default:'active'"` // 'active', 'unlinked', 'lost', 'revoked'
+	AssignedAt    *time.Time `json:"assigned_at,omitempty"`
+	LastTappedAt  *time.Time `json:"last_tapped_at,omitempty"`
+	LastTapGateID *uuid.UUID `json:"last_tap_gate_id,omitempty" gorm:"type:uuid"`
+
+	// Relations
+	Ticket *Ticket `json:"ticket,omitempty" gorm:"foreignKey:TicketID"`
+	Wallet *Wallet `json:"wallet,omitempty" gorm:"foreignKey:WalletID"`
+	User   *User   `json:"user,omitempty" gorm:"foreignKey:UserID"`
+}
+
+func (NFCWristband) TableName() string { return "nfc_wristbands" }

@@ -9,6 +9,7 @@ import (
 	"github.com/tiket-wisata-alam/backend/internal/config"
 	"github.com/tiket-wisata-alam/backend/internal/database"
 	"github.com/tiket-wisata-alam/backend/internal/middleware"
+	"github.com/tiket-wisata-alam/backend/services/seatmap"
 	"github.com/tiket-wisata-alam/backend/services/ticket"
 )
 
@@ -46,6 +47,12 @@ func main() {
 	// Register ticket service routes
 	ticketGroup := router.Group("/api/v1/tickets")
 	ticket.RegisterRoutes(ticketGroup, handler, cfg.JWT.Secret, redisClient)
+
+	// Register interactive seatmap routes
+	seatMapSvc := seatmap.NewSeatMapService(db, redisClient)
+	seatMapHandler := seatmap.NewSeatMapHandler(seatMapSvc)
+	seatMapGroup := router.Group("/api/v1/seatmap")
+	seatmap.RegisterRoutes(seatMapGroup, seatMapHandler, cfg.JWT.Secret)
 
 	port := cfg.TicketServicePort
 	if !strings.HasPrefix(port, ":") {
