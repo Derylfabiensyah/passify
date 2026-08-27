@@ -3,7 +3,27 @@ import { useTenant } from '../contexts/TenantContext';
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
 
 /**
- * API client hook that automatically includes tenant context
+ * Generate or get existing device fingerprint for anti-bot / rate-limiting protection
+ */
+export function getDeviceFingerprint() {
+  let fp = localStorage.getItem('passify_device_fp');
+  if (!fp) {
+    // Generate a pseudo-fingerprint using screen, language, timezone, userAgent, and random salt
+    const raw = `${navigator.userAgent}|${navigator.language}|${screen.width}x${screen.height}|${new Date().getTimezoneOffset()}|${Math.random().toString(36).substring(2)}`;
+    // Simple hash function
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) {
+      hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+      hash |= 0;
+    }
+    fp = 'fp_' + Math.abs(hash).toString(16) + '_' + Math.random().toString(36).substring(2, 10);
+    localStorage.setItem('passify_device_fp', fp);
+  }
+  return fp;
+}
+
+/**
+ * API client hook that automatically includes tenant context and device fingerprint
  */
 export function useApiClient() {
   const { slug } = useTenant();
@@ -11,6 +31,7 @@ export function useApiClient() {
   const request = async (endpoint, options = {}) => {
     const headers = {
       'Content-Type': 'application/json',
+      'X-Device-Fingerprint': getDeviceFingerprint(),
       ...options.headers,
     };
 

@@ -45,7 +45,7 @@ func main() {
 
 	// Register ticket service routes
 	ticketGroup := router.Group("/api/v1/tickets")
-	ticket.RegisterRoutes(ticketGroup, handler, cfg.JWT.Secret)
+	ticket.RegisterRoutes(ticketGroup, handler, cfg.JWT.Secret, redisClient)
 
 	port := cfg.TicketServicePort
 	if !strings.HasPrefix(port, ":") {
