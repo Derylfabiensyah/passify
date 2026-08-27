@@ -210,6 +210,21 @@ func (h *TicketHandler) HandleCancelTicket(c *gin.Context) {
 	response.Success(c, http.StatusOK, "Ticket cancelled successfully", nil)
 }
 
+// HandleGetLiveQR generates an up-to-date TOTP QR payload for a given ticket
+func (h *TicketHandler) HandleGetLiveQR(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		response.BadRequest(c, "Invalid ticket ID", err.Error())
+		return
+	}
+	qr, err := h.service.GetLiveQRPayload(id)
+	if err != nil {
+		response.NotFound(c, "Ticket not found or unable to generate QR")
+		return
+	}
+	response.Success(c, http.StatusOK, "QR payload generated", qr)
+}
+
 func (h *TicketHandler) HandleJoinQueue(c *gin.Context) {
 	userID, _ := middleware.GetUserID(c)
 	var req JoinQueueRequest

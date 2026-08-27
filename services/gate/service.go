@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/tiket-wisata-alam/backend/internal/models"
+	internaltotp "github.com/tiket-wisata-alam/backend/internal/totp"
 	"gorm.io/gorm"
 )
 
@@ -46,6 +47,7 @@ type ManifestResponse struct {
 type OnlineValidateRequest struct {
 	DeviceID   uuid.UUID `json:"device_id" binding:"required"`
 	TicketCode string    `json:"ticket_code" binding:"required"`
+	QRPayload  string    `json:"qr_payload,omitempty"` // full TOTP QR payload e.g. "PASSIFY:TWA-XXXXX:123456"
 	ScannedAt  time.Time `json:"scanned_at"`
 }
 
@@ -231,7 +233,46 @@ func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*Validate
 		scannedAt = time.Now()
 	}
 
-	ticket, err := s.repo.GetTicketForValidation(req.TicketCode, scannedAt)
+	// If a full QR payload is provided, validate TOTP first
+	ticketCodeToLookup := req.TicketCode
+	if req.QRPayload != "" {
+		extractedCode, valid, err := internaltotp.ValidateQRPayload(req.QRPayload, "")
+		// We need the TOTP secret from the ticket - fetch ticket first for secret
+		tempTicket, tErr := s.repo.GetTicketByCode(req.TicketCode)
+		if tErr == nil && tempTicket != nil {
+			extractedCode, valid, err = internaltotp.ValidateQRPayload(req.QRPayload, tempTicket.TOTPSecretKey)
+			if err != nil || !valid {
+				now := time.Now()
+				ticketCode := req.TicketCode
+				log := &models.ScanLog{
+					ID:            uuid.New(),
+					TenantID:      device.TenantID,
+					GateDeviceID:  device.ID,
+					TicketID:      &tempTicket.ID,
+					TicketCode:    &ticketCode,
+					ScannedAt:     scannedAt,
+					ScanResult:    "invalid",
+					IsOfflineScan: false,
+					SyncedAt:      &now,
+					RawQRPayload:  &req.QRPayload,
+					CreatedAt:     now,
+				}
+				_ = s.repo.CreateScanLog(log)
+				return &ValidateResponse{
+					Valid:      false,
+					ScanResult: "invalid_totp",
+					TicketCode: req.TicketCode,
+					Message:    "QR Code tidak valid atau sudah kadaluarsa. Minta pengunjung refresh e-ticket.",
+				}, nil
+			}
+			ticketCodeToLookup = extractedCode
+			_ = extractedCode
+		}
+		_ = valid
+		_ = err
+	}
+
+	ticket, err := s.repo.GetTicketForValidation(ticketCodeToLookup, scannedAt)
 	if err == nil && ticket != nil {
 		// Ticket is active and valid for today
 		if err := s.repo.UpdateTicketStatus(ticket.ID, "used", &scannedAt, &device.ID); err != nil {

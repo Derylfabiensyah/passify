@@ -2,17 +2,17 @@ package ticket
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
+	"crypto/rand"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"github.com/tiket-wisata-alam/backend/internal/config"
 	"github.com/tiket-wisata-alam/backend/internal/models"
+	internaltotp "github.com/tiket-wisata-alam/backend/internal/totp"
 )
 
 // DTOs
@@ -121,6 +121,14 @@ type BookingResponse struct {
 	GrandTotal    float64
 }
 
+// LiveQRResponse holds the current TOTP QR payload for an e-ticket
+type LiveQRResponse struct {
+	TicketCode      string `json:"ticket_code"`
+	QRPayload       string `json:"qr_payload"`         // PASSIFY:{code}:{totp}
+	SecondsLeft     int    `json:"seconds_until_refresh"` // time until QR changes
+	VisitDate       string `json:"visit_date"`
+}
+
 type TicketService interface {
 	CreateCategory(tenantID uuid.UUID, req CreateCategoryRequest) (*models.TicketCategory, error)
 	ListCategories(destinationID uuid.UUID) ([]models.TicketCategory, error)
@@ -134,6 +142,7 @@ type TicketService interface {
 	CheckQueueStatus(userID uuid.UUID, destinationID uuid.UUID, visitDate string) (*QueueResponse, error)
 	GetTicket(id uuid.UUID) (*models.Ticket, error)
 	GetTicketByCode(code string) (*models.Ticket, error)
+	GetLiveQRPayload(id uuid.UUID) (*LiveQRResponse, error)
 	ListQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error)
 	CancelTicket(id uuid.UUID) error
 }
@@ -346,21 +355,29 @@ func (s *ticketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsR
 	for _, item := range req.Items {
 		cat, _ := s.repo.GetTicketCategoryByID(item.CategoryID)
 		for i := 0; i < item.Quantity; i++ {
-			secretBytes := make([]byte, 10)
-			rand.Read(secretBytes)
-			secret := hex.EncodeToString(secretBytes)
-			
+			// Use TOTP package for cryptographically secure secret
+			secret, secretErr := internaltotp.GenerateSecret()
+			if secretErr != nil {
+				return nil, fmt.Errorf("failed to generate ticket secret: %w", secretErr)
+			}
+
+			ticketCode := fmt.Sprintf("TWA-%s", generateRandomString(5))
+
+			// Pre-generate QR payload for the ticket (changes at runtime via TOTP)
+			qrPayload, _ := internaltotp.GenerateQRPayload(ticketCode, secret)
+
 			ticket := models.Ticket{
 				TenantID:      tenantID,
-				TransactionID: uuid.New(), // Will be set to actual transaction ID
+				TransactionID: uuid.New(),
 				DestinationID: req.DestinationID,
 				CategoryID:    item.CategoryID,
 				TimeSlotID:    req.TimeSlotID,
-				TicketCode:    fmt.Sprintf("TWA-%s", generateRandomString(5)),
+				TicketCode:    ticketCode,
 				VisitDate:     req.VisitDate,
 				UnitPrice:     cat.BasePrice,
 				Status:        "active",
 				TOTPSecretKey: secret,
+				QRPayload:     &qrPayload,
 			}
 			tickets = append(tickets, ticket)
 			if cat != nil {
@@ -459,5 +476,26 @@ func (s *ticketService) CheckQueueStatus(userID uuid.UUID, destinationID uuid.UU
 		EstimatedWaitMinutes: position / 50,
 		QueueToken:           token,
 		Status:               status,
+	}, nil
+}
+
+// GetLiveQRPayload generates a fresh TOTP QR code payload for the given ticket ID.
+// The payload changes every 30 seconds and includes the seconds until next refresh.
+func (s *ticketService) GetLiveQRPayload(id uuid.UUID) (*LiveQRResponse, error) {
+	ticket, err := s.repo.GetTicketByID(id)
+	if err != nil || ticket == nil {
+		return nil, fmt.Errorf("ticket not found")
+	}
+
+	payload, err := internaltotp.GenerateQRPayload(ticket.TicketCode, ticket.TOTPSecretKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate QR payload: %w", err)
+	}
+
+	return &LiveQRResponse{
+		TicketCode:  ticket.TicketCode,
+		QRPayload:   payload,
+		SecondsLeft: internaltotp.SecondsUntilRefresh(),
+		VisitDate:   ticket.VisitDate.Format("2006-01-02"),
 	}, nil
 }
