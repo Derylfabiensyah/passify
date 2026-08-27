@@ -406,16 +406,21 @@ export default function TravelerPortal() {
       </footer>
 
       {/* 🔐 Modals Integration */}
-      <BookingModal
-        destination={destination}
-        onClose={() => setIsBookingModalOpen(false)}
-        onBookingSuccess={handleBookingSuccess}
-      />
+      {isBookingModalOpen && (
+        <BookingModal
+          isOpen={isBookingModalOpen}
+          destination={destination}
+          onClose={() => setIsBookingModalOpen(false)}
+          onBookingSuccess={handleBookingSuccess}
+        />
+      )}
 
-      <ETicketModal
-        order={activeOrder}
-        onClose={() => setIsTicketModalOpen(false)}
-      />
+      {isTicketModalOpen && activeOrder && (
+        <ETicketModal
+          order={activeOrder}
+          onClose={() => setIsTicketModalOpen(false)}
+        />
+      )}
 
       <AuthModal
         isOpen={isAuthModalOpen}

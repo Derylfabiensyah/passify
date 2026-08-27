@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Calendar, User, Ticket, ArrowRight } from 'lucide-react';
 import { useApiClient } from '../api/client';
 
-export default function BookingModal({ destination, onClose, onBookingSuccess }) {
+export default function BookingModal({ isOpen = true, destination, onClose, onBookingSuccess }) {
   const apiClient = useApiClient(); // API client with automatic tenant header injection
   const todayStr = new Date().toISOString().split('T')[0];
   const [visitDate, setVisitDate] = useState(todayStr);
@@ -14,7 +14,18 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
   const [visitors, setVisitors] = useState([{ name: '', nik: '' }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!destination) return null;
+  // Close on Escape key
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && onClose) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  if (isOpen === false || !destination) return null;
 
   const handleQtyChange = (catId, delta) => {
     setQuantities((prev) => {
@@ -115,7 +126,14 @@ export default function BookingModal({ destination, onClose, onBookingSuccess })
   };
 
   return (
-    <div className="modal-overlay">
+    <div
+      className="modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && onClose) {
+          onClose();
+        }
+      }}
+    >
       <div className="modal-content card relative max-w-xl w-full rounded-[18px] border border-[#cddac8] bg-[#fffdf8] p-5 shadow-[0_24px_60px_rgba(23,59,50,0.18)] sm:p-7">
         {/* Close Button */}
         <button
