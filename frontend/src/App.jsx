@@ -12,6 +12,7 @@ import GatesPage from './pages/admin/GatesPage';
 import FinancePage from './pages/admin/FinancePage';
 import LoadingScreen from './components/LoadingScreen';
 import ErrorScreen from './components/ErrorScreen';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function AppRoutes() {
   const { slug, destination, isLoading, error } = useTenant();
@@ -26,13 +27,13 @@ function AppRoutes() {
     return <ErrorScreen error={error} />;
   }
 
-  // Root domain - show landing page
+  // Root domain - show landing page & traveler showcase
   if (!slug) {
     return (
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/jelajah" element={<TravelerPortal />} />
-        <Route path="/admin/*" element={<ErrorScreen error="Admin access requires a tenant domain" />} />
+        <Route path="/admin/*" element={<ErrorScreen error="Akses admin memerlukan subdomain pengelola wisata (tenant)." />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
@@ -42,6 +43,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<TenantPortal />} />
+      <Route path="/jelajah" element={<TravelerPortal />} />
       <Route
         path="/admin/*"
         element={
@@ -63,8 +65,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <TenantProvider>
-      <AppRoutes />
-    </TenantProvider>
+    <ErrorBoundary>
+      <TenantProvider>
+        <AppRoutes />
+      </TenantProvider>
+    </ErrorBoundary>
   );
 }
