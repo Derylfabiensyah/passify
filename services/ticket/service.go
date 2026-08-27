@@ -59,6 +59,18 @@ type CheckAvailabilityRequest struct {
 	TimeSlotID    *uuid.UUID
 }
 
+type JoinQueueRequest struct {
+	DestinationID uuid.UUID `json:"destination_id" binding:"required"`
+	VisitDate     string    `json:"visit_date" binding:"required"` // YYYY-MM-DD
+}
+
+type QueueResponse struct {
+	Position             int    `json:"position"`
+	EstimatedWaitMinutes int    `json:"estimated_wait_minutes"`
+	QueueToken           string `json:"queue_token"`
+	Status               string `json:"status"` // "waiting" or "ready"
+}
+
 type SlotAvailability struct {
 	SlotID         uuid.UUID
 	SlotLabel      string
@@ -96,6 +108,8 @@ type BookTicketsRequest struct {
 	TimeSlotID     *uuid.UUID
 	Items          []BookingItem
 	VisitorDetails []VisitorDetail
+	IdempotencyKey string `json:"idempotency_key"`
+	QueueToken     string `json:"queue_token,omitempty"`
 }
 
 type BookingResponse struct {
@@ -116,6 +130,8 @@ type TicketService interface {
 	ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error)
 	CheckAvailability(req CheckAvailabilityRequest) (*AvailabilityResponse, error)
 	BookTickets(tenantID, userID uuid.UUID, req BookTicketsRequest) (*BookingResponse, error)
+	JoinQueue(userID uuid.UUID, req JoinQueueRequest) (*QueueResponse, error)
+	CheckQueueStatus(userID uuid.UUID, destinationID uuid.UUID, visitDate string) (*QueueResponse, error)
 	GetTicket(id uuid.UUID) (*models.Ticket, error)
 	GetTicketByCode(code string) (*models.Ticket, error)
 	ListQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error)
@@ -273,6 +289,29 @@ func generateRandomString(n int) string {
 
 func (s *ticketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsRequest) (*BookingResponse, error) {
 	ctx := context.Background()
+
+	// 1. Idempotency Check
+	if req.IdempotencyKey != "" {
+		idemKey := fmt.Sprintf("idempotency:%s", req.IdempotencyKey)
+		val, err := s.redis.Get(ctx, idemKey).Result()
+		if err == nil && val != "" {
+			return nil, errors.New("request already processed or processing")
+		}
+		// Set processing state
+		s.redis.SetNX(ctx, idemKey, "processing", 10*time.Minute)
+		// Mark as completed when done
+		defer s.redis.Set(ctx, idemKey, "completed", 24*time.Hour)
+	}
+
+	// 2. Queue Token Verification
+	if req.QueueToken != "" {
+		tokenKey := fmt.Sprintf("queue_token:%s", userID.String())
+		validToken, err := s.redis.Get(ctx, tokenKey).Result()
+		if err != nil || validToken != req.QueueToken {
+			return nil, errors.New("invalid or expired queue token")
+		}
+	}
+
 	lockKey := fmt.Sprintf("quota_lock:%s:%s", req.DestinationID.String(), req.VisitDate.Format("2006-01-02"))
 	
 	// Redis lock
@@ -360,4 +399,65 @@ func (s *ticketService) ListQuotas(destinationID uuid.UUID, startDate, endDate t
 
 func (s *ticketService) CancelTicket(id uuid.UUID) error {
 	return s.repo.UpdateTicketStatus(id, "cancelled", nil, nil)
+}
+
+func (s *ticketService) JoinQueue(userID uuid.UUID, req JoinQueueRequest) (*QueueResponse, error) {
+	ctx := context.Background()
+	queueKey := fmt.Sprintf("queue:%s:%s", req.DestinationID.String(), req.VisitDate)
+	
+	score := float64(time.Now().UnixNano())
+	s.redis.ZAddNX(ctx, queueKey, redis.Z{Score: score, Member: userID.String()})
+	
+	rank, err := s.redis.ZRank(ctx, queueKey, userID.String()).Result()
+	if err != nil {
+		return nil, err
+	}
+	
+	position := int(rank) + 1
+	status := "waiting"
+	token := ""
+	
+	if position <= 1000 {
+		status = "ready"
+		token = generateRandomString(16)
+		s.redis.Set(ctx, fmt.Sprintf("queue_token:%s", userID.String()), token, 1*time.Hour)
+	}
+	
+	return &QueueResponse{
+		Position:             position,
+		EstimatedWaitMinutes: position / 50,
+		QueueToken:           token,
+		Status:               status,
+	}, nil
+}
+
+func (s *ticketService) CheckQueueStatus(userID uuid.UUID, destinationID uuid.UUID, visitDate string) (*QueueResponse, error) {
+	ctx := context.Background()
+	queueKey := fmt.Sprintf("queue:%s:%s", destinationID.String(), visitDate)
+	
+	rank, err := s.redis.ZRank(ctx, queueKey, userID.String()).Result()
+	if err != nil {
+		return nil, errors.New("not in queue")
+	}
+	
+	position := int(rank) + 1
+	status := "waiting"
+	token := ""
+	
+	if position <= 1000 {
+		status = "ready"
+		tokenKey := fmt.Sprintf("queue_token:%s", userID.String())
+		token, err = s.redis.Get(ctx, tokenKey).Result()
+		if err != nil || token == "" {
+			token = generateRandomString(16)
+			s.redis.Set(ctx, tokenKey, token, 1*time.Hour)
+		}
+	}
+	
+	return &QueueResponse{
+		Position:             position,
+		EstimatedWaitMinutes: position / 50,
+		QueueToken:           token,
+		Status:               status,
+	}, nil
 }

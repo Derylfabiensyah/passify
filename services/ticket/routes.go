@@ -17,6 +17,8 @@ func RegisterRoutes(router *gin.RouterGroup, handler *TicketHandler, jwtSecret s
 	protected.Use(middleware.AuthMiddleware(jwtSecret))
 	{
 		protected.POST("/book", handler.HandleBookTickets)
+		protected.POST("/queue/join", handler.HandleJoinQueue)
+		protected.GET("/queue/status", handler.HandleCheckQueueStatus)
 		protected.GET("/tickets/:id", handler.HandleGetTicket)
 		protected.GET("/tickets/code/:code", handler.HandleGetTicketByCode)
 		protected.POST("/tickets/:id/cancel", handler.HandleCancelTicket)

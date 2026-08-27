@@ -209,3 +209,40 @@ func (h *TicketHandler) HandleCancelTicket(c *gin.Context) {
 	}
 	response.Success(c, http.StatusOK, "Ticket cancelled successfully", nil)
 }
+
+func (h *TicketHandler) HandleJoinQueue(c *gin.Context) {
+	userID, _ := middleware.GetUserID(c)
+	var req JoinQueueRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Invalid request body", err.Error())
+		return
+	}
+	
+	resp, err := h.service.JoinQueue(userID, req)
+	if err != nil {
+		response.InternalServerError(c, "Failed to join queue")
+		return
+	}
+	response.Success(c, http.StatusOK, "Joined queue", resp)
+}
+
+func (h *TicketHandler) HandleCheckQueueStatus(c *gin.Context) {
+	userID, _ := middleware.GetUserID(c)
+	destID, err := uuid.Parse(c.Query("destination_id"))
+	if err != nil {
+		response.BadRequest(c, "Invalid destination ID", err.Error())
+		return
+	}
+	visitDate := c.Query("visit_date")
+	if visitDate == "" {
+		response.BadRequest(c, "Visit date is required", "Missing visit_date")
+		return
+	}
+	
+	resp, err := h.service.CheckQueueStatus(userID, destID, visitDate)
+	if err != nil {
+		response.NotFound(c, "Not in queue")
+		return
+	}
+	response.Success(c, http.StatusOK, "Queue status retrieved", resp)
+}
