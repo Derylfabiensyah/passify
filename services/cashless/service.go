@@ -319,6 +319,77 @@ func (s *CashlessService) RefundWallet(userID uuid.UUID, amount float64, referen
 	return updatedWallet, walletTx, nil
 }
 
+// AutoRefundRemainingBalance automatically transfers all remaining wallet balance back to the visitor's bank/e-wallet account upon leaving the venue or upon request
+func (s *CashlessService) AutoRefundRemainingBalance(userID uuid.UUID, payoutChannel, accountNumber string) (*models.Wallet, *models.WalletTransaction, float64, error) {
+	wallet, err := s.GetOrCreateWallet(userID, nil)
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	if wallet.Balance <= 0 {
+		return nil, nil, 0, errors.New("tidak ada sisa saldo wallet untuk di-refund")
+	}
+
+	refundAmount := wallet.Balance
+	var updatedWallet *models.Wallet
+	var walletTx *models.WalletTransaction
+
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		repoTx := s.repo.WithTx(tx)
+
+		w, err := repoTx.GetWalletByID(wallet.ID)
+		if err != nil {
+			return err
+		}
+
+		if w.Balance <= 0 {
+			return errors.New("saldo sudah ditarik atau kosong")
+		}
+
+		balanceBefore := w.Balance
+		balanceAfter := 0.0
+
+		if err := repoTx.UpdateWalletBalance(w.ID, balanceAfter); err != nil {
+			return fmt.Errorf("gagal mengupdate saldo wallet: %w", err)
+		}
+
+		channelDesc := payoutChannel
+		if channelDesc == "" {
+			channelDesc = "Metode Pembayaran Awal"
+		}
+		refStr := fmt.Sprintf("REFUND-AUTO-%s-%s", userID.String()[:8], time.Now().Format("20060102150405"))
+		descStr := fmt.Sprintf("Auto-refund otomatis sisa deposit ke %s (%s)", channelDesc, accountNumber)
+
+		txRecord := &models.WalletTransaction{
+			ID:            uuid.New(),
+			WalletID:      w.ID,
+			TenantID:      w.TenantID,
+			TxType:        "refund",
+			Amount:        refundAmount,
+			BalanceBefore: balanceBefore,
+			BalanceAfter:  balanceAfter,
+			ReferenceID:   &refStr,
+			Description:   &descStr,
+			CreatedAt:     time.Now(),
+		}
+
+		if err := repoTx.CreateWalletTransaction(txRecord); err != nil {
+			return fmt.Errorf("gagal mencatat transaksi refund: %w", err)
+		}
+
+		w.Balance = balanceAfter
+		updatedWallet = w
+		walletTx = txRecord
+		return nil
+	})
+
+	if err != nil {
+		return nil, nil, 0, err
+	}
+
+	return updatedWallet, walletTx, refundAmount, nil
+}
+
 // GetTransactionHistory retrieves paginated wallet transactions for a user
 func (s *CashlessService) GetTransactionHistory(userID uuid.UUID, page, perPage int) ([]models.WalletTransaction, int64, error) {
 	wallet, err := s.GetOrCreateWallet(userID, nil)

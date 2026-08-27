@@ -19,6 +19,7 @@ func RegisterRoutes(router *gin.RouterGroup, handler *CashlessHandler, jwtSecret
 		authenticated.GET("/wallet", handler.HandleGetWallet)
 		authenticated.POST("/wallet/topup", handler.HandleTopUp)
 		authenticated.POST("/wallet/pay", handler.HandlePay)
+		authenticated.POST("/wallet/auto-refund", handler.HandleAutoRefund)
 		authenticated.GET("/wallet/transactions", handler.HandleTransactionHistory)
 	}
 

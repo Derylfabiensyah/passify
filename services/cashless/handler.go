@@ -116,6 +116,48 @@ func (h *CashlessHandler) HandleRefund(c *gin.Context) {
 	})
 }
 
+// AutoRefundRequest payload for visitor self auto-refund
+type AutoRefundRequest struct {
+	PayoutChannel string `json:"payout_channel"` // 'BCA', 'GoPay', 'OVO', 'ShopeePay'
+	AccountNumber string `json:"account_number"` // Bank account number or e-wallet phone number
+}
+
+// HandleAutoRefund handles POST /wallet/auto-refund (visitor self-service)
+func (h *CashlessHandler) HandleAutoRefund(c *gin.Context) {
+	userID, err := middleware.GetUserID(c)
+	if err != nil {
+		response.Unauthorized(c, "Autentikasi diperlukan")
+		return
+	}
+
+	var req AutoRefundRequest
+	// optional body: can be empty to use default
+	_ = c.ShouldBindJSON(&req)
+
+	channel := req.PayoutChannel
+	if channel == "" {
+		channel = "Rekening Utama"
+	}
+	account := req.AccountNumber
+	if account == "" {
+		account = "Terdaftar"
+	}
+
+	wallet, tx, refundAmount, err := h.service.AutoRefundRemainingBalance(userID, channel, account)
+	if err != nil {
+		response.BadRequest(c, err.Error(), nil)
+		return
+	}
+
+	response.OK(c, "Auto-refund sisa saldo berhasil diproses", gin.H{
+		"refunded_amount": refundAmount,
+		"payout_channel":  channel,
+		"account_number":  account,
+		"wallet":          wallet,
+		"transaction":     tx,
+	})
+}
+
 // HandleTransactionHistory handles GET /wallet/transactions
 func (h *CashlessHandler) HandleTransactionHistory(c *gin.Context) {
 	userID, err := middleware.GetUserID(c)
