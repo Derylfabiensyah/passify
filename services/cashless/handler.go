@@ -84,7 +84,12 @@ func (h *CashlessHandler) HandlePay(c *gin.Context) {
 		return
 	}
 
-	wallet, tx, err := h.service.Pay(userID, req)
+	targetUserID := userID
+	if req.CustomerUserID != nil && *req.CustomerUserID != uuid.Nil {
+		targetUserID = *req.CustomerUserID
+	}
+
+	wallet, tx, err := h.service.Pay(targetUserID, req)
 	if err != nil {
 		response.BadRequest(c, err.Error(), nil)
 		return

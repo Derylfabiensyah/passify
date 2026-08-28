@@ -6,12 +6,8 @@ import {
   Check,
   ChevronRight,
   CloudOff,
-  Compass,
   Landmark,
-  ScanLine,
-  TicketCheck,
   Trees,
-  WalletCards,
 } from 'lucide-react';
 
 const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1800&q=88';
@@ -36,9 +32,8 @@ export default function LandingPage() {
     <div className="landing-page min-h-screen overflow-x-hidden bg-[var(--canvas)] text-[var(--ink)]">
       <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-2.5 no-underline" aria-label="Passify beranda">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--forest-deep)] text-white"><Compass className="h-4 w-4" /></span>
-            <span><span className="block text-xl font-bold leading-none tracking-[-.05em] text-[var(--forest-deep)]">passify</span><span className="mt-1 block text-[9px] font-extrabold uppercase tracking-[.14em] text-[var(--ink-soft)]">Operasi wisata alam</span></span>
+          <Link to="/" className="text-xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline" aria-label="Passify beranda">
+            passify
           </Link>
 
           <nav className="hidden items-center gap-6 text-xs font-bold text-[var(--ink-soft)] lg:flex" aria-label="Navigasi utama">
@@ -101,10 +96,10 @@ export default function LandingPage() {
             <SectionHeading eyebrow="Satu alur, bukan banyak alat" title="Dari rencana pengunjung sampai rekonsiliasi hari ini.">Passify membantu kawasan merespons dengan satu sumber informasi yang sama—di portal, di gerbang, dan pada laporan pengelola.</SectionHeading>
             <div className="border-t border-[var(--border)]">
               {[
-                { number: '01', icon: TicketCheck, title: 'Pengunjung memilih waktu yang masih masuk akal', text: 'Reservasi mengikuti tanggal, sesi, jalur, atau aktivitas yang Anda atur untuk kawasan.' },
-                { number: '02', icon: ScanLine, title: 'Gerbang memvalidasi tanpa menunggu kondisi ideal', text: 'Tiket dinamis tetap dapat diperiksa di lapangan dan diselaraskan ketika koneksi tersedia kembali.' },
-                { number: '03', icon: WalletCards, title: 'Pendapatan kembali dalam gambaran yang bisa ditindak', text: 'Komponen penjualan dan settlement disusun agar tim memahami apa yang terjadi, bukan sekadar melihat angka.' },
-              ].map(({ number, icon: Icon, title, text }) => <article key={number} className="grid gap-4 border-b border-[var(--border)] py-7 sm:grid-cols-[46px_1fr_auto] sm:items-start sm:gap-5"><span className="text-2xl font-bold tracking-[-.04em] text-[var(--bark)]">{number}</span><div><h3 className="font-sans text-xl font-bold leading-snug tracking-[-.035em]">{title}</h3><p className="mt-2 max-w-xl text-sm leading-6 text-[var(--ink-soft)]">{text}</p></div><Icon className="hidden h-5 w-5 text-[var(--forest)] sm:block" strokeWidth={1.5} /></article>)}
+                { number: '01', title: 'Pengunjung memilih waktu yang masih masuk akal', text: 'Reservasi mengikuti tanggal, sesi, jalur, atau aktivitas yang Anda atur untuk kawasan.' },
+                { number: '02', title: 'Gerbang memvalidasi tanpa menunggu kondisi ideal', text: 'Tiket dinamis tetap dapat diperiksa di lapangan dan diselaraskan ketika koneksi tersedia kembali.' },
+                { number: '03', title: 'Pendapatan kembali dalam gambaran yang bisa ditindak', text: 'Komponen penjualan dan settlement disusun agar tim memahami apa yang terjadi, bukan sekadar melihat angka.' },
+              ].map(({ number, title, text }) => <article key={number} className="grid gap-4 border-b border-[var(--border)] py-7 sm:grid-cols-[46px_1fr] sm:items-start sm:gap-5"><span className="text-2xl font-bold tracking-[-.04em] text-[var(--bark)]">{number}</span><div><h3 className="font-sans text-xl font-bold leading-snug tracking-[-.035em]">{title}</h3><p className="mt-2 max-w-xl text-sm leading-6 text-[var(--ink-soft)]">{text}</p></div></article>)}
               <div className="mt-7 rounded-[var(--radius)] bg-[var(--forest-deep)] p-5 text-white sm:p-6"><div className="flex items-center justify-between gap-4 border-b border-white/15 pb-4"><div><Eyebrow className="!text-[var(--leaf)]">Simulasi operasional</Eyebrow><p className="mt-1 text-2xl font-bold tracking-[-.045em] text-white">Gerbang selatan siap menerima</p></div><CloudOff className="h-5 w-5 shrink-0 text-[var(--leaf)]" /></div><div className="mt-5 grid grid-cols-2 gap-px bg-white/15"><div className="bg-[var(--forest-deep)] p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-white/55">Scan terakhir</span><strong className="mt-2 block text-xl">08:42</strong></div><div className="bg-[var(--forest-deep)] p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-white/55">Sesi pagi</span><strong className="mt-2 block text-xl">142 / 200</strong></div></div><p className="mt-4 text-xs leading-5 text-white/65">Contoh tampilan status; data akan diselaraskan saat koneksi tersedia.</p></div>
             </div>
           </div>

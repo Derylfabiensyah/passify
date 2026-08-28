@@ -17,11 +17,12 @@ type TopUpRequest struct {
 }
 
 type PayRequest struct {
-	BoothID   uuid.UUID  `json:"booth_id" binding:"required"`
-	ProductID *uuid.UUID `json:"product_id,omitempty"`
-	Quantity  int        `json:"quantity"`
-	Amount    float64    `json:"amount" binding:"required"`
-	QRScanRef string     `json:"qr_scan_ref,omitempty"`
+	BoothID        uuid.UUID  `json:"booth_id" binding:"required"`
+	ProductID      *uuid.UUID `json:"product_id,omitempty"`
+	Quantity       int        `json:"quantity"`
+	Amount         float64    `json:"amount" binding:"required"`
+	QRScanRef      string     `json:"qr_scan_ref,omitempty"`
+	CustomerUserID *uuid.UUID `json:"customer_user_id,omitempty"`
 }
 
 type CreateBoothRequest struct {
