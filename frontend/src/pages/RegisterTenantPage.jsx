@@ -196,25 +196,34 @@ export default function RegisterTenantPage() {
 
       {/* Main Container */}
       <main className="mx-auto w-full max-w-2xl px-4 py-8 sm:py-12 flex-1">
-        {step < 3 && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-[var(--clay)]">
-                Langkah {step} dari 2
-              </span>
-              <span className="text-xs font-semibold text-[var(--ink-soft)]">
-                {step === 1 ? 'Data Akun Pengelola' : 'Identitas Wisata Alam'}
-              </span>
+        <div className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--sand)] p-4 sm:p-5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="eyebrow">Partner onboarding</p>
+              <p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Siapkan portal wisata Anda dalam tiga langkah.</p>
             </div>
-            {/* Progress Bar */}
-            <div className="h-1.5 w-full bg-[rgba(23,59,50,0.08)] rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-[var(--forest)] transition-all duration-300 rounded-full"
-                style={{ width: step === 1 ? '50%' : '100%' }}
-              />
-            </div>
+            <span className="hidden rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)] sm:inline">Langkah {step} dari 3</span>
           </div>
-        )}
+          <ol className="mt-5 grid grid-cols-3 gap-2">
+            {[
+              ['01', 'Akun'],
+              ['02', 'Destinasi'],
+              ['03', 'Aktivasi'],
+            ].map(([number, label]) => {
+              const numberValue = Number(number);
+              const isCurrent = numberValue === step;
+              const isDone = numberValue < step;
+              return (
+                <li key={number} className="min-w-0">
+                  <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide ${isCurrent ? 'text-[var(--forest-deep)]' : isDone ? 'text-[var(--forest)]' : 'text-[var(--ink-muted)]'}`}>
+                    <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full ${isCurrent || isDone ? 'bg-[var(--forest)] text-white' : 'border border-[var(--border)] bg-white'}`}>{isDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : number}</span>
+                    <span className="truncate">{label}</span>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
 
         {/* Step 1: Data Akun */}
         {step === 1 && (

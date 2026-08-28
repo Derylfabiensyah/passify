@@ -1,317 +1,79 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, Phone, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, Lock, Mail, Phone, ShieldCheck, User, X } from 'lucide-react';
 
 export default function AuthModal({ isOpen, onClose, onAuthSuccess, initialMode = 'login' }) {
-  const [mode, setMode] = useState(initialMode); // 'login' or 'register'
+  const [mode, setMode] = useState(initialMode);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // Login form state
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-
-  // Register form state
-  const [regName, setRegName] = useState('');
-  const [regEmail, setRegEmail] = useState('');
-  const [regPhone, setRegPhone] = useState('');
-  const [regRole, setRegRole] = useState('wisatawan');
-  const [regPassword, setRegPassword] = useState('');
+  const [registration, setRegistration] = useState({ name: '', email: '', phone: '', role: 'wisatawan', password: '' });
 
   if (!isOpen) return null;
 
-  const handleLoginSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    if (!loginEmail || !loginPassword) {
-      setError('Silakan masukkan email dan kata sandi Anda.');
-      return;
-    }
+  const completeAuth = (user) => {
+    localStorage.setItem('passify_user', JSON.stringify(user));
+    localStorage.setItem('passify_token', 'demo-jwt-token-99281');
+    onAuthSuccess(user);
+  };
 
+  const submitLogin = (event) => {
+    event.preventDefault();
+    setError('');
+    if (!loginEmail || !loginPassword) return setError('Silakan masukkan email dan kata sandi Anda.');
     setLoading(true);
     setTimeout(() => {
-      setLoading(false);
       const isManager = loginEmail.includes('admin') || loginEmail.includes('pengelola');
-      const userObj = {
-        id: `usr-${Math.floor(100 + Math.random() * 900)}`,
-        name: loginEmail.split('@')[0].toUpperCase(),
-        email: loginEmail,
-        role: isManager ? 'pengelola' : 'wisatawan',
-        phone: '081234567890',
-        avatar: loginEmail.charAt(0).toUpperCase()
-      };
-      localStorage.setItem('passify_user', JSON.stringify(userObj));
-      localStorage.setItem('passify_token', 'demo-jwt-token-99281');
-      onAuthSuccess(userObj);
+      completeAuth({ id: `usr-${Math.floor(100 + Math.random() * 900)}`, name: loginEmail.split('@')[0].toUpperCase(), email: loginEmail, role: isManager ? 'pengelola' : 'wisatawan', phone: '081234567890', avatar: loginEmail.charAt(0).toUpperCase() });
+      setLoading(false);
     }, 600);
   };
 
-  const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
+  const submitRegistration = (event) => {
+    event.preventDefault();
     setError('');
-    if (!regName || !regEmail || !regPassword) {
-      setError('Mohon lengkapi seluruh field wajib.');
-      return;
-    }
-    if (regPassword.length < 6) {
-      setError('Kata sandi minimal 6 karakter.');
-      return;
-    }
-
+    if (!registration.name || !registration.email || !registration.password) return setError('Mohon lengkapi seluruh field wajib.');
+    if (registration.password.length < 6) return setError('Kata sandi minimal 6 karakter.');
     setLoading(true);
     setTimeout(() => {
+      completeAuth({ id: `usr-${Math.floor(100 + Math.random() * 900)}`, name: registration.name, email: registration.email, role: registration.role, phone: registration.phone || '081234567890', avatar: registration.name.charAt(0).toUpperCase() });
       setLoading(false);
-      const newUser = {
-        id: `usr-${Math.floor(100 + Math.random() * 900)}`,
-        name: regName,
-        email: regEmail,
-        role: regRole,
-        phone: regPhone || '081234567890',
-        avatar: regName.charAt(0).toUpperCase()
-      };
-      localStorage.setItem('passify_user', JSON.stringify(newUser));
-      localStorage.setItem('passify_token', 'demo-jwt-token-99281');
-      onAuthSuccess(newUser);
     }, 600);
   };
+
+  const updateRegistration = (field, value) => setRegistration((previous) => ({ ...previous, [field]: value }));
+  const inputClass = 'field-control pl-10';
 
   return (
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-content card relative max-w-md w-full overflow-hidden rounded-[18px] border border-[#cddac8] bg-[#fffdf8] p-0 shadow-[0_24px_60px_rgba(23,59,50,0.18)]">
-        {/* Header Tabs */}
-        <div className="flex items-start justify-between border-b border-[#28594e] bg-[#173b32] px-6 py-5 sm:px-7 sm:py-6">
-          <div>
-            <h2 className="font-['Outfit'] text-[1.25rem] font-bold leading-tight text-white">
-              Portal Akses Passify Cloud
-            </h2>
-            <p className="mt-1 text-sm leading-snug text-[#dce8d3]">
-              {mode === 'login' ? 'Masuk ke akun Anda' : 'Daftarkan akun tenant / pengunjung'}
-            </p>
-          </div>
-          <button
-            id="close-auth-modal-btn"
-            onClick={onClose}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-[#9aae85] hover:text-[#173b32] focus:outline-none focus:ring-2 focus:ring-[#dce8d3]"
-            aria-label="Tutup modal"
-          >
-            <X className="w-4 h-4" />
-          </button>
+    <div className="modal-overlay" role="presentation" onClick={(event) => event.target === event.currentTarget && onClose?.()}>
+      <div className="modal-content card relative max-w-md overflow-hidden bg-[var(--sand)]">
+        <div className="bg-[var(--forest-deep)] px-6 pb-6 pt-7 text-white sm:px-7">
+          <button id="close-auth-modal-btn" type="button" onClick={onClose} aria-label="Tutup modal" className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 transition-colors hover:bg-white/20"><X className="h-4 w-4" /></button>
+          <p className="text-[10px] font-extrabold uppercase tracking-[.15em] text-[var(--leaf)]">Akses akun</p>
+          <h2 className="mt-2 pr-10 font-serif text-3xl font-bold text-white">{mode === 'login' ? 'Selamat datang kembali' : 'Mulai perjalanan Anda'}</h2>
+          <p className="mt-2 text-sm text-white/75">{mode === 'login' ? 'Masuk untuk menyimpan dan melanjutkan pemesanan.' : 'Buat akun untuk memesan tiket atau mengelola kawasan.'}</p>
         </div>
 
-        {/* Mode Switcher */}
-        <div className="px-6 pt-5 sm:px-7">
-          <div className="grid grid-cols-2 gap-1 rounded-xl border border-[#cddac8] bg-[#e7efdf] p-1">
-            <button
-              id="auth-tab-login"
-              type="button"
-              onClick={() => { setMode('login'); setError(''); }}
-              className={`min-h-10 rounded-lg px-3 py-2 text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
-                mode === 'login'
-                  ? 'border border-[#b8cbb0] bg-white text-[#173b32] shadow-sm'
-                  : 'text-[#52635d] hover:bg-white/60 hover:text-[#173b32]'
-              }`}
-            >
-              Masuk
-            </button>
-            <button
-              id="auth-tab-register"
-              type="button"
-              onClick={() => { setMode('register'); setError(''); }}
-              className={`min-h-10 rounded-lg px-3 py-2 text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
-                mode === 'register'
-                  ? 'border border-[#b8cbb0] bg-white text-[#173b32] shadow-sm'
-                  : 'text-[#52635d] hover:bg-white/60 hover:text-[#173b32]'
-              }`}
-            >
-              Daftar Baru
-            </button>
+        <div className="p-5 sm:p-7">
+          <div className="grid grid-cols-2 rounded-xl border border-[var(--border)] bg-[var(--fog)] p-1">
+            {[['login', 'Masuk'], ['register', 'Daftar baru']].map(([value, label]) => <button key={value} id={`auth-tab-${value}`} type="button" onClick={() => { setMode(value); setError(''); }} className={`min-h-10 rounded-lg px-3 text-sm font-bold transition-colors ${mode === value ? 'bg-[var(--sand)] text-[var(--forest-deep)] shadow-sm' : 'text-[var(--ink-soft)] hover:text-[var(--forest-deep)]'}`}>{label}</button>)}
           </div>
-        </div>
 
-        {/* Body Content */}
-        <div className="px-6 pb-6 pt-5 sm:px-7 sm:pb-7">
-          {error && (
-            <div className="mb-5 flex items-center justify-between rounded-xl border border-[#c98c66] bg-[#fff3e8] px-3.5 py-3 text-sm leading-snug text-[#704127]">
-              <span>{error}</span>
-              <button onClick={() => setError('')} className="ml-3 text-[#9a5c35] transition-colors hover:text-[#5f3622]" aria-label="Tutup pesan kesalahan">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
+          {error && <div role="alert" className="mt-5 flex items-center justify-between gap-3 rounded-xl border border-[var(--bark)]/25 bg-[var(--bark-pale)] px-3.5 py-3 text-xs font-semibold text-[var(--bark)]"><span>{error}</span><button type="button" onClick={() => setError('')} aria-label="Tutup pesan kesalahan"><X className="h-4 w-4" /></button></div>}
 
-          {mode === 'login' ? (
-            <form onSubmit={handleLoginSubmit} className="space-y-5">
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Email Akses</label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
-                  <input
-                    id="login-email-input"
-                    type="email"
-                    required
-                    placeholder="nama@email.com"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-sm font-semibold text-[#173b32]">Kata Sandi</label>
-                  <a href="#forgot" onClick={(e) => e.preventDefault()} className="text-xs font-semibold text-[#80512f] hover:underline">
-                    Lupa sandi?
-                  </a>
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
-                  <input
-                    id="login-password-input"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-10 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#80512f] transition-colors hover:text-[#173b32]"
-                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                id="login-submit-btn"
-                type="submit"
-                disabled={loading}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#173b32] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#7b9680]"
-              >
-                {loading ? 'Memproses...' : 'Masuk Sekarang'}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-
-
-            </form>
-          ) : (
-            <form onSubmit={handleRegisterSubmit} className="space-y-5">
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Nama Lengkap *</label>
-                <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
-                  <input
-                    id="register-name-input"
-                    type="text"
-                    required
-                    placeholder="Nama lengkap Anda"
-                    value={regName}
-                    onChange={(e) => setRegName(e.target.value)}
-                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Alamat Email *</label>
-                <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
-                  <input
-                    id="register-email-input"
-                    type="email"
-                    required
-                    placeholder="nama@email.com"
-                    value={regEmail}
-                    onChange={(e) => setRegEmail(e.target.value)}
-                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Nomor WhatsApp / HP</label>
-                <div className="relative">
-                  <Phone className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
-                  <input
-                    id="register-phone-input"
-                    type="tel"
-                    placeholder="081234567890"
-                    value={regPhone}
-                    onChange={(e) => setRegPhone(e.target.value)}
-                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-4 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Peran Akun *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setRegRole('wisatawan')}
-                    className={`flex min-h-16 items-center gap-2 rounded-xl border p-3 text-left text-xs leading-snug font-medium transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
-                      regRole === 'wisatawan'
-                        ? 'border-[#173b32] bg-[#e7efdf] font-semibold text-[#173b32] shadow-sm'
-                        : 'border-[#c6d2c2] bg-white text-[#52635d] hover:border-[#9aae85]'
-                    }`}
-                  >
-                    <User className="h-4 w-4 shrink-0 text-[#80512f]" />
-                    <span>Wisatawan / Pengunjung</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRegRole('pengelola')}
-                    className={`flex min-h-16 items-center gap-2 rounded-xl border p-3 text-left text-xs leading-snug font-medium transition-all focus:outline-none focus:ring-2 focus:ring-[#9aae85] ${
-                      regRole === 'pengelola'
-                        ? 'border-[#173b32] bg-[#e7efdf] font-semibold text-[#173b32] shadow-sm'
-                        : 'border-[#c6d2c2] bg-white text-[#52635d] hover:border-[#9aae85]'
-                    }`}
-                  >
-                    <ShieldCheck className="h-4 w-4 shrink-0 text-[#80512f]" />
-                    <span>Pengelola / Tenant Admin</span>
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1.5 block text-sm font-semibold text-[#173b32]">Kata Sandi *</label>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#80512f]" />
-                  <input
-                    id="register-password-input"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Minimal 6 karakter"
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                    className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] py-2.5 pl-10 pr-10 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#80512f] transition-colors hover:text-[#173b32]"
-                    aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <button
-                id="register-submit-btn"
-                type="submit"
-                disabled={loading}
-                className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#173b32] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#7b9680]"
-              >
-                {loading ? 'Membuat Akun...' : 'Buat Akun Sekarang'}
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
-          )}
+          {mode === 'login' ? <form onSubmit={submitLogin} className="mt-5 space-y-4">
+            <label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 block uppercase tracking-wide text-[var(--ink-soft)]">Email akses</span><span className="relative block"><Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" /><input id="login-email-input" type="email" value={loginEmail} onChange={(event) => setLoginEmail(event.target.value)} className={inputClass} placeholder="nama@email.com" required /></span></label>
+            <label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 flex items-center justify-between uppercase tracking-wide text-[var(--ink-soft)]">Kata sandi <button type="button" className="normal-case tracking-normal text-[var(--bark)] hover:underline">Lupa sandi?</button></span><span className="relative block"><Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" /><input id="login-password-input" type={showPassword ? 'text' : 'password'} value={loginPassword} onChange={(event) => setLoginPassword(event.target.value)} className="field-control px-10" placeholder="••••••••" required /><button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-soft)]" aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></span></label>
+            <button id="login-submit-btn" type="submit" disabled={loading} className="btn-primary mt-2 w-full disabled:cursor-not-allowed disabled:opacity-60">{loading ? 'Memproses…' : 'Masuk dan lanjutkan'}<ArrowRight className="h-4 w-4" /></button>
+          </form> : <form onSubmit={submitRegistration} className="mt-5 space-y-4">
+            <label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 block uppercase tracking-wide text-[var(--ink-soft)]">Nama lengkap</span><span className="relative block"><User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" /><input id="register-name-input" value={registration.name} onChange={(event) => updateRegistration('name', event.target.value)} className={inputClass} placeholder="Nama lengkap Anda" required /></span></label>
+            <label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 block uppercase tracking-wide text-[var(--ink-soft)]">Alamat email</span><span className="relative block"><Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" /><input id="register-email-input" type="email" value={registration.email} onChange={(event) => updateRegistration('email', event.target.value)} className={inputClass} placeholder="nama@email.com" required /></span></label>
+            <label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 block uppercase tracking-wide text-[var(--ink-soft)]">Nomor WhatsApp <em className="normal-case text-[var(--ink-muted)]">(opsional)</em></span><span className="relative block"><Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" /><input id="register-phone-input" type="tel" value={registration.phone} onChange={(event) => updateRegistration('phone', event.target.value)} className={inputClass} placeholder="081234567890" /></span></label>
+            <fieldset><legend className="mb-2 text-xs font-bold uppercase tracking-wide text-[var(--ink-soft)]">Saya mendaftar sebagai</legend><div className="grid grid-cols-2 gap-2"><button type="button" onClick={() => updateRegistration('role', 'wisatawan')} className={`rounded-xl border p-3 text-left text-xs font-semibold ${registration.role === 'wisatawan' ? 'border-[var(--forest)] bg-[var(--leaf-pale)] text-[var(--forest-deep)]' : 'border-[var(--border)] text-[var(--ink-soft)] hover:bg-[var(--fog)]'}`}><User className="mb-2 h-4 w-4 text-[var(--bark)]" />Wisatawan</button><button type="button" onClick={() => updateRegistration('role', 'pengelola')} className={`rounded-xl border p-3 text-left text-xs font-semibold ${registration.role === 'pengelola' ? 'border-[var(--forest)] bg-[var(--leaf-pale)] text-[var(--forest-deep)]' : 'border-[var(--border)] text-[var(--ink-soft)] hover:bg-[var(--fog)]'}`}><ShieldCheck className="mb-2 h-4 w-4 text-[var(--bark)]" />Pengelola</button></div></fieldset>
+            <label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 block uppercase tracking-wide text-[var(--ink-soft)]">Kata sandi</span><span className="relative block"><Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" /><input id="register-password-input" type={showPassword ? 'text' : 'password'} value={registration.password} onChange={(event) => updateRegistration('password', event.target.value)} className="field-control px-10" placeholder="Minimal 6 karakter" required /><button type="button" onClick={() => setShowPassword((value) => !value)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-soft)]" aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}>{showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></span></label>
+            <button id="register-submit-btn" type="submit" disabled={loading} className="btn-primary mt-2 w-full disabled:cursor-not-allowed disabled:opacity-60">{loading ? 'Membuat akun…' : 'Buat akun'}<ArrowRight className="h-4 w-4" /></button>
+          </form>}
         </div>
       </div>
     </div>

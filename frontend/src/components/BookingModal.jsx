@@ -1,336 +1,153 @@
-import React, { useState } from 'react';
-import { X, Calendar, User, Ticket, ArrowRight } from 'lucide-react';
-import { useApiClient } from '../api/client';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, Ticket, User, Users, X } from 'lucide-react';
+
+const steps = [
+  { number: '01', label: 'Jadwal' },
+  { number: '02', label: 'Tiket & tamu' },
+  { number: '03', label: 'Tinjau' },
+];
+
+function formatRupiah(value) {
+  return `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
+}
 
 export default function BookingModal({ isOpen = true, destination, onClose, onBookingSuccess }) {
-  const apiClient = useApiClient(); // API client with automatic tenant header injection
   const todayStr = new Date().toISOString().split('T')[0];
+  const [activeStep, setActiveStep] = useState(1);
   const [visitDate, setVisitDate] = useState(todayStr);
   const [selectedSlotId, setSelectedSlotId] = useState(destination?.time_slots?.[0]?.id || '');
-  const [quantities, setQuantities] = useState({
-    [destination?.ticket_categories?.[0]?.id || 'cat-1']: 1
-  });
-
+  const [quantities, setQuantities] = useState({ [destination?.ticket_categories?.[0]?.id || 'cat-1']: 1 });
   const [visitors, setVisitors] = useState([{ name: '', nik: '' }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationMessage, setValidationMessage] = useState('');
 
-  // Close on Escape key
-  React.useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && onClose) {
-        onClose();
-      }
-    };
+  useEffect(() => {
+    const handleKeyDown = (event) => event.key === 'Escape' && onClose?.();
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
-  if (isOpen === false || !destination) return null;
-
-  const handleQtyChange = (catId, delta) => {
-    setQuantities((prev) => {
-      const current = prev[catId] || 0;
-      const next = Math.max(0, current + delta);
-      return { ...prev, [catId]: next };
-    });
-  };
-
-  // Update visitors array when total quantity changes
-  React.useEffect(() => {
-    const newTotalQty = Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
-    if (newTotalQty !== visitors.length) {
-      const newVisitors = Array.from({ length: newTotalQty }, (_, i) => 
-        visitors[i] || { name: '', nik: '' }
-      );
-      setVisitors(newVisitors);
-    }
+  useEffect(() => {
+    const total = Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
+    setVisitors((previous) => Array.from({ length: total }, (_, index) => previous[index] || { name: '', nik: '' }));
   }, [quantities]);
 
-  const handleVisitorChange = (index, field, value) => {
-    setVisitors((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
+  const totals = useMemo(() => {
+    const ticketCategories = destination?.ticket_categories || [];
+    return ticketCategories.reduce((result, category) => {
+      const qty = quantities[category.id] || 0;
+      result.ticket += Number(category.price || 0) * qty;
+      result.insurance += Number(category.insurance || 0) * qty;
+      result.retribution += Number(category.retribusi || 0) * qty;
+      result.quantity += qty;
+      return result;
+    }, { ticket: 0, insurance: 0, retribution: 0, quantity: 0 });
+  }, [destination, quantities]);
+  const platformFee = totals.quantity > 0 ? 2500 : 0;
+  const grandTotal = totals.ticket + totals.insurance + totals.retribution + platformFee;
+  const selectedSlot = (destination?.time_slots || []).find((slot) => slot.id === selectedSlotId);
+
+  if (!isOpen || !destination) return null;
+
+  const changeQuantity = (categoryId, delta) => {
+    setValidationMessage('');
+    setQuantities((previous) => ({ ...previous, [categoryId]: Math.max(0, (previous[categoryId] || 0) + delta) }));
   };
 
-  // Calculate fees
-  let totalTicketPrice = 0;
-  let totalInsurance = 0;
-  let totalRetribusi = 0;
-  let totalQty = 0;
+  const changeVisitor = (index, field, value) => {
+    setValidationMessage('');
+    setVisitors((previous) => previous.map((visitor, visitorIndex) => visitorIndex === index ? { ...visitor, [field]: value } : visitor));
+  };
 
-  destination.ticket_categories.forEach((cat) => {
-    const qty = quantities[cat.id] || 0;
-    totalQty += qty;
-    totalTicketPrice += cat.price * qty;
-    totalInsurance += cat.insurance * qty;
-    totalRetribusi += cat.retribusi * qty;
-  });
-
-  const platformFee = totalQty > 0 ? 2500 : 0;
-  const grandTotal = totalTicketPrice + totalInsurance + totalRetribusi + platformFee;
-
-  const handleSubmitBooking = async (e) => {
-    e.preventDefault();
-    if (totalQty === 0) {
-      alert('Pilih minimal 1 tiket untuk melanjutkan.');
+  const moveForward = () => {
+    if (activeStep === 2 && totals.quantity === 0) {
+      setValidationMessage('Pilih minimal satu tiket untuk melanjutkan.');
       return;
     }
-    
-    // Validate all visitor names are filled
-    const allNamesFilled = visitors.every(v => v.name.trim() !== '');
-    if (!allNamesFilled) {
-      alert('Mohon isi Nama Lengkap untuk semua pengunjung.');
+    if (activeStep === 2 && visitors.some((visitor) => !visitor.name.trim())) {
+      setValidationMessage('Isi nama lengkap untuk setiap pengunjung.');
       return;
     }
+    setValidationMessage('');
+    setActiveStep((step) => Math.min(3, step + 1));
+  };
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (activeStep < 3) {
+      moveForward();
+      return;
+    }
+    if (!totals.quantity || visitors.some((visitor) => !visitor.name.trim())) {
+      setActiveStep(2);
+      setValidationMessage('Lengkapi pilihan tiket dan nama pengunjung terlebih dahulu.');
+      return;
+    }
     setIsSubmitting(true);
-    
     try {
-      // Prepare booking data
-      const bookingData = {
-        destination_id: destination.id,
-        visit_date: visitDate,
-        time_slot_id: selectedSlotId,
-        visitors,
-        quantities,
-        total_amount: grandTotal
-      };
-
-      // TODO: Replace with actual API call when backend endpoint is ready
-      // const result = await apiClient.post('/api/bookings', bookingData);
-      
-      // For now, use demo/mock response
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newOrder = {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      onBookingSuccess({
         orderNumber: `TWA-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`,
         destinationName: destination.name,
         visitDate,
-        timeSlotLabel: destination.time_slots.find((ts) => ts.id === selectedSlotId)?.label || 'Full Day',
-        totalQty,
+        timeSlotLabel: selectedSlot?.label || 'Full Day',
+        totalQty: totals.quantity,
         grandTotal,
         visitors,
+        visitorName: visitors[0]?.name || '-',
         ticketCode: `TWA-QR-${Math.floor(10000 + Math.random() * 90000)}`,
         totpSecret: 'JBSWY3DPEHPK3PXP',
-        createdAt: new Date().toISOString()
-      };
-      
-      onBookingSuccess(newOrder);
+        createdAt: new Date().toISOString(),
+      });
     } catch (error) {
-      alert(`Booking failed: ${error.message}`);
+      setValidationMessage(`Pemesanan belum dapat diproses: ${error.message}`);
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div
-      className="modal-overlay"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && onClose) {
-          onClose();
-        }
-      }}
-    >
-      <div className="modal-content card relative max-w-xl w-full rounded-[18px] border border-[#cddac8] bg-[#fffdf8] p-5 shadow-[0_24px_60px_rgba(23,59,50,0.18)] sm:p-7">
-        {/* Close Button */}
-        <button
-          id="close-booking-modal-btn"
-          onClick={onClose}
-          className="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full border border-[#c6d2c2] bg-white text-[#80512f] transition-colors hover:border-[#80512f] hover:bg-[#fff3e8] hover:text-[#5f3622] focus:outline-none focus:ring-2 focus:ring-[#9aae85] sm:right-7 sm:top-7"
-          aria-label="Tutup modal"
-        >
-          <X className="w-5 h-5" />
-        </button>
-
-        {/* Modal Header */}
-        <div className="mb-5 flex items-center gap-3 border-b border-[#cddac8] pb-5 pr-10">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#b8cbb0] bg-[#e7efdf] text-[#173b32] shadow-sm">
-            <Ticket className="w-5 h-5" />
-          </div>
-          <div>
-            <h2 className="font-['Outfit'] text-[1.35rem] font-bold leading-tight text-[#173b32]">Pemesanan Tiket Wisata Alam</h2>
-            <p className="mt-1 text-sm leading-snug text-[#52635d]">{destination.name}</p>
+    <div className="modal-overlay" role="presentation" onClick={(event) => event.target === event.currentTarget && onClose?.()}>
+      <div className="modal-content card relative max-w-2xl overflow-hidden bg-[var(--sand)]">
+        <div className="border-b border-[var(--border)] bg-[var(--forest-deep)] px-5 pb-5 pt-6 text-white sm:px-7 sm:pt-7">
+          <button id="close-booking-modal-btn" type="button" onClick={onClose} className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20" aria-label="Tutup pemesanan"><X className="h-4 w-4" /></button>
+          <p className="text-[10px] font-extrabold uppercase tracking-[.15em] text-[var(--leaf)]">Reservasi kunjungan</p>
+          <h2 className="mt-2 max-w-md pr-10 font-serif text-2xl font-bold text-white sm:text-3xl">{destination.name}</h2>
+          <div className="mt-6 grid grid-cols-3 gap-2 border-t border-white/15 pt-4">
+            {steps.map((step) => {
+              const current = step.number === String(activeStep).padStart(2, '0');
+              const completed = Number(step.number) < activeStep;
+              return <div key={step.number} className="flex min-w-0 items-center gap-2"><span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-[10px] font-extrabold ${current || completed ? 'bg-[var(--leaf)] text-[var(--forest-deep)]' : 'border border-white/30 text-white/65'}`}>{completed ? <CheckCircle2 className="h-3.5 w-3.5" /> : step.number}</span><span className={`truncate text-[10px] font-bold uppercase tracking-wide ${current ? 'text-white' : 'text-white/55'}`}>{step.label}</span></div>;
+            })}
           </div>
         </div>
 
-        <form onSubmit={handleSubmitBooking} className="space-y-5">
-          {/* Step 1: Date & Time Slot */}
-          <div>
-            <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#173b32]">
-              <Calendar className="w-4 h-4 text-[#80512f]" />
-              1. Pilih Tanggal Kunjungan & Sesi
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-              <div>
-                <span className="mb-1 block text-xs font-semibold text-[#52635d]">Tanggal Kunjungan</span>
-                <input
-                  id="booking-date-input"
-                  type="date"
-                  min={todayStr}
-                  value={visitDate}
-                  onChange={(e) => setVisitDate(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                  required
-                />
-              </div>
+        <form onSubmit={handleSubmit}>
+          <div className="min-h-[340px] space-y-5 p-5 sm:p-7">
+            {activeStep === 1 && <section aria-labelledby="booking-step-title">
+              <div className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]"><Calendar className="h-5 w-5" /></span><div><p className="eyebrow">Langkah 1 dari 3</p><h3 id="booking-step-title" className="mt-1 text-2xl font-bold">Pilih waktu kunjungan</h3><p className="mt-1 text-sm text-[var(--ink-soft)]">Ketersediaan akan mengikuti sesi yang Anda pilih.</p></div></div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2"><label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 block uppercase tracking-wide text-[var(--ink-soft)]">Tanggal kunjungan</span><input id="booking-date-input" type="date" min={todayStr} value={visitDate} onChange={(event) => setVisitDate(event.target.value)} className="field-control" required /></label><label className="block text-xs font-bold text-[var(--ink)]"><span className="mb-2 block uppercase tracking-wide text-[var(--ink-soft)]">Sesi kunjungan</span><select id="booking-timeslot-select" value={selectedSlotId} onChange={(event) => setSelectedSlotId(event.target.value)} className="field-control">{(destination.time_slots || []).map((slot) => <option key={slot.id} value={slot.id}>{slot.label} · sisa {Math.max(0, slot.max_capacity - slot.booked)} orang</option>)}</select></label></div>
+              {selectedSlot && <div className="mt-5 rounded-xl border border-[var(--border)] bg-[var(--fog)] px-4 py-3 text-xs text-[var(--ink-soft)]"><strong className="text-[var(--forest-deep)]">{selectedSlot.label}</strong><span className="ml-2">tersisa {Math.max(0, selectedSlot.max_capacity - selectedSlot.booked).toLocaleString('id-ID')} dari {Number(selectedSlot.max_capacity || 0).toLocaleString('id-ID')} pengunjung.</span></div>}
+            </section>}
 
-              <div>
-                <span className="mb-1 block text-xs font-semibold text-[#52635d]">Sesi Kunjungan (Time Slot)</span>
-                <select
-                  id="booking-timeslot-select"
-                  value={selectedSlotId}
-                  onChange={(e) => setSelectedSlotId(e.target.value)}
-                  className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-[#f5f8f2] px-3 py-2.5 text-sm text-[#173b32] transition-colors focus:border-[#173b32] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                >
-                  {destination.time_slots.map((slot) => (
-                    <option key={slot.id} value={slot.id}>
-                      {slot.label} (Sisa Kuota: {slot.max_capacity - slot.booked})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            {activeStep === 2 && <section aria-labelledby="booking-step-title">
+              <div className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]"><Users className="h-5 w-5" /></span><div><p className="eyebrow">Langkah 2 dari 3</p><h3 id="booking-step-title" className="mt-1 text-2xl font-bold">Tiket dan pengunjung</h3><p className="mt-1 text-sm text-[var(--ink-soft)]">Tambahkan tiket, lalu isi data minimum setiap orang.</p></div></div>
+              <div className="mt-6 space-y-3">{(destination.ticket_categories || []).map((category) => { const qty = quantities[category.id] || 0; return <div key={category.id} className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-4"><div className="flex items-center justify-between gap-4"><div><h4 className="text-sm font-bold text-[var(--forest-deep)]">{category.name}</h4><p className="mt-1 text-xs text-[var(--ink-soft)]">{formatRupiah(category.price)} + biaya sesuai ketentuan</p></div><div className="flex shrink-0 items-center gap-2"><button type="button" id={`btn-dec-${category.id}`} onClick={() => changeQuantity(category.id, -1)} className="grid h-9 w-9 place-items-center rounded-lg border border-[var(--border)] bg-white font-bold text-[var(--forest)] hover:bg-[var(--leaf-pale)]" aria-label={`Kurangi ${category.name}`}>−</button><strong className="w-5 text-center text-sm">{qty}</strong><button type="button" id={`btn-inc-${category.id}`} onClick={() => changeQuantity(category.id, 1)} className="grid h-9 w-9 place-items-center rounded-lg bg-[var(--forest)] font-bold text-white hover:bg-[var(--forest-deep)]" aria-label={`Tambah ${category.name}`}>+</button></div></div></div>; })}</div>
+              <div className="mt-6 border-t border-[var(--border)] pt-5"><div className="flex items-center gap-2"><User className="h-4 w-4 text-[var(--bark)]" /><h4 className="text-sm font-bold">Data pengunjung</h4></div>{totals.quantity === 0 ? <p className="mt-3 rounded-xl border border-dashed border-[var(--border)] bg-[var(--fog)] p-4 text-center text-xs text-[var(--ink-soft)]">Pilih tiket terlebih dahulu untuk mengisi data pengunjung.</p> : <div className="mt-3 space-y-3">{visitors.map((visitor, index) => <div key={index} className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-3.5"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--bark)]">Pengunjung {index + 1}</span><div className="mt-2.5 grid gap-2 sm:grid-cols-2"><input id={`visitor-name-input-${index}`} value={visitor.name} onChange={(event) => changeVisitor(index, 'name', event.target.value)} className="field-control" placeholder="Nama lengkap sesuai identitas" required /><input id={`visitor-nik-input-${index}`} value={visitor.nik} onChange={(event) => changeVisitor(index, 'nik', event.target.value)} className="field-control" placeholder="NIK / nomor identitas (opsional)" /></div></div>)}</div>}</div>
+            </section>}
+
+            {activeStep === 3 && <section aria-labelledby="booking-step-title">
+              <div className="flex items-start gap-3"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[var(--bark-pale)] text-[var(--bark)]"><Ticket className="h-5 w-5" /></span><div><p className="eyebrow !text-[var(--bark)]">Langkah 3 dari 3</p><h3 id="booking-step-title" className="mt-1 text-2xl font-bold">Tinjau pesanan</h3><p className="mt-1 text-sm text-[var(--ink-soft)]">Pastikan jadwal dan data pengunjung sudah benar sebelum menerbitkan tiket.</p></div></div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2"><div className="surface-muted p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Jadwal kunjungan</span><strong className="mt-2 block text-sm text-[var(--forest-deep)]">{new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${visitDate}T00:00:00`))}</strong><span className="mt-1 block text-xs text-[var(--ink-soft)]">{selectedSlot?.label || 'Sesi belum dipilih'}</span></div><div className="surface-muted p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Pengunjung</span><strong className="mt-2 block text-sm text-[var(--forest-deep)]">{totals.quantity} tiket</strong><span className="mt-1 block truncate text-xs text-[var(--ink-soft)]">{visitors.map((visitor) => visitor.name).join(', ')}</span></div></div>
+              <div className="mt-5 rounded-2xl border border-[var(--border-hover)] bg-[var(--leaf-pale)] p-5"><div className="space-y-2 text-xs text-[var(--ink-soft)]"><div className="flex justify-between gap-4"><span>Subtotal tiket ({totals.quantity})</span><strong className="text-[var(--ink)]">{formatRupiah(totals.ticket)}</strong></div><div className="flex justify-between gap-4"><span>Asuransi & retribusi</span><strong className="text-[var(--ink)]">{formatRupiah(totals.insurance + totals.retribution)}</strong></div><div className="flex justify-between gap-4"><span>Biaya sistem</span><strong className="text-[var(--ink)]">{formatRupiah(platformFee)}</strong></div></div><div className="mt-4 flex items-end justify-between border-t border-[var(--forest-soft)]/30 pt-4"><span className="font-bold text-[var(--forest-deep)]">Total pembayaran</span><strong className="font-serif text-2xl text-[var(--bark)]">{formatRupiah(grandTotal)}</strong></div></div>
+            </section>}
+            {validationMessage && <p role="alert" className="rounded-xl border border-[var(--bark)]/25 bg-[var(--bark-pale)] px-3 py-2.5 text-xs font-semibold text-[var(--bark)]">{validationMessage}</p>}
           </div>
 
-          {/* Step 2: Select Ticket Categories */}
-          <div>
-            <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#173b32]">
-              <Ticket className="w-4 h-4 text-[#80512f]" />
-              2. Pilih Kategori Tiket
-            </label>
-            <div className="space-y-2.5">
-              {destination.ticket_categories.map((cat) => {
-                const qty = quantities[cat.id] || 0;
-                return (
-                  <div
-                    key={cat.id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-[#cddac8] bg-[#f5f8f2] p-3.5 shadow-sm sm:p-4"
-                  >
-                    <div>
-                      <div className="text-sm font-semibold text-[#173b32]">{cat.name}</div>
-                      <div className="mt-0.5 text-sm font-bold text-[#80512f]">
-                        Rp {cat.price.toLocaleString('id-ID')}
-                        <span className="ml-2 text-xs font-normal leading-snug text-[#52635d]">
-                          (+Asuransi Rp {cat.insurance.toLocaleString('id-ID')} & Retribusi Rp {cat.retribusi.toLocaleString('id-ID')})
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Qty Controls */}
-                    <div className="flex shrink-0 items-center gap-2">
-                      <button
-                        type="button"
-                        id={`btn-dec-${cat.id}`}
-                        onClick={() => handleQtyChange(cat.id, -1)}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#b8cbb0] bg-white text-base font-bold text-[#173b32] transition-colors hover:bg-[#e7efdf] focus:outline-none focus:ring-2 focus:ring-[#9aae85]"
-                      >
-                        -
-                      </button>
-                      <span className="w-6 text-center text-sm font-semibold text-[#173b32]">{qty}</span>
-                      <button
-                        type="button"
-                        id={`btn-inc-${cat.id}`}
-                        onClick={() => handleQtyChange(cat.id, 1)}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#173b32] text-base font-bold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85]"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-[var(--border)] bg-[rgba(255,254,250,.96)] px-5 py-4 backdrop-blur-sm sm:px-7">
+            {activeStep > 1 ? <button type="button" onClick={() => { setValidationMessage(''); setActiveStep((step) => step - 1); }} className="btn-secondary btn-sm"><ArrowLeft className="h-3.5 w-3.5" />Kembali</button> : <span className="text-xs font-semibold text-[var(--ink-soft)]">Aman &amp; transparan</span>}
+            {activeStep < 3 ? <button type="submit" className="btn-primary">Lanjutkan<ArrowRight className="h-4 w-4" /></button> : <button id="submit-booking-btn" type="submit" disabled={isSubmitting} className="btn-clay disabled:cursor-not-allowed disabled:opacity-60">{isSubmitting ? 'Memproses pesanan…' : 'Konfirmasi & bayar'}<ArrowRight className="h-4 w-4" /></button>}
           </div>
-
-          {/* Step 3: Visitor Info */}
-          <div>
-            <label className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-[#173b32]">
-              <User className="w-4 h-4 text-[#80512f]" />
-              3. Data Pengunjung
-            </label>
-            {totalQty === 0 ? (
-              <div className="rounded-xl border border-[#cddac8] bg-[#f5f8f2] p-4 text-center text-sm text-[#52635d]">
-                Pilih tiket terlebih dahulu untuk mengisi data pengunjung
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {visitors.map((visitor, index) => (
-                  <div key={index} className="rounded-xl border border-[#cddac8] bg-[#f5f8f2] p-4 shadow-sm">
-                    <div className="mb-2.5 text-xs font-semibold text-[#80512f]">
-                      Pengunjung {index + 1}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <input
-                          id={`visitor-name-input-${index}`}
-                          type="text"
-                          placeholder="Nama Lengkap Sesuai KTP"
-                          value={visitor.name}
-                          onChange={(e) => handleVisitorChange(index, 'name', e.target.value)}
-                          className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-white px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <input
-                          id={`visitor-nik-input-${index}`}
-                          type="text"
-                          placeholder="NIK / No Identitas"
-                          value={visitor.nik}
-                          onChange={(e) => handleVisitorChange(index, 'nik', e.target.value)}
-                          className="min-h-11 w-full rounded-xl border border-[#c6d2c2] bg-white px-3 py-2.5 text-sm text-[#173b32] placeholder:text-[#77857d] transition-colors focus:border-[#173b32] focus:outline-none focus:ring-2 focus:ring-[#9aae85]/40"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Step 4: Price Summary */}
-          <div className="space-y-2 rounded-xl border border-[#b8cbb0] bg-[#e7efdf] p-4 text-sm shadow-sm">
-            <div className="flex justify-between gap-4 text-[#52635d]">
-              <span>Subtotal Tiket ({totalQty} tiket)</span>
-              <span className="whitespace-nowrap font-semibold text-[#173b32]">Rp {totalTicketPrice.toLocaleString('id-ID')}</span>
-            </div>
-            <div className="flex justify-between gap-4 text-[#52635d]">
-              <span>Asuransi Jiwa & Retribusi Pemda</span>
-              <span className="whitespace-nowrap font-semibold text-[#173b32]">Rp {(totalInsurance + totalRetribusi).toLocaleString('id-ID')}</span>
-            </div>
-            <div className="flex justify-between gap-4 text-[#52635d]">
-              <span>Biaya Sistem Cloud Passify</span>
-              <span className="whitespace-nowrap font-semibold text-[#173b32]">Rp {platformFee.toLocaleString('id-ID')}</span>
-            </div>
-            <div className="mt-3 flex items-center justify-between border-t border-[#9aae85] pt-3">
-              <span className="font-semibold text-[#173b32]">Total Pembayaran</span>
-              <span className="text-lg font-bold text-[#80512f]">
-                Rp {grandTotal.toLocaleString('id-ID')}
-              </span>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            id="submit-booking-btn"
-            disabled={isSubmitting || totalQty === 0}
-            className="flex min-h-11 w-full items-center justify-center rounded-xl bg-[#173b32] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#28594e] focus:outline-none focus:ring-2 focus:ring-[#9aae85] focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#7b9680]"
-          >
-            {isSubmitting ? (
-              <span className="flex items-center gap-2">
-                <span>Memproses Pesanan...</span>
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <span>Konfirmasi & Bayar Sekarang</span>
-                <ArrowRight className="w-4 h-4" />
-              </span>
-            )}
-          </button>
         </form>
       </div>
     </div>

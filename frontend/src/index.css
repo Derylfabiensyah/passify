@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --font-heading: Georgia, 'Times New Roman', serif;
+  /* Passify's shared premium-conservation system. */
+  --font-display: Georgia, 'Times New Roman', serif;
   --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
-  /* Light Theme — White-Label SaaS */
-  /* Passify public brand — calm field operations */
-  /* Shared palette: forest, leaf, white, and bark. */
   --forest-deep: #102d20;
   --forest: #1e4b35;
   --forest-soft: #3c7152;
@@ -16,38 +14,40 @@
   --bark: #8a5638;
   --bark-pale: #f2e5da;
 
-  --canvas: #f8fbf5;
-  --sand: var(--white);
-  --fog: #e8f1df;
-  --ink: var(--forest-deep);
-  --ink-soft: #586d5d;
+  --canvas: #f8faf5;
+  --sand: #fffefa;
+  --fog: #eff5e9;
+  --ink: #102d20;
+  --ink-soft: #526b5a;
+  --ink-muted: #748476;
   --river: var(--forest-soft);
   --moss: var(--leaf);
   --clay: var(--bark);
 
-  /* Existing app surfaces, retained for modals and the operations console. */
   --bg-base: var(--canvas);
-  --bg-card: var(--white);
+  --bg-card: var(--sand);
   --bg-elevated: #f1f6ec;
-  --bg-input: #f6f9f2;
-
+  --bg-input: #f7faf3;
   --border: #d6e2cf;
   --border-hover: #a9c598;
-
-  --text-primary: #193024;
-  --text-secondary: #586d5d;
-  --text-muted: #809080;
-
-  /* Brand accent — configurable per tenant */
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-soft);
+  --text-muted: var(--ink-muted);
   --accent: var(--forest);
   --accent-hover: var(--forest-deep);
-  --accent-muted: rgba(30, 75, 53, 0.1);
+  --accent-muted: rgba(30, 75, 53, .1);
 
-  --radius: 14px;
+  --radius-xs: .625rem;
+  --radius-sm: .875rem;
+  --radius: 1.125rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --shadow-soft: 0 12px 32px rgba(16, 45, 32, .08);
+  --shadow-lift: 0 22px 54px rgba(16, 45, 32, .15);
 
-  /* Remap existing Tailwind utilities to the same forest-and-bark palette. */
-  --color-gray-50: #f8fbf5;
-  --color-gray-100: #f1f6ec;
+  /* Remap utility colors that pre-existing pages use. */
+  --color-gray-50: #f8faf5;
+  --color-gray-100: #f0f5eb;
   --color-gray-200: #d6e2cf;
   --color-gray-300: #b8cbb0;
   --color-gray-400: #8a9a88;
@@ -57,9 +57,8 @@
   --color-gray-800: #283e2e;
   --color-gray-900: #193024;
   --color-gray-950: #102d20;
-
-  --color-stone-50: #f8fbf5;
-  --color-stone-100: #f1f6ec;
+  --color-stone-50: #f8faf5;
+  --color-stone-100: #f0f5eb;
   --color-stone-200: #d6e2cf;
   --color-stone-300: #b8cbb0;
   --color-stone-400: #8a9a88;
@@ -68,7 +67,6 @@
   --color-stone-700: #394e3e;
   --color-stone-800: #283e2e;
   --color-stone-900: #193024;
-
   --color-emerald-50: #f0f6e9;
   --color-emerald-100: #e1edd1;
   --color-emerald-200: #c9dfae;
@@ -80,15 +78,12 @@
   --color-emerald-800: #365b30;
   --color-emerald-900: #1e4b35;
   --color-emerald-950: #102d20;
-
   --color-red-50: #faf1ea;
   --color-red-200: #e7c7b0;
   --color-red-500: #a76742;
   --color-red-600: #8a5638;
   --color-red-700: #71452f;
   --color-red-800: #5b3424;
-  --color-red-950: #392015;
-
   --color-amber-50: #faf1ea;
   --color-amber-200: #e7c7b0;
   --color-amber-300: #d7aa82;
@@ -96,156 +91,87 @@
   --color-amber-500: #a76742;
   --color-amber-700: #71452f;
   --color-amber-800: #5b3424;
-  --color-amber-950: #392015;
-
-  --color-blue-50: #f0f6e9;
-  --color-blue-100: #e1edd1;
-  --color-blue-500: #78a85d;
-  --color-blue-700: #47723b;
-  --color-blue-800: #365b30;
-  --color-blue-950: #102d20;
 }
 
 @layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: var(--font-body);
-  }
-
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    background-color: var(--bg-base);
-    color: var(--text-primary);
+    min-height: 100vh;
+    margin: 0;
     overflow-x: hidden;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
     font-size: 15px;
     line-height: 1.55;
-    min-height: 100vh;
     -webkit-font-smoothing: antialiased;
   }
-
-  button, a, input, select, textarea {
-    font: inherit;
-    -webkit-tap-highlight-color: transparent;
+  button, a, input, select, textarea { font: inherit; -webkit-tap-highlight-color: transparent; }
+  button { cursor: pointer; }
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 3px solid rgba(156, 189, 114, .72);
+    outline-offset: 3px;
   }
-
-  button {
-    cursor: pointer;
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 5px; }
-  ::-webkit-scrollbar-track { background: var(--leaf-pale); }
-  ::-webkit-scrollbar-thumb { background: var(--forest-soft); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--bark); }
-
-  /* Headings */
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
     color: var(--text-primary);
-    letter-spacing: -0.035em;
-    line-height: 1.06;
+    font-family: var(--font-display);
+    letter-spacing: -.04em;
+    line-height: 1.04;
   }
+  ::selection { background: var(--leaf); color: var(--forest-deep); }
+  ::-webkit-scrollbar { width: 7px; height: 7px; }
+  ::-webkit-scrollbar-track { background: var(--leaf-pale); }
+  ::-webkit-scrollbar-thumb { border: 2px solid var(--leaf-pale); border-radius: 99px; background: var(--forest-soft); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--bark); }
 }
 
 @layer components {
-  /* Card */
   .card {
-    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    transition: border-color 0.2s ease;
+    background: var(--bg-card);
+    box-shadow: 0 2px 3px rgba(16, 45, 32, .015);
+    transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
   }
-
-  .card:hover {
-    border-color: var(--border-hover);
-  }
-
-  /* Nav */
-  .nav-bar {
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  /* Buttons */
-  .btn-primary {
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-    padding: 0.7rem 1.1rem;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
+  .card:hover { border-color: var(--border-hover); }
+  .surface-muted { border: 1px solid var(--border); border-radius: var(--radius); background: var(--fog); }
+  .eyebrow { color: var(--river); font-size: .6875rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+  .status-dot { width: .5rem; height: .5rem; flex: 0 0 auto; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+  .nav-bar { border-bottom: 1px solid var(--border); background: rgba(255, 254, 250, .88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .btn-primary, .btn-secondary, .btn-clay {
+    min-height: 2.75rem;
     display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background 0.15s ease;
-    text-decoration: none;
-    font-size: 0.8125rem;
-  }
-
-  .btn-primary:hover {
-    background: var(--accent-hover);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--text-secondary);
-    font-weight: 500;
-    padding: 0.7rem 1.1rem;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.15s ease;
-    font-size: 0.8125rem;
-  }
-
-  .btn-secondary:hover {
-    background: var(--bg-elevated);
-    border-color: var(--border-hover);
-    color: var(--text-primary);
-  }
-
-  .btn-sm {
-    padding: 0.4rem 0.85rem;
-    font-size: 0.8rem;
-  }
-
-  /* Modal */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
-    z-index: 100;
-    display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    gap: .5rem;
+    border-radius: .75rem;
+    padding: .7rem 1.05rem;
+    font-size: .8125rem;
+    font-weight: 750;
+    text-decoration: none;
+    transition: background .16s ease, border-color .16s ease, color .16s ease, transform .16s ease, box-shadow .16s ease;
   }
-
-  .modal-content {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    max-width: 560px;
+  .btn-primary { border: 1px solid var(--forest); background: var(--forest); color: white; box-shadow: 0 7px 18px rgba(30, 75, 53, .16); }
+  .btn-primary:hover { background: var(--forest-deep); border-color: var(--forest-deep); transform: translateY(-1px); }
+  .btn-secondary { border: 1px solid var(--border); background: var(--sand); color: var(--forest); }
+  .btn-secondary:hover { border-color: var(--border-hover); background: var(--leaf-pale); }
+  .btn-clay { border: 1px solid var(--bark); background: var(--bark); color: white; box-shadow: 0 7px 18px rgba(138, 86, 56, .16); }
+  .btn-clay:hover { background: #71452f; transform: translateY(-1px); }
+  .btn-sm { min-height: 2.25rem; padding: .45rem .78rem; font-size: .75rem; }
+  .field-control {
+    min-height: 2.75rem;
     width: 100%;
-    max-height: 88vh;
-    overflow-y: auto;
-    box-shadow: 0 24px 64px rgba(16, 45, 32, 0.18);
+    border: 1px solid var(--border);
+    border-radius: .75rem;
+    background: var(--bg-input);
+    color: var(--ink);
+    padding: .65rem .8rem;
+    font-size: .875rem;
+    transition: background .16s ease, border-color .16s ease, box-shadow .16s ease;
   }
-
-  /* Status dot */
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent);
-    flex-shrink: 0;
-  }
+  .field-control:focus { border-color: var(--forest-soft); background: white; box-shadow: 0 0 0 3px rgba(156, 189, 114, .3); outline: none; }
+  .modal-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; justify-content: center; padding: .75rem; background: rgba(16, 45, 32, .56); backdrop-filter: blur(6px); }
+  .modal-content { width: 100%; max-height: calc(100vh - 1.5rem); overflow-y: auto; border-radius: 1.5rem 1.5rem 1rem 1rem; box-shadow: var(--shadow-lift); }
+  @media (min-width: 640px) { .modal-overlay { align-items: center; padding: 1.5rem; } .modal-content { max-height: 88vh; border-radius: 1.5rem; } }
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, Home } from 'lucide-react';
+import { AlertCircle, ArrowRight, Home } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
 
 export default function ErrorScreen({ error }) {
@@ -7,27 +7,20 @@ export default function ErrorScreen({ error }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--canvas)] px-4">
-      <div className="max-w-md text-center">
-        <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-red-100 text-red-600">
+      <div className="card w-full max-w-md p-8 text-center shadow-[var(--shadow-soft)] sm:p-10">
+        <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[var(--bark-pale)] text-[var(--bark)]">
           <AlertCircle className="h-8 w-8" />
         </div>
-        <h1 className="mt-4 font-serif text-2xl font-semibold text-[var(--forest-deep)]">
-          Terjadi Kesalahan
-        </h1>
+        <p className="eyebrow mt-6 !text-[var(--bark)]">Butuh perhatian</p>
+        <h1 className="mt-2 text-3xl font-bold">Halaman belum siap dibuka</h1>
         <p className="mt-2 text-sm text-[var(--ink-soft)]">{error}</p>
         <div className="mt-6 flex items-center justify-center gap-3">
-          <button
-            onClick={refetch}
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--forest)] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[var(--forest-deep)]"
-          >
-            Coba Lagi
+          <button onClick={refetch} className="btn-primary">
+            Coba lagi <ArrowRight className="h-4 w-4" />
           </button>
-          <a
-            href="https://passify.com"
-            className="inline-flex items-center gap-2 rounded-lg border border-[var(--border)] bg-white px-4 py-2 text-sm font-semibold text-[var(--forest)] transition-colors hover:bg-[var(--leaf-pale)]"
-          >
+          <a href="https://passify.com" className="btn-secondary">
             <Home className="h-4 w-4" />
-            Kembali ke Beranda
+            Beranda
           </a>
         </div>
       </div>
