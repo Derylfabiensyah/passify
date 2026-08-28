@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/tiket-wisata-alam/backend/internal/models"
 	"gorm.io/gorm"
@@ -16,6 +18,12 @@ type AuthRepository interface {
 	GetRefreshToken(tokenHash string) (*models.RefreshToken, error)
 	RevokeRefreshToken(id uuid.UUID) error
 	RevokeAllUserTokens(userID uuid.UUID) error
+
+	// Tenant operations for self-registration
+	CreateTenant(tenant *models.Tenant) error
+	GetTenantBySubdomain(subdomain string) (*models.Tenant, error)
+	ActivateTenant(tenantID uuid.UUID) error
+	ActivateUser(userID uuid.UUID) error
 }
 
 type authRepository struct {
@@ -69,4 +77,28 @@ func (r *authRepository) RevokeRefreshToken(id uuid.UUID) error {
 
 func (r *authRepository) RevokeAllUserTokens(userID uuid.UUID) error {
 	return r.db.Model(&models.RefreshToken{}).Where("user_id = ?", userID).Update("revoked", true).Error
+}
+
+func (r *authRepository) CreateTenant(tenant *models.Tenant) error {
+	return r.db.Create(tenant).Error
+}
+
+func (r *authRepository) GetTenantBySubdomain(subdomain string) (*models.Tenant, error) {
+	var tenant models.Tenant
+	if err := r.db.Where("subdomain = ? OR slug = ?", subdomain, subdomain).First(&tenant).Error; err != nil {
+		return nil, err
+	}
+	return &tenant, nil
+}
+
+func (r *authRepository) ActivateTenant(tenantID uuid.UUID) error {
+	return r.db.Model(&models.Tenant{}).Where("id = ?", tenantID).Update("is_active", true).Error
+}
+
+func (r *authRepository) ActivateUser(userID uuid.UUID) error {
+	now := time.Now()
+	return r.db.Model(&models.User{}).Where("id = ?", userID).Updates(map[string]interface{}{
+		"is_active":          true,
+		"email_verified_at": &now,
+	}).Error
 }

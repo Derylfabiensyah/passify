@@ -39,6 +39,69 @@ func (h *AuthHandler) HandleRegister(c *gin.Context) {
 	response.Created(c, "Registrasi berhasil", user)
 }
 
+// HandleRegisterTenant handles POST /register-tenant
+func (h *AuthHandler) HandleRegisterTenant(c *gin.Context) {
+	var req RegisterTenantRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Data pendaftaran tenant tidak valid", err.Error())
+		return
+	}
+
+	tenant, user, verifyToken, err := h.service.RegisterTenant(req)
+	if err != nil {
+		if err.Error() == "email sudah terdaftar" || err.Error() == "subdomain sudah digunakan oleh pengelola lain" {
+			response.Conflict(c, err.Error())
+			return
+		}
+		response.BadRequest(c, err.Error(), nil)
+		return
+	}
+
+	response.Created(c, "Pendaftaran berhasil! Silakan cek email Anda untuk verifikasi akun.", gin.H{
+		"tenant":           tenant,
+		"user":             user,
+		"verify_token_dev": verifyToken, // Provided for easy dev testing
+	})
+}
+
+// HandleCheckSubdomain handles GET /check-subdomain?subdomain=xxx
+func (h *AuthHandler) HandleCheckSubdomain(c *gin.Context) {
+	subdomain := c.Query("subdomain")
+	if subdomain == "" {
+		response.BadRequest(c, "Parameter subdomain diperlukan", nil)
+		return
+	}
+
+	available, err := h.service.CheckSubdomain(subdomain)
+	if err != nil {
+		response.BadRequest(c, err.Error(), nil)
+		return
+	}
+
+	response.OK(c, "Pengecekan subdomain", gin.H{
+		"subdomain": subdomain,
+		"available": available,
+	})
+}
+
+// HandleVerifyEmail handles GET /verify-email?token=xxx
+func (h *AuthHandler) HandleVerifyEmail(c *gin.Context) {
+	token := c.Query("token")
+	if token == "" {
+		response.BadRequest(c, "Token verifikasi diperlukan", nil)
+		return
+	}
+
+	if err := h.service.VerifyEmail(token); err != nil {
+		response.BadRequest(c, err.Error(), nil)
+		return
+	}
+
+	response.OK(c, "Email berhasil diverifikasi! Akun pengelola Anda sekarang aktif. Silakan login.", gin.H{
+		"verified": true,
+	})
+}
+
 // HandleLogin handles POST /login
 func (h *AuthHandler) HandleLogin(c *gin.Context) {
 	var req LoginRequest

@@ -1,13 +1,18 @@
 package auth
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"log"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"github.com/tiket-wisata-alam/backend/internal/config"
 	"github.com/tiket-wisata-alam/backend/internal/middleware"
 	"github.com/tiket-wisata-alam/backend/internal/models"
@@ -24,6 +29,15 @@ type RegisterRequest struct {
 	Nationality  string  `json:"nationality,omitempty"`
 	IDCardType   *string `json:"id_card_type,omitempty"`
 	IDCardNumber *string `json:"id_card_number,omitempty"`
+}
+
+type RegisterTenantRequest struct {
+	FullName   string  `json:"full_name" binding:"required"`
+	Email      string  `json:"email" binding:"required,email"`
+	Password   string  `json:"password" binding:"required,min=6"`
+	Phone      *string `json:"phone,omitempty"`
+	TenantName string  `json:"tenant_name" binding:"required"`
+	Subdomain  string  `json:"subdomain" binding:"required"`
 }
 
 type LoginRequest struct {
@@ -53,6 +67,9 @@ type UpdateProfileRequest struct {
 // AuthService defines authentication business logic interface
 type AuthService interface {
 	Register(req RegisterRequest) (*models.User, error)
+	RegisterTenant(req RegisterTenantRequest) (*models.Tenant, *models.User, string, error)
+	CheckSubdomain(subdomain string) (bool, error)
+	VerifyEmail(token string) error
 	Login(req LoginRequest) (*LoginResponse, error)
 	RefreshToken(req RefreshTokenRequest) (*LoginResponse, error)
 	GetProfile(userID uuid.UUID) (*models.User, error)
@@ -61,15 +78,17 @@ type AuthService interface {
 }
 
 type authService struct {
-	repo AuthRepository
-	cfg  *config.Config
+	repo  AuthRepository
+	cfg   *config.Config
+	redis *redis.Client
 }
 
 // NewAuthService creates a new AuthService instance
-func NewAuthService(repo AuthRepository, cfg *config.Config) AuthService {
+func NewAuthService(repo AuthRepository, cfg *config.Config, rdb *redis.Client) AuthService {
 	return &authService{
-		repo: repo,
-		cfg:  cfg,
+		repo:  repo,
+		cfg:   cfg,
+		redis: rdb,
 	}
 }
 
@@ -257,6 +276,157 @@ func (s *authService) Logout(userID uuid.UUID) error {
 	if err := s.repo.RevokeAllUserTokens(userID); err != nil {
 		return fmt.Errorf("gagal mencabut token refresh: %w", err)
 	}
+	return nil
+}
+
+func (s *authService) RegisterTenant(req RegisterTenantRequest) (*models.Tenant, *models.User, string, error) {
+	// 1. Check if email already registered
+	existing, err := s.repo.GetUserByEmail(req.Email)
+	if err == nil && existing != nil {
+		return nil, nil, "", errors.New("email sudah terdaftar")
+	}
+
+	// 2. Validate and clean subdomain
+	cleanSubdomain := strings.ToLower(strings.TrimSpace(req.Subdomain))
+	re := regexp.MustCompile(`^[a-z0-9]+(-[a-z0-9]+)*$`)
+	if len(cleanSubdomain) < 3 || len(cleanSubdomain) > 50 || !re.MatchString(cleanSubdomain) {
+		return nil, nil, "", errors.New("subdomain hanya boleh berisi huruf kecil, angka, dan tanda hubung (-) minimal 3 karakter")
+	}
+
+	// Check reserved subdomains
+	reserved := map[string]bool{
+		"admin": true, "api": true, "app": true, "auth": true,
+		"dashboard": true, "mail": true, "root": true, "superadmin": true,
+		"test": true, "www": true, "gate": true, "payment": true,
+	}
+	if reserved[cleanSubdomain] {
+		return nil, nil, "", errors.New("subdomain ini tidak tersedia (reserved)")
+	}
+
+	// Check if subdomain already exists
+	existingTenant, err := s.repo.GetTenantBySubdomain(cleanSubdomain)
+	if err == nil && existingTenant != nil {
+		return nil, nil, "", errors.New("subdomain sudah digunakan oleh pengelola lain")
+	}
+
+	// 3. Create Tenant (initially inactive until email verified)
+	tenant := &models.Tenant{
+		Name:           req.TenantName,
+		Slug:           cleanSubdomain,
+		Subdomain:      cleanSubdomain,
+		PrimaryColor:   "#059669",
+		SecondaryColor: "#047857",
+		ContactEmail:   &req.Email,
+		ContactPhone:   req.Phone,
+		IsActive:       false,
+	}
+	if err := s.repo.CreateTenant(tenant); err != nil {
+		return nil, nil, "", fmt.Errorf("gagal membuat data tenant: %w", err)
+	}
+
+	// 4. Hash password and create Tenant Admin User (inactive until email verified)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, nil, "", fmt.Errorf("gagal memproses kata sandi: %w", err)
+	}
+
+	user := &models.User{
+		TenantID:     &tenant.ID,
+		Email:        req.Email,
+		PasswordHash: string(hashedPassword),
+		FullName:     req.FullName,
+		Phone:        req.Phone,
+		Role:         models.RoleTenantAdmin,
+		Nationality:  "WNI",
+		IsActive:     false,
+	}
+	if err := s.repo.CreateUser(user); err != nil {
+		return nil, nil, "", fmt.Errorf("gagal membuat akun pengguna: %w", err)
+	}
+
+	// 5. Generate verification token
+	verifyToken := uuid.New().String()
+	if s.redis != nil {
+		ctx := context.Background()
+		tokenValue := fmt.Sprintf("%s:%s", user.ID.String(), tenant.ID.String())
+		if err := s.redis.Set(ctx, "verify_email:"+verifyToken, tokenValue, 24*time.Hour).Err(); err != nil {
+			log.Printf("⚠️ Gagal menyimpan token verifikasi ke Redis: %v", err)
+		}
+	}
+
+	// Simulation log for development
+	log.Printf("📧 [SIMULASI EMAIL VERIFIKASI] Pengelola: %s (%s) | Token: %s | Link: http://localhost:5173/verifikasi-email?token=%s", req.FullName, req.Email, verifyToken, verifyToken)
+
+	return tenant, user, verifyToken, nil
+}
+
+func (s *authService) CheckSubdomain(subdomain string) (bool, error) {
+	clean := strings.ToLower(strings.TrimSpace(subdomain))
+	re := regexp.MustCompile(`^[a-z0-9]+(-[a-z0-9]+)*$`)
+	if len(clean) < 3 || len(clean) > 50 || !re.MatchString(clean) {
+		return false, nil
+	}
+
+	reserved := map[string]bool{
+		"admin": true, "api": true, "app": true, "auth": true,
+		"dashboard": true, "mail": true, "root": true, "superadmin": true,
+		"test": true, "www": true, "gate": true, "payment": true,
+	}
+	if reserved[clean] {
+		return false, nil
+	}
+
+	existing, err := s.repo.GetTenantBySubdomain(clean)
+	if err == nil && existing != nil {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (s *authService) VerifyEmail(token string) error {
+	cleanToken := strings.TrimSpace(token)
+	if cleanToken == "" {
+		return errors.New("token verifikasi tidak boleh kosong")
+	}
+
+	if s.redis == nil {
+		return errors.New("layanan verifikasi sedang tidak tersedia (Redis offline)")
+	}
+
+	ctx := context.Background()
+	val, err := s.redis.Get(ctx, "verify_email:"+cleanToken).Result()
+	if err != nil || val == "" {
+		return errors.New("link verifikasi tidak valid atau telah kedaluwarsa")
+	}
+
+	parts := strings.Split(val, ":")
+	if len(parts) != 2 {
+		return errors.New("format token verifikasi tidak valid")
+	}
+
+	userID, err := uuid.Parse(parts[0])
+	if err != nil {
+		return errors.New("user ID tidak valid")
+	}
+
+	tenantID, err := uuid.Parse(parts[1])
+	if err != nil {
+		return errors.New("tenant ID tidak valid")
+	}
+
+	// Activate user and tenant
+	if err := s.repo.ActivateUser(userID); err != nil {
+		return fmt.Errorf("gagal mengaktifkan akun user: %w", err)
+	}
+
+	if err := s.repo.ActivateTenant(tenantID); err != nil {
+		return fmt.Errorf("gagal mengaktifkan tenant: %w", err)
+	}
+
+	// Delete verification token
+	_ = s.redis.Del(ctx, "verify_email:"+cleanToken).Err()
+
 	return nil
 }
 

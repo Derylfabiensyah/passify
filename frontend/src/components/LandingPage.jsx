@@ -34,11 +34,11 @@ export default function LandingPage() {
 
           <div className="flex items-center gap-4">
             <Link to="/jelajah" className="hidden text-[13px] font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)] sm:inline">
-              Coba portal wisatawan
+              Portal Wisatawan
             </Link>
-            <a href="#contact" className="inline-flex items-center gap-2 rounded-full bg-[var(--forest)] px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[var(--forest-deep)]">
-              Jadwalkan demo <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
+            <Link to="/daftar-wisata" className="inline-flex items-center gap-2 rounded-full bg-[var(--forest)] px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[var(--forest-deep)] text-decoration-none">
+              Daftarkan Wisata <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
         </div>
       </header>
@@ -56,10 +56,10 @@ export default function LandingPage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                <a href="#contact" className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--clay)] px-6 py-3.5 text-[13px] font-extrabold text-white transition-transform hover:-translate-y-0.5">
-                  Mulai percakapan <ArrowRight className="h-4 w-4" />
-                </a>
-                <Link to="/jelajah" className="inline-flex items-center justify-center gap-2 px-4 py-3 text-[13px] font-bold text-[var(--ink)]">
+                <Link to="/daftar-wisata" className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--clay)] px-6 py-3.5 text-[13px] font-extrabold text-white transition-transform hover:-translate-y-0.5 text-decoration-none">
+                  Daftarkan Wisata Anda <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link to="/jelajah" className="inline-flex items-center justify-center gap-2 px-4 py-3 text-[13px] font-bold text-[var(--ink)] text-decoration-none">
                   Lihat contoh pemesanan <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>

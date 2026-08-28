@@ -23,8 +23,13 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 
+	rdb, err := database.NewRedisClient(&cfg.Redis)
+	if err != nil {
+		log.Printf("⚠️ Redis connection warning: %v (running with limited caching)", err)
+	}
+
 	repo := auth.NewAuthRepository(db)
-	service := auth.NewAuthService(repo, cfg)
+	service := auth.NewAuthService(repo, cfg, rdb)
 	handler := auth.NewAuthHandler(service)
 
 	router := gin.Default()

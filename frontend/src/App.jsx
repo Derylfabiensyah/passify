@@ -13,6 +13,8 @@ import FinancePage from './pages/admin/FinancePage';
 import LoadingScreen from './components/LoadingScreen';
 import ErrorScreen from './components/ErrorScreen';
 import ErrorBoundary from './components/ErrorBoundary';
+import RegisterTenantPage from './pages/RegisterTenantPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 function AppRoutes() {
   const { slug, destination, isLoading, error } = useTenant();
@@ -32,6 +34,8 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/daftar-wisata" element={<RegisterTenantPage />} />
+        <Route path="/verifikasi-email" element={<VerifyEmailPage />} />
         <Route path="/jelajah" element={<TravelerPortal />} />
         <Route path="/admin/*" element={<ErrorScreen error="Akses admin memerlukan subdomain pengelola wisata (tenant)." />} />
         <Route path="*" element={<Navigate to="/" replace />} />
