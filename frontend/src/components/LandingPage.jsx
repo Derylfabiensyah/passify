@@ -1,208 +1,128 @@
 import React from 'react';
-import { ArrowRight, ArrowUpRight, Check, ChevronRight, CloudOff, Compass, ScanLine, TicketCheck, Trees, WalletCards } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  ChevronRight,
+  CloudOff,
+  Compass,
+  Landmark,
+  ScanLine,
+  TicketCheck,
+  Trees,
+  WalletCards,
+} from 'lucide-react';
 
 const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1800&q=88';
 const trailImage = 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=85';
 
+function Eyebrow({ children, className = '' }) {
+  return <p className={`eyebrow ${className}`}>{children}</p>;
+}
 
-
-function Eyebrow({ children }) {
+function SectionHeading({ eyebrow, title, children, className = '' }) {
   return (
-    <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.17em] text-[var(--river)]">
-      {children}
+    <div className={className}>
+      <Eyebrow>{eyebrow}</Eyebrow>
+      <h2 className="mt-3 max-w-3xl text-4xl font-bold leading-[.98] sm:text-5xl">{title}</h2>
+      {children && <p className="mt-5 max-w-2xl text-sm leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">{children}</p>}
     </div>
   );
 }
 
 export default function LandingPage() {
-  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-
   return (
     <div className="min-h-screen overflow-x-hidden bg-[var(--canvas)] text-[var(--ink)]">
-      <header className="relative z-20 border-b border-[rgba(23,59,50,0.13)] bg-[var(--canvas)]">
-        <div className="mx-auto flex h-[68px] max-w-[1240px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center text-decoration-none" aria-label="Passify beranda">
-            <span className="text-[17px] font-extrabold tracking-[-0.04em]">passify</span>
+      <header className="nav-bar sticky top-0 z-40">
+        <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <Link to="/" className="flex items-center gap-2.5 no-underline" aria-label="Passify beranda">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--forest-deep)] text-white"><Compass className="h-4 w-4" /></span>
+            <span><span className="block font-serif text-xl font-bold leading-none text-[var(--forest-deep)]">passify</span><span className="mt-1 block text-[9px] font-extrabold uppercase tracking-[.14em] text-[var(--ink-soft)]">Operasi wisata alam</span></span>
           </Link>
 
-          <nav className="hidden items-center gap-6 text-[12px] font-semibold text-[var(--ink-soft)] md:flex">
-            <button onClick={() => scrollTo('platform')} className="transition-colors hover:text-[var(--ink)]">Platform</button>
-            <button onClick={() => scrollTo('field-work')} className="transition-colors hover:text-[var(--ink)]">Di lapangan</button>
-            <button onClick={() => scrollTo('white-label')} className="transition-colors hover:text-[var(--ink)]">White-label</button>
+          <nav className="hidden items-center gap-6 text-xs font-bold text-[var(--ink-soft)] lg:flex" aria-label="Navigasi utama">
+            <a href="#masalah" className="transition-colors hover:text-[var(--forest-deep)]">Kawasan</a>
+            <a href="#alur" className="transition-colors hover:text-[var(--forest-deep)]">Cara kerja</a>
+            <a href="#white-label" className="transition-colors hover:text-[var(--forest-deep)]">White-label</a>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <Link to="/jelajah" className="hidden text-[13px] font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)] sm:inline">
-              Portal Wisatawan
-            </Link>
-            <Link to="/daftar-wisata" className="inline-flex items-center gap-2 rounded-full bg-[var(--forest)] px-4 py-2.5 text-[12px] font-bold text-white transition-transform hover:-translate-y-0.5 hover:bg-[var(--forest-deep)] text-decoration-none">
-              Daftarkan Wisata <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--forest)] transition-colors hover:text-[var(--bark)] sm:inline">Lihat demo</Link>
+            <Link to="/daftar-wisata" className="btn-primary rounded-full px-3.5 sm:px-4">Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" /></Link>
           </div>
         </div>
       </header>
 
       <main>
-        <section className="relative border-b border-[rgba(23,59,50,0.13)]">
-          <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-8 px-4 pb-12 pt-10 sm:px-6 md:pb-16 md:pt-14 lg:grid-cols-[0.94fr_1.06fr] lg:items-center lg:gap-12 lg:px-8 lg:py-16">
-            <div className="relative z-10 max-w-[610px]">
-              <Eyebrow>Ticketing untuk kawasan yang dijaga</Eyebrow>
-              <h1 className="mt-5 max-w-[590px] font-serif text-[clamp(3rem,6vw,5.5rem)] leading-[0.94] tracking-[-0.06em] text-[var(--ink)]">
-                Tiket yang memberi alam ruang bernapas.
-              </h1>
-              <p className="mt-6 max-w-[510px] text-[15px] leading-7 text-[var(--ink-soft)] sm:text-[16px]">
-                Passify menyatukan reservasi, batas kunjungan, dan validasi gerbang dalam satu sistem white-label yang tetap siap saat koneksi tidak ada.
-              </p>
-
-              <div className="mt-8 flex flex-col gap-2.5 sm:flex-row sm:items-center">
-                <Link to="/daftar-wisata" className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--clay)] px-6 py-3.5 text-[13px] font-extrabold text-white transition-transform hover:-translate-y-0.5 text-decoration-none">
-                  Daftarkan Wisata Anda <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link to="/jelajah" className="inline-flex items-center justify-center gap-2 px-4 py-3 text-[13px] font-bold text-[var(--ink)] text-decoration-none">
-                  Lihat contoh pemesanan <ChevronRight className="h-4 w-4" />
-                </Link>
+        <section className="relative isolate overflow-hidden bg-[var(--forest-deep)] text-white">
+          <img src={heroImage} alt="Lanskap pegunungan saat pagi hari" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-55 saturate-[.64]" />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10"
+            style={{ backgroundImage: 'linear-gradient(105deg, rgba(16,45,32,.98) 4%, rgba(16,45,32,.88) 46%, rgba(16,45,32,.46))' }}
+          />
+          <div className="mx-auto grid min-h-[calc(100vh-68px)] max-w-[1240px] gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,1fr)_350px] lg:items-end lg:gap-14 lg:px-8 lg:py-20">
+            <div className="max-w-[780px]">
+              <Eyebrow className="!text-[var(--leaf)]">Untuk pengelola kawasan yang ingin menjaga ritme</Eyebrow>
+              <h1 className="mt-5 max-w-[760px] text-[clamp(3.25rem,7vw,6.75rem)] font-bold leading-[.88] tracking-[-.065em] text-white">Alam memberi batas.<br />Operasi memberi kepastian.</h1>
+              <p className="mt-7 max-w-[590px] text-[15px] leading-7 text-white/80 sm:text-[17px] sm:leading-8">Passify menyatukan tiket, daya dukung, gerbang, dan arus dana dalam satu sistem yang tetap bekerja saat hari di lapangan tidak berjalan sempurna.</p>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm">Daftarkan wisata Anda <ArrowRight className="h-4 w-4" /></Link>
+                <Link to="/jelajah" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white/90 transition-colors hover:bg-white/10 hover:text-white">Jelajahi portal wisatawan <ChevronRight className="h-4 w-4" /></Link>
               </div>
-
-              <div className="mt-10 grid max-w-[520px] grid-cols-3 border-t border-[rgba(23,59,50,0.18)] pt-4">
-                {[
-                  ['Reservasi', 'berdasar sesi'],
-                  ['Gerbang', 'siap offline'],
-                  ['Keuangan', 'mudah ditelusuri'],
-                ].map(([title, text]) => (
-                  <div key={title} className="pr-3">
-                    <p className="text-[12px] font-extrabold text-[var(--ink)]">{title}</p>
-                    <p className="mt-1 text-[11px] leading-4 text-[var(--ink-soft)]">{text}</p>
-                  </div>
-                ))}
-              </div>
+              <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/20 pt-5 text-xs font-semibold text-white/75"><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Kuota per sesi</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Gerbang siap offline</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Payout terlacak</span></div>
             </div>
 
-            <div className="relative min-h-[380px] sm:min-h-[470px] lg:min-h-[560px]">
-              <div className="absolute inset-y-0 right-0 w-[92%] overflow-hidden rounded-tl-[140px] rounded-br-[140px] bg-[var(--fog)] sm:w-[89%]">
-                <img src={heroImage} alt="Lanskap pegunungan Indonesia saat pagi hari" className="h-full w-full object-cover contrast-[.92] saturate-[.75]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[rgba(16,42,35,0.64)] via-transparent to-transparent" />
-              </div>
-              <div className="absolute bottom-5 left-0 max-w-[290px] border border-white/40 bg-[rgba(244,240,232,0.94)] p-5 backdrop-blur-md sm:bottom-9 sm:p-6">
-                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--river)]">
-                  <span>Contoh dashboard</span>
-                  <span>06 Agu 2026</span>
-                </div>
-                <p className="mt-4 font-serif text-2xl leading-6 tracking-[-0.04em]">Jalur sunrise menjaga ritmenya.</p>
-                <div className="mt-5 flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--ink-soft)]">Sisa kapasitas</p>
-                    <p className="mt-1 text-xl font-extrabold tracking-[-0.04em]">58 <span className="text-[12px] font-bold">orang</span></p>
-                  </div>
-                  <div className="w-24">
-                    <div className="h-1.5 overflow-hidden rounded-full bg-[rgba(23,59,50,0.14)]"><div className="h-full w-[71%] bg-[var(--clay)]" /></div>
-                    <p className="mt-1.5 text-right text-[10px] font-bold text-[var(--river)]">71% terisi</p>
-                  </div>
-                </div>
-              </div>
-              <p className="absolute bottom-5 right-5 max-w-[190px] text-right text-[10px] leading-4 text-white/90 sm:bottom-8 sm:right-8">Sistem merespons batas yang Anda tetapkan—bukan sebaliknya.</p>
-            </div>
+            <aside className="rounded-[1.5rem] border border-white/20 bg-[rgba(255,254,250,.96)] p-5 text-[var(--ink)] shadow-[0_20px_46px_rgba(0,0,0,.24)] backdrop-blur-md sm:p-6">
+              <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-4"><div><Eyebrow>Contoh operasional</Eyebrow><p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Kawasan Lereng Arunika</p></div><span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Normal</span></div>
+              <div className="mt-5"><div className="flex items-end justify-between"><span className="text-xs font-semibold text-[var(--ink-soft)]">Kuota sesi pagi</span><strong className="font-serif text-2xl text-[var(--forest-deep)]">71%</strong></div><div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"><div className="h-full w-[71%] rounded-full bg-[var(--leaf)]" /></div></div>
+              <dl className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-3"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kunjungan</dt><dd className="mt-1 font-serif text-xl font-bold text-[var(--forest-deep)]">58 orang</dd></div><div className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-3"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Gate utara</dt><dd className="mt-1 text-sm font-bold text-[var(--forest)]">Siap menerima</dd></div></dl>
+              <p className="mt-4 text-[11px] leading-5 text-[var(--ink-soft)]">Simulasi status yang membantu tim memutuskan sebelum kawasan menjadi terlalu penuh.</p>
+            </aside>
           </div>
         </section>
 
-        <section id="platform" className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-[0.77fr_1.23fr] lg:gap-16">
-            <div>
-              <Eyebrow>Rapi di depan, tangguh di belakang</Eyebrow>
-              <h2 className="mt-4 max-w-[365px] font-serif text-4xl leading-[1] tracking-[-0.05em] sm:text-5xl">Satu alur, dari rencana sampai pintu masuk.</h2>
-            </div>
-            <div className="grid gap-0 border-t border-[rgba(23,59,50,0.18)] lg:grid-cols-3">
+        <section id="masalah" className="scroll-mt-24 border-b border-[var(--border)] bg-[var(--sand)]">
+          <div className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+            <SectionHeading eyebrow="Kawasan punya ritmenya sendiri" title="Ketika kunjungan bertambah, keputusan harus semakin jernih.">Bukan sekadar menjual tiket. Pengelola perlu menjaga ruang, menggerakkan petugas, dan tetap memahami uang yang mengalir setiap hari.</SectionHeading>
+            <div className="mt-12 grid border-y border-[var(--border)] lg:grid-cols-3">
               {[
-                { number: '01', icon: TicketCheck, title: 'Reservasi yang terukur', text: 'Atur kunjungan per tanggal, sesi, jalur, atau aktivitas. Pengunjung tahu apa yang tersedia sebelum berangkat.' },
-                { number: '02', icon: ScanLine, title: 'Gerbang tetap bergerak', text: 'Validasi tiket disiapkan untuk kondisi lapangan yang tidak selalu punya sinyal stabil.' },
-                { number: '03', icon: WalletCards, title: 'Arus dana lebih jelas', text: 'Pisahkan komponen tiket dan lihat jejak transaksi yang dibutuhkan tim operasional.' },
-              ].map(({ number, icon: Icon, title, text }) => (
-                <article key={number} className="border-b border-[rgba(23,59,50,0.18)] py-7 lg:border-b-0 lg:border-r lg:px-7 lg:py-0 first:lg:pl-0 last:lg:border-r-0 last:lg:pr-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-extrabold tracking-[0.1em] text-[var(--clay)]">{number}</span>
-                    <Icon className="h-5 w-5 text-[var(--river)] stroke-[1.5]" />
-                  </div>
-                  <h3 className="mt-8 text-[16px] font-extrabold tracking-[-0.025em]">{title}</h3>
-                  <p className="mt-3 text-[13px] leading-6 text-[var(--ink-soft)]">{text}</p>
-                </article>
-              ))}
+                { index: '01', icon: Trees, title: 'Ruang yang tidak bisa ditambah', text: 'Daya dukung menentukan berapa banyak orang yang dapat hadir tanpa mengubah pengalaman atau ekosistem kawasan.' },
+                { index: '02', icon: CloudOff, title: 'Hari lapangan tidak selalu tersambung', text: 'Gerbang tetap harus bergerak ketika sinyal hilang, antrean datang, dan petugas membutuhkan jawaban yang cepat.' },
+                { index: '03', icon: Landmark, title: 'Kepercayaan perlu jejak yang jelas', text: 'Komponen tiket, transaksi, dan pencairan perlu mudah dibaca tanpa menambah pekerjaan administratif.' },
+              ].map(({ index, icon: Icon, title, text }) => <article key={index} className="border-b border-[var(--border)] py-7 last:border-b-0 lg:border-b-0 lg:border-r lg:px-8 lg:py-9 first:lg:pl-0 last:lg:border-r-0 last:lg:pr-0"><div className="flex items-center justify-between"><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span><Icon className="h-5 w-5 text-[var(--forest-soft)]" strokeWidth={1.5} /></div><h3 className="mt-10 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
             </div>
           </div>
         </section>
 
-        <section id="field-work" className="border-y border-[rgba(23,59,50,0.13)] bg-[var(--fog)]">
-          <div className="mx-auto grid max-w-[1240px] gap-8 px-4 py-14 sm:px-6 sm:py-18 lg:grid-cols-[1.07fr_.93fr] lg:items-center lg:gap-16 lg:px-8">
-            <div className="order-2 lg:order-1">
-              <Eyebrow>Untuk hari yang sebenarnya</Eyebrow>
-              <h2 className="mt-4 max-w-[545px] font-serif text-4xl leading-[1] tracking-[-0.05em] sm:text-5xl">Di lapangan, koneksi bukan satu-satunya yang harus dijaga.</h2>
-              <p className="mt-5 max-w-[560px] text-[14px] leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">
-                Petugas perlu bergerak cepat, pengunjung perlu masuk dengan tenang, dan pengelola perlu tetap punya catatan yang dapat dipercaya. Karena itu, setiap bagian Passify dibangun untuk memperjelas keputusan—bukan menambah layar.
-              </p>
-              <ul className="mt-7 grid gap-3 text-[13px] font-semibold text-[var(--ink-soft)] sm:grid-cols-2">
-                {['Mode validasi yang tetap siap saat offline', 'Kuota disesuaikan dengan aturan kawasan', 'Riwayat transaksi untuk tim pengelola', 'Portal yang membawa identitas destinasi Anda'].map((item) => (
-                  <li className="flex gap-2.5" key={item}><Check className="mt-0.5 h-4 w-4 shrink-0 text-[var(--clay)]" />{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="relative order-1 overflow-hidden bg-[var(--ink)] p-6 text-white sm:p-8 lg:order-2">
-              <div className="flex items-center justify-between border-b border-white/15 pb-5 text-[10px] font-bold uppercase tracking-[0.12em] text-white/60">
-                <span>Gerbang selatan — contoh data</span>
-                <CloudOff className="h-4 w-4 text-[var(--moss)]" />
-              </div>
-              <div className="py-10 sm:py-14">
-                <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[var(--moss)]">Status pemindaian</p>
-                <p className="mt-3 font-serif text-5xl leading-none tracking-[-0.055em]">Siap menerima</p>
-                <div className="mt-10 grid grid-cols-2 gap-px bg-white/15">
-                  <div className="bg-[var(--ink)] p-4"><p className="text-[10px] uppercase tracking-[0.1em] text-white/50">Terakhir dipindai</p><p className="mt-2 text-xl font-bold">08:42</p></div>
-                  <div className="bg-[var(--ink)] p-4"><p className="text-[10px] uppercase tracking-[0.1em] text-white/50">Sesi pagi</p><p className="mt-2 text-xl font-bold">142 / 200</p></div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 border-t border-white/15 pt-5 text-[11px] text-white/65"><span className="h-2 w-2 rounded-full bg-[var(--moss)]" />Data akan diselaraskan saat koneksi tersedia.</div>
+        <section id="alur" className="scroll-mt-24 bg-[var(--fog)]">
+          <div className="mx-auto grid max-w-[1240px] gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[.88fr_1.12fr] lg:items-start lg:gap-20 lg:px-8">
+            <SectionHeading eyebrow="Satu alur, bukan banyak alat" title="Dari rencana pengunjung sampai rekonsiliasi hari ini.">Passify membantu kawasan merespons dengan satu sumber informasi yang sama—di portal, di gerbang, dan pada laporan pengelola.</SectionHeading>
+            <div className="border-t border-[var(--border)]">
+              {[
+                { number: '01', icon: TicketCheck, title: 'Pengunjung memilih waktu yang masih masuk akal', text: 'Reservasi mengikuti tanggal, sesi, jalur, atau aktivitas yang Anda atur untuk kawasan.' },
+                { number: '02', icon: ScanLine, title: 'Gerbang memvalidasi tanpa menunggu kondisi ideal', text: 'Tiket dinamis tetap dapat diperiksa di lapangan dan diselaraskan ketika koneksi tersedia kembali.' },
+                { number: '03', icon: WalletCards, title: 'Pendapatan kembali dalam gambaran yang bisa ditindak', text: 'Komponen penjualan dan settlement disusun agar tim memahami apa yang terjadi, bukan sekadar melihat angka.' },
+              ].map(({ number, icon: Icon, title, text }) => <article key={number} className="grid gap-4 border-b border-[var(--border)] py-6 sm:grid-cols-[46px_1fr_auto] sm:items-start sm:gap-5"><span className="font-serif text-2xl font-bold text-[var(--bark)]">{number}</span><div><h3 className="text-xl font-bold leading-snug">{title}</h3><p className="mt-2 max-w-xl text-sm leading-6 text-[var(--ink-soft)]">{text}</p></div><Icon className="hidden h-5 w-5 text-[var(--forest)] sm:block" strokeWidth={1.5} /></article>)}
+              <div className="mt-6 rounded-[var(--radius)] bg-[var(--forest-deep)] p-5 text-white sm:p-6"><div className="flex items-center justify-between gap-4 border-b border-white/15 pb-4"><div><Eyebrow className="!text-[var(--leaf)]">Simulasi operasional</Eyebrow><p className="mt-1 font-serif text-2xl font-bold text-white">Gerbang selatan siap menerima</p></div><CloudOff className="h-5 w-5 shrink-0 text-[var(--leaf)]" /></div><div className="mt-5 grid grid-cols-2 gap-px bg-white/15"><div className="bg-[var(--forest-deep)] p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-white/55">Scan terakhir</span><strong className="mt-2 block text-xl">08:42</strong></div><div className="bg-[var(--forest-deep)] p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-white/55">Sesi pagi</span><strong className="mt-2 block text-xl">142 / 200</strong></div></div><p className="mt-4 text-xs leading-5 text-white/65">Contoh tampilan status; data akan diselaraskan saat koneksi tersedia.</p></div>
             </div>
           </div>
         </section>
 
-        <section id="white-label" className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-            <div>
-              <Eyebrow>Bermerek Anda, dengan fondasi yang sama</Eyebrow>
-              <h2 className="mt-4 max-w-[520px] font-serif text-4xl leading-[1] tracking-[-0.05em] sm:text-5xl">Pengunjung datang ke destinasi Anda. Bukan ke platform kami.</h2>
-              <p className="mt-5 max-w-[500px] text-[14px] leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">Setiap portal dapat menampilkan nama, warna, konten, dan alur kunjungan yang terasa milik kawasan sendiri—sementara tim Anda tetap memakai operasi yang konsisten di belakangnya.</p>
-              <Link to="/jelajah" className="mt-7 inline-flex items-center gap-2 border-b border-[var(--bark)] pb-1 text-[13px] font-extrabold text-[var(--forest)] hover:text-[var(--bark)]">Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" /></Link>
-            </div>
-            <div className="relative overflow-hidden border border-[var(--border)] bg-white p-5 shadow-[0_12px_32px_rgba(16,45,32,0.07)] sm:p-7">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--bark)] text-white"><Trees className="h-4 w-4" /></span><span><span className="block text-sm font-extrabold">Rimba Senja</span><span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--ink-soft)]">Taman wisata alam</span></span></div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--river)]">Portal contoh</span>
-              </div>
-              <div className="mt-12 grid grid-cols-[1.1fr_.9fr] gap-5 border-y border-[rgba(23,59,50,0.13)] py-5">
-                <div><p className="font-serif text-3xl tracking-[-0.04em]">Kunjungan minggu ini</p><p className="mt-2 text-[11px] leading-5 text-[var(--ink-soft)]">Pilih tanggal dan sesi yang sesuai dengan rencana perjalanan Anda.</p></div>
-                <div className="self-end bg-[var(--bark-pale)] p-4"><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--bark)]">Sesi tersisa</p><p className="mt-1 text-2xl font-extrabold text-[var(--forest-deep)]">58</p></div>
-              </div>
-              <div className="mt-5 flex items-center justify-between text-[11px] font-bold"><span className="text-[var(--ink-soft)]">Rp35.000 / orang</span><span className="rounded-full bg-[var(--bark)] px-4 py-2 text-white">Pilih tanggal</span></div>
-            </div>
+        <section id="white-label" className="scroll-mt-24 bg-[var(--canvas)]">
+          <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:gap-20 lg:px-8">
+            <div><SectionHeading eyebrow="Wajah yang tetap milik kawasan" title="Pengunjung datang ke destinasi Anda, bukan ke marketplace kami.">Setiap pengelola memiliki portal dengan nama, domain, identitas, dan alur kunjungannya sendiri. Di belakangnya, tim Anda tetap menggunakan fondasi operasi yang sama.</SectionHeading><Link to="/jelajah" className="mt-7 inline-flex items-center gap-2 border-b border-[var(--bark)] pb-1 text-sm font-extrabold text-[var(--forest)] transition-colors hover:border-[var(--forest)] hover:text-[var(--bark)]">Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" /></Link></div>
+            <div className="overflow-hidden rounded-[1.5rem] border border-[var(--border)] bg-[var(--sand)] p-4 shadow-[var(--shadow-soft)] sm:p-6"><div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-5"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--bark)] text-white"><Trees className="h-4 w-4" /></span><span><span className="block text-sm font-extrabold text-[var(--forest-deep)]">Rimba Senja</span><span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[.13em] text-[var(--ink-soft)]">Taman wisata alam</span></span></div><span className="rounded-full bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]">Portal contoh</span></div><div className="grid gap-5 py-8 sm:grid-cols-[1.15fr_.85fr] sm:items-end"><div><Eyebrow>Rencana kunjungan</Eyebrow><p className="mt-3 font-serif text-4xl font-bold leading-[.95]">Hari yang baik dimulai dari kuota yang jelas.</p><p className="mt-4 text-xs leading-5 text-[var(--ink-soft)]">Pilih tanggal dan sesi yang sesuai dengan rencana perjalanan Anda.</p></div><div className="rounded-xl bg-[var(--bark-pale)] p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--bark)]">Contoh sesi tersisa</span><strong className="mt-2 block font-serif text-4xl text-[var(--forest-deep)]">58</strong><span className="text-xs font-semibold text-[var(--ink-soft)]">pengunjung</span></div></div><div className="flex items-center justify-between border-t border-[var(--border)] pt-5 text-xs font-bold"><span className="text-[var(--ink-soft)]">Mulai Rp35.000 / orang</span><span className="rounded-full bg-[var(--forest)] px-4 py-2 text-white">Pilih tanggal</span></div></div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-          <div className="grid overflow-hidden bg-[var(--ink)] text-white lg:grid-cols-[.8fr_1.2fr]">
-            <div className="p-7 sm:p-10 lg:p-12">
-              <Compass className="h-7 w-7 text-[var(--moss)] stroke-[1.35]" />
-              <h2 className="mt-8 max-w-[390px] font-serif text-4xl leading-[1] tracking-[-0.05em] text-white">Mulai dari kebutuhan kawasan Anda.</h2>
-              <p className="mt-4 max-w-[380px] text-[14px] leading-6 text-white/70">Ceritakan cara tiket, kuota, dan gerbang Anda bekerja hari ini. Kami bantu memetakan langkah awal yang relevan.</p>
-              <a id="contact" href="mailto:hello@passify.id" className="mt-8 inline-flex items-center gap-2 rounded-full bg-[var(--sand)] px-5 py-3 text-[13px] font-extrabold text-[var(--ink)] transition-transform hover:-translate-y-0.5">Bicarakan kebutuhan Anda <ArrowUpRight className="h-4 w-4" /></a>
-            </div>
-            <div className="min-h-[310px] lg:min-h-full"><img src={trailImage} alt="Jalur hutan yang tenang" className="h-full w-full object-cover opacity-80 saturate-[.58]" /></div>
-          </div>
+        <section id="contact" className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+          <div className="relative isolate overflow-hidden rounded-[2rem] bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]"><img src={trailImage} alt="Jalur hutan yang tenang" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-42 saturate-[.55]" /><div aria-hidden="true" className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.97), rgba(16,45,32,.74), rgba(16,45,32,.40))' }} /><div className="grid min-h-[390px] items-end px-7 py-9 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14"><div className="max-w-xl"><Eyebrow className="!text-[var(--leaf)]">Mulai dari kebutuhan kawasan Anda</Eyebrow><h2 className="mt-4 text-4xl font-bold leading-[.96] text-white sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2><p className="mt-5 text-sm leading-6 text-white/75 sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link to="/daftar-wisata" className="btn-clay px-5 py-3.5 text-sm">Daftarkan wisata <ArrowRight className="h-4 w-4" /></Link><a href="mailto:hello@passify.id" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/25 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-white/10">Bicarakan kebutuhan <ArrowUpRight className="h-4 w-4" /></a></div></div></div></div>
         </section>
       </main>
 
-      <footer className="border-t border-[rgba(23,59,50,0.13)] px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1240px] flex-col gap-3 text-[11px] font-semibold text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between">
-          <span>© 2026 Passify. Ticketing untuk kawasan yang dijaga.</span>
-          <div className="flex gap-5"><a href="#platform">Platform</a><Link to="/jelajah">Portal demo</Link><a href="mailto:hello@passify.id">Kontak</a></div>
-        </div>
-      </footer>
+      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 sm:px-6 lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col gap-3 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between"><span>© 2026 Passify. Ticketing untuk kawasan yang dijaga.</span><div className="flex gap-5 font-semibold"><a href="#alur" className="hover:text-[var(--forest)]">Cara kerja</a><Link to="/jelajah" className="hover:text-[var(--forest)]">Portal demo</Link><a href="mailto:hello@passify.id" className="hover:text-[var(--forest)]">Kontak</a></div></div></footer>
     </div>
   );
 }
