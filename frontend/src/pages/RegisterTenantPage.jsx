@@ -187,7 +187,7 @@ export default function RegisterTenantPage() {
           </Link>
           <div className="text-xs font-semibold text-[var(--ink-soft)]">
             Sudah punya akun?{' '}
-            <Link to="/jelajah" className="text-[var(--forest)] font-bold hover:underline">
+            <Link to="/masuk" className="text-[var(--forest)] font-bold hover:underline">
               Masuk
             </Link>
           </div>

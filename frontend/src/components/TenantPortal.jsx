@@ -1,22 +1,29 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight, CalendarDays, CheckCircle2, Compass, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Ticket } from 'lucide-react';
 import BookingModal from './BookingModal';
 import ETicketModal from './ETicketModal';
-import AuthModal from './AuthModal';
 import { useTenant } from '../contexts/TenantContext';
 
 const rupiah = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
 
 export default function TenantPortal() {
   const { destination } = useTenant();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('passify_user') || 'null'); } catch { return null; }
   });
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeOrder, setActiveOrder] = useState(null);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (user && location.state?.openBooking) {
+      setIsBookingModalOpen(true);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state?.openBooking, navigate, user]);
 
   if (!destination) return null;
 
@@ -26,7 +33,13 @@ export default function TenantPortal() {
   const used = capacity ? Math.round((booked / capacity) * 100) : 0;
   const startingPrice = Math.min(...(destination.ticket_categories || []).map((category) => Number(category.price || 0)));
 
-  const openBooking = () => user ? setIsBookingModalOpen(true) : setIsAuthModalOpen(true);
+  const openBooking = () => {
+    if (!user) {
+      navigate('/masuk', { state: { from: location.pathname, openBooking: true } });
+      return;
+    }
+    setIsBookingModalOpen(true);
+  };
   const logout = () => {
     localStorage.removeItem('passify_user');
     localStorage.removeItem('passify_token');
@@ -38,7 +51,7 @@ export default function TenantPortal() {
       <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-3 no-underline"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--forest-deep)] text-white"><Compass className="h-4 w-4" /></span><span className="min-w-0"><span className="block truncate font-serif text-lg font-bold text-[var(--forest-deep)] sm:text-xl">{destination.name}</span><span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-[var(--ink-soft)]">Tiket resmi kawasan</span></span></Link>
-          {user ? <div className="flex items-center gap-2"><span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">Halo, {user.name?.split(' ')[0] || 'Wisatawan'}</span><span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold">{user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}</span><button type="button" onClick={logout} title="Keluar" className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-soft)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)]"><LogOut className="h-4 w-4" /></button></div> : <button type="button" onClick={() => setIsAuthModalOpen(true)} className="btn-secondary rounded-full"><LogIn className="h-3.5 w-3.5" /><span>Masuk</span></button>}
+          {user ? <div className="flex items-center gap-2"><span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">Halo, {user.name?.split(' ')[0] || 'Wisatawan'}</span><span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold">{user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}</span><button type="button" onClick={logout} title="Keluar" className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-soft)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)]"><LogOut className="h-4 w-4" /></button></div> : <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-full"><LogIn className="h-3.5 w-3.5" /><span>Masuk</span></Link>}
         </div>
       </header>
 
@@ -64,7 +77,6 @@ export default function TenantPortal() {
 
       {isBookingModalOpen && <BookingModal destination={destination} onClose={() => setIsBookingModalOpen(false)} onBookingSuccess={(order) => { setActiveOrder(order); setIsBookingModalOpen(false); setIsTicketModalOpen(true); }} />}
       {isTicketModalOpen && activeOrder && <ETicketModal order={activeOrder} onClose={() => setIsTicketModalOpen(false)} />}
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onAuthSuccess={(userData) => { setUser(userData); setIsAuthModalOpen(false); setIsBookingModalOpen(true); }} />
     </div>
   );
 }

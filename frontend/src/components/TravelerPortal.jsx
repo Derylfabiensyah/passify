@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, Clock, Compass,
   Info, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Sparkles, Ticket, Users,
 } from 'lucide-react';
 import BookingModal from './BookingModal';
 import ETicketModal from './ETicketModal';
-import AuthModal from './AuthModal';
 import { DESTINATIONS } from '../data/destinations';
 
 const fallbackDestination = {
@@ -29,6 +28,8 @@ function formatRupiah(value) {
 }
 
 export default function TravelerPortal() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [demoIndex, setDemoIndex] = useState(0);
   const [user, setUser] = useState(() => {
     try {
@@ -39,7 +40,6 @@ export default function TravelerPortal() {
     }
   });
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [activeOrder, setActiveOrder] = useState(null);
 
@@ -52,14 +52,18 @@ export default function TravelerPortal() {
   const lowestPrice = Math.min(...(destination.ticket_categories || []).map((cat) => Number(cat.price) || 0));
   const todayLabel = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
 
-  const handleBookNowClick = () => {
-    if (!user) setIsAuthModalOpen(true);
-    else setIsBookingModalOpen(true);
-  };
+  useEffect(() => {
+    if (user && location.state?.openBooking) {
+      setIsBookingModalOpen(true);
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state?.openBooking, navigate, user]);
 
-  const handleAuthSuccess = (userData) => {
-    setUser(userData);
-    setIsAuthModalOpen(false);
+  const handleBookNowClick = () => {
+    if (!user) {
+      navigate('/masuk', { state: { from: location.pathname, openBooking: true } });
+      return;
+    }
     setIsBookingModalOpen(true);
   };
 
@@ -98,9 +102,7 @@ export default function TravelerPortal() {
               </button>
             </div>
           ) : (
-            <button type="button" onClick={() => setIsAuthModalOpen(true)} className="btn-secondary rounded-full px-3.5 sm:px-4">
-              <LogIn className="h-3.5 w-3.5" /><span className="hidden sm:inline">Masuk / Daftar</span><span className="sm:hidden">Masuk</span>
-            </button>
+            <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-full px-3.5 sm:px-4"><LogIn className="h-3.5 w-3.5" /><span className="hidden sm:inline">Masuk / Daftar</span><span className="sm:hidden">Masuk</span></Link>
           )}
         </div>
       </header>
@@ -190,7 +192,6 @@ export default function TravelerPortal() {
 
       {isBookingModalOpen && <BookingModal isOpen={isBookingModalOpen} destination={destination} onClose={() => setIsBookingModalOpen(false)} onBookingSuccess={handleBookingSuccess} />}
       {isTicketModalOpen && activeOrder && <ETicketModal order={activeOrder} onClose={() => setIsTicketModalOpen(false)} />}
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} onAuthSuccess={handleAuthSuccess} />
     </div>
   );
 }
