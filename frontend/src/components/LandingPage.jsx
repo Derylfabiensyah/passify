@@ -6,7 +6,9 @@ import {
   Check,
   ChevronRight,
   CloudOff,
+  Globe,
   Landmark,
+  Mail,
   Trees,
 } from 'lucide-react';
 
@@ -181,7 +183,94 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 sm:px-6 lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col gap-3 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between"><span>© 2026 Passify. Ticketing untuk kawasan yang dijaga.</span><div className="flex gap-5 font-semibold"><a href="#alur" className="hover:text-[var(--forest)]">Cara kerja</a><Link to="/jelajah" className="hover:text-[var(--forest)]">Portal demo</Link><a href="mailto:hello@passify.id" className="hover:text-[var(--forest)]">Kontak</a></div></div></footer>
+      <footer className="bg-[var(--forest-deep)] text-white pt-16 pb-12">
+        <div className="mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-8">
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5 pb-12 border-b border-white/10">
+            {/* Column 1: Brand & Identity */}
+            <div className="lg:col-span-2 space-y-4">
+              <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-white no-underline inline-block">
+                passify
+              </Link>
+              <p className="text-sm leading-6 text-white/70 max-w-sm">
+                Platform SaaS White-Label E-Ticketing & Manajemen Kuota Wisata Alam. Dirancang tangguh di lapangan dengan teknologi offline-first, dynamic TOTP QR, dan ekosistem pembayaran terpadu.
+              </p>
+              <div className="flex flex-wrap gap-2 pt-2">
+                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-[var(--leaf)]">
+                  🌲 Offline-First Engine
+                </span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-[var(--leaf)]">
+                  ⚡ Gate Scanner Mobile
+                </span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-[var(--leaf)]">
+                  💳 Cashless POS
+                </span>
+              </div>
+            </div>
+
+            {/* Column 2: Solusi Kawasan */}
+            <div>
+              <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
+                Solusi Kawasan
+              </h4>
+              <ul className="space-y-2.5 text-sm text-white/75">
+                <li><a href="#masalah" className="hover:text-white transition-colors">Daya Dukung & Kuota</a></li>
+                <li><a href="#alur" className="hover:text-white transition-colors">Validasi Gate Offline</a></li>
+                <li><a href="#white-label" className="hover:text-white transition-colors">Portal White-Label</a></li>
+                <li><Link to="/jelajah" className="hover:text-white transition-colors">E-Ticket QR Dinamis</Link></li>
+                <li><span className="text-white/40">Rekonsiliasi Kas Otomatis</span></li>
+              </ul>
+            </div>
+
+            {/* Column 3: Akses Cepat */}
+            <div>
+              <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
+                Akses & Portal
+              </h4>
+              <ul className="space-y-2.5 text-sm text-white/75">
+                <li><Link to="/jelajah" className="hover:text-white transition-colors">Portal Wisatawan</Link></li>
+                <li><Link to="/daftar-wisata" className="hover:text-white transition-colors">Daftarkan Wisata Baru</Link></li>
+                <li><Link to="/masuk" className="hover:text-white transition-colors">Masuk Petugas / Admin</Link></li>
+                <li><Link to="/verifikasi-email" className="hover:text-white transition-colors">Aktivasi Akun Pengelola</Link></li>
+                <li><a href="#contact" className="hover:text-white transition-colors">Konsultasi Kebutuhan</a></li>
+              </ul>
+            </div>
+
+            {/* Column 4: Kontak & Dukungan */}
+            <div>
+              <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
+                Hubungi Kami
+              </h4>
+              <ul className="space-y-3 text-sm text-white/75">
+                <li className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-[var(--leaf)] shrink-0" />
+                  <a href="mailto:hello@passify.id" className="hover:text-white transition-colors">hello@passify.id</a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-[var(--leaf)] shrink-0" />
+                  <span className="text-white/75">Indonesia (BKSDA & BUMDes)</span>
+                </li>
+                <li className="pt-2">
+                  <div className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs font-medium text-white/90">
+                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Sistem Cloud & Gate Aktif</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
+            <p>© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
+            <div className="flex gap-6 font-medium">
+              <a href="#white-label" className="hover:text-white transition-colors">Kebijakan Privasi</a>
+              <a href="#masalah" className="hover:text-white transition-colors">Syarat Penggunaan</a>
+              <a href="#contact" className="hover:text-white transition-colors">Pusat Bantuan</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
