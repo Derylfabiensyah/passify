@@ -34,11 +34,7 @@ export default function TenantPortal() {
   const startingPrice = Math.min(...(destination.ticket_categories || []).map((category) => Number(category.price || 0)));
 
   const openBooking = () => {
-    if (!user) {
-      navigate('/masuk', { state: { from: location.pathname, openBooking: true } });
-      return;
-    }
-    setIsBookingModalOpen(true);
+    navigate(`/pesan/${destination.slug || destination.id}`);
   };
   const logout = () => {
     localStorage.removeItem('passify_user');

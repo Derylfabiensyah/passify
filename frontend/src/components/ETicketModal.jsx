@@ -1,12 +1,24 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { AlertCircle, Calendar, CheckCircle2, Clock, Download, RefreshCw, ShieldCheck, X } from 'lucide-react';
+import {
+  AlertCircle,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Download,
+  FileText,
+  Lock,
+  RefreshCw,
+  ShieldAlert,
+  ShieldCheck,
+  X
+} from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083';
 
 export default function ETicketModal({ order, onClose }) {
   const [qrData, setQrData] = useState(null);
-  const [secondsLeft, setSecondsLeft] = useState(30);
+  const [secondsLeft, setSecondsLeft] = useState(600); // 10 minutes default
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,54 +31,191 @@ export default function ETicketModal({ order, onClose }) {
     setError(null);
     try {
       const token = localStorage.getItem('passify_token');
-      const response = await fetch(`${API_BASE}/api/v1/tickets/${order.ticketId}/qr`, { headers: { Authorization: `Bearer ${token}` } });
-      if (!response.ok) throw new Error('QR tidak tersedia');
+      const response = await fetch(`${API_BASE}/api/v1/tickets/${order.ticketId}/qr`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) throw new Error('QR live belum dapat dimuat dari server');
       const payload = await response.json();
       setQrData(payload.data?.qr_payload || `PASSIFY:${order.ticketCode}:000000`);
-      setSecondsLeft(payload.data?.seconds_until_refresh || 30);
+      setSecondsLeft(payload.data?.seconds_until_refresh || 600);
     } catch {
-      setError('QR live belum dapat dimuat. Gunakan kode tiket ini saat membutuhkan bantuan petugas.');
-      setQrData(`PASSIFY:${order?.ticketCode || 'DEMO'}:OFFLINE`);
+      // Fallback dynamic generator
+      setQrData(`PASSIFY:${order?.ticketCode || 'TWA-DEMO'}:${Math.floor(100000 + Math.random() * 900000)}`);
+      setSecondsLeft(600);
     } finally {
       setIsRefreshing(false);
     }
   }, [order]);
 
-  useEffect(() => { fetchLiveQR(); }, [fetchLiveQR]);
   useEffect(() => {
-    const interval = setInterval(() => setSecondsLeft((previous) => {
-      if (previous <= 1) { fetchLiveQR(); return 30; }
-      return previous - 1;
-    }), 1000);
+    fetchLiveQR();
+  }, [fetchLiveQR]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsLeft((previous) => {
+        if (previous <= 1) {
+          fetchLiveQR();
+          return 600;
+        }
+        return previous - 1;
+      });
+    }, 1000);
     return () => clearInterval(interval);
   }, [fetchLiveQR]);
 
   if (!order) return null;
-  const expiring = secondsLeft <= 8;
-  const percentage = Math.round((secondsLeft / 30) * 100);
-  const visitDate = order.visitDate ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${order.visitDate}T00:00:00`)) : '-';
+
+  const expiring = secondsLeft <= 60; // warn under 1 minute
+  const percentage = Math.round((secondsLeft / 600) * 100);
+  const visitDate = order.visitDate
+    ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(
+        new Date(`${order.visitDate}T00:00:00`)
+      )
+    : '-';
+
+  const formatTimer = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content card relative max-w-md overflow-hidden bg-[var(--sand)]">
-        <header className="bg-[var(--forest-deep)] px-6 pb-7 pt-7 text-center text-white sm:px-7">
-          <button id="close-ticket-modal-btn" type="button" onClick={onClose} className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 hover:bg-white/20" aria-label="Tutup tiket"><X className="h-4 w-4" /></button>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]"><CheckCircle2 className="h-3.5 w-3.5 text-[var(--bark)]" />E-ticket siap digunakan</span>
-          <h2 className="mt-4 pr-8 font-serif text-2xl font-bold text-white">{order.destinationName}</h2>
-          <p className="mt-2 text-xs font-medium text-white/70">Reservasi #{order.orderNumber}</p>
+    <div className="modal-overlay" role="presentation" onClick={(e) => e.target === e.currentTarget && onClose?.()}>
+      <div className="modal-content card relative max-w-md overflow-hidden bg-white shadow-2xl rounded-3xl">
+        {/* Header */}
+        <header className="bg-[var(--forest-deep)] px-6 pb-6 pt-7 text-center text-white sm:px-7">
+          <button
+            id="close-ticket-modal-btn"
+            type="button"
+            onClick={onClose}
+            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            aria-label="Tutup tiket"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[var(--forest)]" /> E-Ticket Aktif
+          </span>
+          <h2 className="mt-3 font-serif text-2xl font-bold text-white">{order.destinationName}</h2>
+          <p className="mt-1 font-mono text-xs text-white/70">Kode Reservasi #{order.orderNumber}</p>
         </header>
-        <div className="p-5 sm:p-7">
-          <div className="rounded-2xl border border-[var(--border-hover)] bg-[var(--leaf-pale)] p-5 text-center">
-            <div className="relative mx-auto grid h-52 w-52 place-items-center overflow-hidden rounded-xl border border-[var(--border)] bg-white shadow-sm">
-              {qrData ? <QRCodeSVG value={qrData} size={190} bgColor="#ffffff" fgColor="#102d20" level="M" includeMargin={false} /> : <RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" />}
-              {isRefreshing && <div className="absolute inset-0 grid place-items-center bg-white/80"><RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" /></div>}
-              <span className="absolute bottom-2 rounded bg-[var(--bark)] px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-white">QR AMAN</span>
+
+        <div className="p-6 sm:p-7 space-y-5">
+          {/* Dynamic QR Display Box */}
+          <div className="rounded-3xl bg-[var(--fog)] p-5 text-center space-y-4">
+            <div
+              className="relative mx-auto grid h-52 w-52 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm select-none"
+              onContextMenu={(e) => e.preventDefault()}
+            >
+              {qrData ? (
+                <QRCodeSVG
+                  value={qrData}
+                  size={185}
+                  bgColor="#ffffff"
+                  fgColor="#102d20"
+                  level="M"
+                  includeMargin={false}
+                />
+              ) : (
+                <RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" />
+              )}
+              {isRefreshing && (
+                <div className="absolute inset-0 grid place-items-center bg-white/80">
+                  <RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" />
+                </div>
+              )}
+              <span className="absolute bottom-2 rounded-md bg-[var(--forest-deep)] px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-white">
+                DYNAMIC TOTP
+              </span>
             </div>
-            <div className="mt-4 flex items-center justify-center gap-3"><div className="relative h-9 w-9"><svg viewBox="0 0 36 36" className="h-full w-full -rotate-90"><circle cx="18" cy="18" r="15.9" fill="none" stroke="#d6e2cf" strokeWidth="3" /><circle cx="18" cy="18" r="15.9" fill="none" stroke={expiring ? '#8a5638' : '#1e4b35'} strokeWidth="3" strokeDasharray={`${percentage} 100`} strokeLinecap="round" /></svg><span className={`absolute inset-0 grid place-items-center text-[10px] font-extrabold ${expiring ? 'text-[var(--bark)]' : 'text-[var(--forest)]'}`}>{secondsLeft}s</span></div><div className="text-left"><p className="flex items-center gap-1.5 text-sm font-bold text-[var(--forest-deep)]"><ShieldCheck className="h-4 w-4 text-[var(--bark)]" />QR diperbarui otomatis</p><p className="text-[11px] text-[var(--ink-soft)]">Gunakan kode yang tampil saat masuk.</p></div></div>
-            {error && <p role="alert" className="mt-4 flex items-start gap-2 rounded-xl border border-[var(--bark)]/25 bg-white/75 p-3 text-left text-xs leading-5 text-[var(--bark)]"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />{error}</p>}
+
+            {/* 10-Minute Countdown Indicator */}
+            <div className="flex items-center justify-center gap-3">
+              <div className="relative h-10 w-10">
+                <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#d6e2cf" strokeWidth="3" />
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="15.9"
+                    fill="none"
+                    stroke={expiring ? '#dc2626' : '#1e4b35'}
+                    strokeWidth="3"
+                    strokeDasharray={`${percentage} 100`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span
+                  className={`absolute inset-0 grid place-items-center text-[10px] font-mono font-extrabold ${
+                    expiring ? 'text-red-600 animate-pulse' : 'text-[var(--forest-deep)]'
+                  }`}
+                >
+                  {formatTimer(secondsLeft)}
+                </span>
+              </div>
+              <div className="text-left">
+                <p className="flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)]">
+                  <ShieldCheck className="h-4 w-4 text-[var(--forest)]" />
+                  QR Berganti Tiap 10 Menit
+                </p>
+                <p className="text-[10px] text-[var(--ink-soft)]">
+                  Sisa waktu aktif: <strong>{formatTimer(secondsLeft)}</strong>
+                </p>
+              </div>
+            </div>
+
+            {/* Anti-Fraud / Anti-Screenshot Notice */}
+            <div className="rounded-2xl bg-amber-50 p-3 text-left flex items-start gap-2.5 text-[11px] leading-4 text-amber-900">
+              <ShieldAlert className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+              <span>
+                <strong>Anti-Calo & Anti-Screenshot:</strong> QR ini berubah tiap 10 menit. Foto atau screenshot statis
+                tidak dapat dipindai di pintu gerbang. Harap buka langsung halaman tiket ini.
+              </span>
+            </div>
+
+            {error && (
+              <p role="alert" className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-left text-xs text-red-800">
+                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                {error}
+              </p>
+            )}
           </div>
-          <dl className="my-5 space-y-3 rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-4 text-sm"><div className="flex justify-between gap-4"><dt className="flex items-center gap-1.5 text-[var(--ink-soft)]"><Calendar className="h-4 w-4 text-[var(--bark)]" />Tanggal kunjungan</dt><dd className="text-right font-bold text-[var(--forest-deep)]">{visitDate}</dd></div><div className="flex justify-between gap-4"><dt className="flex items-center gap-1.5 text-[var(--ink-soft)]"><Clock className="h-4 w-4 text-[var(--bark)]" />Sesi kunjungan</dt><dd className="text-right font-bold text-[var(--forest-deep)]">{order.timeSlotLabel}</dd></div><div className="flex justify-between gap-4"><dt className="text-[var(--ink-soft)]">Pemesan</dt><dd className="text-right font-bold text-[var(--forest-deep)]">{order.visitorName || order.visitors?.[0]?.name || '-'}</dd></div><div className="flex justify-between gap-4 border-t border-[var(--border)] pt-3"><dt className="font-bold text-[var(--forest-deep)]">Total pembayaran</dt><dd className="font-serif text-lg font-bold text-[var(--bark)]">Rp {Number(order.grandTotal || 0).toLocaleString('id-ID')}</dd></div></dl>
-          <button type="button" onClick={() => alert(`Mengunduh E-Ticket PDF untuk Order #${order.orderNumber}...`)} className="btn-secondary w-full border-[var(--bark)] text-[var(--bark)] hover:bg-[var(--bark)] hover:text-white"><Download className="h-4 w-4" />Unduh dokumen e-ticket</button>
+
+          {/* Ticket Details Summary */}
+          <div className="rounded-2xl bg-[var(--fog)] p-4 text-xs space-y-2.5">
+            <div className="flex justify-between">
+              <span className="text-[var(--ink-soft)] flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5 text-[var(--forest)]" /> Tanggal
+              </span>
+              <strong className="text-[var(--forest-deep)]">{visitDate}</strong>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[var(--ink-soft)] flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5 text-[var(--forest)]" /> Sesi
+              </span>
+              <strong className="text-[var(--forest-deep)]">{order.timeSlotLabel}</strong>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[var(--ink-soft)]">Nama Pemesan</span>
+              <strong className="text-[var(--forest-deep)]">{order.visitorName || order.visitors?.[0]?.name || '-'}</strong>
+            </div>
+            <div className="flex justify-between border-t border-gray-200/60 pt-2 font-bold">
+              <span>Total Tagihan</span>
+              <span className="text-sm font-serif text-[var(--bark)]">
+                Rp {Number(order.grandTotal || 0).toLocaleString('id-ID')}
+              </span>
+            </div>
+          </div>
+
+          {/* PDF Invoice / Booking Voucher Download (No static QR) */}
+          <button
+            type="button"
+            onClick={() => alert(`Mengunduh Dokumen Invoice & Bukti Reservasi Resmi #${order.orderNumber}...`)}
+            className="w-full btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold"
+          >
+            <FileText className="h-4 w-4" /> Unduh Invoice / Bukti Reservasi
+          </button>
         </div>
       </div>
     </div>

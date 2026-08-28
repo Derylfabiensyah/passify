@@ -60,11 +60,8 @@ export default function TravelerPortal() {
   }, [location.pathname, location.state?.openBooking, navigate, user]);
 
   const handleBookNowClick = () => {
-    if (!user) {
-      navigate('/masuk', { state: { from: location.pathname, openBooking: true } });
-      return;
-    }
-    setIsBookingModalOpen(true);
+    const slug = destination.slug || destination.id || 'curug-bidadari';
+    navigate(`/pesan/${slug}`);
   };
 
   const handleLogout = () => {

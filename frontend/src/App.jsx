@@ -16,6 +16,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import RegisterTenantPage from './pages/RegisterTenantPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import TravelerAuthPage from './pages/TravelerAuthPage';
+import CheckoutPage from './pages/CheckoutPage';
 
 function AppRoutes() {
   const { slug, isLoading, error } = useTenant();
@@ -40,6 +41,9 @@ function AppRoutes() {
         <Route path="/masuk" element={<TravelerAuthPage mode="login" />} />
         <Route path="/daftar" element={<TravelerAuthPage mode="register" />} />
         <Route path="/jelajah" element={<TravelerPortal />} />
+        <Route path="/pesan" element={<CheckoutPage />} />
+        <Route path="/pesan/:tenantSlug" element={<CheckoutPage />} />
+        <Route path="/pesan/:tenantSlug/:destinationId" element={<CheckoutPage />} />
         <Route path="/admin/*" element={<ErrorScreen error="Akses admin memerlukan subdomain pengelola wisata (tenant)." />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -51,6 +55,9 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<TenantPortal />} />
       <Route path="/jelajah" element={<TravelerPortal />} />
+      <Route path="/pesan" element={<CheckoutPage />} />
+      <Route path="/pesan/:tenantSlug" element={<CheckoutPage />} />
+      <Route path="/pesan/:tenantSlug/:destinationId" element={<CheckoutPage />} />
       <Route path="/masuk" element={<TravelerAuthPage mode="login" />} />
       <Route path="/daftar" element={<TravelerAuthPage mode="register" />} />
       <Route

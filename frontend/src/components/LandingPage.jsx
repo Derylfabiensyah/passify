@@ -170,9 +170,12 @@ export default function LandingPage() {
               {/* Footer Card */}
               <div className="flex items-center justify-between pt-5 text-xs font-bold">
                 <span className="text-[var(--ink-soft)] font-semibold">Mulai Rp35.000 / orang</span>
-                <span className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-white transition-colors hover:bg-[var(--forest-deep)] shadow-xs">
+                <Link
+                  to="/pesan/curug-bidadari"
+                  className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-white transition-colors hover:bg-[var(--forest-deep)] shadow-xs no-underline font-bold"
+                >
                   Pilih tanggal
-                </span>
+                </Link>
               </div>
             </div>
           </div>

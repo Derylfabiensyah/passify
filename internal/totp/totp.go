@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	// TOTPPeriod is the number of seconds each TOTP code is valid for
-	TOTPPeriod = 30
+	// TOTPPeriod is the number of seconds each TOTP code is valid for (10 minutes as per spec)
+	TOTPPeriod = 600
 	// TOTPDigits is the number of digits in the TOTP code
 	TOTPDigits = otp.DigitsSix
 	// TOTPAlgorithm is the hash algorithm used for TOTP
