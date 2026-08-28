@@ -17,6 +17,7 @@ import RegisterTenantPage from './pages/RegisterTenantPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import TravelerAuthPage from './pages/TravelerAuthPage';
 import CheckoutPage from './pages/CheckoutPage';
+import BookingHistoryPage from './pages/BookingHistoryPage';
 
 function AppRoutes() {
   const { slug, isLoading, error } = useTenant();
@@ -41,6 +42,9 @@ function AppRoutes() {
         <Route path="/masuk" element={<TravelerAuthPage mode="login" />} />
         <Route path="/daftar" element={<TravelerAuthPage mode="register" />} />
         <Route path="/jelajah" element={<TravelerPortal />} />
+        <Route path="/riwayat-pesanan" element={<BookingHistoryPage />} />
+        <Route path="/tiket-saya" element={<BookingHistoryPage />} />
+        <Route path="/riwayat" element={<BookingHistoryPage />} />
         <Route path="/pesan" element={<CheckoutPage />} />
         <Route path="/pesan/:tenantSlug" element={<CheckoutPage />} />
         <Route path="/pesan/:tenantSlug/:destinationId" element={<CheckoutPage />} />
@@ -55,6 +59,9 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<TenantPortal />} />
       <Route path="/jelajah" element={<TravelerPortal />} />
+      <Route path="/riwayat-pesanan" element={<BookingHistoryPage />} />
+      <Route path="/tiket-saya" element={<BookingHistoryPage />} />
+      <Route path="/riwayat" element={<BookingHistoryPage />} />
       <Route path="/pesan" element={<CheckoutPage />} />
       <Route path="/pesan/:tenantSlug" element={<CheckoutPage />} />
       <Route path="/pesan/:tenantSlug/:destinationId" element={<CheckoutPage />} />

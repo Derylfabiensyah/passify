@@ -956,7 +956,7 @@ export default function CheckoutPage() {
               {/* Action Buttons as requested by User */}
               <div className="space-y-3 pt-2">
                 <Link
-                  to="/jelajah"
+                  to="/riwayat-pesanan"
                   className="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md no-underline"
                 >
                   <Ticket className="h-4 w-4" /> Lihat Tiket di Riwayat Saya
