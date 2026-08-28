@@ -86,12 +86,12 @@ export default function LandingPage() {
         <section id="masalah" className="scroll-mt-24 border-b border-[var(--border)] bg-[var(--sand)]">
           <div className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
             <SectionHeading eyebrow="Kawasan punya ritmenya sendiri" title="Ketika kunjungan bertambah, keputusan harus semakin jernih.">Bukan sekadar menjual tiket. Pengelola perlu menjaga ruang, menggerakkan petugas, dan tetap memahami uang yang mengalir setiap hari.</SectionHeading>
-            <div className="mt-12 grid border-y border-[var(--border)] lg:grid-cols-3">
+            <div className="mt-10 grid gap-4 md:grid-cols-3 lg:gap-5">
               {[
                 { index: '01', icon: Trees, title: 'Ruang yang tidak bisa ditambah', text: 'Daya dukung menentukan berapa banyak orang yang dapat hadir tanpa mengubah pengalaman atau ekosistem kawasan.' },
                 { index: '02', icon: CloudOff, title: 'Hari lapangan tidak selalu tersambung', text: 'Gerbang tetap harus bergerak ketika sinyal hilang, antrean datang, dan petugas membutuhkan jawaban yang cepat.' },
                 { index: '03', icon: Landmark, title: 'Kepercayaan perlu jejak yang jelas', text: 'Komponen tiket, transaksi, dan pencairan perlu mudah dibaca tanpa menambah pekerjaan administratif.' },
-              ].map(({ index, icon: Icon, title, text }) => <article key={index} className="border-b border-[var(--border)] py-7 last:border-b-0 lg:border-b-0 lg:border-r lg:px-8 lg:py-9 first:lg:pl-0 last:lg:border-r-0 last:lg:pr-0"><div className="flex items-center justify-between"><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span><Icon className="h-5 w-5 text-[var(--forest-soft)]" strokeWidth={1.5} /></div><h3 className="mt-10 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
+              ].map(({ index, icon: Icon, title, text }) => <article key={index} className="rounded-[var(--radius-lg)] bg-[var(--canvas)] p-6 shadow-[var(--shadow-soft)] sm:p-7"><div className="flex items-center justify-between"><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span><Icon className="h-5 w-5 text-[var(--forest-soft)]" strokeWidth={1.5} /></div><h3 className="mt-9 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
             </div>
           </div>
         </section>
