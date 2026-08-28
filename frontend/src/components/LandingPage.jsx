@@ -107,8 +107,72 @@ export default function LandingPage() {
 
         <section id="white-label" className="scroll-mt-24 bg-[var(--canvas)]">
           <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-20 lg:px-8 lg:py-24">
-            <div><SectionHeading eyebrow="Wajah yang tetap milik kawasan" title="Pengunjung datang ke destinasi Anda, bukan ke marketplace kami.">Setiap pengelola memiliki portal dengan nama, domain, identitas, dan alur kunjungannya sendiri. Di belakangnya, tim Anda tetap menggunakan fondasi operasi yang sama.</SectionHeading><Link to="/jelajah" className="mt-7 inline-flex items-center gap-2 border-b border-[var(--bark)] pb-1 text-sm font-extrabold text-[var(--forest)] transition-colors hover:border-[var(--forest)] hover:text-[var(--bark)]">Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" /></Link></div>
-            <div className="overflow-hidden rounded-[1.5rem] bg-[var(--sand)] p-5 shadow-[var(--shadow-soft)] sm:p-6"><div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-5"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--bark)] text-white"><Trees className="h-4 w-4" /></span><span><span className="block text-sm font-extrabold text-[var(--forest-deep)]">Rimba Senja</span><span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[.13em] text-[var(--ink-soft)]">Taman wisata alam</span></span></div><span className="rounded-full bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]">Portal contoh</span></div><div className="grid gap-5 py-8 sm:grid-cols-2 sm:items-end"><div><Eyebrow>Rencana kunjungan</Eyebrow><p className="mt-3 text-4xl font-bold leading-[.98] tracking-[-.05em]">Hari yang baik dimulai dari kuota yang jelas.</p><p className="mt-4 text-xs leading-5 text-[var(--ink-soft)]">Pilih tanggal dan sesi yang sesuai dengan rencana perjalanan Anda.</p></div><div className="rounded-xl bg-[var(--bark-pale)] p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--bark)]">Contoh sesi tersisa</span><strong className="mt-2 block text-4xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">58</strong><span className="text-xs font-semibold text-[var(--ink-soft)]">pengunjung</span></div></div><div className="flex items-center justify-between border-t border-[var(--border)] pt-5 text-xs font-bold"><span className="text-[var(--ink-soft)]">Mulai Rp35.000 / orang</span><span className="rounded-full bg-[var(--forest)] px-4 py-2 text-white">Pilih tanggal</span></div></div>
+            <div>
+              <SectionHeading
+                eyebrow="Wajah yang tetap milik kawasan"
+                title="Pengunjung datang ke destinasi Anda, bukan ke marketplace kami."
+              >
+                Setiap pengelola memiliki portal dengan nama, domain, identitas, dan alur kunjungannya sendiri. Di belakangnya, tim Anda tetap menggunakan fondasi operasi yang sama.
+              </SectionHeading>
+              <Link
+                to="/jelajah"
+                className="mt-7 inline-flex items-center gap-2 border-b border-[var(--bark)] pb-1 text-sm font-extrabold text-[var(--forest)] transition-colors hover:border-[var(--forest)] hover:text-[var(--bark)]"
+              >
+                Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="overflow-hidden rounded-3xl border border-[var(--border)] bg-white p-6 shadow-[var(--shadow-soft)] sm:p-8">
+              {/* Header Card */}
+              <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] pb-5">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[var(--bark)] text-white shadow-xs">
+                    <Trees className="h-5 w-5" />
+                  </span>
+                  <span>
+                    <span className="block text-sm font-extrabold text-[var(--forest-deep)]">Rimba Senja</span>
+                    <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[.13em] text-[var(--ink-soft)]">Taman wisata alam</span>
+                  </span>
+                </div>
+                <span className="inline-flex items-center rounded-full border border-[var(--leaf)]/30 bg-[var(--leaf-pale)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]">
+                  Portal contoh
+                </span>
+              </div>
+
+              {/* Body Content */}
+              <div className="grid gap-6 py-8 sm:grid-cols-2 sm:items-end">
+                <div>
+                  <Eyebrow>Rencana kunjungan</Eyebrow>
+                  <p className="mt-3 text-3xl font-bold leading-[1.05] tracking-[-.045em] text-[var(--forest-deep)] sm:text-4xl">
+                    Hari yang baik dimulai dari kuota yang jelas.
+                  </p>
+                  <p className="mt-4 text-xs leading-5 text-[var(--ink-soft)]">
+                    Pilih tanggal dan sesi yang sesuai dengan rencana perjalanan Anda.
+                  </p>
+                </div>
+                
+                {/* Sesi Box */}
+                <div className="rounded-2xl border border-[var(--border)] bg-[var(--bark-pale)] p-5">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--bark)]">
+                    Contoh sesi tersisa
+                  </span>
+                  <strong className="mt-2 block text-4xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">
+                    58
+                  </strong>
+                  <span className="text-xs font-semibold text-[var(--ink-soft)]">
+                    pengunjung
+                  </span>
+                </div>
+              </div>
+
+              {/* Footer Card */}
+              <div className="flex items-center justify-between border-t border-[var(--border)] pt-5 text-xs font-bold">
+                <span className="text-[var(--ink-soft)] font-semibold">Mulai Rp35.000 / orang</span>
+                <span className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-white transition-colors hover:bg-[var(--forest-deep)] shadow-xs">
+                  Pilih tanggal
+                </span>
+              </div>
+            </div>
           </div>
         </section>
 
