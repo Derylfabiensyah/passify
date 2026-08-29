@@ -19,13 +19,13 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] ?? '',
-      email: json['email'] ?? '',
-      fullName: json['full_name'] ?? json['name'] ?? '',
-      role: json['role'] ?? 'visitor',
-      tenantId: json['tenant_id'],
-      phoneNumber: json['phone_number'],
-      destinationId: json['destination_id'],
+      id: json['id']?.toString() ?? '',
+      email: json['email']?.toString() ?? '',
+      fullName: (json['full_name'] ?? json['name'])?.toString() ?? '',
+      role: json['role']?.toString() ?? 'visitor',
+      tenantId: json['tenant_id']?.toString(),
+      phoneNumber: (json['phone'] ?? json['phone_number'])?.toString(),
+      destinationId: json['destination_id']?.toString(),
     );
   }
 

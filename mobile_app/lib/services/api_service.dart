@@ -53,9 +53,9 @@ class ApiService {
     );
 
     if (response.statusCode == 200 && response.data['success'] == true) {
-      final data = response.data['data'];
-      final token = data['token'] as String;
-      final userJson = data['user'] as Map<String, dynamic>;
+      final data = response.data['data'] as Map<String, dynamic>? ?? {};
+      final token = (data['access_token'] ?? data['token'] ?? '') as String;
+      final userJson = (data['user'] ?? {}) as Map<String, dynamic>;
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('passify_jwt_token', token);
