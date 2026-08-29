@@ -16,8 +16,21 @@ export function TenantProvider({ children }) {
     const hostname = window.location.hostname;
     
     try {
-      // Step 1: Resolve tenant slug from hostname
-      const slug = await resolveTenantFromHostname(hostname);
+      // Step 1: Resolve tenant slug from hostname or query param
+      let slug = await resolveTenantFromHostname(hostname);
+
+      if (!slug) {
+        // Check if user is logged in as a tenant admin or has active tenant selected
+        try {
+          const currentTenant = localStorage.getItem('passify_current_tenant');
+          const savedUser = JSON.parse(localStorage.getItem('passify_user') || 'null');
+          if (currentTenant) {
+            slug = currentTenant;
+          } else if (savedUser && (savedUser.role === 'tenant_admin' || savedUser.role === 'pengelola' || savedUser.role === 'super_admin')) {
+            slug = savedUser.tenant?.slug || savedUser.tenant?.subdomain || savedUser.tenant_slug;
+          }
+        } catch (_) {}
+      }
       
       if (!slug) {
         // Root domain - no tenant context needed

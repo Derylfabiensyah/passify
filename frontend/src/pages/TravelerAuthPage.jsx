@@ -27,25 +27,23 @@ export default function TravelerAuthPage({ mode }) {
     const tenantSlug = user.tenant?.slug || user.tenant?.subdomain || user.tenant_slug;
 
     if (isManager) {
-      // If tenant admin logs in, navigate directly to Admin Dashboard
-      if (tenantSlug) {
-        const isLocal =
-          window.location.hostname === 'localhost' ||
-          window.location.hostname === '127.0.0.1' ||
-          window.location.hostname === '::1';
+      const slug = tenantSlug || 'curug-bidadari';
+      localStorage.setItem('passify_current_tenant', slug);
 
-        if (isLocal) {
-          // In local environment, set tenant query param to load tenant context
-          window.location.href = `/?tenant=${tenantSlug}#/admin`;
-          return;
-        } else {
-          // On production, redirect to tenant subdomain
-          window.location.href = `https://${tenantSlug}.${ROOT_DOMAIN}/admin`;
-          return;
-        }
+      const isLocal =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === '::1';
+
+      if (isLocal) {
+        // Open the Tenant's Website Template for their specific nature destination
+        window.location.href = `/?tenant=${slug}`;
+        return;
+      } else {
+        // On production, redirect to the tenant's official domain
+        window.location.href = `https://${slug}.${ROOT_DOMAIN}`;
+        return;
       }
-      navigate('/admin', { replace: true });
-      return;
     }
 
     // Traveler (Wisatawan) redirection

@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowRight, CalendarDays, CheckCircle2, Compass, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Ticket } from 'lucide-react';
+import {
+  ArrowRight,
+  CalendarDays,
+  CheckCircle2,
+  Compass,
+  LayoutDashboard,
+  Leaf,
+  LogIn,
+  LogOut,
+  MapPin,
+  Mountain,
+  ShieldCheck,
+  Sparkles,
+  Ticket
+} from 'lucide-react';
 import BookingModal from './BookingModal';
 import ETicketModal from './ETicketModal';
 import { useTenant } from '../contexts/TenantContext';
@@ -27,6 +41,7 @@ export default function TenantPortal() {
 
   if (!destination) return null;
 
+  const isManager = user?.role === 'tenant_admin' || user?.role === 'pengelola' || user?.role === 'super_admin';
   const capacity = Number(destination.max_daily_capacity || 0);
   const booked = Number(destination.booked_today || 0);
   const remaining = Math.max(0, capacity - booked);
@@ -39,15 +54,88 @@ export default function TenantPortal() {
   const logout = () => {
     localStorage.removeItem('passify_user');
     localStorage.removeItem('passify_token');
+    localStorage.removeItem('passify_current_tenant');
     setUser(null);
   };
 
   return (
     <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
-      <header className="nav-bar sticky top-0 z-40">
+      {/* Pengelola Top Bar (Only visible for Tenant Admins) */}
+      {isManager && (
+        <div className="bg-[var(--forest-deep)] text-white px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-white/10 shadow-xs">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-bold">Template Website Resmi: {destination.name}</span>
+            <span className="hidden sm:inline text-white/60">({destination.slug}.passify.id)</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/admin"
+              className="btn-primary text-[11px] py-1 px-3.5 rounded-full flex items-center gap-1.5 no-underline font-bold shadow-xs"
+            >
+              <LayoutDashboard className="h-3.5 w-3.5" /> Buka Dashboard Admin
+            </Link>
+            <Link
+              to="/"
+              onClick={() => localStorage.removeItem('passify_current_tenant')}
+              className="text-white/75 hover:text-white text-xs no-underline font-medium"
+            >
+              Beranda Utama Passify
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <header className="nav-bar sticky top-0 z-40 bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-3 no-underline"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--forest-deep)] text-white"><Compass className="h-4 w-4" /></span><span className="min-w-0"><span className="block truncate font-serif text-lg font-bold text-[var(--forest-deep)] sm:text-xl">{destination.name}</span><span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-[var(--ink-soft)]">Tiket resmi kawasan</span></span></Link>
-          {user ? <div className="flex items-center gap-2"><span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">Halo, {user.name?.split(' ')[0] || 'Wisatawan'}</span><span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold">{user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}</span><button type="button" onClick={logout} title="Keluar" className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-soft)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)]"><LogOut className="h-4 w-4" /></button></div> : <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-full"><LogIn className="h-3.5 w-3.5" /><span>Masuk</span></Link>}
+          <Link to="/" className="flex min-w-0 items-center gap-3 no-underline">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--forest-deep)] text-white">
+              <Compass className="h-4 w-4" />
+            </span>
+            <span className="min-w-0">
+              <span className="block truncate font-serif text-lg font-bold text-[var(--forest-deep)] sm:text-xl">
+                {destination.name}
+              </span>
+              <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-[var(--ink-soft)]">
+                Tiket resmi kawasan
+              </span>
+            </span>
+          </Link>
+          
+          <div className="flex items-center gap-3">
+            {isManager && (
+              <Link
+                to="/admin"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] px-3 py-1.5 rounded-full no-underline hover:bg-[var(--sand)]"
+              >
+                <LayoutDashboard className="h-3.5 w-3.5 text-[var(--forest)]" /> Dashboard Admin
+              </Link>
+            )}
+
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">
+                  Halo, {user.name?.split(' ')[0] || (isManager ? 'Pengelola' : 'Wisatawan')}
+                </span>
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold text-[var(--forest-deep)]">
+                  {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'P'}
+                </span>
+                <button
+                  type="button"
+                  onClick={logout}
+                  title="Keluar"
+                  className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-soft)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)] transition-colors"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-full">
+                <LogIn className="h-3.5 w-3.5" />
+                <span>Masuk</span>
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 
