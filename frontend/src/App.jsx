@@ -47,8 +47,20 @@ function AppRoutes() {
         <Route path="/riwayat" element={<BookingHistoryPage />} />
         <Route path="/pesan" element={<CheckoutPage />} />
         <Route path="/pesan/:tenantSlug" element={<CheckoutPage />} />
-        <Route path="/pesan/:tenantSlug/:destinationId" element={<CheckoutPage />} />
-        <Route path="/admin/*" element={<ErrorScreen error="Akses admin memerlukan subdomain pengelola wisata (tenant)." />} />
+        <Route
+          path="/admin/*"
+          element={
+            <AdminLayout>
+              <Routes>
+                <Route index element={<DashboardOverview />} />
+                <Route path="destinations" element={<DestinationsPage />} />
+                <Route path="quotas" element={<QuotasPage />} />
+                <Route path="gates" element={<GatesPage />} />
+                <Route path="finance" element={<FinancePage />} />
+              </Routes>
+            </AdminLayout>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     );
