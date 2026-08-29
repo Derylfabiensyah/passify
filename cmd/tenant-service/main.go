@@ -51,7 +51,13 @@ func main() {
 	// API v1 group
 	v1 := router.Group("/api/v1")
 
-	// Health check endpoint
+	// Health check endpoints
+	router.GET("/health", func(c *gin.Context) {
+		response.OK(c, "Tenant service is healthy", gin.H{
+			"service": "tenant-service",
+			"status":  "UP",
+		})
+	})
 	v1.GET("/health", func(c *gin.Context) {
 		response.OK(c, "Tenant service is healthy", gin.H{
 			"service": "tenant-service",
