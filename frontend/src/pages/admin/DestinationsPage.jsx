@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   MapPin,
   Plus,
@@ -6,163 +7,198 @@ import {
   Trash2,
   Search,
   Eye,
-  EyeOff,
-  Star,
   ChevronDown,
   ChevronUp,
   X,
   Save,
   DollarSign,
   Ticket,
-  Image,
-  AlertTriangle,
+  Image as ImageIcon,
   Compass,
   CheckCircle2,
-  Users
+  Users,
+  Sparkles,
+  ExternalLink,
+  ShieldCheck,
+  Palette,
+  Layers,
+  Leaf,
+  FileText
 } from 'lucide-react';
-import { useApiClient } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import { ADMIN_DESTINATIONS } from '../../data/adminData';
+import { useTenant } from '../../contexts/TenantContext';
 
-function TicketCategoryRow({ cat, onEdit }) {
+function TicketCategoryRow({ cat, onEdit, onDelete }) {
   return (
-    <div className="flex items-center justify-between py-2.5 px-3 rounded-lg bg-white border border-gray-200 shadow-2xs">
+    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white border border-gray-200 shadow-2xs">
       <div className="flex-1">
-        <span className="text-xs font-bold text-gray-900">{cat.name}</span>
-        <div className="flex items-center gap-3 mt-0.5 text-[10px] text-gray-500">
-          <span>
-            Tiket: <strong className="text-gray-900">Rp {cat.price.toLocaleString('id-ID')}</strong>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-gray-900">{cat.name}</span>
+          <span className={`text-[10px] font-extrabold uppercase px-2 py-0.2 rounded-full ${cat.is_active !== false ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
+            {cat.is_active !== false ? 'Aktif' : 'Nonaktif'}
           </span>
-          <span>Asuransi: Rp {cat.insurance.toLocaleString('id-ID')}</span>
-          <span>Retribusi: Rp {cat.retribusi.toLocaleString('id-ID')}</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 mt-1 text-[11px] text-gray-500">
+          <span>
+            Harga Masuk: <strong className="text-gray-900">Rp {Number(cat.price || 0).toLocaleString('id-ID')}</strong>
+          </span>
+          <span>• Asuransi: Rp {Number(cat.insurance || 0).toLocaleString('id-ID')}</span>
+          <span>• Retribusi: Rp {Number(cat.retribusi || 0).toLocaleString('id-ID')}</span>
+          <span className="text-[var(--bark)] font-bold">
+            Total: Rp {(Number(cat.price || 0) + Number(cat.insurance || 0) + Number(cat.retribusi || 0)).toLocaleString('id-ID')}
+          </span>
         </div>
       </div>
-      <div className="flex items-center gap-2">
-        <span className="text-[10px] font-semibold text-emerald-700">
-          {cat.is_active ? '• Aktif' : '• Nonaktif'}
-        </span>
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => onEdit(cat)}
-          className="w-7 h-7 rounded-lg text-gray-400 hover:text-gray-900 flex items-center justify-center transition-colors"
+          className="p-2 rounded-lg text-gray-500 hover:text-[var(--forest-deep)] hover:bg-gray-100 transition-colors"
+          title="Edit Kategori"
         >
-          <Pencil className="w-3.5 h-3.5" />
+          <Pencil className="w-4 h-4" />
         </button>
+        {onDelete && (
+          <button
+            type="button"
+            onClick={() => onDelete(cat.id)}
+            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+            title="Hapus Kategori"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-function DestinationCard({ dest, onToggleExpand, isExpanded, onEditDest, onEditCategory }) {
-  const quotaPct = Math.round((dest.booked_today / dest.max_daily_capacity) * 100);
+function DestinationCard({ dest, onToggleExpand, isExpanded, onEditDest, onAddCategory, onEditCategory, onDeleteCategory }) {
+  const quotaPct = Math.round(((dest.booked_today || 0) / (dest.max_daily_capacity || 1000)) * 100);
 
   return (
-    <div className="card bg-white border border-gray-200 rounded-xl overflow-hidden shadow-2xs">
+    <div className="card bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-2xs">
       {/* Card Header */}
-      <div className="flex gap-4 p-5">
-        <img
-          src={dest.cover_image_url}
-          alt={dest.name}
-          className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-gray-200"
-        />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <h3 className="text-base font-bold text-gray-900 truncate font-['Outfit']">
-                {dest.name}
-              </h3>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-gray-100 text-gray-700 border border-gray-200">
-                  {dest.typeLabel}
-                </span>
-                <span className="text-xs text-gray-500 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                  {dest.location}
-                </span>
+      <div className="flex flex-col sm:flex-row gap-5 p-5 sm:p-6">
+        <div className="relative w-full sm:w-36 h-32 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+          <img
+            src={dest.cover_image_url || 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=400&q=80'}
+            alt={dest.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute top-2 left-2">
+            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-black/60 text-white backdrop-blur-xs">
+              {dest.typeLabel || 'Wisata Alam'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex-1 min-w-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="text-lg font-bold text-[var(--forest-deep)] truncate font-serif">
+                  {dest.name}
+                </h3>
+                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                  <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  {dest.location || 'Indonesia'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Link
+                  to={`/?tenant=${dest.slug}`}
+                  target="_blank"
+                  className="btn-secondary text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-decoration-none"
+                  title="Buka Website Resmi"
+                >
+                  <Eye className="w-3.5 h-3.5" /> Pratinjau Website <ExternalLink className="w-3 h-3" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => onEditDest(dest)}
+                  className="btn-primary text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-xs"
+                >
+                  <Pencil className="w-3.5 h-3.5" /> Edit Halaman
+                </button>
               </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span
-                className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${
-                  dest.is_active
-                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                    : 'bg-red-50 text-red-800 border-red-200'
-                }`}
-              >
-                {dest.is_active ? 'Aktif' : 'Nonaktif'}
-              </span>
-            </div>
+
+            <p className="text-xs text-gray-600 line-clamp-2 mt-2 leading-relaxed">
+              {dest.description || 'Destinasi wisata alam resmi.'}
+            </p>
           </div>
 
-          {/* Quick Stats Row */}
-          <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-gray-100 text-xs">
+          {/* Stats Bar */}
+          <div className="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-gray-100 text-xs">
             <div>
-              <span className="text-[11px] text-gray-500 block">Kapasitas Harian</span>
-              <span className="font-bold text-gray-900">
-                {dest.max_daily_capacity.toLocaleString('id-ID')} pax
-              </span>
+              <span className="text-[10px] uppercase font-bold text-gray-400 block">Kapasitas Harian</span>
+              <strong className="text-sm font-bold text-gray-900">
+                {Number(dest.max_daily_capacity || 0).toLocaleString('id-ID')} pax
+              </strong>
             </div>
             <div>
-              <span className="text-[11px] text-gray-500 block">Terisi Hari Ini</span>
-              <span className="font-bold text-emerald-700">
-                {dest.booked_today.toLocaleString('id-ID')} ({quotaPct}%)
-              </span>
+              <span className="text-[10px] uppercase font-bold text-gray-400 block">Terisi Hari Ini</span>
+              <strong className="text-sm font-bold text-emerald-700">
+                {Number(dest.booked_today || 0).toLocaleString('id-ID')} ({quotaPct}%)
+              </strong>
             </div>
             <div>
-              <span className="text-[11px] text-gray-500 block">Kategori Tiket</span>
-              <span className="font-bold text-gray-900">
-                {dest.ticket_categories.length} tipe
-              </span>
+              <span className="text-[10px] uppercase font-bold text-gray-400 block">Kategori Tiket</span>
+              <strong className="text-sm font-bold text-gray-900">
+                {(dest.ticket_categories || []).length} Tipe Tarif
+              </strong>
             </div>
           </div>
         </div>
       </div>
 
       {/* Expand Bar */}
-      <div className="px-5 py-2.5 bg-gray-50 border-t border-gray-200 flex items-center justify-between text-xs">
+      <div className="px-6 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between text-xs">
         <button
           type="button"
           onClick={() => onToggleExpand(dest.id)}
-          className="flex items-center gap-1 text-gray-600 hover:text-gray-900 font-semibold transition-colors"
+          className="flex items-center gap-1.5 text-gray-700 hover:text-[var(--forest-deep)] font-bold transition-colors cursor-pointer"
         >
-          {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-          <span>
-            {isExpanded ? 'Sembunyikan Tarif & Kuota' : 'Kelola Tarif & Kategori Tiket'}
-          </span>
+          {isExpanded ? <ChevronUp className="w-4 h-4 text-[var(--forest)]" /> : <ChevronDown className="w-4 h-4 text-[var(--forest)]" />}
+          <span>{isExpanded ? 'Tutup Pengaturan Tiket & Tarif' : 'Kelola Kategori & Struktur Harga Tiket'}</span>
         </button>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => onEditDest(dest)}
-            className="text-gray-400 hover:text-gray-900 p-1 transition-colors"
-            title="Edit Destinasi"
-          >
-            <Pencil className="w-3.5 h-3.5" />
-          </button>
-        </div>
+
+        <span className="text-[11px] text-gray-500">
+          {(dest.facilities || []).length} Fasilitas • {(dest.rules ? 'Ada Aturan Kawasan' : 'Belum ada aturan')}
+        </span>
       </div>
 
-      {/* Expanded Content */}
+      {/* Expanded Content: Ticket Categories Management */}
       {isExpanded && (
-        <div className="p-5 border-t border-gray-200 bg-gray-50 space-y-3">
+        <div className="p-6 border-t border-gray-100 bg-gray-50/60 space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-              Daftar Kategori & Struktur Harga Tiket
-            </span>
+            <div>
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-[var(--forest-deep)]">
+                Struktur Harga & Komponen Tiket Resmi
+              </h4>
+              <p className="text-[11px] text-gray-500">
+                Harga tiket otomatis memisahkan komponen retribusi PEMDA dan asuransi Jasa Raharja.
+              </p>
+            </div>
             <button
               type="button"
-              onClick={() => onEditCategory({ destId: dest.id })}
-              className="text-xs text-emerald-700 hover:text-emerald-900 font-bold flex items-center gap-1"
+              onClick={() => onAddCategory(dest.id)}
+              className="btn-primary text-xs px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-xs"
             >
-              <Plus className="w-3.5 h-3.5" /> Tambah Kategori
+              <Plus className="w-3.5 h-3.5" /> Tambah Kategori Tiket
             </button>
           </div>
-          <div className="space-y-2">
-            {dest.ticket_categories.map((cat) => (
+
+          <div className="space-y-2.5">
+            {(dest.ticket_categories || []).map((cat) => (
               <TicketCategoryRow
                 key={cat.id}
                 cat={cat}
-                onEdit={(c) => onEditCategory({ ...c, destId: dest.id })}
+                onEdit={(c) => onEditCategory(dest.id, c)}
+                onDelete={(catId) => onDeleteCategory(dest.id, catId)}
               />
             ))}
           </div>
@@ -172,111 +208,540 @@ function DestinationCard({ dest, onToggleExpand, isExpanded, onEditDest, onEditC
   );
 }
 
+// =========================================================================
+// MODAL: EDIT DESTINASI & TAMPILAN HALAMAN WEBSITE
+// =========================================================================
+function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    location: '',
+    province: '',
+    cover_image_url: '',
+    max_daily_capacity: 1000,
+    facilities: '',
+    rules: '',
+    primary_color: '#102d20',
+  });
+
+  useEffect(() => {
+    if (dest) {
+      setFormData({
+        name: dest.name || '',
+        description: dest.description || '',
+        location: dest.location || '',
+        province: dest.province || 'Indonesia',
+        cover_image_url: dest.cover_image_url || '',
+        max_daily_capacity: dest.max_daily_capacity || 1000,
+        facilities: Array.isArray(dest.facilities) ? dest.facilities.join(', ') : (dest.facilities || ''),
+        rules: dest.rules || '',
+        primary_color: dest.primary_color || '#102d20',
+      });
+    }
+  }, [dest]);
+
+  if (!isOpen || !dest) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const facilityList = formData.facilities
+      .split(',')
+      .map((f) => f.trim())
+      .filter(Boolean);
+
+    onSave({
+      ...dest,
+      ...formData,
+      max_daily_capacity: Number(formData.max_daily_capacity),
+      facilities: facilityList.length ? facilityList : ['Area Parkir', 'Pusat Informasi', 'Toilet Bersih', 'Pos P3K'],
+    });
+  };
+
+  return (
+    <div className="modal-overlay z-50 flex items-center justify-center p-4">
+      <div className="modal-content bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        {/* Header */}
+        <div className="bg-[var(--forest-deep)] text-white p-6 flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
+              Kustomisasi Halaman Website Wisata
+            </span>
+            <h2 className="text-xl font-bold font-serif mt-0.5">Edit Informasi {dest.name}</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                Nama Destinasi Wisata
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="field-control font-semibold"
+                placeholder="Contoh: Curug Bidadari Eco Park"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+                Kapasitas Pengunjung Harian (Pax)
+              </label>
+              <input
+                type="number"
+                value={formData.max_daily_capacity}
+                onChange={(e) => setFormData({ ...formData, max_daily_capacity: e.target.value })}
+                className="field-control font-semibold"
+                placeholder="1000"
+                min="10"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+              Lokasi & Alamat Lengkap
+            </label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              className="field-control font-medium"
+              placeholder="Contoh: Sentul Paradise Park, Babakan Madang, Bogor, Jawa Barat"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+              URL Foto Sampul (Cover Image Landscape)
+            </label>
+            <input
+              type="url"
+              value={formData.cover_image_url}
+              onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
+              className="field-control font-mono text-xs"
+              placeholder="https://images.unsplash.com/photo-..."
+            />
+            {formData.cover_image_url && (
+              <div className="mt-2 h-28 rounded-xl overflow-hidden border border-gray-200">
+                <img
+                  src={formData.cover_image_url}
+                  alt="Pratinjau Foto Sampul"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+              Deskripsi Wisata & Cerita Kawasan
+            </label>
+            <textarea
+              rows={3}
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="field-control leading-relaxed"
+              placeholder="Jelaskan keindahan alam, daya tarik utama, dan informasi penting bagi wisatawan..."
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+              Fasilitas Kawasan (Pisahkan dengan koma)
+            </label>
+            <input
+              type="text"
+              value={formData.facilities}
+              onChange={(e) => setFormData({ ...formData, facilities: e.target.value })}
+              className="field-control"
+              placeholder="Area Parkir, Pos Pemandu, Toilet Bersih, Musholla, Pos P3K, Gazebo"
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+              Aturan & Etika Kawasan Wisata Alam
+            </label>
+            <textarea
+              rows={2}
+              value={formData.rules}
+              onChange={(e) => setFormData({ ...formData, rules: e.target.value })}
+              className="field-control leading-relaxed"
+              placeholder="Patuhi batas daya dukung lingkungan, dilarang merusak flora & fauna, buang sampah pada tempatnya."
+            />
+          </div>
+
+          {/* Footer Actions */}
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary px-5 py-2.5 rounded-xl font-bold"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              className="btn-primary px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md"
+            >
+              <Save className="h-4 w-4" /> Simpan Perubahan Halaman
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// =========================================================================
+// MODAL: TAMBAH / EDIT KATEGORI TIKET
+// =========================================================================
+function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    price: 35000,
+    insurance: 3000,
+    retribusi: 2000,
+    is_active: true,
+  });
+
+  useEffect(() => {
+    if (cat) {
+      setFormData({
+        name: cat.name || '',
+        price: cat.price || 0,
+        insurance: cat.insurance || 3000,
+        retribusi: cat.retribusi || 2000,
+        is_active: cat.is_active !== false,
+      });
+    }
+  }, [cat]);
+
+  if (!isOpen) return null;
+
+  const total = Number(formData.price || 0) + Number(formData.insurance || 0) + Number(formData.retribusi || 0);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave({
+      id: cat?.id || `cat-${Date.now()}`,
+      ...formData,
+      price: Number(formData.price),
+      insurance: Number(formData.insurance),
+      retribusi: Number(formData.retribusi),
+    });
+  };
+
+  return (
+    <div className="modal-overlay z-50 flex items-center justify-center p-4">
+      <div className="modal-content bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+        <div className="bg-[var(--forest-deep)] text-white p-5 flex items-center justify-between">
+          <h3 className="text-base font-bold font-serif">
+            {cat?.id ? 'Edit Kategori Tiket' : 'Tambah Kategori Tiket Baru'}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
+              Nama Kategori Tiket
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="field-control font-bold"
+              placeholder="Contoh: Tiket Masuk Dewasa (WNI)"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1">
+                Tarif Masuk (Rp)
+              </label>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="field-control"
+                min="0"
+                step="500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1">
+                Asuransi (Rp)
+              </label>
+              <input
+                type="number"
+                value={formData.insurance}
+                onChange={(e) => setFormData({ ...formData, insurance: e.target.value })}
+                className="field-control"
+                min="0"
+                step="500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1">
+                Retribusi (Rp)
+              </label>
+              <input
+                type="number"
+                value={formData.retribusi}
+                onChange={(e) => setFormData({ ...formData, retribusi: e.target.value })}
+                className="field-control"
+                min="0"
+                step="500"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Grand Total Preview */}
+          <div className="p-4 rounded-2xl bg-[var(--fog)] flex items-baseline justify-between">
+            <span className="font-bold text-gray-700">Total Harga Tiket per Orang:</span>
+            <span className="text-base font-extrabold text-[var(--bark)]">
+              Rp {total.toLocaleString('id-ID')}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary px-4 py-2 rounded-xl font-bold"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              className="btn-primary px-5 py-2 rounded-xl font-bold shadow-xs"
+            >
+              Simpan Kategori
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// =========================================================================
+// MAIN DESTINATIONS PAGE COMPONENT
+// =========================================================================
 export default function DestinationsPage() {
-  const apiClient = useApiClient(); // API client with automatic tenant header injection
-  // TODO: Fetch destinations from API: const destinations = await apiClient.get('/api/admin/destinations');
-  // TODO: Create: await apiClient.post('/api/admin/destinations', newDestinationData);
-  // TODO: Update: await apiClient.put(`/api/admin/destinations/${id}`, updatedData);
-  // TODO: Delete: await apiClient.delete(`/api/admin/destinations/${id}`);
-  
-  const [destinations, setDestinations] = useState(ADMIN_DESTINATIONS);
-  const [expandedId, setExpandedId] = useState(ADMIN_DESTINATIONS[0]?.id || null);
+  const { refetch } = useTenant();
+  const [destinations, setDestinations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('passify_admin_destinations');
+      return saved ? JSON.parse(saved) : ADMIN_DESTINATIONS;
+    } catch {
+      return ADMIN_DESTINATIONS;
+    }
+  });
+
+  const [expandedId, setExpandedId] = useState(destinations[0]?.id || null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [editingDest, setEditingDest] = useState(null);
+  const [editingCatContext, setEditingCatContext] = useState(null); // { destId, cat }
+  const [toastMessage, setToastMessage] = useState('');
+
+  const showToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 4000);
+  };
+
+  const saveDestinationsList = (updated) => {
+    setDestinations(updated);
+    localStorage.setItem('passify_admin_destinations', JSON.stringify(updated));
+    refetch?.();
+  };
 
   const toggleExpand = (id) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
+  const handleSaveDestination = (updatedDest) => {
+    const updated = destinations.map((d) => (d.id === updatedDest.id ? updatedDest : d));
+    saveDestinationsList(updated);
+    setEditingDest(null);
+    showToast(`Halaman "${updatedDest.name}" berhasil diperbarui!`);
+  };
+
+  const handleSaveCategory = (categoryData) => {
+    if (!editingCatContext?.destId) return;
+    const destId = editingCatContext.destId;
+
+    const updated = destinations.map((d) => {
+      if (d.id !== destId) return d;
+      const categories = [...(d.ticket_categories || [])];
+      const existingIdx = categories.findIndex((c) => c.id === categoryData.id);
+      if (existingIdx >= 0) {
+        categories[existingIdx] = categoryData;
+      } else {
+        categories.push(categoryData);
+      }
+      return { ...d, ticket_categories: categories };
+    });
+
+    saveDestinationsList(updated);
+    setEditingCatContext(null);
+    showToast('Kategori tiket berhasil disimpan!');
+  };
+
+  const handleDeleteCategory = (destId, catId) => {
+    if (!window.confirm('Hapus kategori tiket ini?')) return;
+    const updated = destinations.map((d) => {
+      if (d.id !== destId) return d;
+      return {
+        ...d,
+        ticket_categories: (d.ticket_categories || []).filter((c) => c.id !== catId),
+      };
+    });
+    saveDestinationsList(updated);
+    showToast('Kategori tiket telah dihapus.');
+  };
+
   const filteredDests = destinations.filter(
     (d) =>
-      d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.location.toLowerCase().includes(searchQuery.toLowerCase())
+      d.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.location?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalCapacity = destinations.reduce((s, d) => s + d.max_daily_capacity, 0);
-  const totalBooked = destinations.reduce((s, d) => s + d.booked_today, 0);
-  const overallPct = Math.round((totalBooked / totalCapacity) * 100);
+  const totalCapacity = destinations.reduce((s, d) => s + (Number(d.max_daily_capacity) || 0), 0);
+  const totalBooked = destinations.reduce((s, d) => s + (Number(d.booked_today) || 0), 0);
+  const overallPct = totalCapacity ? Math.round((totalBooked / totalCapacity) * 100) : 0;
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-5 right-5 z-50 bg-[var(--forest-deep)] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 text-xs font-bold animate-fade-in border border-[var(--leaf)]">
+          <CheckCircle2 className="h-5 w-5 text-[var(--leaf)]" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
           <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
             <span className="status-dot" />
-            <span>Passify Destination Engine • White-Label SaaS</span>
+            <span>Passify Destination Engine • Editor Halaman Kawasan</span>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
-            Manajemen Destinasi & Tarif Tiket Klien
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-serif">
+            Manajemen Destinasi & Kustomisasi Halaman Website
           </h1>
+          <p className="text-xs text-gray-500 mt-1">
+            Ubah nama wisata, foto pemandangan, deskripsi, fasilitas, dan harga tiket yang tampil di website resmi Anda.
+          </p>
         </div>
-
-        <button className="btn-primary btn-sm shadow-2xs">
-          <Plus className="w-4 h-4" />
-          <span>Tambah Destinasi Tenant</span>
-        </button>
       </div>
 
-      {/* KPI Cards (Minimalist style) */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminStatCard
           icon={Compass}
-          label="Total Kawasan Terdaftar"
+          label="Total Kawasan Wisata"
           value={`${destinations.length} Kawasan`}
-          subValue="Dikelola oleh pengelola tenant"
+          subValue="Dikelola oleh akun tenant Anda"
           badgeText="VENUES"
         />
         <AdminStatCard
           icon={CheckCircle2}
-          label="Destinasi Aktif & Buka"
-          value={`${destinations.filter((d) => d.is_active).length} Kawasan`}
-          subValue="Menerima pemesanan tiket daring"
-          badgeText="ACTIVE"
+          label="Status Website"
+          value="Online & Aktif"
+          subValue="Menerima reservasi e-ticket"
+          badgeText="PORTAL"
         />
         <AdminStatCard
           icon={Users}
-          label="Total Kuota Harian Gabungan"
+          label="Total Daya Dukung Alam"
           value={`${totalCapacity.toLocaleString('id-ID')} pax`}
           subValue={`Terisi: ${totalBooked.toLocaleString('id-ID')} pax hari ini`}
           progress={overallPct}
-          badgeText="CAPACITY"
+          badgeText="KUOTA"
         />
         <AdminStatCard
           icon={Ticket}
-          label="Total Kategori Tiket"
-          value={`${destinations.reduce((s, d) => s + d.ticket_categories.length, 0)} Tipe`}
-          subValue="Reguler, VIP, Rombongan & Khusus"
-          badgeText="PRICING"
+          label="Kategori Tarif Tiket"
+          value={`${destinations.reduce((s, d) => s + (d.ticket_categories || []).length, 0)} Tipe`}
+          subValue="WNI, WNA, Asuransi & Retribusi"
+          badgeText="TARIF"
         />
       </div>
 
-      {/* Search Filter */}
+      {/* Search & Filter */}
       <div className="flex items-center justify-between gap-4">
         <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Cari destinasi atau lokasi..."
+            placeholder="Cari nama destinasi atau lokasi..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 shadow-2xs"
+            className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 shadow-2xs"
           />
         </div>
       </div>
 
-      {/* Destination Cards Grid */}
-      <div className="space-y-4">
+      {/* Destination Cards List */}
+      <div className="space-y-5">
         {filteredDests.map((dest) => (
           <DestinationCard
             key={dest.id}
             dest={dest}
             isExpanded={expandedId === dest.id}
             onToggleExpand={toggleExpand}
-            onEditDest={() => {}}
-            onEditCategory={() => {}}
+            onEditDest={(d) => setEditingDest(d)}
+            onAddCategory={(destId) => setEditingCatContext({ destId, cat: null })}
+            onEditCategory={(destId, cat) => setEditingCatContext({ destId, cat })}
+            onDeleteCategory={handleDeleteCategory}
           />
         ))}
       </div>
+
+      {/* Modal Edit Destination */}
+      <EditDestinationModal
+        dest={editingDest}
+        isOpen={Boolean(editingDest)}
+        onClose={() => setEditingDest(null)}
+        onSave={handleSaveDestination}
+      />
+
+      {/* Modal Edit Ticket Category */}
+      <EditCategoryModal
+        cat={editingCatContext?.cat}
+        isOpen={Boolean(editingCatContext)}
+        onClose={() => setEditingCatContext(null)}
+        onSave={handleSaveCategory}
+      />
     </div>
   );
 }
