@@ -651,10 +651,6 @@ export default function DestinationsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
-          <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
-            <span className="status-dot" />
-            <span>Passify Destination Engine • Editor Halaman Kawasan</span>
-          </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-serif">
             Manajemen Destinasi & Kustomisasi Halaman Website
           </h1>
