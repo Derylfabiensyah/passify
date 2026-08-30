@@ -44,9 +44,6 @@ export default function VerifyEmailPage() {
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 text-decoration-none">
             <span className="text-xl font-extrabold tracking-tight text-[var(--forest-deep)]">passify</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--bark-pale)] text-[var(--bark)]">
-              Verifikasi Akun
-            </span>
           </Link>
           <Link to="/" className="text-xs font-semibold text-[var(--ink-soft)] hover:text-[var(--ink)]">
             Kembali ke Beranda
@@ -56,7 +53,7 @@ export default function VerifyEmailPage() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-lg px-4 py-12 flex-1 flex items-center justify-center">
-        <div className="w-full rounded-3xl border border-[rgba(23,59,50,0.12)] bg-white p-8 sm:p-10 shadow-sm text-center">
+        <div className="w-full rounded-3xl bg-white p-8 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)] text-center">
           {/* Loading State */}
           {status === 'loading' && (
             <div>

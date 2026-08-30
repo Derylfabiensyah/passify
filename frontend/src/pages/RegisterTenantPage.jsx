@@ -181,9 +181,6 @@ export default function RegisterTenantPage() {
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 text-decoration-none">
             <span className="text-xl font-extrabold tracking-tight text-[var(--forest-deep)]">passify</span>
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--bark-pale)] text-[var(--bark)]">
-              Partner Onboarding
-            </span>
           </Link>
           <div className="text-xs font-semibold text-[var(--ink-soft)]">
             Sudah punya akun?{' '}
@@ -196,13 +193,13 @@ export default function RegisterTenantPage() {
 
       {/* Main Container */}
       <main className="mx-auto w-full max-w-2xl px-4 py-8 sm:py-12 flex-1">
-        <div className="mb-8 rounded-2xl border border-[var(--border)] bg-[var(--sand)] p-4 sm:p-5">
+        <div className="mb-8 rounded-2xl bg-[var(--leaf-pale)]/60 p-4 sm:p-5 shadow-2xs">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="eyebrow">Partner onboarding</p>
+              <p className="eyebrow">Pendaftaran Wisata</p>
               <p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Siapkan portal wisata Anda dalam tiga langkah.</p>
             </div>
-            <span className="hidden rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)] sm:inline">Langkah {step} dari 3</span>
+            <span className="hidden rounded-lg bg-white/80 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)] shadow-xs sm:inline">Langkah {step} dari 3</span>
           </div>
           <ol className="mt-5 grid grid-cols-3 gap-2">
             {[
@@ -227,9 +224,9 @@ export default function RegisterTenantPage() {
 
         {/* Step 1: Data Akun */}
         {step === 1 && (
-          <div className="rounded-3xl border border-[rgba(23,59,50,0.12)] bg-white p-6 sm:p-10 shadow-sm">
+          <div className="rounded-3xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)]">
             <div className="mb-6">
-              <h1 className="font-serif text-3xl font-bold tracking-tight text-[var(--ink)]">
+              <h1 className="text-3xl font-bold tracking-tight text-[var(--ink)]">
                 Daftarkan Wisata Alam Anda
               </h1>
               <p className="mt-2 text-sm text-[var(--ink-soft)]">
@@ -344,9 +341,9 @@ export default function RegisterTenantPage() {
 
         {/* Step 2: Data Wisata */}
         {step === 2 && (
-          <div className="rounded-3xl border border-[rgba(23,59,50,0.12)] bg-white p-6 sm:p-10 shadow-sm">
+          <div className="rounded-3xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)]">
             <div className="mb-6">
-              <h1 className="font-serif text-3xl font-bold tracking-tight text-[var(--ink)]">
+              <h1 className="text-3xl font-bold tracking-tight text-[var(--ink)]">
                 Identitas Destinasi & Domain
               </h1>
               <p className="mt-2 text-sm text-[var(--ink-soft)]">
@@ -475,12 +472,12 @@ export default function RegisterTenantPage() {
 
         {/* Step 3: Success Confirmation */}
         {step === 3 && (
-          <div className="rounded-3xl border border-[rgba(23,59,50,0.12)] bg-white p-6 sm:p-10 shadow-sm text-center">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+          <div className="rounded-3xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)] text-center">
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-xs">
               <Mail className="h-8 w-8" />
             </div>
 
-            <h1 className="font-serif text-3xl font-bold tracking-tight text-[var(--ink)]">
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--ink)]">
               Periksa Email Anda
             </h1>
             
