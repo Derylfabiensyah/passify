@@ -346,14 +346,18 @@ func (s *ticketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsR
 	}
 
 	orderNum := fmt.Sprintf("TWA-%s-%s", time.Now().Format("20060102"), generateRandomString(4))
+	transactionID := uuid.New()
 	
-	// Dummy platform fee and total
 	var totalAmount float64
 	platformFee := float64(totalQty) * s.cfg.PlatformFeePerTicket
 	
 	var tickets []models.Ticket
 	for _, item := range req.Items {
 		cat, _ := s.repo.GetTicketCategoryByID(item.CategoryID)
+		unitPrice := 0.0
+		if cat != nil {
+			unitPrice = cat.BasePrice
+		}
 		for i := 0; i < item.Quantity; i++ {
 			// Use TOTP package for cryptographically secure secret
 			secret, secretErr := internaltotp.GenerateSecret()
@@ -368,22 +372,46 @@ func (s *ticketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsR
 
 			ticket := models.Ticket{
 				TenantID:      tenantID,
-				TransactionID: uuid.New(),
+				TransactionID: transactionID,
 				DestinationID: req.DestinationID,
 				CategoryID:    item.CategoryID,
 				TimeSlotID:    req.TimeSlotID,
 				TicketCode:    ticketCode,
 				VisitDate:     req.VisitDate,
-				UnitPrice:     cat.BasePrice,
-				Status:        "active",
+				UnitPrice:     unitPrice,
+				Status:        "pending",
 				TOTPSecretKey: secret,
 				QRPayload:     &qrPayload,
 			}
 			tickets = append(tickets, ticket)
-			if cat != nil {
-				totalAmount += cat.BasePrice
-			}
+			totalAmount += unitPrice
 		}
+	}
+
+	grandTotal := totalAmount + platformFee
+	netPayoutAmount := grandTotal - platformFee
+
+	txRecord := &models.Transaction{
+		BaseModel: models.BaseModel{
+			ID: transactionID,
+		},
+		TenantID:         tenantID,
+		UserID:           userID,
+		OrderNumber:      orderNum,
+		VisitDate:        req.VisitDate,
+		TimeSlotID:       req.TimeSlotID,
+		DestinationID:    req.DestinationID,
+		VisitorCount:     totalQty,
+		Subtotal:         totalAmount,
+		PlatformFee:      s.cfg.PlatformFeePerTicket,
+		TotalPlatformFee: platformFee,
+		GrandTotal:       grandTotal,
+		NetPayoutAmount:  netPayoutAmount,
+		PaymentStatus:    "pending",
+	}
+
+	if err := s.repo.CreateTransaction(txRecord); err != nil {
+		return nil, fmt.Errorf("failed to create transaction: %w", err)
 	}
 	
 	if err := s.repo.CreateTickets(tickets); err != nil {
@@ -393,12 +421,12 @@ func (s *ticketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsR
 	s.repo.IncrementBookedQuota(dq.ID, totalQty)
 	
 	return &BookingResponse{
-		TransactionID: uuid.New(),
+		TransactionID: transactionID,
 		OrderNumber:   orderNum,
 		Tickets:       tickets,
 		TotalAmount:   totalAmount,
 		PlatformFee:   platformFee,
-		GrandTotal:    totalAmount + platformFee,
+		GrandTotal:    grandTotal,
 	}, nil
 }
 

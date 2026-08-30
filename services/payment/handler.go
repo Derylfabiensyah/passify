@@ -57,6 +57,22 @@ func (h *PaymentHandler) HandleCreateInvoice(c *gin.Context) {
 	response.OK(c, "Invoice payment berhasil dibuat", res)
 }
 
+// HandleMidtransWebhook handles POST /webhooks/midtrans
+func (h *PaymentHandler) HandleMidtransWebhook(c *gin.Context) {
+	var req MidtransNotificationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Format data notifikasi Midtrans tidak valid", err.Error())
+		return
+	}
+
+	if err := h.service.HandleMidtransNotification(req); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.OK(c, "Notifikasi Midtrans berhasil diproses", nil)
+}
+
 // HandlePaymentWebhook handles POST /webhooks/payment
 func (h *PaymentHandler) HandlePaymentWebhook(c *gin.Context) {
 	if h.cfg.XenditWebhookToken != "" {

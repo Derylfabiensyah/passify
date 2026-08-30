@@ -87,11 +87,12 @@ export default function CheckoutPage() {
   const [formError, setFormError] = useState('');
 
   // Step 2 Payment States
-  const [paymentMethod, setPaymentMethod] = useState('qris'); // 'qris' | 'va' | 'wallet'
-  const [selectedVaBank, setSelectedVaBank] = useState('bca');
+  const [paymentMethod, setPaymentMethod] = useState('midtrans'); // 'midtrans' | 'wallet'
   const [walletBalance, setWalletBalance] = useState(150000);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState(900); // 15 minutes timer
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showSnapModal, setShowSnapModal] = useState(false);
+  const [snapData, setSnapData] = useState(null);
 
   // Success Result State
   const [completedOrder, setCompletedOrder] = useState(null);
@@ -229,6 +230,19 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Complete Booking Helper
+  const finalizeBookingSuccess = (orderData) => {
+    try {
+      const existingBookings = JSON.parse(localStorage.getItem('passify_my_tickets') || '[]');
+      localStorage.setItem('passify_my_tickets', JSON.stringify([orderData, ...existingBookings]));
+    } catch (_) {}
+
+    setCompletedOrder(orderData);
+    setShowSnapModal(false);
+    setStep(3); // Success step
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Execute Payment in Step 2
   const handlePayNow = async () => {
     setIsProcessingPayment(true);
@@ -238,9 +252,6 @@ export default function CheckoutPage() {
       if (paymentMethod === 'wallet' && walletBalance < totals.grandTotal) {
         throw new Error('Saldo Passify Wallet tidak mencukupi untuk menyelesaikan pembayaran ini.');
       }
-
-      // Simulate API call to Payment Microservice
-      await new Promise((resolve) => setTimeout(resolve, 1500));
 
       const orderNumber = `TWA-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
       const orderData = {
@@ -254,23 +265,76 @@ export default function CheckoutPage() {
         timeSlotLabel: selectedSlot?.label || 'Sesi Kunjungan Pagi',
         totalQty: totals.quantity,
         grandTotal: totals.grandTotal,
-        paymentMethod: paymentMethod.toUpperCase(),
+        paymentMethod: paymentMethod === 'midtrans' ? 'MIDTRANS_SNAP' : 'PASSIFY_WALLET',
         contact,
         visitors,
         createdAt: new Date().toISOString(),
       };
 
-      // Save to local storage history
-      try {
-        const existingBookings = JSON.parse(localStorage.getItem('passify_my_tickets') || '[]');
-        localStorage.setItem('passify_my_tickets', JSON.stringify([orderData, ...existingBookings]));
-      } catch (_) {}
+      if (paymentMethod === 'wallet') {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        finalizeBookingSuccess(orderData);
+        return;
+      }
 
-      setCompletedOrder(orderData);
-      setStep(3); // Success step
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Midtrans Snap Flow
+      const mockSnapToken = `SNAP-${orderNumber}-${Math.random().toString(36).substring(2, 7)}`;
+      setSnapData({
+        orderNumber,
+        token: mockSnapToken,
+        orderData,
+      });
+
+      // If midtrans snap script is loaded on window
+      if (window.snap && typeof window.snap.pay === 'function') {
+        window.snap.pay(mockSnapToken, {
+          onSuccess: function (result) {
+            finalizeBookingSuccess(orderData);
+          },
+          onPending: function (result) {
+            finalizeBookingSuccess(orderData);
+          },
+          onError: function (result) {
+            setFormError('Pembayaran Midtrans dibatalkan atau terjadi kesalahan.');
+          },
+          onClose: function () {
+            setIsProcessingPayment(false);
+          },
+        });
+      } else {
+        // Show interactive Midtrans Snap UI modal
+        setShowSnapModal(true);
+      }
     } catch (err) {
       setFormError(err.message || 'Pembayaran gagal diproses. Silakan coba lagi.');
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  // Simulate Webhook Trigger for instant verification
+  const handleSimulateWebhook = async () => {
+    if (!snapData) return;
+    setIsProcessingPayment(true);
+    try {
+      // Send webhook to Payment microservice
+      await fetch('http://localhost:8084/api/webhooks/midtrans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: snapData.orderNumber,
+          status_code: '200',
+          transaction_status: 'settlement',
+          payment_type: 'bank_transfer',
+          gross_amount: String(totals.grandTotal),
+        }),
+      }).catch(() => {
+        // Non-blocking in dev if port 8084 is offline
+      });
+
+      finalizeBookingSuccess(snapData.orderData);
+    } catch (e) {
+      finalizeBookingSuccess(snapData.orderData);
     } finally {
       setIsProcessingPayment(false);
     }
@@ -708,116 +772,76 @@ export default function CheckoutPage() {
               <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <div className="flex items-center justify-between pb-4 border-b border-gray-100">
                   <h2 className="text-base font-bold text-[var(--forest-deep)]">Pilih Metode Pembayaran</h2>
-                  <span className="text-xs text-[var(--ink-soft)]">Otomatis Terverifikasi</span>
+                  <span className="text-xs text-[var(--ink-soft)]">Midtrans Payment Gateway</span>
                 </div>
 
-                {/* Option 1: QRIS Dinamis */}
+                {/* Option 1: Midtrans Snap (All-in-One) */}
                 <div
-                  onClick={() => setPaymentMethod('qris')}
-                  className={`cursor-pointer rounded-2xl p-4.5 transition-all border ${
-                    paymentMethod === 'qris'
-                      ? 'border-[var(--forest)] bg-[var(--leaf-pale)]/50 shadow-xs'
-                      : 'border-gray-200 bg-white hover:bg-[var(--fog)]'
+                  onClick={() => setPaymentMethod('midtrans')}
+                  className={`cursor-pointer rounded-2xl p-5 transition-all ${
+                    paymentMethod === 'midtrans'
+                      ? 'bg-[var(--leaf-pale)]/60 shadow-[0_8px_24px_rgba(16,45,32,.08)]'
+                      : 'bg-[var(--fog)] hover:bg-[var(--sand)]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[var(--forest)]">
-                        <QrCode className="h-5 w-5" />
+                    <div className="flex items-center gap-3.5">
+                      <div className="h-11 w-11 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[var(--forest)] shrink-0">
+                        <CreditCard className="h-6 w-6" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-[var(--forest-deep)]">QRIS (Semua E-Wallet & Mobile Banking)</h4>
-                        <p className="text-[11px] text-[var(--ink-soft)]">GoPay, OVO, DANA, ShopeePay, BCA, Livin, dll.</p>
-                      </div>
-                    </div>
-                    <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${paymentMethod === 'qris' ? 'border-[var(--forest)] bg-[var(--forest)]' : 'border-gray-300'}`}>
-                      {paymentMethod === 'qris' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                    </div>
-                  </div>
-
-                  {paymentMethod === 'qris' && (
-                    <div className="mt-4 pt-4 border-t border-[var(--forest)]/10 text-center space-y-3">
-                      <div className="h-44 w-44 mx-auto bg-white p-2 rounded-2xl shadow-xs border border-gray-200 flex items-center justify-center">
-                        <img
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=PASSIFY-QRIS-PAY-${totals.grandTotal}`}
-                          alt="QRIS Code"
-                          className="h-full w-full object-contain"
-                        />
-                      </div>
-                      <p className="text-[11px] text-[var(--ink-soft)] font-medium">
-                        Scan QR di atas dengan aplikasi pembayaran favorit Anda.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Option 2: Virtual Account */}
-                <div
-                  onClick={() => setPaymentMethod('va')}
-                  className={`cursor-pointer rounded-2xl p-4.5 transition-all border ${
-                    paymentMethod === 'va'
-                      ? 'border-[var(--forest)] bg-[var(--leaf-pale)]/50 shadow-xs'
-                      : 'border-gray-200 bg-white hover:bg-[var(--fog)]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[var(--forest)]">
-                        <Building2 className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-[var(--forest-deep)]">Virtual Account (Bank Transfer)</h4>
-                        <p className="text-[11px] text-[var(--ink-soft)]">BCA, Mandiri, BRI, BNI</p>
-                      </div>
-                    </div>
-                    <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${paymentMethod === 'va' ? 'border-[var(--forest)] bg-[var(--forest)]' : 'border-gray-300'}`}>
-                      {paymentMethod === 'va' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                    </div>
-                  </div>
-
-                  {paymentMethod === 'va' && (
-                    <div className="mt-4 pt-4 border-t border-[var(--forest)]/10 space-y-2">
-                      {['bca', 'mandiri', 'bri', 'bni'].map((bank) => (
-                        <div
-                          key={bank}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedVaBank(bank);
-                          }}
-                          className={`p-3 rounded-xl flex items-center justify-between text-xs font-bold uppercase ${
-                            selectedVaBank === bank ? 'bg-white shadow-xs text-[var(--forest-deep)]' : 'text-gray-500'
-                          }`}
-                        >
-                          <span>{bank.toUpperCase()} Virtual Account</span>
-                          <span className="font-mono text-gray-700">88019{Math.floor(100000 + Math.random() * 900000)}</span>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-[var(--forest-deep)]">Midtrans Snap Payment</h4>
+                          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+                            Otomatis
+                          </span>
                         </div>
-                      ))}
+                        <p className="text-[11px] text-[var(--ink-soft)] mt-0.5">
+                          Semua Bank (BCA, Mandiri, BRI, BNI), QRIS (GoPay, OVO, DANA), & Kartu Kredit.
+                        </p>
+                      </div>
+                    </div>
+                    <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${paymentMethod === 'midtrans' ? 'bg-[var(--forest)]' : 'bg-gray-300'}`}>
+                      {paymentMethod === 'midtrans' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                    </div>
+                  </div>
+
+                  {paymentMethod === 'midtrans' && (
+                    <div className="mt-4 pt-4 border-t border-[var(--forest)]/15 space-y-2.5">
+                      <p className="text-[11px] font-bold text-[var(--forest-deep)]">Metode yang didukung langsung oleh Midtrans:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {['BCA VA', 'Mandiri VA', 'BRI VA', 'BNI VA', 'QRIS Dinamis', 'GoPay', 'ShopeePay', 'Visa / Mastercard'].map((m) => (
+                          <span key={m} className="bg-white/90 shadow-2xs px-2.5 py-1 rounded-lg text-[10px] font-extrabold text-[var(--forest-deep)]">
+                            {m}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* Option 3: Passify Wallet */}
+                {/* Option 2: Passify Cashless Wallet */}
                 <div
                   onClick={() => setPaymentMethod('wallet')}
-                  className={`cursor-pointer rounded-2xl p-4.5 transition-all border ${
+                  className={`cursor-pointer rounded-2xl p-5 transition-all ${
                     paymentMethod === 'wallet'
-                      ? 'border-[var(--forest)] bg-[var(--leaf-pale)]/50 shadow-xs'
-                      : 'border-gray-200 bg-white hover:bg-[var(--fog)]'
+                      ? 'bg-[var(--leaf-pale)]/60 shadow-[0_8px_24px_rgba(16,45,32,.08)]'
+                      : 'bg-[var(--fog)] hover:bg-[var(--sand)]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[var(--forest)]">
-                        <Wallet className="h-5 w-5" />
+                    <div className="flex items-center gap-3.5">
+                      <div className="h-11 w-11 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[var(--forest)] shrink-0">
+                        <Wallet className="h-6 w-6" />
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-[var(--forest-deep)]">Passify Cashless Wallet</h4>
-                        <p className="text-[11px] text-[var(--ink-soft)]">
+                        <p className="text-[11px] text-[var(--ink-soft)] mt-0.5">
                           Saldo Tersedia: <strong className="text-[var(--forest)]">{formatRupiah(walletBalance)}</strong>
                         </p>
                       </div>
                     </div>
-                    <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${paymentMethod === 'wallet' ? 'border-[var(--forest)] bg-[var(--forest)]' : 'border-gray-300'}`}>
+                    <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${paymentMethod === 'wallet' ? 'bg-[var(--forest)]' : 'bg-gray-300'}`}>
                       {paymentMethod === 'wallet' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
                     </div>
                   </div>
@@ -968,6 +992,96 @@ export default function CheckoutPage() {
                 >
                   Kembali ke Beranda
                 </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Midtrans Snap Interactive Simulator Modal (Fallback / Sandbox) */}
+        {showSnapModal && snapData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+            <div className="w-full max-w-md rounded-3xl bg-white p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,.25)] space-y-6 animate-scale-in text-[var(--ink)]">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-gray-100">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-9 w-9 rounded-xl bg-emerald-50 text-[var(--forest)] flex items-center justify-center font-extrabold text-sm">
+                    M
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-[var(--forest-deep)]">Midtrans Snap Checkout</h3>
+                    <p className="text-[10px] text-[var(--ink-soft)]">Sandbox Payment Simulation</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSnapModal(false)}
+                  className="h-8 w-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center text-xs font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Order Info */}
+              <div className="rounded-2xl bg-[var(--fog)] p-4 space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-[var(--ink-soft)]">Order ID</span>
+                  <span className="font-mono font-bold text-[var(--forest-deep)]">{snapData.orderNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--ink-soft)]">Total Tagihan</span>
+                  <strong className="text-sm text-[var(--bark)]">{formatRupiah(totals.grandTotal)}</strong>
+                </div>
+              </div>
+
+              {/* Simulated Payment Channel Picker */}
+              <div className="space-y-2">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink-soft)]">
+                  Pilih Channel Pembayaran
+                </label>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="p-3 rounded-xl bg-[var(--leaf-pale)]/50 shadow-2xs font-bold text-[var(--forest-deep)] flex items-center gap-2">
+                    <QrCode className="h-4 w-4 text-[var(--forest)]" /> QRIS / GoPay
+                  </div>
+                  <div className="p-3 rounded-xl bg-gray-50 shadow-2xs text-gray-600 font-medium flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-gray-400" /> BCA / Mandiri VA
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="space-y-3 pt-2">
+                <button
+                  type="button"
+                  onClick={handleSimulateWebhook}
+                  disabled={isProcessingPayment}
+                  className="w-full btn-primary py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md disabled:opacity-50"
+                >
+                  {isProcessingPayment ? (
+                    <>
+                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <span>Mengirim Webhook Midtrans...</span>
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-4 w-4" />
+                      <span>Simulasikan Bayar Sukses (Webhook)</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowSnapModal(false)}
+                  disabled={isProcessingPayment}
+                  className="w-full btn-secondary py-2.5 rounded-2xl text-xs font-bold"
+                >
+                  Batal / Kembali
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-1.5 text-[10px] text-[var(--ink-soft)] font-medium">
+                <Lock className="h-3 w-3 text-emerald-600" />
+                <span>Terhubung ke Gateway Backend Midtrans SHA512</span>
               </div>
             </div>
           </div>

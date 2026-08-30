@@ -23,6 +23,8 @@ type TicketRepository interface {
 	ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error)
 	GetOrCreateSlotQuota(dailyQuotaID, timeSlotID, tenantID uuid.UUID) (*models.SlotQuota, error)
 	IncrementSlotBookedQuota(slotQuotaID uuid.UUID, count int) error
+	CreateTransaction(tx *models.Transaction) error
+	GetTransactionByID(id uuid.UUID) (*models.Transaction, error)
 	CreateTicket(ticket *models.Ticket) error
 	CreateTickets(tickets []models.Ticket) error
 	GetTicketByID(id uuid.UUID) (*models.Ticket, error)
@@ -125,6 +127,18 @@ func (r *ticketRepository) GetOrCreateSlotQuota(dailyQuotaID, timeSlotID, tenant
 func (r *ticketRepository) IncrementSlotBookedQuota(slotQuotaID uuid.UUID, count int) error {
 	return r.db.Model(&models.SlotQuota{}).Where("id = ?", slotQuotaID).
 		UpdateColumn("booked_quota", gorm.Expr("booked_quota + ?", count)).Error
+}
+
+func (r *ticketRepository) CreateTransaction(tx *models.Transaction) error {
+	return r.db.Create(tx).Error
+}
+
+func (r *ticketRepository) GetTransactionByID(id uuid.UUID) (*models.Transaction, error) {
+	var tx models.Transaction
+	if err := r.db.Preload("User").Preload("Destination").Preload("Tickets").First(&tx, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &tx, nil
 }
 
 func (r *ticketRepository) CreateTicket(ticket *models.Ticket) error {

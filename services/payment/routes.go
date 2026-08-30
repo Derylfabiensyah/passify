@@ -8,9 +8,11 @@ import (
 
 // RegisterRoutes registers all payment service endpoints
 func RegisterRoutes(router *gin.RouterGroup, handler *PaymentHandler, jwtSecret string) {
-	// Public routes (validated via webhook token, not JWT)
+	// Public routes (validated via webhook token/signature, not JWT)
 	webhooks := router.Group("/webhooks")
 	{
+		webhooks.POST("/midtrans", handler.HandleMidtransWebhook)
+		webhooks.POST("/midtrans/notification", handler.HandleMidtransWebhook)
 		webhooks.POST("/payment", handler.HandlePaymentWebhook)
 		webhooks.POST("/payout", handler.HandlePayoutWebhook)
 	}

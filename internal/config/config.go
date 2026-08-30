@@ -36,6 +36,7 @@ type Config struct {
 	XenditWebhookToken  string
 	MidtransServerKey   string
 	MidtransClientKey   string
+	MidtransIsProduction bool
 
 	// Platform Fee
 	PlatformFeePerTicket float64
@@ -129,8 +130,9 @@ func Load() (*Config, error) {
 		PaymentGateway:     getEnv("PAYMENT_GATEWAY", "xendit"),
 		XenditSecretKey:    getEnv("XENDIT_SECRET_KEY", ""),
 		XenditWebhookToken: getEnv("XENDIT_WEBHOOK_TOKEN", ""),
-		MidtransServerKey:  getEnv("MIDTRANS_SERVER_KEY", ""),
-		MidtransClientKey:  getEnv("MIDTRANS_CLIENT_KEY", ""),
+		MidtransServerKey:    getEnv("MIDTRANS_SERVER_KEY", ""),
+		MidtransClientKey:    getEnv("MIDTRANS_CLIENT_KEY", ""),
+		MidtransIsProduction: getEnvBool("MIDTRANS_IS_PRODUCTION", false),
 
 		PlatformFeePerTicket: getEnvFloat("PLATFORM_FEE_PER_TICKET", 2500),
 
@@ -164,6 +166,15 @@ func getEnvFloat(key string, defaultVal float64) float64 {
 	if val, ok := os.LookupEnv(key); ok {
 		if floatVal, err := strconv.ParseFloat(val, 64); err == nil {
 			return floatVal
+		}
+	}
+	return defaultVal
+}
+
+func getEnvBool(key string, defaultVal bool) bool {
+	if val, ok := os.LookupEnv(key); ok {
+		if boolVal, err := strconv.ParseBool(val); err == nil {
+			return boolVal
 		}
 	}
 	return defaultVal

@@ -50,9 +50,15 @@ func main() {
 		})
 	})
 
-	// Register payment service routes under /api/v1/payments
+	// Register payment service routes under /api/v1/payments and /api/payments
 	apiGroup := router.Group("/api/v1/payments")
 	payment.RegisterRoutes(apiGroup, paymentHandler, cfg.JWT.Secret)
+
+	apiGroupV2 := router.Group("/api/payments")
+	payment.RegisterRoutes(apiGroupV2, paymentHandler, cfg.JWT.Secret)
+
+	rootGroup := router.Group("")
+	payment.RegisterRoutes(rootGroup, paymentHandler, cfg.JWT.Secret)
 
 	// Start server on cfg.PaymentServicePort
 	port := cfg.PaymentServicePort
