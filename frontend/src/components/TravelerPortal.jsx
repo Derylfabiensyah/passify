@@ -169,9 +169,37 @@ export default function TravelerPortal() {
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               {(destination.ticket_categories || []).map((cat) => {
                 const total = Number(cat.price || 0) + Number(cat.insurance || 0) + Number(cat.retribusi || 0);
-                return <article key={cat.id} className="card group flex min-h-[242px] flex-col justify-between p-5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]">
-                  <div><span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><Ticket className="h-3 w-3" />E-ticket resmi</span><h3 className="mt-4 text-xl font-bold leading-snug">{cat.name}</h3><dl className="mt-4 space-y-1.5 text-xs text-[var(--ink-soft)]"><div className="flex justify-between gap-3"><dt>Tarif masuk</dt><dd className="font-semibold text-[var(--ink)]">{formatRupiah(cat.price)}</dd></div>{Number(cat.insurance) > 0 && <div className="flex justify-between gap-3"><dt>Asuransi</dt><dd>{formatRupiah(cat.insurance)}</dd></div>}{Number(cat.retribusi) > 0 && <div className="flex justify-between gap-3"><dt>Retribusi kawasan</dt><dd>{formatRupiah(cat.retribusi)}</dd></div>}</dl></div>
-                  <div className="mt-5 flex items-end justify-between gap-3 border-t border-[var(--border)] pt-4"><div><span className="block text-[10px] font-bold uppercase tracking-wide text-[var(--ink-muted)]">Total per orang</span><strong className="mt-1 block font-serif text-xl text-[var(--bark)]">{formatRupiah(total)}</strong></div><button type="button" onClick={handleBookNowClick} className="btn-primary btn-sm">Pilih<ChevronRight className="h-3.5 w-3.5" /></button></div>
+                return <article key={cat.id} className="card group flex min-h-[220px] flex-col justify-between p-5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]">
+                  <div>
+                    <h3 className="text-xl font-bold leading-snug">{cat.name}</h3>
+                    <dl className="mt-4 space-y-1.5 text-xs text-[var(--ink-soft)]">
+                      <div className="flex justify-between gap-3">
+                        <dt>Tarif masuk</dt>
+                        <dd className="font-semibold text-[var(--ink)]">{formatRupiah(cat.price)}</dd>
+                      </div>
+                      {Number(cat.insurance) > 0 && (
+                        <div className="flex justify-between gap-3">
+                          <dt>Asuransi</dt>
+                          <dd>{formatRupiah(cat.insurance)}</dd>
+                        </div>
+                      )}
+                      {Number(cat.retribusi) > 0 && (
+                        <div className="flex justify-between gap-3">
+                          <dt>Retribusi kawasan</dt>
+                          <dd>{formatRupiah(cat.retribusi)}</dd>
+                        </div>
+                      )}
+                    </dl>
+                  </div>
+                  <div className="mt-5 flex items-end justify-between gap-3 border-t border-[var(--border)] pt-4">
+                    <div>
+                      <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Total per orang</span>
+                      <strong className="mt-1 block text-xl font-extrabold text-[var(--bark)]">{formatRupiah(total)}</strong>
+                    </div>
+                    <button type="button" onClick={handleBookNowClick} className="btn-primary btn-sm rounded-xl">
+                      Pilih <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </article>;
               })}
             </div>
