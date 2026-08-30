@@ -64,10 +64,13 @@ export default function LandingPage() {
             <div className="max-w-[780px]">
               <Eyebrow className="!text-[var(--leaf)]">Untuk pengelola kawasan yang ingin menjaga ritme</Eyebrow>
               <h1 className="mt-5 max-w-[760px] font-sans text-[clamp(2.7rem,6.4vw,5.9rem)] font-bold leading-[.93] tracking-[-.06em] text-white">Alam memberi batas.<br />Operasi memberi kepastian.</h1>
-              <p className="mt-7 max-w-[590px] text-[15px] leading-7 text-white/80 sm:text-[17px] sm:leading-8">Passify menyatukan tiket, daya dukung, gerbang, dan arus dana dalam satu sistem yang tetap bekerja saat hari di lapangan tidak berjalan sempurna.</p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">Daftarkan wisata Anda <ArrowRight className="h-4 w-4" /></Link>
-                <Link to="/jelajah" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white/90 transition-colors hover:bg-white/10 hover:text-white">Jelajahi portal wisatawan <ChevronRight className="h-4 w-4" /></Link>
+                <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
+                  Daftarkan wisata Anda <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link to="/jelajah" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/12 text-white hover:bg-white/20">
+                  Jelajahi portal wisatawan <ChevronRight className="h-4 w-4" />
+                </Link>
               </div>
               <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/20 pt-5 text-xs font-semibold text-white/75"><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Kuota per sesi</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Gerbang siap offline</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Payout terlacak</span></div>
             </div>
@@ -183,7 +186,14 @@ export default function LandingPage() {
         </section>
 
         <section id="contact" className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-          <div className="relative isolate overflow-hidden rounded-[2rem] bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]"><img src={trailImage} alt="Jalur hutan yang tenang" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-42 saturate-[.55]" /><div aria-hidden="true" className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.97), rgba(16,45,32,.74), rgba(16,45,32,.40))' }} /><div className="grid min-h-[390px] items-end px-7 py-9 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14"><div className="max-w-xl"><Eyebrow className="!text-[var(--leaf)]">Mulai dari kebutuhan kawasan Anda</Eyebrow><h2 className="mt-4 text-4xl font-bold leading-[.96] text-white sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2><p className="mt-5 text-sm leading-6 text-white/75 sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><Link to="/daftar-wisata" className="btn-clay px-5 py-3.5 text-sm">Daftarkan wisata <ArrowRight className="h-4 w-4" /></Link><a href="mailto:hello@passify.id" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white/15 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-white/25">Bicarakan kebutuhan <ArrowUpRight className="h-4 w-4" /></a></div></div></div></div>
+          <div className="relative isolate overflow-hidden rounded-[2rem] bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]"><img src={trailImage} alt="Jalur hutan yang tenang" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-42 saturate-[.55]" /><div aria-hidden="true" className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.97), rgba(16,45,32,.74), rgba(16,45,32,.40))' }} /><div className="grid min-h-[390px] items-end px-7 py-9 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14"><div className="max-w-xl"><Eyebrow className="!text-[var(--leaf)]">Mulai dari kebutuhan kawasan Anda</Eyebrow><h2 className="mt-4 text-4xl font-bold leading-[.96] text-white sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2><p className="mt-5 text-sm leading-6 text-white/75 sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p>                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
+                    Daftarkan wisata <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <a href="mailto:hello@passify.id" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/15 text-white hover:bg-white/25">
+                    Bicarakan kebutuhan <ArrowUpRight className="h-4 w-4" />
+                  </a>
+                </div></div></div></div>
         </section>
       </main>
 
