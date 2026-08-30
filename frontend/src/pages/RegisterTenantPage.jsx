@@ -427,10 +427,9 @@ export default function RegisterTenantPage() {
 
               {/* Preview Card */}
               {formData.subdomain && (
-                <div className="rounded-2xl border border-[rgba(23,59,50,0.1)] bg-[var(--fog)]/60 p-4">
-                  <div className="flex items-center justify-between text-[11px] font-bold text-[var(--ink-soft)] uppercase tracking-wider mb-2">
-                    <span>Pratinjau Alamat Website</span>
-                    <Sparkles className="h-3.5 w-3.5 text-[var(--clay)]" />
+                <div className="rounded-2xl bg-[var(--leaf-pale)]/60 p-4 shadow-2xs">
+                  <div className="text-[11px] font-extrabold text-[var(--forest-deep)] uppercase tracking-wider mb-1.5">
+                    Pratinjau Alamat Website
                   </div>
                   <div className="flex items-center gap-2 text-sm font-bold text-[var(--forest-deep)] font-mono">
                     <span>https://{formData.subdomain.trim() || 'nama-wisata'}.passify.id</span>
@@ -446,7 +445,7 @@ export default function RegisterTenantPage() {
                   type="button"
                   onClick={() => setStep(1)}
                   disabled={isSubmitting}
-                  className="flex-1 flex items-center justify-center gap-2 rounded-xl border border-[rgba(23,59,50,0.18)] bg-white px-5 py-3 text-sm font-bold text-[var(--ink)] hover:bg-gray-50 transition-all disabled:opacity-50 cursor-pointer"
+                  className="flex-1 btn-secondary rounded-xl px-5 py-3 text-sm font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                 >
                   <ArrowLeft className="h-4 w-4" /> Kembali
                 </button>
