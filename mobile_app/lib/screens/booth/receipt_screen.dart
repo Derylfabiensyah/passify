@@ -90,7 +90,10 @@ class ReceiptScreen extends StatelessWidget {
                             ),
                           ),
                           const Divider(height: 28, color: AppColors.border),
-                          _buildReceiptRow('No. Transaksi', txId.toString().substring(0, 18)),
+                          _buildReceiptRow(
+                            'No. Transaksi',
+                            txId.toString().length > 18 ? txId.toString().substring(0, 18) : txId.toString(),
+                          ),
                           const SizedBox(height: 8),
                           _buildReceiptRow('Waktu', DateFormat('dd MMM yyyy, HH:mm:ss').format(DateTime.now())),
                           const SizedBox(height: 8),
@@ -128,12 +131,17 @@ class ReceiptScreen extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(label, style: const TextStyle(fontSize: 13, color: AppColors.inkSoft)),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: isHighlight ? FontWeight.bold : FontWeight.w600,
-            color: isHighlight ? AppColors.forest : AppColors.ink,
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: isHighlight ? FontWeight.bold : FontWeight.w600,
+              color: isHighlight ? AppColors.forest : AppColors.ink,
+            ),
           ),
         ),
       ],
