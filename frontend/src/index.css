@@ -158,19 +158,24 @@
   .btn-secondary:hover { background: var(--leaf-pale); }
   .btn-clay { border: none; background: var(--bark); color: white; box-shadow: 0 7px 18px rgba(138, 86, 56, .16); }
   .btn-clay:hover { background: #71452f; transform: translateY(-1px); }
-  .btn-sm { min-height: 2.25rem; padding: .45rem .78rem; font-size: .75rem; }
   .field-control {
     min-height: 2.75rem;
     width: 100%;
-    border: 1px solid var(--border);
+    border: none;
     border-radius: .75rem;
-    background: var(--bg-input);
+    background: var(--canvas);
     color: var(--ink);
-    padding: .65rem .8rem;
+    padding: .65rem .85rem;
     font-size: .875rem;
-    transition: background .16s ease, border-color .16s ease, box-shadow .16s ease;
+    box-shadow: 0 1px 3px rgba(16, 45, 32, .08), 0 1px 2px rgba(16, 45, 32, .04);
+    transition: background .16s ease, box-shadow .16s ease;
   }
-  .field-control:focus { border-color: var(--forest-soft); background: white; box-shadow: 0 0 0 3px rgba(156, 189, 114, .3); outline: none; }
+  .field-control:focus {
+    border: none;
+    background: white;
+    box-shadow: 0 0 0 2px var(--forest-soft), 0 6px 18px rgba(16, 45, 32, .08);
+    outline: none;
+  }
   .modal-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: flex-end; justify-content: center; padding: .75rem; background: rgba(16, 45, 32, .56); backdrop-filter: blur(6px); }
   .modal-content { width: 100%; max-height: calc(100vh - 1.5rem); overflow-y: auto; border-radius: 1.5rem 1.5rem 1rem 1rem; box-shadow: var(--shadow-lift); }
   @media (min-width: 640px) { .modal-overlay { align-items: center; padding: 1.5rem; } .modal-content { max-height: 88vh; border-radius: 1.5rem; } }

@@ -231,7 +231,7 @@ export default function TravelerAuthPage({ mode }) {
         </section>
 
         {/* Right Side Form Card */}
-        <section className="order-1 card bg-white p-6 shadow-sm rounded-3xl sm:p-8 lg:order-2 space-y-5">
+        <section className="order-1 bg-white p-6 shadow-[0_16px_40px_rgba(16,45,32,.08)] rounded-3xl sm:p-8 lg:order-2 space-y-5">
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--bark)]">
               {isLogin ? 'Autentikasi Akun' : 'Registrasi Wisatawan'}
@@ -297,7 +297,7 @@ export default function TravelerAuthPage({ mode }) {
                 id="login-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-sm disabled:opacity-60 cursor-pointer"
+                className="btn-primary w-full py-3.5 rounded-xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-sm disabled:opacity-60 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -386,7 +386,7 @@ export default function TravelerAuthPage({ mode }) {
                 id="register-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full py-3.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-sm disabled:opacity-60 cursor-pointer"
+                className="btn-primary w-full py-3.5 rounded-xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-sm disabled:opacity-60 cursor-pointer"
               >
                 {loading ? (
                   <>
