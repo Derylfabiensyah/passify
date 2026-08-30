@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { TenantProvider, useTenant } from './contexts/TenantContext';
+import { ToastProvider } from './contexts/ToastContext';
 import LandingPage from './components/LandingPage';
 import TravelerPortal from './components/TravelerPortal';
 import TenantPortal from './components/TenantPortal';
@@ -101,9 +102,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <TenantProvider>
-        <AppRoutes />
-      </TenantProvider>
+      <ToastProvider>
+        <TenantProvider>
+          <AppRoutes />
+        </TenantProvider>
+      </ToastProvider>
     </ErrorBoundary>
   );
 }

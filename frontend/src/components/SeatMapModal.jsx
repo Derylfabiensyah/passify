@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Lock, AlertCircle, Sparkles } from 'lucide-react';
+import { useToast } from '../contexts/ToastContext';
 
 /**
  * SeatMapModal - Interactive seat selection component with live seat lock timer.
  * Supports VIP, Tribune, and General Admission seating tiers.
  */
 export default function SeatMapModal({ isOpen, onClose, destinationId, onSeatsSelected }) {
+  const { toast } = useToast();
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [activeZone, setActiveZone] = useState('VIP Area');
   const [countdown, setCountdown] = useState(300); // 5 min lock timer
@@ -45,7 +47,7 @@ export default function SeatMapModal({ isOpen, onClose, destinationId, onSeatsSe
         return prev.filter(s => s.code !== seatCode);
       }
       if (prev.length >= 6) {
-        alert('Maksimal 6 kursi per reservasi.');
+        toast.warning('Maksimal 6 kursi per reservasi.');
         return prev;
       }
       return [...prev, { code: seatCode, zone: currentZone.badge, price: currentZone.price }];

@@ -13,10 +13,12 @@ import {
   X
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useToast } from '../contexts/ToastContext';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083';
 
 export default function ETicketModal({ order, onClose }) {
+  const { toast } = useToast();
   const [qrData, setQrData] = useState(null);
   const [secondsLeft, setSecondsLeft] = useState(600); // 10 minutes default
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -211,7 +213,7 @@ export default function ETicketModal({ order, onClose }) {
           {/* PDF Invoice / Booking Voucher Download (No static QR) */}
           <button
             type="button"
-            onClick={() => alert(`Mengunduh Dokumen Invoice & Bukti Reservasi Resmi #${order.orderNumber}...`)}
+            onClick={() => toast.success(`Mengunduh Dokumen Invoice & Bukti Reservasi Resmi #${order.orderNumber}...`)}
             className="w-full btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold"
           >
             <FileText className="h-4 w-4" /> Unduh Invoice / Bukti Reservasi

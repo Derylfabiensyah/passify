@@ -23,6 +23,7 @@ import {
   Users
 } from 'lucide-react';
 import ETicketModal from '../components/ETicketModal';
+import { useToast } from '../contexts/ToastContext';
 
 const DEFAULT_SAMPLE_TICKETS = [
   {
@@ -71,6 +72,7 @@ function formatRupiah(num) {
 }
 
 export default function BookingHistoryPage() {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'active' | 'used' | 'expired'
@@ -396,7 +398,7 @@ export default function BookingHistoryPage() {
                     {/* Secondary Action */}
                     <button
                       type="button"
-                      onClick={() => alert(`Mengunduh Dokumen Invoice & Bukti Reservasi Resmi #${ticket.orderNumber}...`)}
+                      onClick={() => toast.success(`Mengunduh Dokumen Invoice & Bukti Reservasi Resmi #${ticket.orderNumber}...`)}
                       className="w-full text-center text-[11px] font-bold text-[var(--ink-soft)] hover:text-[var(--forest)] py-1 flex items-center justify-center gap-1.5"
                     >
                       <Download className="h-3.5 w-3.5" /> Unduh Invoice / Bukti Reservasi (PDF)
