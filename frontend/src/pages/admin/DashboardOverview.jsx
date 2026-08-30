@@ -382,10 +382,6 @@ export default function DashboardOverview() {
               Powered by Chart.js — Pemantauan pintu masuk & keluar real-time
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 shadow-2xs self-start sm:self-auto">
-            <Activity className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Live Gate Telemetry</span>
-          </span>
         </div>
 
         <div className="h-64 sm:h-72 w-full">
