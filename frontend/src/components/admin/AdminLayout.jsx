@@ -4,7 +4,8 @@ import {
   Bell, CalendarClock, ChevronLeft, ChevronRight, Landmark, LayoutDashboard,
   MapPin, Menu, Mountain, ScanLine, X,
 } from 'lucide-react';
-import { ADMIN_USER, TENANT_INFO } from '../../data/adminData';
+import { getAdminUser } from '../../api/admin';
+import { useTenant } from '../../contexts/TenantContext';
 
 const menuItems = [
   { id: 'dashboard', label: 'Ringkasan', icon: LayoutDashboard, path: '/admin' },
@@ -32,6 +33,11 @@ function Brand({ collapsed = false }) {
 }
 
 function SidebarContent({ collapsed, location, onNavigate, onToggle }) {
+  const adminUser = getAdminUser();
+  const { destination } = useTenant();
+  const tenantDisplayName = adminUser.tenant_name || destination?.name || 'Kawasan Konservasi Alam';
+  const userInitial = (adminUser.name || 'P').charAt(0).toUpperCase();
+
   return <>
     <div className="border-b border-[var(--border)] px-4 py-5"><Brand collapsed={collapsed} /></div>
     <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5" aria-label="Navigasi pengelola">
@@ -43,7 +49,7 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle }) {
       })}
     </nav>
     <div className="border-t border-[var(--border)] p-3">
-      {!collapsed && <div className="mb-2 flex items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--fog)] p-2.5"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white">{ADMIN_USER.name.charAt(0)}</span><span className="min-w-0"><span className="block truncate text-xs font-bold text-[var(--forest-deep)]">{ADMIN_USER.name}</span><span className="block truncate text-[10px] text-[var(--ink-soft)]">{TENANT_INFO.name}</span></span></div>}
+      {!collapsed && <div className="mb-2 flex items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--fog)] p-2.5"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white">{userInitial}</span><span className="min-w-0"><span className="block truncate text-xs font-bold text-[var(--forest-deep)]">{adminUser.name}</span><span className="block truncate text-[10px] text-[var(--ink-soft)]">{tenantDisplayName}</span></span></div>}
       {onToggle && <button id="toggle-sidebar-btn" type="button" onClick={onToggle} className="hidden w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] md:flex">{collapsed ? <ChevronRight className="h-4 w-4" /> : <><ChevronLeft className="h-4 w-4" /><span>Tutup menu</span></>}</button>}
     </div>
   </>;

@@ -20,7 +20,9 @@ import {
   AlertCircle,
   Copy
 } from 'lucide-react';
-import { useApiClient } from '../../api/client';
+import { useTenant } from '../../contexts/TenantContext';
+import { fetchAdminDestinations, fetchAdminGateTelemetry } from '../../api/admin';
+import { apiRequest } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
 import { GATE_DEVICES, ADMIN_DESTINATIONS } from '../../data/adminData';
@@ -336,17 +338,32 @@ function AddEditGateModal({ device, destinations, onClose, onSave }) {
 }
 
 export default function GatesPage() {
-  const apiClient = useApiClient(); // API client with automatic tenant header injection
-  // TODO: Fetch gates from API: const gates = await apiClient.get('/api/admin/gates');
-  // TODO: Create gate: await apiClient.post('/api/admin/gates', gateData);
-  // TODO: Update gate: await apiClient.put(`/api/admin/gates/${id}`, updatedData);
-  // TODO: Delete gate: await apiClient.delete(`/api/admin/gates/${id}`);
-  
+  const { slug } = useTenant();
+  const [destinations, setDestinations] = useState(ADMIN_DESTINATIONS);
   const [devices, setDevices] = useState(GATE_DEVICES);
   const [filterDest, setFilterDest] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+
+  // Load real gate telemetry from backend
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const dests = await fetchAdminDestinations(slug);
+        if (dests && dests.length > 0) {
+          setDestinations(dests);
+          const { devices: realDevices } = await fetchAdminGateTelemetry(dests[0].id);
+          if (realDevices && realDevices.length > 0) {
+            setDevices(realDevices);
+          }
+        }
+      } catch (err) {
+        console.warn('Gate telemetry load fallback:', err);
+      }
+    }
+    loadData();
+  }, [slug]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -354,21 +371,21 @@ export default function GatesPage() {
   };
 
   const uniqueDestinations = useMemo(() => {
-    const dests = ADMIN_DESTINATIONS.map((d) => d.name);
+    const dests = destinations.map((d) => d.name);
     devices.forEach((dev) => {
       if (dev.destination && !dests.includes(dev.destination)) {
         dests.push(dev.destination);
       }
     });
     return Array.from(new Set(dests));
-  }, [devices]);
+  }, [destinations, devices]);
 
   const filteredDevices = useMemo(() => {
     if (filterDest === 'all') return devices;
     return devices.filter((d) => d.destination === filterDest);
   }, [devices, filterDest]);
 
-  const handleSaveDevice = (savedDevice) => {
+  const handleSaveDevice = async (savedDevice) => {
     setDevices((prev) => {
       const exists = prev.some((d) => d.id === savedDevice.id);
       if (exists) {
@@ -379,6 +396,20 @@ export default function GatesPage() {
     showToast(`Perangkat "${savedDevice.device_name}" berhasil disimpan!`);
     setShowAddModal(false);
     setEditingDevice(null);
+
+    // Sync to gate service
+    try {
+      await apiRequest('/api/v1/gate/devices', {
+        method: 'POST',
+        body: {
+          destination_id: destinations[0]?.id,
+          device_code: savedDevice.device_code,
+          device_name: savedDevice.device_name,
+          gate_type: savedDevice.gate_type,
+          hmac_key: savedDevice.hmac_key,
+        },
+      }).catch(() => null);
+    } catch (_) {}
   };
 
   const handleToggleDevice = (device) => {

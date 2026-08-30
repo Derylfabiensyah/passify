@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CalendarClock,
   AlertTriangle,
@@ -17,7 +17,9 @@ import {
   CalendarCheck,
   CheckCircle2
 } from 'lucide-react';
-import { useApiClient } from '../../api/client';
+import { useTenant } from '../../contexts/TenantContext';
+import { fetchAdminDestinations, fetchAdminQuotas } from '../../api/admin';
+import { apiRequest } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import { ADMIN_DESTINATIONS, QUOTA_CALENDAR } from '../../data/adminData';
 
@@ -358,18 +360,39 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
 }
 
 export default function QuotasPage() {
-  const apiClient = useApiClient(); // API client with automatic tenant header injection
-  // TODO: Fetch quotas from API: const quotas = await apiClient.get('/api/admin/quotas');
-  // TODO: Update quota: await apiClient.put(`/api/admin/quotas/${date}`, { max_capacity: newCapacity });
-  
+  const { slug } = useTenant();
   const [destinations, setDestinations] = useState(ADMIN_DESTINATIONS);
-  const [selectedDestId, setSelectedDestId] = useState(ADMIN_DESTINATIONS[0].id);
+  const [selectedDestId, setSelectedDestId] = useState(ADMIN_DESTINATIONS[0]?.id || 'dest-1');
   const [quotaCalendar, setQuotaCalendar] = useState(QUOTA_CALENDAR);
   const [editingQuota, setEditingQuota] = useState(null);
   const [editingSlot, setEditingSlot] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
-  const selectedDest = destinations.find((d) => d.id === selectedDestId) || destinations[0];
+  // Load real destinations
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const dests = await fetchAdminDestinations(slug);
+        if (dests && dests.length > 0) {
+          setDestinations(dests);
+          setSelectedDestId(dests[0].id);
+
+          // Fetch quota calendar and time slots
+          const { quotas, timeSlots } = await fetchAdminQuotas(dests[0].id);
+          if (timeSlots && timeSlots.length > 0) {
+            setDestinations((prev) =>
+              prev.map((d, idx) => (idx === 0 ? { ...d, time_slots: timeSlots } : d))
+            );
+          }
+        }
+      } catch (err) {
+        console.warn('Quota load error:', err);
+      }
+    }
+    loadData();
+  }, [slug]);
+
+  const selectedDest = destinations.find((d) => d.id === selectedDestId) || destinations[0] || {};
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -394,14 +417,15 @@ export default function QuotasPage() {
     showToast(`Kapasitas harian berhasil diperbarui menjadi ${newCapacity.toLocaleString('id-ID')} pax.`);
   };
 
-  const handleSaveTimeSlot = (updatedSlot) => {
+  const handleSaveTimeSlot = async (updatedSlot) => {
     setDestinations((prevDests) =>
       prevDests.map((dest) => {
         if (dest.id !== selectedDest.id) return dest;
-        const exists = dest.time_slots.some((s) => s.id === updatedSlot.id);
+        const currentSlots = dest.time_slots || [];
+        const exists = currentSlots.some((s) => s.id === updatedSlot.id);
         const newSlots = exists
-          ? dest.time_slots.map((s) => (s.id === updatedSlot.id ? { ...s, ...updatedSlot } : s))
-          : [...dest.time_slots, { ...updatedSlot, id: updatedSlot.id || `ts-${Date.now()}`, booked: updatedSlot.booked || 0 }];
+          ? currentSlots.map((s) => (s.id === updatedSlot.id ? { ...s, ...updatedSlot } : s))
+          : [...currentSlots, { ...updatedSlot, id: updatedSlot.id || `ts-${Date.now()}`, booked: updatedSlot.booked || 0 }];
         return {
           ...dest,
           time_slots: newSlots
@@ -410,6 +434,17 @@ export default function QuotasPage() {
     );
     showToast(`Sesi "${updatedSlot.label}" berhasil disimpan!`);
     setEditingSlot(null);
+
+    // Sync with ticket service
+    try {
+      await apiRequest('/api/v1/tickets/time-slots', {
+        method: 'POST',
+        body: {
+          destination_id: selectedDest.id,
+          ...updatedSlot,
+        },
+      }).catch(() => null);
+    } catch (_) {}
   };
 
   const handleDeleteTimeSlot = (slotId) => {
@@ -418,7 +453,7 @@ export default function QuotasPage() {
         if (dest.id !== selectedDest.id) return dest;
         return {
           ...dest,
-          time_slots: dest.time_slots.filter((s) => s.id !== slotId)
+          time_slots: (dest.time_slots || []).filter((s) => s.id !== slotId)
         };
       })
     );

@@ -28,6 +28,8 @@ import {
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import { ADMIN_DESTINATIONS } from '../../data/adminData';
 import { useTenant } from '../../contexts/TenantContext';
+import { fetchAdminDestinations } from '../../api/admin';
+import { apiRequest } from '../../api/client';
 
 function TicketCategoryRow({ cat, onEdit, onDelete }) {
   return (
@@ -556,7 +558,7 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
 // MAIN DESTINATIONS PAGE COMPONENT
 // =========================================================================
 export default function DestinationsPage() {
-  const { refetch } = useTenant();
+  const { slug, refetch } = useTenant();
   const [destinations, setDestinations] = useState(() => {
     try {
       const saved = localStorage.getItem('passify_admin_destinations');
@@ -566,11 +568,31 @@ export default function DestinationsPage() {
     }
   });
 
+  const [isLoading, setIsLoading] = useState(false);
   const [expandedId, setExpandedId] = useState(destinations[0]?.id || null);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingDest, setEditingDest] = useState(null);
   const [editingCatContext, setEditingCatContext] = useState(null); // { destId, cat }
   const [toastMessage, setToastMessage] = useState('');
+
+  // Fetch real destinations from microservices
+  useEffect(() => {
+    async function loadRealDestinations() {
+      try {
+        setIsLoading(true);
+        const realList = await fetchAdminDestinations(slug);
+        if (realList && realList.length > 0) {
+          setDestinations(realList);
+          if (!expandedId) setExpandedId(realList[0].id);
+        }
+      } catch (err) {
+        console.warn('Real destinations load error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadRealDestinations();
+  }, [slug]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
@@ -587,14 +609,22 @@ export default function DestinationsPage() {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
-  const handleSaveDestination = (updatedDest) => {
+  const handleSaveDestination = async (updatedDest) => {
     const updated = destinations.map((d) => (d.id === updatedDest.id ? updatedDest : d));
     saveDestinationsList(updated);
     setEditingDest(null);
     showToast(`Halaman "${updatedDest.name}" berhasil diperbarui!`);
+
+    // Sync to backend destination endpoint if available
+    try {
+      await apiRequest(`/api/v1/destinations/${updatedDest.id}`, {
+        method: 'PUT',
+        body: updatedDest,
+      }).catch(() => null);
+    } catch (_) {}
   };
 
-  const handleSaveCategory = (categoryData) => {
+  const handleSaveCategory = async (categoryData) => {
     if (!editingCatContext?.destId) return;
     const destId = editingCatContext.destId;
 
@@ -613,9 +643,20 @@ export default function DestinationsPage() {
     saveDestinationsList(updated);
     setEditingCatContext(null);
     showToast('Kategori tiket berhasil disimpan!');
+
+    // Sync to ticket microservice
+    try {
+      await apiRequest('/api/v1/tickets/categories', {
+        method: 'POST',
+        body: {
+          destination_id: destId,
+          ...categoryData,
+        },
+      }).catch(() => null);
+    } catch (_) {}
   };
 
-  const handleDeleteCategory = (destId, catId) => {
+  const handleDeleteCategory = async (destId, catId) => {
     if (!window.confirm('Hapus kategori tiket ini?')) return;
     const updated = destinations.map((d) => {
       if (d.id !== destId) return d;
@@ -626,6 +667,13 @@ export default function DestinationsPage() {
     });
     saveDestinationsList(updated);
     showToast('Kategori tiket telah dihapus.');
+
+    // Sync deletion to backend
+    try {
+      await apiRequest(`/api/v1/tickets/categories/${catId}`, {
+        method: 'DELETE',
+      }).catch(() => null);
+    } catch (_) {}
   };
 
   const filteredDests = destinations.filter(

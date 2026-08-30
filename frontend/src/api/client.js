@@ -1,6 +1,58 @@
 import { useTenant } from '../contexts/TenantContext';
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
+export const SERVICE_URLS = {
+  auth: import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8081',
+  tenant: import.meta.env.VITE_TENANT_API_URL || 'http://localhost:8082',
+  ticket: import.meta.env.VITE_TICKET_API_URL || 'http://localhost:8083',
+  payment: import.meta.env.VITE_PAYMENT_API_URL || 'http://localhost:8084',
+  cashless: import.meta.env.VITE_CASHLESS_API_URL || 'http://localhost:8085',
+  gate: import.meta.env.VITE_GATE_API_URL || 'http://localhost:8086',
+};
+
+export const API_BASE_URL = SERVICE_URLS.tenant;
+
+/**
+ * Resolves the appropriate service base URL based on endpoint path
+ */
+export function resolveServiceUrl(endpoint) {
+  if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
+    return endpoint;
+  }
+
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  if (cleanEndpoint.startsWith('/api/v1/auth')) {
+    return `${SERVICE_URLS.auth}${cleanEndpoint}`;
+  }
+  if (
+    cleanEndpoint.startsWith('/api/v1/tickets') ||
+    cleanEndpoint.startsWith('/api/v1/seatmap') ||
+    cleanEndpoint.startsWith('/api/v1/nfc')
+  ) {
+    return `${SERVICE_URLS.ticket}${cleanEndpoint}`;
+  }
+  if (
+    cleanEndpoint.startsWith('/api/v1/payments') ||
+    cleanEndpoint.startsWith('/api/payments') ||
+    cleanEndpoint.startsWith('/api/v1/invoices')
+  ) {
+    return `${SERVICE_URLS.payment}${cleanEndpoint}`;
+  }
+  if (
+    cleanEndpoint.startsWith('/api/v1/cashless') ||
+    cleanEndpoint.startsWith('/api/v1/wallet') ||
+    cleanEndpoint.startsWith('/api/v1/cards') ||
+    cleanEndpoint.startsWith('/api/v1/merchants')
+  ) {
+    return `${SERVICE_URLS.cashless}${cleanEndpoint}`;
+  }
+  if (cleanEndpoint.startsWith('/api/v1/gate')) {
+    return `${SERVICE_URLS.gate}${cleanEndpoint}`;
+  }
+
+  // Default to tenant service
+  return `${SERVICE_URLS.tenant}${cleanEndpoint}`;
+}
 
 /**
  * Generate or get existing device fingerprint for anti-bot / rate-limiting protection
@@ -8,9 +60,7 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 export function getDeviceFingerprint() {
   let fp = localStorage.getItem('passify_device_fp');
   if (!fp) {
-    // Generate a pseudo-fingerprint using screen, language, timezone, userAgent, and random salt
     const raw = `${navigator.userAgent}|${navigator.language}|${screen.width}x${screen.height}|${new Date().getTimezoneOffset()}|${Math.random().toString(36).substring(2)}`;
-    // Simple hash function
     let hash = 0;
     for (let i = 0; i < raw.length; i++) {
       hash = ((hash << 5) - hash) + raw.charCodeAt(i);
@@ -23,40 +73,51 @@ export function getDeviceFingerprint() {
 }
 
 /**
+ * Direct API request helper (can be used outside React hooks)
+ */
+export async function apiRequest(endpoint, options = {}) {
+  const targetUrl = resolveServiceUrl(endpoint);
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-Device-Fingerprint': getDeviceFingerprint(),
+    ...options.headers,
+  };
+
+  const currentSlug = localStorage.getItem('passify_current_tenant');
+  if (currentSlug && !headers['X-Tenant-Slug']) {
+    headers['X-Tenant-Slug'] = currentSlug;
+  }
+
+  const token = localStorage.getItem('passify_token');
+  if (token && !headers['Authorization']) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(targetUrl, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ message: `Request failed with status ${response.status}` }));
+    throw new Error(error.message || error.error?.details || 'Request failed');
+  }
+
+  return response.json();
+}
+
+/**
  * API client hook that automatically includes tenant context and device fingerprint
  */
 export function useApiClient() {
   const { slug } = useTenant();
 
   const request = async (endpoint, options = {}) => {
-    const headers = {
-      'Content-Type': 'application/json',
-      'X-Device-Fingerprint': getDeviceFingerprint(),
-      ...options.headers,
-    };
-
-    // Add tenant slug header if tenant context exists
+    const customHeaders = { ...options.headers };
     if (slug) {
-      headers['X-Tenant-Slug'] = slug;
+      customHeaders['X-Tenant-Slug'] = slug;
     }
-
-    // Add authentication token if present
-    const token = localStorage.getItem('passify_token');
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Request failed' }));
-      throw new Error(error.message || 'Request failed');
-    }
-
-    return response.json();
+    return apiRequest(endpoint, { ...options, headers: customHeaders });
   };
 
   return {

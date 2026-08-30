@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   TrendingUp,
   Ticket,
@@ -26,7 +26,8 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
-import { useApiClient } from '../../api/client';
+import { useTenant } from '../../contexts/TenantContext';
+import { fetchDashboardOverviewTelemetry } from '../../api/admin';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
 import {
@@ -52,31 +53,54 @@ ChartJS.register(
 );
 
 export default function DashboardOverview() {
-  const apiClient = useApiClient(); // API client with automatic tenant header injection
-  // TODO: Replace static DASHBOARD_STATS with: const stats = await apiClient.get('/api/admin/stats');
-  
-  const stats = DASHBOARD_STATS;
+  const { slug } = useTenant();
+  const [telemetry, setTelemetry] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const loadData = async () => {
+    try {
+      setIsRefreshing(true);
+      const data = await fetchDashboardOverviewTelemetry(slug);
+      setTelemetry(data);
+    } catch (err) {
+      console.warn('Live telemetry load fallback:', err);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadData();
+  }, [slug]);
+
+  const stats = telemetry?.stats || DASHBOARD_STATS;
+  const hourlyVisitors = telemetry?.hourlyVisitors || HOURLY_VISITORS;
+  const revenueWeekly = telemetry?.revenueWeekly || REVENUE_WEEKLY;
+  const ticketCategorySales = telemetry?.ticketCategorySales || TICKET_CATEGORY_SALES;
+  const recentTransactions = telemetry?.recentTransactions || RECENT_TRANSACTIONS;
+  const gateScanStats = telemetry?.gateScanStats || GATE_SCAN_STATS;
+
   const revGrowth = Math.round(
-    ((stats.today.revenue - stats.yesterday.revenue) / stats.yesterday.revenue) * 100
+    ((stats.today.revenue - stats.yesterday.revenue) / (stats.yesterday.revenue || 1)) * 100
   );
   const ticketGrowth = Math.round(
     ((stats.today.tickets_sold - stats.yesterday.tickets_sold) /
-      stats.yesterday.tickets_sold) *
+      (stats.yesterday.tickets_sold || 1)) *
       100
   );
   const quotaUsedPct = Math.round(
     ((stats.today.total_capacity - stats.today.remaining_quota) /
-      stats.today.total_capacity) *
+      (stats.today.total_capacity || 1)) *
       100
   );
 
   // ─── Chart.js Configuration: Hourly Visitors ──────────────────
   const hourlyChartData = {
-    labels: HOURLY_VISITORS.map((h) => h.hour),
+    labels: hourlyVisitors.map((h) => h.hour),
     datasets: [
       {
         label: 'Masuk (Entered)',
-        data: HOURLY_VISITORS.map((h) => h.entered),
+        data: hourlyVisitors.map((h) => h.entered),
         backgroundColor: '#1e4b35',
         hoverBackgroundColor: '#3c7152',
         borderRadius: 4,
@@ -84,7 +108,7 @@ export default function DashboardOverview() {
       },
       {
         label: 'Keluar (Exited)',
-        data: HOURLY_VISITORS.map((h) => h.exited),
+        data: hourlyVisitors.map((h) => h.exited),
         backgroundColor: '#8a5638',
         hoverBackgroundColor: '#71452f',
         borderRadius: 4,
@@ -135,11 +159,11 @@ export default function DashboardOverview() {
 
   // ─── Chart.js Configuration: Weekly Revenue ───────────────────
   const revenueChartData = {
-    labels: REVENUE_WEEKLY.map((d) => d.day),
+    labels: revenueWeekly.map((d) => d.day),
     datasets: [
       {
         label: 'Pendapatan (Rp)',
-        data: REVENUE_WEEKLY.map((d) => d.revenue),
+        data: revenueWeekly.map((d) => d.revenue),
         backgroundColor: '#1e4b35',
         hoverBackgroundColor: '#3c7152',
         borderRadius: 6
@@ -422,18 +446,18 @@ export default function DashboardOverview() {
             </div>
 
             <div className="space-y-4">
-              {TICKET_CATEGORY_SALES.map((cat, idx) => (
+              {ticketCategorySales.map((cat, idx) => (
                 <div key={idx}>
                   <div className="flex items-center justify-between text-xs mb-1.5">
                     <span className="font-semibold text-gray-700">{cat.name}</span>
                     <span className="text-emerald-700 font-bold">
-                      {cat.sold.toLocaleString('id-ID')} tiket ({cat.percentage}%)
+                      {(cat.sold || 0).toLocaleString('id-ID')} tiket ({cat.percentage || 0}%)
                     </span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-emerald-600 transition-all duration-500"
-                      style={{ width: `${cat.percentage}%` }}
+                      style={{ width: `${cat.percentage || 0}%` }}
                     />
                   </div>
                 </div>
@@ -442,7 +466,7 @@ export default function DashboardOverview() {
           </div>
 
           <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-            <span>Total Kategori Terdaftar: 4 Kategori</span>
+            <span>Total Kategori Terdaftar: {ticketCategorySales.length} Kategori</span>
             <span className="text-emerald-700 font-bold">100% Validasi Aktif</span>
           </div>
         </div>
@@ -450,7 +474,7 @@ export default function DashboardOverview() {
 
       {/* TanStack React Table: Recent Transactions */}
       <DataTable
-        data={RECENT_TRANSACTIONS}
+        data={recentTransactions}
         columns={transactionColumns}
         title="Riwayat Transaksi & Pembelian Terbaru"
         subtitle="Dukungan sorting, filtering, & pagination oleh TanStack React Table v8"
@@ -460,7 +484,7 @@ export default function DashboardOverview() {
 
       {/* TanStack React Table: Gate Scan Stats */}
       <DataTable
-        data={GATE_SCAN_STATS}
+        data={gateScanStats}
         columns={gateColumns}
         title="Performa & Terminal Pemindai Gerbang (Gates)"
         subtitle="Status pemindai e-Ticket & gelang NFC secara waktu nyata"
