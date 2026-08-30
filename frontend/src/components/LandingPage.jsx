@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -10,6 +10,13 @@ import {
   Landmark,
   Mail,
   Trees,
+  Menu,
+  X,
+  Compass,
+  Building2,
+  Sparkles,
+  PhoneCall,
+  Layers
 } from 'lucide-react';
 
 const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1800&q=88';
@@ -30,6 +37,33 @@ function SectionHeading({ eyebrow, title, children, className = '' }) {
 }
 
 export default function LandingPage() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Close drawer on Escape key and handle body scroll lock
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false);
+      }
+    };
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
+
+  const navLinks = [
+    { label: 'Kawasan', href: '#masalah' },
+    { label: 'Cara kerja', href: '#alur' },
+    { label: 'White-label', href: '#white-label' },
+  ];
+
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-[var(--canvas)] text-[var(--ink)]">
       <header className="nav-bar sticky top-0 z-40">
@@ -39,16 +73,134 @@ export default function LandingPage() {
           </Link>
 
           <nav className="hidden items-center gap-6 text-xs font-bold text-[var(--ink-soft)] lg:flex" aria-label="Navigasi utama">
-            <a href="#masalah" className="transition-colors hover:text-[var(--forest-deep)]">Kawasan</a>
-            <a href="#alur" className="transition-colors hover:text-[var(--forest-deep)]">Cara kerja</a>
-            <a href="#white-label" className="transition-colors hover:text-[var(--forest-deep)]">White-label</a>
+            {navLinks.map((link, idx) => (
+              <a key={idx} href={link.href} className="transition-colors hover:text-[var(--forest-deep)]">
+                {link.label}
+              </a>
+            ))}
           </nav>
 
-          <div className="flex items-center gap-3">
-            <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--forest-deep)] sm:inline">Jelajah Wisata</Link>
-            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px]">Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--forest-deep)] sm:inline">
+              Jelajah Wisata
+            </Link>
+            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px]">
+              Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+
+            {/* Hamburger Button for Mobile */}
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl text-[var(--forest-deep)] hover:bg-[var(--fog)] border border-[var(--border)] transition-colors"
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? 'Tutup navigasi mobile' : 'Buka navigasi mobile'}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Slide-Over Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu Navigasi Mobile">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-hidden="true"
+            />
+
+            {/* Drawer Panel */}
+            <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-[var(--sand)] shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300 border-l border-[var(--border)]">
+              {/* Drawer Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] bg-[var(--canvas)]">
+                <Link
+                  to="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline"
+                >
+                  passify
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="p-2 rounded-xl text-[var(--ink-soft)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                  aria-label="Tutup menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="flex-1 overflow-y-auto px-4 py-5 space-y-2">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-muted)] px-3 mb-2">
+                  Navigasi Halaman
+                </div>
+                {navLinks.map((link, idx) => (
+                  <a
+                    key={idx}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                  >
+                    <span>{link.label}</span>
+                    <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
+                  </a>
+                ))}
+
+                <div className="pt-4 mt-4 border-t border-[var(--border)]">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-muted)] px-3 mb-2">
+                    Portal Wisata & Mitra
+                  </div>
+                  <Link
+                    to="/jelajah"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Compass className="h-4 w-4 text-[var(--forest)]" />
+                      <span>Jelajah Wisata</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
+                  </Link>
+                  <Link
+                    to="/daftar-wisata"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Building2 className="h-4 w-4 text-[var(--forest)]" />
+                      <span>Daftarkan Wisata Anda</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
+                  </Link>
+                </div>
+              </div>
+
+              {/* Drawer Bottom Actions */}
+              <div className="p-4 border-t border-[var(--border)] bg-[var(--canvas)] space-y-2.5">
+                <Link
+                  to="/daftar-wisata"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="btn-clay w-full py-3 justify-center text-xs font-bold rounded-xl shadow-sm"
+                >
+                  <span>Daftarkan Wisata Anda</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+
+                <Link
+                  to="/jelajah"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="btn-secondary w-full py-2.5 justify-center text-xs font-bold rounded-xl border border-[var(--border)]"
+                >
+                  <Compass className="h-4 w-4" />
+                  <span>Portal Wisatawan</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       <main>
