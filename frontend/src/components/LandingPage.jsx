@@ -86,10 +86,10 @@ export default function LandingPage() {
             <SectionHeading eyebrow="Kawasan punya ritmenya sendiri" title="Ketika kunjungan bertambah, keputusan harus semakin jernih.">Bukan sekadar menjual tiket. Pengelola perlu menjaga ruang, menggerakkan petugas, dan tetap memahami uang yang mengalir setiap hari.</SectionHeading>
             <div className="mt-10 grid gap-4 md:grid-cols-3 lg:gap-5">
               {[
-                { index: '01', icon: Trees, title: 'Ruang yang tidak bisa ditambah', text: 'Daya dukung menentukan berapa banyak orang yang dapat hadir tanpa mengubah pengalaman atau ekosistem kawasan.' },
-                { index: '02', icon: CloudOff, title: 'Hari lapangan tidak selalu tersambung', text: 'Gerbang tetap harus bergerak ketika sinyal hilang, antrean datang, dan petugas membutuhkan jawaban yang cepat.' },
-                { index: '03', icon: Landmark, title: 'Kepercayaan perlu jejak yang jelas', text: 'Komponen tiket, transaksi, dan pencairan perlu mudah dibaca tanpa menambah pekerjaan administratif.' },
-              ].map(({ index, icon: Icon, title, text }) => <article key={index} className="rounded-3xl bg-[var(--canvas)] p-6 shadow-[0_18px_42px_rgba(16,45,32,.10)] sm:p-7"><div className="flex items-center justify-between"><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span><Icon className="h-5 w-5 text-[var(--forest-soft)]" strokeWidth={1.5} /></div><h3 className="mt-9 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
+                { index: '01', title: 'Ruang yang tidak bisa ditambah', text: 'Daya dukung menentukan berapa banyak orang yang dapat hadir tanpa mengubah pengalaman atau ekosistem kawasan.' },
+                { index: '02', title: 'Hari lapangan tidak selalu tersambung', text: 'Gerbang tetap harus bergerak ketika sinyal hilang, antrean datang, dan petugas membutuhkan jawaban yang cepat.' },
+                { index: '03', title: 'Kepercayaan perlu jejak yang jelas', text: 'Komponen tiket, transaksi, dan pencairan perlu mudah dibaca tanpa menambah pekerjaan administratif.' },
+              ].map(({ index, title, text }) => <article key={index} className="rounded-3xl bg-[var(--canvas)] p-6 shadow-[0_18px_42px_rgba(16,45,32,.10)] sm:p-7"><div><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span></div><h3 className="mt-9 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
             </div>
           </div>
         </section>
