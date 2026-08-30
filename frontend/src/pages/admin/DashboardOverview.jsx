@@ -124,7 +124,11 @@ export default function DashboardOverview() {
       },
       y: {
         grid: { color: '#e8f1dc' },
-        ticks: { color: '#526b5a', font: { size: 10 } }
+        ticks: {
+          color: '#526b5a',
+          font: { size: 10 },
+          callback: (value) => `${value} pax`
+        }
       }
     }
   };
@@ -192,13 +196,14 @@ export default function DashboardOverview() {
         )
       },
       {
-        accessorKey: 'visitor_name',
+        id: 'visitor',
+        accessorFn: (row) => row.visitor || row.visitor_name,
         header: 'Wisatawan / Pemesan',
         cell: (info) => (
           <div>
             <div className="font-semibold text-gray-900">{info.getValue()}</div>
             <div className="text-[10px] text-gray-500">
-              {info.row.original.category}
+              {info.row.original.category} {info.row.original.qty ? `(${info.row.original.qty} pax)` : ''}
             </div>
           </div>
         )
@@ -223,25 +228,34 @@ export default function DashboardOverview() {
         accessorKey: 'status',
         header: 'Status',
         cell: (info) => {
-          const status = info.getValue();
+          const rawStatus = (info.getValue() || '').toLowerCase();
+          const cfg =
+            rawStatus === 'paid' || rawStatus === 'success' || rawStatus === 'settled' || rawStatus === 'completed'
+              ? {
+                  label: 'Berhasil',
+                  cls: 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                }
+              : rawStatus === 'pending' || rawStatus === 'process' || rawStatus === 'waiting'
+              ? {
+                  label: 'Proses',
+                  cls: 'bg-amber-50 text-amber-800 border-amber-200'
+                }
+              : rawStatus === 'refunded'
+              ? {
+                  label: 'Refund',
+                  cls: 'bg-purple-50 text-purple-800 border-purple-200'
+                }
+              : {
+                  label: 'Gagal',
+                  cls: 'bg-red-50 text-red-800 border-red-200'
+                };
+
           return (
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${
-                status === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                  : status === 'pending'
-                  ? 'bg-amber-50 text-amber-800 border-amber-200'
-                  : 'bg-red-50 text-red-800 border-red-200'
-              }`}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border ${cfg.cls}`}
             >
               <span className="status-dot" />
-              <span>
-                {status === 'success'
-                  ? 'Berhasil'
-                  : status === 'pending'
-                  ? 'Proses'
-                  : 'Gagal'}
-              </span>
+              <span>{cfg.label}</span>
             </span>
           );
         }
@@ -280,11 +294,12 @@ export default function DashboardOverview() {
         accessorKey: 'status',
         header: 'Status Terminal',
         cell: (info) => {
-          const st = info.getValue();
+          const st = (info.getValue() || '').toLowerCase();
+          const isOnline = st === 'online';
           return (
             <span
               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
-                st === 'online'
+                isOnline
                   ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                   : 'bg-red-50 text-red-800 border-red-200'
               }`}
