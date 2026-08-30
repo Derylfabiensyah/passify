@@ -395,6 +395,13 @@ func (s *authService) VerifyEmail(token string) error {
 	}
 
 	ctx := context.Background()
+
+	// Check if this token was already verified recently (idempotent for React StrictMode / refreshes)
+	doneKey := "verify_email_done:" + cleanToken
+	if alreadyDone, _ := s.redis.Get(ctx, doneKey).Result(); alreadyDone != "" {
+		return nil
+	}
+
 	val, err := s.redis.Get(ctx, "verify_email:"+cleanToken).Result()
 	if err != nil || val == "" {
 		return errors.New("link verifikasi tidak valid atau telah kedaluwarsa")
@@ -424,8 +431,9 @@ func (s *authService) VerifyEmail(token string) error {
 		return fmt.Errorf("gagal mengaktifkan tenant: %w", err)
 	}
 
-	// Delete verification token
+	// Delete verification token and keep idempotent marker for 24h
 	_ = s.redis.Del(ctx, "verify_email:"+cleanToken).Err()
+	_ = s.redis.Set(ctx, doneKey, "verified", 24*time.Hour).Err()
 
 	return nil
 }

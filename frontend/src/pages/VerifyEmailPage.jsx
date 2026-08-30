@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle2, AlertCircle, Loader2, ArrowRight, Trees, ExternalLink } from 'lucide-react';
 
@@ -8,6 +8,7 @@ export default function VerifyEmailPage() {
 
   const [status, setStatus] = useState('loading'); // 'loading' | 'success' | 'error'
   const [message, setMessage] = useState('');
+  const hasRequestedRef = useRef(false);
 
   useEffect(() => {
     if (!token) {
@@ -15,6 +16,9 @@ export default function VerifyEmailPage() {
       setMessage('Token verifikasi tidak ditemukan dalam URL.');
       return;
     }
+
+    if (hasRequestedRef.current) return;
+    hasRequestedRef.current = true;
 
     const verify = async () => {
       try {
