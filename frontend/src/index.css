@@ -144,7 +144,7 @@
     box-shadow: 0 4px 16px rgba(16, 45, 32, .05);
   }
   .eyebrow { color: var(--river); font-size: .6875rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
-  .status-dot { width: .5rem; height: .5rem; flex: 0 0 auto; border-radius: 999px; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-muted); }
+  .status-dot { width: .5rem; height: .5rem; flex: 0 0 auto; border-radius: 999px; background: currentColor; opacity: 0.85; }
   .nav-bar { border-bottom: 1px solid var(--border); background: rgba(255, 254, 250, .88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
   .btn-primary, .btn-secondary, .btn-clay {
     min-height: 2.75rem;
