@@ -206,8 +206,7 @@ export default function TravelerPortal() {
           </div>
 
           <aside className="surface-muted h-fit p-5 lg:sticky lg:top-24">
-            <Leaf className="h-5 w-5 text-[var(--forest)]" />
-            <h2 className="mt-4 text-xl font-bold">Sebelum berkunjung</h2>
+            <h2 className="text-xl font-bold">Sebelum berkunjung</h2>
             <p className="mt-2 text-xs leading-5 text-[var(--ink-soft)]">Tiket dikaitkan dengan waktu kunjungan agar kawasan tetap nyaman bagi semua orang.</p>
             <ul className="mt-5 space-y-3 text-xs text-[var(--ink-soft)]">
               <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Pilih sesi yang masih tersedia.</li>
@@ -218,8 +217,8 @@ export default function TravelerPortal() {
         </section>
 
         <section className="mt-10 grid gap-5 md:grid-cols-2">
-          <article className="card p-6"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]"><Leaf className="h-5 w-5" /></span><div><p className="eyebrow">Di kawasan</p><h2 className="mt-1 text-xl font-bold">Fasilitas untuk perjalanan nyaman</h2></div></div><ul className="mt-5 grid gap-2 sm:grid-cols-2">{(destination.facilities || []).map((facility) => <li key={facility} className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--canvas)] px-3 py-2.5 text-xs font-semibold text-[var(--ink-soft)]"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />{facility}</li>)}</ul></article>
-          <article className="rounded-[var(--radius)] border border-[var(--bark)]/25 bg-[var(--bark-pale)]/55 p-6"><div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-xl bg-white/75 text-[var(--bark)]"><Info className="h-5 w-5" /></span><div><p className="eyebrow !text-[var(--bark)]">Etika berkunjung</p><h2 className="mt-1 text-xl font-bold">Aturan konservasi</h2></div></div><p className="mt-5 text-sm leading-6 text-[var(--ink-soft)]">{destination.rules}</p><p className="mt-5 flex items-center gap-2 text-xs font-bold text-[var(--bark)]"><Clock className="h-4 w-4" />Tunjukkan QR aktif saat memasuki kawasan.</p></article>
+          <article className="card p-6"><div><p className="eyebrow">Di kawasan</p><h2 className="mt-1 text-xl font-bold">Fasilitas untuk perjalanan nyaman</h2></div><ul className="mt-5 grid gap-2 sm:grid-cols-2">{(destination.facilities || []).map((facility) => <li key={facility} className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--canvas)] px-3 py-2.5 text-xs font-semibold text-[var(--ink-soft)]"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />{facility}</li>)}</ul></article>
+          <article className="rounded-[var(--radius)] border border-[var(--bark)]/25 bg-[var(--bark-pale)]/55 p-6"><div><p className="eyebrow !text-[var(--bark)]">Etika berkunjung</p><h2 className="mt-1 text-xl font-bold">Aturan konservasi</h2></div><p className="mt-5 text-sm leading-6 text-[var(--ink-soft)]">{destination.rules}</p><p className="mt-5 flex items-center gap-2 text-xs font-bold text-[var(--bark)]"><Clock className="h-4 w-4" />Tunjukkan QR aktif saat memasuki kawasan.</p></article>
         </section>
       </main>
 
