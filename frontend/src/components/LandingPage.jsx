@@ -199,17 +199,6 @@ export default function LandingPage() {
               <p className="text-sm leading-6 text-white/70 max-w-sm">
                 Platform SaaS White-Label E-Ticketing & Manajemen Kuota Wisata Alam. Dirancang tangguh di lapangan dengan teknologi offline-first, dynamic TOTP QR, dan ekosistem pembayaran terpadu.
               </p>
-              <div className="flex flex-wrap gap-2 pt-2">
-                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-[var(--leaf)]">
-                  🌲 Offline-First Engine
-                </span>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-[var(--leaf)]">
-                  ⚡ Gate Scanner Mobile
-                </span>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-[var(--leaf)]">
-                  💳 Cashless POS
-                </span>
-              </div>
             </div>
 
             {/* Column 2: Solusi Kawasan */}
