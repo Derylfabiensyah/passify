@@ -57,10 +57,10 @@ export default function VerifyEmailPage() {
           {/* Loading State */}
           {status === 'loading' && (
             <div>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--fog)] text-[var(--forest)]">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest)] shadow-xs">
                 <Loader2 className="h-8 w-8 animate-spin" />
               </div>
-              <h1 className="font-serif text-2xl font-bold tracking-tight text-[var(--ink)]">
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
                 Memverifikasi Email...
               </h1>
               <p className="mt-2 text-sm text-[var(--ink-soft)]">
@@ -72,10 +72,10 @@ export default function VerifyEmailPage() {
           {/* Success State */}
           {status === 'success' && (
             <div>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-xs">
                 <CheckCircle2 className="h-8 w-8" />
               </div>
-              <h1 className="font-serif text-2xl font-bold tracking-tight text-[var(--ink)]">
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
                 Verifikasi Berhasil! 🎉
               </h1>
               <p className="mt-3 text-sm leading-relaxed text-[var(--ink-soft)]">
@@ -84,13 +84,13 @@ export default function VerifyEmailPage() {
               <div className="mt-8 space-y-3">
                 <Link
                   to="/admin"
-                  className="flex items-center justify-center gap-2 w-full rounded-xl bg-[var(--forest)] px-6 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[var(--forest-deep)] transition-all text-decoration-none"
+                  className="btn-primary w-full py-3.5 rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-sm text-decoration-none"
                 >
                   Buka Dashboard Pengelola <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/"
-                  className="inline-flex items-center justify-center gap-2 w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white px-5 py-2.5 text-xs font-bold text-[var(--ink-soft)] hover:text-[var(--ink)] hover:bg-gray-50 text-decoration-none"
+                  className="btn-secondary w-full py-2.5 rounded-xl inline-flex items-center justify-center gap-2 text-xs font-bold shadow-xs text-decoration-none"
                 >
                   Ke Halaman Utama
                 </Link>
@@ -101,10 +101,10 @@ export default function VerifyEmailPage() {
           {/* Error State */}
           {status === 'error' && (
             <div>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-50 text-red-600 border border-red-200">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600 shadow-xs">
                 <AlertCircle className="h-8 w-8" />
               </div>
-              <h1 className="font-serif text-2xl font-bold tracking-tight text-[var(--ink)]">
+              <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
                 Verifikasi Gagal
               </h1>
               <p className="mt-3 text-sm leading-relaxed text-red-600 font-medium">
@@ -113,13 +113,13 @@ export default function VerifyEmailPage() {
               <div className="mt-8 space-y-3">
                 <Link
                   to="/daftar-wisata"
-                  className="flex items-center justify-center gap-2 w-full rounded-xl bg-[var(--forest)] px-6 py-3 text-sm font-bold text-white shadow-sm hover:bg-[var(--forest-deep)] transition-all text-decoration-none"
+                  className="btn-primary w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-bold shadow-sm text-decoration-none"
                 >
                   Daftar Ulang <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   to="/"
-                  className="inline-flex items-center justify-center gap-2 w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white px-5 py-2.5 text-xs font-bold text-[var(--ink-soft)] hover:text-[var(--ink)] hover:bg-gray-50 text-decoration-none"
+                  className="btn-secondary w-full py-2.5 rounded-xl inline-flex items-center justify-center gap-2 text-xs font-bold shadow-xs text-decoration-none"
                 >
                   Kembali ke Beranda
                 </Link>

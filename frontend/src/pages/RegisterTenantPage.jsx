@@ -486,28 +486,25 @@ export default function RegisterTenantPage() {
               Silakan klik tautan di email tersebut untuk mengaktifkan akun dan mulai menggunakan dashboard Passify.
             </p>
 
-            {/* Dev Mode Simulation Helper */}
+            {/* Direct Verification Action */}
             {registeredData?.verify_token_dev && (
-              <div className="mt-6 rounded-2xl border border-dashed border-[var(--forest)]/40 bg-[var(--bark-pale)]/50 p-5 text-left max-w-lg mx-auto">
-                <div className="flex items-center justify-between text-xs font-bold text-[var(--forest-deep)] uppercase tracking-wider mb-2">
-                  <span>🛠️ Mode Development (Simulasi Email)</span>
-                </div>
-                <p className="text-xs text-[var(--ink-soft)] mb-3">
-                  Di lingkungan pengembangan, Anda dapat langsung mengklik tombol verifikasi instan di bawah ini:
+              <div className="mt-6 rounded-2xl bg-[var(--leaf-pale)]/60 p-5 shadow-2xs text-center max-w-md mx-auto">
+                <p className="text-xs text-[var(--forest-deep)] font-semibold mb-3">
+                  Klik tombol di bawah untuk langsung memverifikasi email dan mengaktifkan portal wisata Anda:
                 </p>
                 <Link
                   to={`/verifikasi-email?token=${registeredData.verify_token_dev}`}
-                  className="inline-flex items-center justify-center gap-2 w-full rounded-xl bg-[var(--forest)] px-4 py-2.5 text-xs font-bold text-white hover:bg-[var(--forest-deep)] transition-all text-decoration-none"
+                  className="btn-primary w-full py-3 rounded-xl flex items-center justify-center gap-2 text-xs font-extrabold shadow-sm text-decoration-none"
                 >
-                  Verifikasi Email Sekarang <ExternalLink className="h-3.5 w-3.5" />
+                  Verifikasi Email Sekarang <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
             )}
 
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="mt-8 flex items-center justify-center">
               <Link
                 to="/"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-[rgba(23,59,50,0.18)] bg-white px-6 py-2.5 text-xs font-bold text-[var(--ink)] hover:bg-gray-50 text-decoration-none"
+                className="btn-secondary rounded-xl px-6 py-2.5 text-xs font-bold shadow-xs text-decoration-none"
               >
                 Kembali ke Beranda
               </Link>
