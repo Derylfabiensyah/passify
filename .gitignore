@@ -12,7 +12,8 @@ bin/
 
 # Go test / coverage
 *.out
-*.html
+coverage.html
+!frontend/index.html
 
 # Frontend Node modules & builds
 node_modules/
