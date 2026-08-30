@@ -45,7 +45,6 @@ export default function LandingPage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link to="/riwayat-pesanan" className="hidden text-xs font-bold text-[var(--forest)] transition-colors hover:text-[var(--bark)] sm:inline">Tiket Saya</Link>
             <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--forest-deep)] sm:inline">Jelajah Wisata</Link>
             <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px]">Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" /></Link>
           </div>
@@ -231,7 +230,6 @@ export default function LandingPage() {
                 Akses & Portal
               </h4>
               <ul className="space-y-2.5 text-sm text-white/75">
-                <li><Link to="/riwayat-pesanan" className="hover:text-white transition-colors text-[var(--leaf)] font-bold">Tiket & Riwayat Saya</Link></li>
                 <li><Link to="/jelajah" className="hover:text-white transition-colors">Portal Wisatawan</Link></li>
                 <li><Link to="/daftar-wisata" className="hover:text-white transition-colors">Daftarkan Wisata Baru</Link></li>
                 <li><Link to="/masuk" className="hover:text-white transition-colors">Masuk Petugas / Admin</Link></li>
