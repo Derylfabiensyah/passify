@@ -27,7 +27,7 @@
   --fog: #eff5e9;
   --ink: #102d20;
   --ink-soft: #526b5a;
-  --ink-muted: #748476;
+  --ink-muted: #546657;
   --river: var(--forest-soft);
   --moss: var(--leaf);
   --clay: var(--bark);
@@ -112,8 +112,9 @@
   button, a, input, select, textarea { font: inherit; -webkit-tap-highlight-color: transparent; }
   button { cursor: pointer; }
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-    outline: 3px solid rgba(156, 189, 114, .72);
-    outline-offset: 3px;
+    outline: 2px solid var(--forest);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(30, 75, 53, .18);
   }
   h1, h2, h3, h4, h5, h6 {
     color: var(--text-primary);

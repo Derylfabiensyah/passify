@@ -21,7 +21,7 @@ class AppColors {
   // Typography
   static const Color ink = Color(0xFF193024);
   static const Color inkSoft = Color(0xFF586D5D);
-  static const Color textMuted = Color(0xFF809080);
+  static const Color textMuted = Color(0xFF556859); // Adjusted for WCAG AA >= 4.5:1 contrast against light background
 
   // Status & Feedback
   static const Color success = Color(0xFF2E7D32);
