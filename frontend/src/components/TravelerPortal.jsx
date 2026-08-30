@@ -99,18 +99,31 @@ export default function TravelerPortal() {
               </button>
             </div>
           ) : (
-            <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-full px-3.5 sm:px-4"><LogIn className="h-3.5 w-3.5" /><span className="hidden sm:inline">Masuk / Daftar</span><span className="sm:hidden">Masuk</span></Link>
+            <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-xl px-3.5 sm:px-4"><LogIn className="h-3.5 w-3.5" /><span className="hidden sm:inline">Masuk / Daftar</span><span className="sm:hidden">Masuk</span></Link>
           )}
         </div>
       </header>
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
-        <section className="mb-6 flex flex-col gap-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--sand)] px-4 py-3 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2"><Sparkles className="h-3.5 w-3.5 text-[var(--bark)]" /><span><strong className="text-[var(--forest-deep)]">Mode demo.</strong> Lihat contoh portal untuk beberapa pengelola wisata.</span></div>
-          <label className="flex min-w-0 items-center gap-2 font-semibold text-[var(--forest)]">
-            <span className="hidden sm:inline">Pilih kawasan</span>
-            <select aria-label="Pilih contoh kawasan wisata" value={demoIndex} onChange={(event) => setDemoIndex(Number(event.target.value))} className="max-w-[260px] rounded-lg border border-[var(--border)] bg-white px-2.5 py-1.5 text-xs font-semibold text-[var(--forest-deep)] outline-none focus:border-[var(--forest)]">
-              {destinations.map((item, index) => <option key={item.id || index} value={index}>{item.name}</option>)}
+        <section className="mb-6 flex flex-col gap-3 rounded-2xl bg-[var(--leaf-pale)]/80 px-5 py-3.5 text-xs text-[var(--ink-soft)] shadow-2xs sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <span>
+              <strong className="font-bold text-[var(--forest-deep)]">Mode demo.</strong> Lihat contoh portal untuk beberapa pengelola wisata.
+            </span>
+          </div>
+          <label className="flex min-w-0 items-center gap-2.5 font-bold text-[var(--forest-deep)]">
+            <span className="hidden sm:inline text-xs">Pilih kawasan</span>
+            <select
+              aria-label="Pilih contoh kawasan wisata"
+              value={demoIndex}
+              onChange={(event) => setDemoIndex(Number(event.target.value))}
+              className="max-w-[280px] rounded-xl bg-white px-3 py-2 text-xs font-bold text-[var(--forest-deep)] shadow-xs outline-none cursor-pointer"
+            >
+              {destinations.map((item, index) => (
+                <option key={item.id || index} value={index}>
+                  {item.name}
+                </option>
+              ))}
             </select>
           </label>
         </section>
