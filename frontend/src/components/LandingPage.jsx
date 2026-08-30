@@ -254,12 +254,6 @@ export default function LandingPage() {
                   <Globe className="h-4 w-4 text-[var(--leaf)] shrink-0" />
                   <span className="text-white/75">Indonesia (BKSDA & BUMDes)</span>
                 </li>
-                <li className="pt-2">
-                  <div className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs font-medium text-white/90">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>Sistem Cloud & Gate Aktif</span>
-                  </div>
-                </li>
               </ul>
             </div>
           </div>
