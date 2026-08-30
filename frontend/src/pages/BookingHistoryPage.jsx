@@ -155,7 +155,7 @@ export default function BookingHistoryPage() {
             </Link>
             <Link
               to="/riwayat-pesanan"
-              className="text-[var(--forest-deep)] font-extrabold bg-[var(--leaf-pale)] px-3 py-1.5 rounded-full"
+              className="text-[var(--forest-deep)] font-extrabold bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl"
             >
               Tiket Saya
             </Link>
@@ -169,13 +169,13 @@ export default function BookingHistoryPage() {
                   type="button"
                   onClick={handleLogout}
                   title="Keluar"
-                  className="grid h-8 w-8 place-items-center rounded-full bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
+                  className="grid h-8 w-8 place-items-center rounded-xl bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
               </div>
             ) : (
-              <Link to="/masuk" className="btn-secondary px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5">
+              <Link to="/masuk" className="btn-secondary px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
                 <LogIn className="h-3.5 w-3.5" /> Masuk
               </Link>
             )}

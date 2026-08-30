@@ -47,7 +47,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <Link to="/riwayat-pesanan" className="hidden text-xs font-bold text-[var(--forest)] transition-colors hover:text-[var(--bark)] sm:inline">Tiket Saya</Link>
             <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--forest-deep)] sm:inline">Jelajah Wisata</Link>
-            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-full px-3 text-[11px] sm:px-4 sm:text-[13px]">Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" /></Link>
+            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px]">Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" /></Link>
           </div>
         </div>
       </header>
@@ -66,14 +66,14 @@ export default function LandingPage() {
               <h1 className="mt-5 max-w-[760px] font-sans text-[clamp(2.7rem,6.4vw,5.9rem)] font-bold leading-[.93] tracking-[-.06em] text-white">Alam memberi batas.<br />Operasi memberi kepastian.</h1>
               <p className="mt-7 max-w-[590px] text-[15px] leading-7 text-white/80 sm:text-[17px] sm:leading-8">Passify menyatukan tiket, daya dukung, gerbang, dan arus dana dalam satu sistem yang tetap bekerja saat hari di lapangan tidak berjalan sempurna.</p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm">Daftarkan wisata Anda <ArrowRight className="h-4 w-4" /></Link>
+                <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">Daftarkan wisata Anda <ArrowRight className="h-4 w-4" /></Link>
                 <Link to="/jelajah" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white/90 transition-colors hover:bg-white/10 hover:text-white">Jelajahi portal wisatawan <ChevronRight className="h-4 w-4" /></Link>
               </div>
               <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/20 pt-5 text-xs font-semibold text-white/75"><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Kuota per sesi</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Gerbang siap offline</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Payout terlacak</span></div>
             </div>
 
             <aside className="rounded-3xl bg-[rgba(255,254,250,.96)] p-5 text-[var(--ink)] shadow-[0_20px_46px_rgba(0,0,0,.24)] backdrop-blur-md sm:p-6 lg:mb-3">
-              <div className="flex items-start justify-between gap-4 pb-4"><div><Eyebrow>Contoh operasional</Eyebrow><p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Kawasan Lereng Arunika</p></div><span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Normal</span></div>
+              <div className="flex items-start justify-between gap-4 pb-4"><div><Eyebrow>Contoh operasional</Eyebrow><p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Kawasan Lereng Arunika</p></div><span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Normal</span></div>
               <div className="mt-5"><div className="flex items-end justify-between"><span className="text-xs font-semibold text-[var(--ink-soft)]">Kuota sesi pagi</span><strong className="text-2xl font-bold tracking-[-.04em] text-[var(--forest-deep)]">71%</strong></div><div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"><div className="h-full w-[71%] rounded-full bg-[var(--leaf)]" /></div></div>
               <dl className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-2xl bg-[var(--canvas)] p-3"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kunjungan</dt><dd className="mt-1 text-xl font-bold tracking-[-.04em] text-[var(--forest-deep)]">58 orang</dd></div><div className="rounded-2xl bg-[var(--canvas)] p-3"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Gate utara</dt><dd className="mt-1 text-sm font-bold text-[var(--forest)]">Siap menerima</dd></div></dl>
               <p className="mt-4 text-[11px] leading-5 text-[var(--ink-soft)]">Simulasi status yang membantu tim memutuskan sebelum kawasan menjadi terlalu penuh.</p>

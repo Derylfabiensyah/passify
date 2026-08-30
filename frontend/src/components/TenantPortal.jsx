@@ -71,7 +71,7 @@ export default function TenantPortal() {
           <div className="flex items-center gap-3">
             <Link
               to="/admin"
-              className="btn-primary text-[11px] py-1 px-3.5 rounded-full flex items-center gap-1.5 no-underline font-bold shadow-xs"
+              className="btn-primary text-[11px] py-1 px-3.5 rounded-xl flex items-center gap-1.5 no-underline font-bold shadow-xs"
             >
               <LayoutDashboard className="h-3.5 w-3.5" /> Buka Dashboard Admin
             </Link>
@@ -106,7 +106,7 @@ export default function TenantPortal() {
             {isManager && (
               <Link
                 to="/admin"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] px-3 py-1.5 rounded-full no-underline hover:bg-[var(--sand)]"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl no-underline hover:bg-[var(--sand)]"
               >
                 <LayoutDashboard className="h-3.5 w-3.5 text-[var(--forest)]" /> Dashboard Admin
               </Link>
@@ -117,20 +117,20 @@ export default function TenantPortal() {
                 <span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">
                   Halo, {user.name?.split(' ')[0] || (isManager ? 'Pengelola' : 'Wisatawan')}
                 </span>
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold text-[var(--forest-deep)]">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--leaf-pale)] text-xs font-bold text-[var(--forest-deep)]">
                   {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'P'}
                 </span>
                 <button
                   type="button"
                   onClick={logout}
                   title="Keluar"
-                  className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-soft)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)] transition-colors"
+                  className="grid h-9 w-9 place-items-center rounded-xl text-[var(--ink-soft)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)] transition-colors"
                 >
                   <LogOut className="h-4 w-4" />
                 </button>
               </div>
             ) : (
-              <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-full">
+              <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-xl">
                 <LogIn className="h-3.5 w-3.5" />
                 <span>Masuk</span>
               </Link>
