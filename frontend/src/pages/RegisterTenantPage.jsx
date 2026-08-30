@@ -134,6 +134,7 @@ export default function RegisterTenantPage() {
   const handleNextStep = (e) => {
     e.preventDefault();
     if (validateStep1()) {
+      setSubmitError('');
       setStep(2);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -265,7 +266,11 @@ export default function RegisterTenantPage() {
                       required
                       placeholder="pengelola@wisata.com"
                       value={formData.email}
-                      onChange={e => setFormData({ ...formData, email: e.target.value })}
+                      onChange={e => {
+                        setFormData({ ...formData, email: e.target.value });
+                        setSubmitError('');
+                        if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
+                      }}
                       className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white pl-10 pr-4 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none"
                     />
                   </div>
@@ -352,7 +357,7 @@ export default function RegisterTenantPage() {
             </div>
 
             {submitError && (
-              <div className="mb-6 flex items-center gap-3 rounded-xl bg-red-50 p-4 text-xs font-semibold text-red-700 border border-red-200">
+              <div className="mb-6 flex items-center gap-3 rounded-2xl bg-red-50 p-4 text-xs font-semibold text-red-700 shadow-2xs">
                 <AlertCircle className="h-5 w-5 shrink-0 text-red-500" />
                 <span>{submitError}</span>
               </div>
@@ -443,7 +448,10 @@ export default function RegisterTenantPage() {
               <div className="flex items-center gap-3 pt-4">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
+                  onClick={() => {
+                    setSubmitError('');
+                    setStep(1);
+                  }}
                   disabled={isSubmitting}
                   className="flex-1 btn-secondary rounded-xl px-5 py-3 text-sm font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
                 >
