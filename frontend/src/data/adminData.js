@@ -93,10 +93,10 @@ export const GATE_SCAN_STATS = [
 export const ADMIN_DESTINATIONS = [
   {
     id: "dest-bromo",
-    name: "Kawasan Konservasi & Wisata Alam Pegunungan",
+    name: "Taman Nasional Bromo Tengger Semeru",
     type: "gunung",
-    typeLabel: "Gunung & Kawah",
-    location: "Kawasan Sektor Alpha",
+    typeLabel: "Gunung & Kaldera",
+    location: "Tengger, Pasuruan & Probolinggo",
     is_active: true,
     max_daily_capacity: 2752,
     booked_today: 1840,
@@ -105,19 +105,19 @@ export const ADMIN_DESTINATIONS = [
       { id: "cat-1", name: "WNI Weekday", price: 35000, insurance: 3000, retribusi: 5000, is_active: true },
       { id: "cat-2", name: "WNI Weekend/Libur", price: 45000, insurance: 3000, retribusi: 5000, is_active: true },
       { id: "cat-3", name: "WNA International", price: 310000, insurance: 10000, retribusi: 15000, is_active: true },
-      { id: "cat-4", name: "Kendaraan & Shuttle", price: 15000, insurance: 0, retribusi: 0, is_active: true },
+      { id: "cat-4", name: "Kendaraan & Shuttle Jeep", price: 15000, insurance: 0, retribusi: 0, is_active: true },
     ],
     time_slots: [
-      { id: "ts-1", label: "Sesi Pagi (03:00 - 09:00)", max_capacity: 1000, booked: 780, is_active: true },
+      { id: "ts-1", label: "Sesi Sunrise (03:00 - 09:00)", max_capacity: 1000, booked: 780, is_active: true },
       { id: "ts-2", label: "Sesi Siang (09:00 - 16:00)", max_capacity: 1752, booked: 1060, is_active: true },
     ]
   },
   {
     id: "dest-ijen",
-    name: "Taman Wisata Kawah & Panorama Alam",
+    name: "Taman Wisata Alam Kawah Ijen",
     type: "gunung",
     typeLabel: "Gunung & Kawah",
-    location: "Kawasan Sektor Beta",
+    location: "Licin, Banyuwangi & Bondowoso",
     is_active: true,
     max_daily_capacity: 1500,
     booked_today: 920,
@@ -128,17 +128,17 @@ export const ADMIN_DESTINATIONS = [
       { id: "cat-3", name: "WNA International", price: 150000, insurance: 5000, retribusi: 10000, is_active: true },
     ],
     time_slots: [
-      { id: "ts-1", label: "Sesi Dini Hari (02:00 - 07:00)", max_capacity: 800, booked: 610, is_active: true },
+      { id: "ts-1", label: "Sesi Blue Fire (02:00 - 07:00)", max_capacity: 800, booked: 610, is_active: true },
       { id: "ts-2", label: "Sesi Pagi (07:00 - 12:00)", max_capacity: 700, booked: 310, is_active: true },
     ]
   }
 ];
 
 export const GATE_DEVICES = [
-  { id: "gd-001", device_name: "Gate A - Pintu Utama", device_code: "GATE-A-001", gate_type: "entrance", destination: "Kawasan Konservasi & Wisata Alam Pegunungan", is_active: true, hmac_key: "a3f8c2d1e6b9...masked", last_manifest_sync: "2026-07-30T06:00:00Z", last_log_sync: "2026-07-30T10:35:00Z", total_scans_today: 148 },
-  { id: "gd-002", device_name: "Gate B - Pintu Selatan", device_code: "GATE-B-002", gate_type: "entrance", destination: "Kawasan Konservasi & Wisata Alam Pegunungan", is_active: true, hmac_key: "b7d4e1f2a3c8...masked", last_manifest_sync: "2026-07-30T06:00:00Z", last_log_sync: "2026-07-30T10:30:00Z", total_scans_today: 96 },
-  { id: "gd-003", device_name: "Gate C - Exit Kawah", device_code: "GATE-C-003", gate_type: "exit", destination: "Kawasan Konservasi & Wisata Alam Pegunungan", is_active: false, hmac_key: "c5e2f3a4b1d7...masked", last_manifest_sync: "2026-07-29T06:00:00Z", last_log_sync: "2026-07-29T16:00:00Z", total_scans_today: 0 },
-  { id: "gd-004", device_name: "Gate Posko Utama", device_code: "GATE-PLT-001", gate_type: "entrance", destination: "Taman Wisata Kawah & Panorama Alam", is_active: true, hmac_key: "d8f1a2b3c4e5...masked", last_manifest_sync: "2026-07-30T01:30:00Z", last_log_sync: "2026-07-30T07:15:00Z", total_scans_today: 85 },
+  { id: "gd-001", device_name: "Gate A - Pintu Utama", device_code: "GATE-A-001", gate_type: "entrance", destination: "Taman Nasional Bromo Tengger Semeru", is_active: true, hmac_key: "a3f8c2d1e6b9...masked", last_manifest_sync: "2026-07-30T06:00:00Z", last_log_sync: "2026-07-30T10:35:00Z", total_scans_today: 148 },
+  { id: "gd-002", device_name: "Gate B - Pintu Selatan", device_code: "GATE-B-002", gate_type: "entrance", destination: "Taman Nasional Bromo Tengger Semeru", is_active: true, hmac_key: "b7d4e1f2a3c8...masked", last_manifest_sync: "2026-07-30T06:00:00Z", last_log_sync: "2026-07-30T10:30:00Z", total_scans_today: 96 },
+  { id: "gd-003", device_name: "Gate C - Exit Kawah", device_code: "GATE-C-003", gate_type: "exit", destination: "Taman Nasional Bromo Tengger Semeru", is_active: false, hmac_key: "c5e2f3a4b1d7...masked", last_manifest_sync: "2026-07-29T06:00:00Z", last_log_sync: "2026-07-29T16:00:00Z", total_scans_today: 0 },
+  { id: "gd-004", device_name: "Gate Posko Paltuding", device_code: "GATE-PLT-001", gate_type: "entrance", destination: "Taman Wisata Alam Kawah Ijen", is_active: true, hmac_key: "d8f1a2b3c4e5...masked", last_manifest_sync: "2026-07-30T01:30:00Z", last_log_sync: "2026-07-30T07:15:00Z", total_scans_today: 85 },
 ];
 
 export const PAYOUT_HISTORY = [
