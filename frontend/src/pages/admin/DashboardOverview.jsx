@@ -300,8 +300,8 @@ export default function DashboardOverview() {
             <span
               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold border ${
                 isOnline
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                  : 'bg-red-50 text-red-800 border-red-200'
+                  ? 'bg-emerald-50 text-emerald-800'
+                  : 'bg-red-50 text-red-800'
               }`}
             >
               <span className="status-dot" />
@@ -328,7 +328,7 @@ export default function DashboardOverview() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-600 bg-white border border-gray-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-2xs">
+          <span className="text-xs text-gray-600 bg-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs">
             <Clock className="w-3.5 h-3.5 text-emerald-600" />
             <span>Sinkronisasi Live Tiap 60s</span>
           </span>
@@ -371,7 +371,7 @@ export default function DashboardOverview() {
       </div>
 
       {/* Main Chart Section: Hourly Visitors Traffic (Chart.js) */}
-      <div className="card p-5 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
+      <div className="card p-5 sm:p-6 bg-white rounded-2xl shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
             <h3 className="text-base font-bold text-gray-900 font-['Outfit'] flex items-center gap-2">
@@ -382,7 +382,7 @@ export default function DashboardOverview() {
               Powered by Chart.js — Pemantauan pintu masuk & keluar real-time
             </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 self-start sm:self-auto">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-xl bg-emerald-50 text-emerald-800 shadow-2xs self-start sm:self-auto">
             <Activity className="w-3.5 h-3.5 text-emerald-600" />
             <span>Live Gate Telemetry</span>
           </span>
@@ -396,7 +396,7 @@ export default function DashboardOverview() {
       {/* Revenue Weekly (Chart.js) + Ticket Category Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Weekly Revenue Chart.js */}
-        <div className="card p-5 bg-white border border-gray-200 rounded-xl shadow-2xs">
+        <div className="card p-5 bg-white rounded-2xl shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
@@ -415,7 +415,7 @@ export default function DashboardOverview() {
         </div>
 
         {/* Ticket Category Breakdown Card */}
-        <div className="card p-5 bg-white border border-gray-200 rounded-xl shadow-2xs flex flex-col justify-between">
+        <div className="card p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
@@ -474,8 +474,8 @@ export default function DashboardOverview() {
 
       {/* System Health / Alerts Footer Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="card p-4 bg-white border border-gray-200 rounded-xl flex items-start gap-3 shadow-2xs">
-          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+        <div className="card p-4 bg-white rounded-2xl flex items-start gap-3 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 shadow-2xs flex items-center justify-center flex-shrink-0">
             <ShieldCheck className="w-4.5 h-4.5 text-emerald-600" />
           </div>
           <div>
@@ -488,8 +488,8 @@ export default function DashboardOverview() {
           </div>
         </div>
 
-        <div className="card p-4 bg-white border border-gray-200 rounded-xl flex items-start gap-3 shadow-2xs">
-          <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+        <div className="card p-4 bg-white rounded-2xl flex items-start gap-3 shadow-sm">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 shadow-2xs flex items-center justify-center flex-shrink-0">
             <RefreshCw className="w-4.5 h-4.5 text-emerald-600" />
           </div>
           <div>

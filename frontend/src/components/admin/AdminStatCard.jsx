@@ -13,7 +13,7 @@ export default function AdminStatCard({
   const trendUp = trend > 0;
 
   return (
-    <div className="p-5 bg-white border border-gray-200/80 rounded-2xl shadow-2xs hover:border-gray-300 transition-all duration-200">
+    <div className="p-5 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
       <div className="flex items-start justify-between mb-3.5">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-gray-100/80 text-gray-900">

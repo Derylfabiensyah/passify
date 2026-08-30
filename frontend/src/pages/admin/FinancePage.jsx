@@ -226,12 +226,8 @@ export default function FinancePage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
-            <span className="status-dot" />
-            <span>Passify Finance Engine • White-Label SaaS</span>
-          </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
             Keuangan & Pencairan Dana (Settlement)
           </h1>
@@ -248,25 +244,24 @@ export default function FinancePage() {
       {/* KPI Cards (Minimalist style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminStatCard
-          icon={Landmark}
-          label="Total Dicairkan (YTD)"
-          value={`Rp ${(totalPayout / 1000000).toFixed(1)}jt`}
-          subValue="Settlement ke rekening bank klien"
+          icon={DollarSign}
+          label="Total Pendapatan Kotor"
+          value={`Rp ${(totalGross / 1000000).toFixed(1)}jt`}
+          subValue="Tiket + Topup Cashless Venue"
+          badgeText="GROSS"
+        />
+        <AdminStatCard
+          icon={CreditCard}
+          label="Total Dana Dicairkan"
+          value={`Rp ${(totalPaidOut / 1000000).toFixed(1)}jt`}
+          subValue="Ditransfer ke Rekening BCA"
           badgeText="SETTLED"
         />
         <AdminStatCard
           icon={Wallet}
-          label="Pendapatan Bulan Ini"
-          value={`Rp ${(stats.this_month.revenue / 1000000).toFixed(0)}jt`}
-          subValue="Sebelum dipotong biaya layanan"
-          trend={14}
-          badgeText="GROSS"
-        />
-        <AdminStatCard
-          icon={Clock}
-          label="Menunggu Settlement"
-          value={`Rp ${(pendingPayout / 1000000).toFixed(1)}jt`}
-          subValue="Pencairan otomatis H+1 jam 06:00 WIB"
+          label="Saldo Tertunda (Pending)"
+          value={`Rp ${(totalPending / 1000000).toFixed(1)}jt`}
+          subValue="Settlement pukul 06:00 besok"
           badgeText="PENDING"
         />
         <AdminStatCard
@@ -279,7 +274,7 @@ export default function FinancePage() {
       </div>
 
       {/* Chart.js Section: Gross vs Net Payout */}
-      <div className="card p-5 sm:p-6 bg-white border border-gray-200 rounded-xl shadow-2xs">
+      <div className="card p-5 sm:p-6 bg-white rounded-2xl shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
             <h3 className="text-base font-bold text-gray-900 font-['Outfit'] flex items-center gap-2">
@@ -308,8 +303,8 @@ export default function FinancePage() {
       />
 
       {/* Payout Schedule Policy Banner */}
-      <div className="card p-4 bg-white border border-gray-200 rounded-xl flex items-start gap-3 shadow-2xs">
-        <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center flex-shrink-0">
+      <div className="card p-4 bg-white rounded-2xl flex items-start gap-3 shadow-sm">
+        <div className="w-9 h-9 rounded-xl bg-emerald-50 shadow-2xs flex items-center justify-center flex-shrink-0">
           <FileText className="w-4.5 h-4.5 text-emerald-600" />
         </div>
         <div className="text-xs text-gray-600 leading-relaxed">

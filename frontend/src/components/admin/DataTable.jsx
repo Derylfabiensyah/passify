@@ -42,9 +42,9 @@ export default function DataTable({
   });
 
   return (
-    <div className="card bg-white border border-gray-200 rounded-xl shadow-2xs overflow-hidden">
+    <div className="card bg-white rounded-2xl shadow-sm overflow-hidden">
       {/* Top Header & Global Search */}
-      <div className="p-4 sm:p-5 border-b border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           {title && <h3 className="text-base font-bold text-gray-900 font-['Outfit']">{title}</h3>}
           {subtitle && <p className="text-xs text-gray-500 mt-0.5">{subtitle}</p>}
@@ -58,7 +58,7 @@ export default function DataTable({
             value={globalFilter ?? ''}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-3 py-1.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+            className="w-full bg-gray-50 rounded-xl pl-9 pr-3 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-600 focus:bg-white transition-colors shadow-2xs"
           />
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function DataTable({
       </div>
 
       {/* Pagination & Row Count Footer */}
-      <div className="p-3 sm:px-5 border-t border-gray-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
+      <div className="p-3 sm:px-5 border-t border-gray-100 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-600">
         <div className="flex items-center gap-2">
           <span>Tampilkan</span>
           <select
@@ -141,7 +141,7 @@ export default function DataTable({
             onChange={(e) => {
               table.setPageSize(Number(e.target.value));
             }}
-            className="bg-gray-50 border border-gray-200 rounded px-2 py-1 text-xs text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
+            className="bg-gray-50 rounded-lg px-2.5 py-1 text-xs text-gray-900 focus:outline-none focus:ring-1 focus:ring-emerald-600 shadow-2xs"
           >
             {[5, 10, 20, 50].map((pageSize) => (
               <option key={pageSize} value={pageSize}>
@@ -169,7 +169,7 @@ export default function DataTable({
               type="button"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="p-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -177,7 +177,7 @@ export default function DataTable({
               type="button"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="p-1.5 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 rounded-lg bg-gray-50 text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

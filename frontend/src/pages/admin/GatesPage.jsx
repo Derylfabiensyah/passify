@@ -49,16 +49,16 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onDelete }) 
   };
 
   return (
-    <div className={`card p-5 bg-white border border-gray-200 rounded-xl shadow-2xs ${!isOnline ? 'opacity-75 bg-gray-50/60' : ''}`}>
+    <div className={`card p-5 bg-white rounded-2xl shadow-sm ${!isOnline ? 'opacity-75 bg-gray-50/60' : ''}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-lg border flex items-center justify-center ${isOnline ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-gray-100 border-gray-200 text-gray-500'}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-2xs ${isOnline ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
             <Smartphone className="w-5 h-5" />
           </div>
           <div>
             <h4 className="text-sm font-bold text-gray-900">{device.device_name}</h4>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[10px] text-gray-500 font-mono font-bold bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">
+              <span className="text-[10px] text-gray-500 font-mono font-bold bg-gray-100 px-1.5 py-0.5 rounded-lg shadow-2xs">
                 {device.device_code}
               </span>
               <span className="text-[10px] font-semibold text-gray-600">
@@ -497,10 +497,6 @@ export default function GatesPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
-          <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
-            <span className="status-dot" />
-            <span>Passify Hardware & Gate Telemetry • White-Label Cloud Engine</span>
-          </div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
             Perangkat & Terminal Pemindai (Gate Scanners)
           </h1>

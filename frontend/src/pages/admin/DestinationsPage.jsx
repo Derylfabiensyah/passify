@@ -31,7 +31,7 @@ import { useTenant } from '../../contexts/TenantContext';
 
 function TicketCategoryRow({ cat, onEdit, onDelete }) {
   return (
-    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white border border-gray-200 shadow-2xs">
+    <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-white shadow-2xs">
       <div className="flex-1">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-gray-900">{cat.name}</span>
@@ -78,7 +78,7 @@ function DestinationCard({ dest, onToggleExpand, isExpanded, onEditDest, onAddCa
   const quotaPct = Math.round(((dest.booked_today || 0) / (dest.max_daily_capacity || 1000)) * 100);
 
   return (
-    <div className="card bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-2xs">
+    <div className="card bg-white rounded-2xl overflow-hidden shadow-sm">
       {/* Card Header */}
       <div className="flex flex-col sm:flex-row gap-5 p-5 sm:p-6">
         <div className="relative w-full sm:w-36 h-32 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
@@ -702,7 +702,7 @@ export default function DestinationsPage() {
             placeholder="Cari nama destinasi atau lokasi..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-emerald-600 shadow-2xs"
+            className="w-full bg-white rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-600 shadow-2xs"
           />
         </div>
       </div>
