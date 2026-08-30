@@ -189,9 +189,6 @@ export default function TravelerAuthPage({ mode }) {
         <div className="mx-auto flex min-h-[68px] max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
             <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
-            <span className="text-[10px] font-extrabold uppercase tracking-[.14em] text-[var(--ink-soft)] bg-[var(--leaf-pale)] px-2 py-0.5 rounded-full text-[var(--forest)]">
-              Portal Akses
-            </span>
           </Link>
           <Link to={backTarget} className="text-xs font-bold text-[var(--forest)] hover:underline">
             Kembali ke Beranda
