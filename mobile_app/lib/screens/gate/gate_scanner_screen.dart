@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
+import '../../models/scan_log_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/gate_scanner_provider.dart';
 import '../../widgets/scan_result_sheet.dart';
@@ -24,11 +27,39 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
   );
 
   bool _isModalShowing = false;
+  bool _isContinuousMode = true; // Continuous HUD Mode by default for high throughput
+  ValidateResultModel? _hudResult;
+  Timer? _hudTimer;
+  String? _lastScannedPayload;
+  DateTime? _lastScannedTime;
 
   @override
   void dispose() {
+    _hudTimer?.cancel();
     _scannerController.dispose();
     super.dispose();
+  }
+
+  void _showDetailModal(ValidateResultModel result) {
+    if (_isModalShowing) return;
+    setState(() => _isModalShowing = true);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => ScanResultSheet(
+        result: result,
+        onDismiss: () {
+          Navigator.of(ctx).pop();
+          setState(() => _isModalShowing = false);
+        },
+      ),
+    ).then((_) {
+      if (mounted) {
+        setState(() => _isModalShowing = false);
+      }
+    });
   }
 
   void _onDetect(BarcodeCapture capture) async {
@@ -40,35 +71,49 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
     final rawCode = barcodes.first.rawValue;
     if (rawCode == null || rawCode.isEmpty) return;
 
+    // Debounce duplicate scans within 2 seconds
+    final now = DateTime.now();
+    if (_lastScannedPayload == rawCode && _lastScannedTime != null) {
+      if (now.difference(_lastScannedTime!) < const Duration(milliseconds: 2000)) {
+        return;
+      }
+    }
+
     final scannerProvider = Provider.of<GateScannerProvider>(context, listen: false);
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (scannerProvider.isProcessing) return;
 
-    setState(() => _isModalShowing = true);
+    _lastScannedPayload = rawCode;
+    _lastScannedTime = now;
+
+    // Audio click / beep feedback
+    SystemSound.play(SystemSoundType.click);
 
     final result = await scannerProvider.processScannedCode(
       rawPayload: rawCode,
       deviceId: authProvider.selectedDeviceId,
     );
 
-    if (mounted) {
-      showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        backgroundColor: Colors.transparent,
-        builder: (ctx) => ScanResultSheet(
-          result: result,
-          onDismiss: () {
-            Navigator.of(ctx).pop();
-            setState(() => _isModalShowing = false);
-          },
-        ),
-      ).then((_) {
+    if (!mounted) return;
+
+    if (_isContinuousMode) {
+      // Continuous HUD Mode: Show auto-dismiss floating HUD banner without stopping camera
+      setState(() {
+        _hudResult = result;
+      });
+
+      _hudTimer?.cancel();
+      _hudTimer = Timer(const Duration(milliseconds: 1800), () {
         if (mounted) {
-          setState(() => _isModalShowing = false);
+          setState(() {
+            _hudResult = null;
+          });
         }
       });
+    } else {
+      // Modal Detail Mode: Show modal bottom sheet
+      _showDetailModal(result);
     }
   }
 
@@ -113,36 +158,96 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                     ),
                   ),
 
-                  // Mode Indicator Badge
-                  GestureDetector(
-                    onTap: () => scannerProvider.toggleOfflineMode(),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: scannerProvider.forceOfflineMode ? AppColors.bark : AppColors.forest,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.white30),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            scannerProvider.forceOfflineMode ? Icons.cloud_off : Icons.cloud_done,
-                            color: Colors.white,
-                            size: 14,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            scannerProvider.forceOfflineMode ? 'MODE OFFLINE' : 'MODE ONLINE',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                  // Mode Switcher (Continuous HUD vs Detail Modal) & Online/Offline
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Continuous Mode Toggle
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _isContinuousMode = !_isContinuousMode;
+                            _hudResult = null;
+                          });
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                _isContinuousMode
+                                    ? '⚡ Mode Kontinu Aktif (HUD Cepat & Auto-Dismiss)'
+                                    : '📋 Mode Detail Aktif (Modal Sheet)',
+                              ),
+                              duration: const Duration(seconds: 1),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: BoxDecoration(
+                            color: _isContinuousMode
+                                ? const Color(0xFF059669).withOpacity(0.9)
+                                : Colors.black54,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: _isContinuousMode ? AppColors.leaf : Colors.white30,
                             ),
                           ),
-                        ],
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _isContinuousMode ? Icons.bolt : Icons.view_agenda_outlined,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _isContinuousMode ? 'KONTINU' : 'DETAIL',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
+
+                      // Offline/Online Mode Indicator
+                      GestureDetector(
+                        onTap: () => scannerProvider.toggleOfflineMode(),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: scannerProvider.forceOfflineMode ? AppColors.bark : AppColors.forest,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white30),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                scannerProvider.forceOfflineMode ? Icons.cloud_off : Icons.cloud_done,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                scannerProvider.forceOfflineMode ? 'OFFLINE' : 'ONLINE',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
 
                   // Torch & Switch Camera Controls
@@ -161,7 +266,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       CircleAvatar(
                         backgroundColor: Colors.black45,
                         child: IconButton(
@@ -195,7 +300,9 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Mendukung Dynamic TOTP & Tiket Reguler (< 500ms)',
+                  _isContinuousMode
+                      ? '⚡ Mode Kontinu Aktif • Scan instan tanpa jeda modal'
+                      : 'Mendukung Dynamic TOTP & Tiket Reguler (< 500ms)',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
@@ -207,7 +314,10 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
             ),
           ),
 
-          // 5. Bottom Live Stats Dashboard
+          // 5. Continuous Mode Floating HUD Toast (Auto-Dismiss)
+          if (_hudResult != null) _buildHudToast(_hudResult!),
+
+          // 6. Bottom Live Stats Dashboard
           Positioned(
             bottom: 0,
             left: 0,
@@ -272,6 +382,125 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHudToast(ValidateResultModel result) {
+    final isValid = result.valid;
+    final statusColor = isValid ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final bgCardColor = isValid ? const Color(0xFF064E3B).withOpacity(0.94) : const Color(0xFF7F1D1D).withOpacity(0.94);
+
+    return Positioned(
+      top: 90,
+      left: 16,
+      right: 16,
+      child: GestureDetector(
+        onTap: () => _showDetailModal(result),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: bgCardColor,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: statusColor, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: statusColor.withOpacity(0.35),
+                blurRadius: 18,
+                spreadRadius: 2,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              // Large Status Icon with Circular border
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.25),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: statusColor, width: 2),
+                ),
+                child: Icon(
+                  isValid ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  color: statusColor,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Info Column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            isValid ? 'TIKET VALID • MASUK' : 'TIKET DITOLAK',
+                            style: TextStyle(
+                              color: statusColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                        if (result.isOffline)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                            decoration: BoxDecoration(
+                              color: Colors.white24,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: const Text(
+                              'OFFLINE',
+                              style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      result.visitorName.isNotEmpty
+                          ? '${result.visitorName} • ${result.categoryName}'
+                          : result.message,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if (result.ticketCode.isNotEmpty)
+                      Text(
+                        result.ticketCode,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 10,
+                          fontFamily: 'monospace',
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+              // Tap hint icon
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.white.withOpacity(0.5),
+                size: 20,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
