@@ -143,18 +143,18 @@ export default function TravelerPortal() {
               </div>
             </div>
 
-            <aside className="rounded-[1.25rem] border border-white/16 bg-[rgba(255,254,250,.97)] p-5 text-[var(--ink)] shadow-[0_16px_36px_rgba(0,0,0,.16)] backdrop-blur-md">
+            <aside className="rounded-2xl border border-white/16 bg-[rgba(255,254,250,.97)] p-5 text-[var(--ink)] shadow-[0_16px_36px_rgba(0,0,0,.16)] backdrop-blur-md">
               <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] pb-4">
-                <div><p className="eyebrow">Ketersediaan hari ini</p><p className="mt-1 text-xs text-[var(--ink-soft)]">{todayLabel}</p></div>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Buka</span>
+                <div><p className="eyebrow">Ketersediaan hari ini</p><p className="mt-1 text-xs font-semibold text-[var(--ink-soft)]">{todayLabel}</p></div>
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Buka</span>
               </div>
               <div className="mt-5">
-                <div className="flex items-end justify-between"><span className="text-xs font-semibold text-[var(--ink-soft)]">Kuota terisi</span><strong className="font-serif text-2xl text-[var(--forest-deep)]">{quotaPercentage}%</strong></div>
+                <div className="flex items-end justify-between"><span className="text-xs font-bold text-[var(--ink-soft)]">Kuota terisi</span><strong className="text-2xl font-extrabold text-[var(--forest-deep)]">{quotaPercentage}%</strong></div>
                 <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"><div className="h-full rounded-full bg-[var(--leaf)]" style={{ width: `${quotaPercentage}%` }} /></div>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3">
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-3"><span className="block text-[10px] font-bold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kuota</span><strong className="mt-1 block font-serif text-xl">{remainingQuota.toLocaleString('id-ID')}</strong></div>
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-3"><span className="block text-[10px] font-bold uppercase tracking-wide text-[var(--ink-muted)]">Mulai dari</span><strong className="mt-1 block font-serif text-lg text-[var(--bark)]">{formatRupiah(lowestPrice)}</strong></div>
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-3"><span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kuota</span><strong className="mt-1 block text-xl font-extrabold text-[var(--forest-deep)]">{remainingQuota.toLocaleString('id-ID')}</strong></div>
+                <div className="rounded-xl border border-[var(--border)] bg-[var(--canvas)] p-3"><span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Mulai dari</span><strong className="mt-1 block text-lg font-extrabold text-[var(--bark)]">{formatRupiah(lowestPrice)}</strong></div>
               </div>
             </aside>
           </div>
