@@ -16,16 +16,21 @@ import {
   Ticket
 } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
+import { PortalPageSkeleton } from './common/Skeleton';
 
 const rupiah = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
 
 export default function TenantPortal() {
-  const { destination } = useTenant();
+  const { destination, isLoading } = useTenant();
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('passify_user') || 'null'); } catch { return null; }
   });
+
+  if (isLoading) {
+    return <PortalPageSkeleton />;
+  }
 
   if (!destination) return null;
 

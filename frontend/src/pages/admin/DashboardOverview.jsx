@@ -30,6 +30,7 @@ import { useTenant } from '../../contexts/TenantContext';
 import { fetchDashboardOverviewTelemetry } from '../../api/admin';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
+import { ChartContainerSkeleton } from '../../components/common/Skeleton';
 import {
   DASHBOARD_STATS,
   HOURLY_VISITORS,
@@ -368,6 +369,7 @@ export default function DashboardOverview() {
           subValue={`Kemarin: Rp ${(stats.yesterday.revenue / 1000000).toFixed(1)}jt`}
           trend={revGrowth}
           badgeText="FINANCE"
+          isLoading={isRefreshing}
         />
         <AdminStatCard
           icon={Ticket}
@@ -376,6 +378,7 @@ export default function DashboardOverview() {
           subValue={`Kemarin: ${stats.yesterday.tickets_sold} tiket`}
           trend={ticketGrowth}
           badgeText="SALES"
+          isLoading={isRefreshing}
         />
         <AdminStatCard
           icon={Users}
@@ -384,6 +387,7 @@ export default function DashboardOverview() {
           subValue={`Kapasitas Maks: ${(stats.today.total_capacity || 2752).toLocaleString('id-ID')}`}
           progress={quotaUsedPct}
           badgeText="CROWD"
+          isLoading={isRefreshing}
         />
         <AdminStatCard
           icon={Wallet}
@@ -391,48 +395,57 @@ export default function DashboardOverview() {
           value={`Rp ${((stats.today.wallet_topups || 4250000) / 1000000).toFixed(1)}jt`}
           subValue="45 transaksi merchant"
           badgeText="TENANT"
+          isLoading={isRefreshing}
         />
       </div>
 
       {/* Main Chart Section: Hourly Visitors Traffic (Chart.js) */}
-      <div className="card p-5 sm:p-6 bg-white rounded-2xl shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-          <div>
-            <h3 className="text-base font-bold text-gray-900 font-['Outfit'] flex items-center gap-2">
-              <BarChart3 className="w-4.5 h-4.5 text-emerald-600" />
-              <span>Arus Wisatawan Hari Ini (Per Jam)</span>
-            </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Powered by Chart.js — Pemantauan pintu masuk & keluar real-time
-            </p>
-          </div>
-        </div>
-
-        <div className="h-64 sm:h-72 w-full">
-          <Bar data={hourlyChartData} options={hourlyChartOptions} />
-        </div>
-      </div>
-
-      {/* Revenue Weekly (Chart.js) + Ticket Category Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Weekly Revenue Chart.js */}
-        <div className="card p-5 bg-white rounded-2xl shadow-sm">
-          <div className="flex items-center justify-between mb-6">
+      {isRefreshing ? (
+        <ChartContainerSkeleton />
+      ) : (
+        <div className="card p-5 sm:p-6 bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
-                <TrendingUp className="w-4 h-4 text-emerald-600" />
-                <span>Pendapatan 7 Hari Terakhir</span>
+              <h3 className="text-base font-bold text-[var(--forest-deep)] font-heading flex items-center gap-2">
+                <BarChart3 className="w-4.5 h-4.5 text-[var(--forest)]" />
+                <span>Arus Wisatawan Hari Ini (Per Jam)</span>
               </h3>
-              <p className="text-xs text-gray-500">
-                Total Bulan Ini: Rp {(stats.this_month.revenue / 1000000).toFixed(0)}jt
+              <p className="text-xs text-[var(--ink-soft)] mt-0.5">
+                Pemantauan pintu masuk &amp; keluar real-time
               </p>
             </div>
           </div>
 
-          <div className="h-48 w-full">
-            <Bar data={revenueChartData} options={revenueChartOptions} />
+          <div className="h-64 sm:h-72 w-full">
+            <Bar data={hourlyChartData} options={hourlyChartOptions} />
           </div>
         </div>
+      )}
+
+      {/* Revenue Weekly (Chart.js) + Ticket Category Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Weekly Revenue Chart.js */}
+        {isRefreshing ? (
+          <ChartContainerSkeleton />
+        ) : (
+          <div className="card p-5 bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-sm">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h3 className="text-sm font-bold text-[var(--forest-deep)] flex items-center gap-2 font-heading">
+                  <TrendingUp className="w-4 h-4 text-[var(--forest)]" />
+                  <span>Pendapatan 7 Hari Terakhir</span>
+                </h3>
+                <p className="text-xs text-[var(--ink-soft)]">
+                  Total Bulan Ini: Rp {(stats.this_month.revenue / 1000000).toFixed(0)}jt
+                </p>
+              </div>
+            </div>
+
+            <div className="h-48 w-full">
+              <Bar data={revenueChartData} options={revenueChartOptions} />
+            </div>
+          </div>
+        )}
 
         {/* Ticket Category Breakdown Card */}
         <div className="card p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between">
