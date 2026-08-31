@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/app_colors.dart';
@@ -11,6 +12,9 @@ class ServerConfigScreen extends StatefulWidget {
 
 class _ServerConfigScreenState extends State<ServerConfigScreen> {
   final TextEditingController _hostController = TextEditingController();
+  bool _isTesting = false;
+  String? _testResult;
+  bool? _testSuccess;
 
   @override
   void initState() {
@@ -36,6 +40,61 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
           backgroundColor: AppColors.forest,
         ),
       );
+    }
+  }
+
+  Future<void> _testConnection() async {
+    final host = _hostController.text.trim();
+    if (host.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Masukkan IP Host terlebih dahulu')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isTesting = true;
+      _testResult = null;
+      _testSuccess = null;
+    });
+
+    final stopwatch = Stopwatch()..start();
+    try {
+      final dio = Dio(
+        BaseOptions(
+          connectTimeout: const Duration(seconds: 3),
+          receiveTimeout: const Duration(seconds: 3),
+        ),
+      );
+
+      await dio.get('http://$host:8081/health');
+      stopwatch.stop();
+      if (mounted) {
+        setState(() {
+          _isTesting = false;
+          _testSuccess = true;
+          _testResult = 'Koneksi Berhasil! Respons diterima (${stopwatch.elapsedMilliseconds} ms)';
+        });
+      }
+    } catch (err) {
+      stopwatch.stop();
+      if (err is DioException && err.response != null) {
+        if (mounted) {
+          setState(() {
+            _isTesting = false;
+            _testSuccess = true;
+            _testResult = 'Host Terhubung! Server aktif (${stopwatch.elapsedMilliseconds} ms)';
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isTesting = false;
+            _testSuccess = false;
+            _testResult = 'Koneksi Gagal: Server tidak merespons. Periksa IP host dan koneksi Wi-Fi.';
+          });
+        }
+      }
     }
   }
 
@@ -79,34 +138,99 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
                 fillColor: AppColors.surface,
                 prefixIcon: const Icon(Icons.dns, color: AppColors.forestSoft),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.radiusMd,
                   borderSide: const BorderSide(color: AppColors.border),
                 ),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.radiusMd,
                   borderSide: const BorderSide(color: AppColors.border),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.forest, width: 2),
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: AppRadius.radiusMd,
+                  borderSide: BorderSide(color: AppColors.forest, width: 2),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
-            // Save Button
-            ElevatedButton(
-              onPressed: () => _saveHost(_hostController.text),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.forest,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(48),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: const Text('Simpan Konfigurasi', style: TextStyle(fontWeight: FontWeight.bold)),
+            // Buttons Row: Uji Koneksi & Simpan
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: _isTesting ? null : _testConnection,
+                    icon: _isTesting
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.forest),
+                          )
+                        : const Icon(Icons.network_ping, size: 18),
+                    label: Text(_isTesting ? 'Menguji...' : 'Uji Koneksi'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.forest,
+                      side: const BorderSide(color: AppColors.forest),
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _saveHost(_hostController.text),
+                    icon: const Icon(Icons.save, size: 18),
+                    label: const Text('Simpan Host'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.forest,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ],
             ),
 
-            const SizedBox(height: 32),
+            // Test Ping Status Result Banner
+            if (_testResult != null) ...[
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _testSuccess == true ? AppColors.successBg : AppColors.errorBg,
+                  borderRadius: AppRadius.radiusMd,
+                  border: Border.all(
+                    color: _testSuccess == true
+                        ? AppColors.success.withValues(alpha: 0.4)
+                        : AppColors.error.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      _testSuccess == true ? Icons.check_circle : Icons.error_outline,
+                      color: _testSuccess == true ? AppColors.success : AppColors.error,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        _testResult!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _testSuccess == true ? AppColors.success : AppColors.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 28),
             const Text(
               'Preset Cepat:',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.ink),
