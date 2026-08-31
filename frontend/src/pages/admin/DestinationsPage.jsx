@@ -692,17 +692,9 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
 export default function DestinationsPage() {
   const { toast } = useToast();
   const { slug, refetch } = useTenant();
-  const [destinations, setDestinations] = useState(() => {
-    try {
-      const saved = localStorage.getItem('passify_admin_destinations');
-      return saved ? JSON.parse(saved) : ADMIN_DESTINATIONS;
-    } catch {
-      return ADMIN_DESTINATIONS;
-    }
-  });
-
+  const [destinations, setDestinations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedId, setExpandedId] = useState(destinations[0]?.id || null);
+  const [expandedId, setExpandedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [editingDest, setEditingDest] = useState(null);
   const [editingCatContext, setEditingCatContext] = useState(null); // { destId, cat }
@@ -716,7 +708,7 @@ export default function DestinationsPage() {
         const realList = await fetchAdminDestinations(slug);
         if (realList && realList.length > 0) {
           setDestinations(realList);
-          if (!expandedId) setExpandedId(realList[0].id);
+          setExpandedId(realList[0].id);
         }
       } catch (err) {
         console.warn('Real destinations load error:', err);

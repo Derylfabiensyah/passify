@@ -545,23 +545,32 @@ export default function QuotasPage() {
         />
       </div>
 
-      {/* Destination Select */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-        {destinations.map((dest) => (
-          <button
-            key={dest.id}
-            type="button"
-            onClick={() => setSelectedDestId(dest.id)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-              selectedDest.id === dest.id
-                ? 'bg-emerald-600 text-white shadow-2xs'
-                : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 shadow-2xs'
-            }`}
-          >
-            {dest.name}
-          </button>
-        ))}
-      </div>
+      {/* Destination Badge / Select */}
+      {destinations.length > 1 ? (
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          {destinations.map((dest) => (
+            <button
+              key={dest.id}
+              type="button"
+              onClick={() => setSelectedDestId(dest.id)}
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                selectedDest.id === dest.id
+                  ? 'bg-emerald-600 text-white shadow-2xs'
+                  : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 shadow-2xs'
+              }`}
+            >
+              {dest.name}
+            </button>
+          ))}
+        </div>
+      ) : selectedDest.name ? (
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold shadow-2xs">
+            <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+            {selectedDest.name}
+          </span>
+        </div>
+      ) : null}
 
       {/* Quota Calendar Grid */}
       <div className="card p-5 bg-white rounded-2xl shadow-sm">
