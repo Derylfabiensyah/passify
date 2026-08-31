@@ -27,31 +27,20 @@ export default function TravelerAuthPage({ mode }) {
     const tenantSlug = user.tenant?.slug || user.tenant?.subdomain || user.tenant_slug;
 
     if (isManager) {
-      const slug = tenantSlug || 'curug-bidadari';
-      localStorage.setItem('passify_current_tenant', slug);
-
-      const isLocal =
-        window.location.hostname === 'localhost' ||
-        window.location.hostname === '127.0.0.1' ||
-        window.location.hostname === '::1';
-
-      if (isLocal) {
-        // Open the Tenant's Website Template for their specific nature destination
-        window.location.href = `/?tenant=${slug}`;
-        return;
-      } else {
-        // On production, redirect to the tenant's official domain
-        window.location.href = `https://${slug}.${ROOT_DOMAIN}`;
-        return;
+      if (tenantSlug) {
+        localStorage.setItem('passify_current_tenant', tenantSlug);
       }
+      navigate('/admin');
+      return;
     }
 
     // Traveler (Wisatawan) redirection
     if (returnTo && returnTo !== '/jelajah' && returnTo !== '/masuk' && returnTo !== '/daftar') {
-      navigate(returnTo, { replace: true, state: nextState });
-    } else {
-      navigate('/riwayat-pesanan', { replace: true });
+      navigate(returnTo, { state: nextState });
+      return;
     }
+
+    navigate('/jelajah');
   };
 
   const handleLogin = async (event) => {
@@ -59,7 +48,7 @@ export default function TravelerAuthPage({ mode }) {
     setError('');
 
     if (!login.email || !login.password) {
-      setError('Masukkan email dan kata sandi untuk melanjutkan.');
+      setError('Email dan kata sandi wajib diisi.');
       return;
     }
 
@@ -80,12 +69,23 @@ export default function TravelerAuthPage({ mode }) {
 
       if (res.ok && (data.success || data.data?.access_token)) {
         const payload = data.data || data;
-        const userObj = payload.user || {
-          id: payload.id || 'usr-default',
+        const rawUser = payload.user || payload;
+        const tenantInfo = rawUser.tenant || payload.tenant || {};
+        const tenantSlug = tenantInfo.slug || tenantInfo.subdomain || rawUser.tenant_slug;
+        const tenantName = tenantInfo.name || rawUser.tenant_name;
+
+        const userObj = {
+          id: rawUser.id || 'usr-default',
           email: login.email,
-          name: payload.full_name || login.email.split('@')[0],
-          role: payload.role || (login.email.includes('admin') ? 'tenant_admin' : 'visitor'),
+          name: rawUser.full_name || rawUser.name || login.email.split('@')[0],
+          full_name: rawUser.full_name || rawUser.name || login.email.split('@')[0],
+          role: rawUser.role || (login.email.includes('admin') ? 'tenant_admin' : 'visitor'),
+          tenant_id: rawUser.tenant_id || tenantInfo.id || null,
+          tenant_slug: tenantSlug || null,
+          tenant_name: tenantName || null,
+          tenant: tenantInfo.id ? tenantInfo : (tenantSlug ? { id: rawUser.tenant_id, name: tenantName, slug: tenantSlug } : null),
         };
+
         handleAuthenticationSuccess(userObj, payload.access_token || payload.token);
         return;
       }

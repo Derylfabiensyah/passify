@@ -1,10 +1,8 @@
-﻿import { apiRequest } from './client';
+import { apiRequest } from './client';
 import {
-  DASHBOARD_STATS,
   HOURLY_VISITORS,
   REVENUE_WEEKLY,
   TICKET_CATEGORY_SALES,
-  RECENT_TRANSACTIONS,
   GATE_SCAN_STATS,
   ADMIN_DESTINATIONS,
   PAYOUT_HISTORY
@@ -36,8 +34,8 @@ export function getAdminUser() {
     email: 'admin@passify.id',
     role: 'tenant_admin',
     tenant_id: null,
-    tenant_slug: localStorage.getItem('passify_current_tenant') || 'curug-bidadari',
-    tenant_name: 'Kawasan Wisata Alam',
+    tenant_slug: localStorage.getItem('passify_current_tenant') || null,
+    tenant_name: null,
   };
 }
 
@@ -46,33 +44,55 @@ export function getAdminUser() {
  */
 export async function fetchAdminDestinations(slug) {
   const user = getAdminUser();
-  const currentSlug = slug || user.tenant_slug || 'curug-bidadari';
+  const currentSlug = slug || user.tenant_slug;
 
-  try {
-    // 1. Try public tenant destination lookup
-    const res = await apiRequest(`/api/v1/public/tenants/${currentSlug}/destination`);
-    if (res && (res.data || res.name)) {
-      const dest = res.data || res;
-      // Also fetch categories from ticket service if destination ID is present
-      if (dest.id) {
-        try {
-          const catRes = await apiRequest(`/api/v1/tickets/destinations/${dest.id}/categories`);
-          if (catRes && (catRes.data || Array.isArray(catRes))) {
-            dest.ticket_categories = catRes.data || catRes;
-          }
-        } catch (_) {}
+  if (currentSlug) {
+    try {
+      // 1. Try public tenant destination lookup
+      const res = await apiRequest(`/api/v1/public/tenants/${currentSlug}/destination`);
+      if (res && (res.data || res.name)) {
+        const dest = res.data || res;
+        // Also fetch categories from ticket service if destination ID is present
+        if (dest.id) {
+          try {
+            const catRes = await apiRequest(`/api/v1/tickets/destinations/${dest.id}/categories`);
+            if (catRes && (catRes.data || Array.isArray(catRes))) {
+              dest.ticket_categories = catRes.data || catRes;
+            }
+          } catch (_) {}
+        }
+        return [dest];
       }
-      return [dest];
+    } catch (err) {
+      console.warn('Backend destination lookup:', err.message);
     }
-  } catch (err) {
-    console.warn('Backend destination lookup fallback:', err.message);
   }
 
-  // Fallback to local admin destinations or tenant default
-  try {
-    const local = localStorage.getItem('passify_admin_destinations');
-    if (local) return JSON.parse(local);
-  } catch (_) {}
+  // If user has a real tenant name/slug, return a real base destination for their tenant
+  if (user.tenant_name || user.tenant_slug) {
+    return [{
+      id: user.tenant_id || `dest-${user.tenant_slug || 'custom'}`,
+      tenant_id: user.tenant_id,
+      name: user.tenant_name || `Kawasan Wisata ${user.tenant_slug}`,
+      slug: user.tenant_slug || 'wisata',
+      description: `Kawasan Konservasi & Destinasi Wisata Alam ${user.tenant_name || ''}`,
+      destination_type: 'air_terjun',
+      address: 'Kawasan Wisata Alam',
+      max_daily_capacity: 1000,
+      booked_today: 0,
+      opening_time: '07:00:00',
+      closing_time: '17:00:00',
+      is_active: true,
+      ticket_categories: [
+        { id: 'cat-1', name: 'Tiket Masuk Reguler (Dewasa)', price: 25000, is_active: true, quota_per_day: 500 },
+        { id: 'cat-2', name: 'Tiket Masuk Pelajar / Anak', price: 15000, is_active: true, quota_per_day: 300 },
+      ],
+      time_slots: [
+        { id: 'ts-1', label: 'Sesi Pagi', time_range: '07:00 - 12:00', max_capacity: 500, booked: 0, is_active: true },
+        { id: 'ts-2', label: 'Sesi Siang', time_range: '12:00 - 17:00', max_capacity: 500, booked: 0, is_active: true },
+      ]
+    }];
+  }
 
   return ADMIN_DESTINATIONS;
 }
@@ -103,7 +123,7 @@ export async function fetchAdminQuotas(destinationId) {
  * Fetch real gate devices and scan stats
  */
 export async function fetchAdminGateTelemetry(destinationId) {
-  if (!destinationId) return { devices: [], stats: GATE_SCAN_STATS };
+  if (!destinationId) return { devices: [], stats: { scans_today: 0, valid_scans: 0, rejected_scans: 0, offline_synced: 0 } };
 
   try {
     const [devicesRes, statsRes] = await Promise.allSettled([
@@ -112,12 +132,14 @@ export async function fetchAdminGateTelemetry(destinationId) {
     ]);
 
     const devices = devicesRes.status === 'fulfilled' && devicesRes.value?.data ? devicesRes.value.data : [];
-    const stats = statsRes.status === 'fulfilled' && statsRes.value?.data ? statsRes.value.data : GATE_SCAN_STATS;
+    const stats = statsRes.status === 'fulfilled' && statsRes.value?.data
+      ? statsRes.value.data
+      : { scans_today: 0, valid_scans: 0, rejected_scans: 0, offline_synced: 0 };
 
     return { devices, stats };
   } catch (err) {
     console.warn('Failed to fetch gate telemetry:', err.message);
-    return { devices: [], stats: GATE_SCAN_STATS };
+    return { devices: [], stats: { scans_today: 0, valid_scans: 0, rejected_scans: 0, offline_synced: 0 } };
   }
 }
 
@@ -130,9 +152,17 @@ export async function fetchAdminFinanceData(tenantId) {
 
   if (!effectiveTenantId) {
     return {
-      transactions: RECENT_TRANSACTIONS,
-      payouts: PAYOUT_HISTORY,
-      weeklyRevenue: REVENUE_WEEKLY,
+      transactions: [],
+      payouts: [],
+      weeklyRevenue: [
+        { day: 'Sen', revenue: 0 },
+        { day: 'Sel', revenue: 0 },
+        { day: 'Rab', revenue: 0 },
+        { day: 'Kam', revenue: 0 },
+        { day: 'Jum', revenue: 0 },
+        { day: 'Sab', revenue: 0 },
+        { day: 'Min', revenue: 0 },
+      ],
     };
   }
 
@@ -142,20 +172,28 @@ export async function fetchAdminFinanceData(tenantId) {
       apiRequest(`/api/v1/payments/tenants/${effectiveTenantId}/payouts`),
     ]);
 
-    const transactions = trxRes.status === 'fulfilled' && trxRes.value?.data ? trxRes.value.data : RECENT_TRANSACTIONS;
-    const payouts = payoutRes.status === 'fulfilled' && payoutRes.value?.data ? payoutRes.value.data : PAYOUT_HISTORY;
+    const transactions = trxRes.status === 'fulfilled' && trxRes.value?.data ? trxRes.value.data : [];
+    const payouts = payoutRes.status === 'fulfilled' && payoutRes.value?.data ? payoutRes.value.data : [];
 
     return {
       transactions,
       payouts,
-      weeklyRevenue: REVENUE_WEEKLY,
+      weeklyRevenue: [
+        { day: 'Sen', revenue: 0 },
+        { day: 'Sel', revenue: 0 },
+        { day: 'Rab', revenue: 0 },
+        { day: 'Kam', revenue: 0 },
+        { day: 'Jum', revenue: 0 },
+        { day: 'Sab', revenue: 0 },
+        { day: 'Min', revenue: 0 },
+      ],
     };
   } catch (err) {
     console.warn('Failed to fetch finance telemetry:', err.message);
     return {
-      transactions: RECENT_TRANSACTIONS,
-      payouts: PAYOUT_HISTORY,
-      weeklyRevenue: REVENUE_WEEKLY,
+      transactions: [],
+      payouts: [],
+      weeklyRevenue: [],
     };
   }
 }
@@ -189,32 +227,57 @@ export async function fetchDashboardOverviewTelemetry(slug) {
 
   const liveStats = {
     today: {
-      revenue: calculatedRevenue > 0 ? calculatedRevenue : DASHBOARD_STATS.today.revenue,
-      tickets_sold: bookedToday > 0 ? bookedToday : DASHBOARD_STATS.today.tickets_sold,
-      visitors_entered: gateData.stats?.scans_today || DASHBOARD_STATS.today.visitors_entered,
+      revenue: calculatedRevenue,
+      tickets_sold: bookedToday,
+      visitors_entered: gateData.stats?.scans_today || 0,
       remaining_quota: remainingQuota,
       total_capacity: totalCapacity,
-      wallet_topups: DASHBOARD_STATS.today.wallet_topups,
-      vendor_transactions: DASHBOARD_STATS.today.vendor_transactions,
+      wallet_topups: 0,
+      vendor_transactions: 0,
     },
-    yesterday: DASHBOARD_STATS.yesterday,
-    this_month: DASHBOARD_STATS.this_month,
+    yesterday: {
+      revenue: 0,
+      tickets_sold: 0,
+      visitors_entered: 0,
+    },
+    this_month: {
+      revenue: calculatedRevenue,
+      tickets_sold: bookedToday,
+      visitors_entered: gateData.stats?.scans_today || 0,
+    },
   };
+
+  const defaultHourly = [
+    { hour: '07:00', entered: 0, exited: 0 },
+    { hour: '09:00', entered: 0, exited: 0 },
+    { hour: '11:00', entered: 0, exited: 0 },
+    { hour: '13:00', entered: 0, exited: 0 },
+    { hour: '15:00', entered: 0, exited: 0 },
+    { hour: '17:00', entered: 0, exited: 0 },
+  ];
 
   return {
     destinations,
     stats: liveStats,
-    hourlyVisitors: HOURLY_VISITORS,
-    revenueWeekly: financeData.weeklyRevenue || REVENUE_WEEKLY,
+    hourlyVisitors: defaultHourly,
+    revenueWeekly: financeData.weeklyRevenue?.length > 0 ? financeData.weeklyRevenue : [
+      { day: 'Sen', revenue: 0 },
+      { day: 'Sel', revenue: 0 },
+      { day: 'Rab', revenue: 0 },
+      { day: 'Kam', revenue: 0 },
+      { day: 'Jum', revenue: 0 },
+      { day: 'Sab', revenue: 0 },
+      { day: 'Min', revenue: 0 },
+    ],
     ticketCategorySales: primaryDest.ticket_categories
       ? primaryDest.ticket_categories.map((c) => ({
           name: c.name,
-          sold: Math.round((bookedToday * 0.4) || 50),
-          revenue: (c.price || 35000) * Math.round((bookedToday * 0.4) || 50),
-          percentage: 35,
+          sold: 0,
+          revenue: 0,
+          percentage: 0,
         }))
-      : TICKET_CATEGORY_SALES,
-    recentTransactions: financeData.transactions || RECENT_TRANSACTIONS,
-    gateScanStats: gateData.stats || GATE_SCAN_STATS,
+      : [],
+    recentTransactions: financeData.transactions || [],
+    gateScanStats: gateData.stats || { scans_today: 0, valid_scans: 0, rejected_scans: 0, offline_synced: 0 },
   };
 }

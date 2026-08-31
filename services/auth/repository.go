@@ -41,7 +41,7 @@ func (r *authRepository) CreateUser(user *models.User) error {
 
 func (r *authRepository) GetUserByEmail(email string) (*models.User, error) {
 	var user models.User
-	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+	if err := r.db.Preload("Tenant").Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil
@@ -49,7 +49,7 @@ func (r *authRepository) GetUserByEmail(email string) (*models.User, error) {
 
 func (r *authRepository) GetUserByID(id uuid.UUID) (*models.User, error) {
 	var user models.User
-	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
+	if err := r.db.Preload("Tenant").Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return &user, nil

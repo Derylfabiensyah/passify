@@ -79,7 +79,8 @@ func (r *repository) GetTenantByCustomDomain(domain string) (*models.Tenant, err
 
 func (r *repository) GetFirstActiveDestinationByTenantID(tenantID uuid.UUID) (*models.Destination, error) {
 	var dest models.Destination
-	err := r.db.Where("tenant_id = ? AND is_active = ?", tenantID, true).
+	err := r.db.Preload("TicketCategories").Preload("TimeSlots").
+		Where("tenant_id = ? AND is_active = ?", tenantID, true).
 		Order("created_at ASC").
 		First(&dest).Error
 	if err != nil {

@@ -77,8 +77,18 @@ export default function FinancePage() {
     loadData();
   }, [slug]);
 
-  const rawPayouts = financeData?.payouts || PAYOUT_HISTORY;
-  const rawWeeklyRevenue = financeData?.weeklyRevenue || REVENUE_WEEKLY;
+  const defaultWeekly = [
+    { day: 'Sen', revenue: 0 },
+    { day: 'Sel', revenue: 0 },
+    { day: 'Rab', revenue: 0 },
+    { day: 'Kam', revenue: 0 },
+    { day: 'Jum', revenue: 0 },
+    { day: 'Sab', revenue: 0 },
+    { day: 'Min', revenue: 0 },
+  ];
+
+  const rawPayouts = financeData?.payouts || [];
+  const rawWeeklyRevenue = financeData?.weeklyRevenue?.length > 0 ? financeData.weeklyRevenue : defaultWeekly;
 
   // Filter payouts based on selected period
   const filteredPayouts = useMemo(() => {
@@ -93,15 +103,6 @@ export default function FinancePage() {
   }, [rawPayouts, period]);
 
   const weeklyRevenue = useMemo(() => {
-    if (period === '30d') {
-      // Extended chart representation for 30d
-      return [
-        { day: 'Mgg 1', revenue: 45000000 },
-        { day: 'Mgg 2', revenue: 52000000 },
-        { day: 'Mgg 3', revenue: 48000000 },
-        { day: 'Mgg 4', revenue: 61000000 },
-      ];
-    }
     return rawWeeklyRevenue;
   }, [rawWeeklyRevenue, period]);
 

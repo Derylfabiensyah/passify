@@ -359,11 +359,29 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
   );
 }
 
+const generateInitialCalendar = (capacity = 1000) => {
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const today = new Date();
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const dateStr = d.toISOString().split('T')[0];
+    const dayLabel = i === 0 ? 'Hari Ini' : i === 1 ? 'Besok' : days[d.getDay()];
+    return {
+      date: dateStr,
+      dayLabel,
+      max_capacity: capacity,
+      booked: 0,
+      is_closed: false,
+    };
+  });
+};
+
 export default function QuotasPage() {
   const { slug } = useTenant();
-  const [destinations, setDestinations] = useState(ADMIN_DESTINATIONS);
-  const [selectedDestId, setSelectedDestId] = useState(ADMIN_DESTINATIONS[0]?.id || 'dest-1');
-  const [quotaCalendar, setQuotaCalendar] = useState(QUOTA_CALENDAR);
+  const [destinations, setDestinations] = useState([]);
+  const [selectedDestId, setSelectedDestId] = useState(null);
+  const [quotaCalendar, setQuotaCalendar] = useState(() => generateInitialCalendar(1000));
   const [editingQuota, setEditingQuota] = useState(null);
   const [editingSlot, setEditingSlot] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
@@ -377,11 +395,22 @@ export default function QuotasPage() {
           setDestinations(dests);
           setSelectedDestId(dests[0].id);
 
+          const destCapacity = Number(dests[0].max_daily_capacity) || 1000;
+          setQuotaCalendar(generateInitialCalendar(destCapacity));
+
           // Fetch quota calendar and time slots
           const { quotas, timeSlots } = await fetchAdminQuotas(dests[0].id);
           if (timeSlots && timeSlots.length > 0) {
             setDestinations((prev) =>
               prev.map((d, idx) => (idx === 0 ? { ...d, time_slots: timeSlots } : d))
+            );
+          }
+          if (quotas && quotas.length > 0) {
+            setQuotaCalendar((prev) =>
+              prev.map((day) => {
+                const match = quotas.find((q) => q.date === day.date);
+                return match ? { ...day, max_capacity: match.max_capacity, booked: match.booked || 0, is_closed: match.is_closed } : day;
+              })
             );
           }
         }

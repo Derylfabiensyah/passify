@@ -22,12 +22,14 @@ export function TenantProvider({ children }) {
       if (!slug) {
         // Check if user is logged in as a tenant admin or has active tenant selected
         try {
-          const currentTenant = localStorage.getItem('passify_current_tenant');
           const savedUser = JSON.parse(localStorage.getItem('passify_user') || 'null');
-          if (currentTenant) {
+          const currentTenant = localStorage.getItem('passify_current_tenant');
+          if (savedUser && (savedUser.role === 'tenant_admin' || savedUser.role === 'pengelola' || savedUser.role === 'super_admin')) {
+            const userTenantSlug = savedUser.tenant_slug || savedUser.tenant?.slug || savedUser.tenant?.subdomain;
+            if (userTenantSlug) slug = userTenantSlug;
+          }
+          if (!slug && currentTenant) {
             slug = currentTenant;
-          } else if (savedUser && (savedUser.role === 'tenant_admin' || savedUser.role === 'pengelola' || savedUser.role === 'super_admin')) {
-            slug = savedUser.tenant?.slug || savedUser.tenant?.subdomain || savedUser.tenant_slug;
           }
         } catch (_) {}
       }

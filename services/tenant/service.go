@@ -1,6 +1,7 @@
 package tenant
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/google/uuid"
@@ -393,5 +394,29 @@ func (s *service) GetPublicDestinationByTenantSlug(slug string) (*models.Destina
 	if !tenant.IsActive {
 		return nil, gorm.ErrRecordNotFound
 	}
-	return s.repo.GetFirstActiveDestinationByTenantID(tenant.ID)
+	dest, err := s.repo.GetFirstActiveDestinationByTenantID(tenant.ID)
+	if err == nil {
+		return dest, nil
+	}
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		desc := "Kawasan Wisata Konservasi Alam " + tenant.Name
+		newDest := &models.Destination{
+			TenantID:         tenant.ID,
+			Name:             tenant.Name,
+			Slug:             tenant.Slug,
+			Description:      &desc,
+			DestinationType:  "lainnya",
+			MaxDailyCapacity: 1000,
+			OpeningTime:      "07:00:00",
+			ClosingTime:      "17:00:00",
+			IsActive:         true,
+			Facilities:       models.StringArray{"Musholla", "Toilet Bersih", "Area Parkir", "Spot Foto", "Pusat Informasi"},
+		}
+		if createErr := s.repo.CreateDestination(newDest); createErr == nil {
+			return s.repo.GetFirstActiveDestinationByTenantID(tenant.ID)
+		}
+	}
+
+	return nil, err
 }

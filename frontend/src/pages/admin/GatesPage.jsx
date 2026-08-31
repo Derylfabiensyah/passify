@@ -339,8 +339,8 @@ function AddEditGateModal({ device, destinations, onClose, onSave }) {
 
 export default function GatesPage() {
   const { slug } = useTenant();
-  const [destinations, setDestinations] = useState(ADMIN_DESTINATIONS);
-  const [devices, setDevices] = useState(GATE_DEVICES);
+  const [destinations, setDestinations] = useState([]);
+  const [devices, setDevices] = useState([]);
   const [filterDest, setFilterDest] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
@@ -356,6 +356,21 @@ export default function GatesPage() {
           const { devices: realDevices } = await fetchAdminGateTelemetry(dests[0].id);
           if (realDevices && realDevices.length > 0) {
             setDevices(realDevices);
+          } else {
+            // Default initial gate device for new tenant
+            setDevices([
+              {
+                id: `dev-${dests[0].id}`,
+                device_code: `GATE-${(dests[0].slug || '01').toUpperCase().substring(0, 8)}-IN01`,
+                device_name: 'Pintu Masuk Utama 01',
+                destination: dests[0].name,
+                gate_type: 'entrance',
+                is_active: true,
+                last_sync_at: new Date().toISOString(),
+                total_scans_today: 0,
+                hmac_key: `PASSIFY-SEC-${(dests[0].slug || 'DEV').toUpperCase()}`,
+              }
+            ]);
           }
         }
       } catch (err) {
