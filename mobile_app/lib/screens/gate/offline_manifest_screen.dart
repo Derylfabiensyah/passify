@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
@@ -16,6 +17,7 @@ class OfflineManifestScreen extends StatefulWidget {
 
 class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounceTimer;
   List<ManifestEntry> _tickets = [];
   bool _isLoading = true;
 
@@ -23,6 +25,22 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
   void initState() {
     super.initState();
     _loadTickets();
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _loadTickets(query: query);
+      }
+    });
   }
 
   Future<void> _loadTickets({String query = ''}) async {
@@ -36,10 +54,129 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
       results = await db.searchCachedTickets(query);
     }
 
-    setState(() {
-      _tickets = results;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _tickets = results;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _confirmAndValidate(ManifestEntry ticket) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusLg),
+          backgroundColor: AppColors.surface,
+          title: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: AppColors.leafPale,
+                  borderRadius: AppRadius.radiusMd,
+                ),
+                child: const Icon(Icons.how_to_reg_rounded, color: AppColors.forest, size: 22),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Text(
+                  'Check-In Manual',
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.ink,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Apakah Anda yakin ingin memvalidasi tiket pengunjung ini secara manual tanpa scan kamera?',
+                style: TextStyle(fontSize: 13, color: AppColors.inkSoft, height: 1.4),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.canvas,
+                  borderRadius: AppRadius.radiusMd,
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Pengunjung:', style: TextStyle(fontSize: 11, color: AppColors.inkSoft)),
+                        Text(
+                          ticket.visitorName.isNotEmpty ? ticket.visitorName : 'Umum',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.ink),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Kode Tiket:', style: TextStyle(fontSize: 11, color: AppColors.inkSoft)),
+                        Text(
+                          ticket.ticketCode,
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.forest),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Kategori:', style: TextStyle(fontSize: 11, color: AppColors.inkSoft)),
+                        Text(
+                          ticket.categoryName.isNotEmpty ? ticket.categoryName : '-',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.ink),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.inkSoft,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.forest,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              ),
+              child: const Text('Ya, Check-In', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true && mounted) {
+      await _manualValidate(ticket);
+    }
   }
 
   Future<void> _manualValidate(ManifestEntry ticket) async {
@@ -87,7 +224,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
             color: AppColors.surface,
             child: TextField(
               controller: _searchController,
-              onChanged: (val) => _loadTickets(query: val),
+              onChanged: _onSearchChanged,
               decoration: InputDecoration(
                 hintText: 'Cari nama pengunjung atau kode tiket...',
                 prefixIcon: const Icon(Icons.search, color: AppColors.forestSoft),
@@ -218,7 +355,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                                   // Action Button
                                   if (!isUsed)
                                     ElevatedButton(
-                                      onPressed: () => _manualValidate(item),
+                                      onPressed: () => _confirmAndValidate(item),
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.forest,
                                         foregroundColor: Colors.white,
