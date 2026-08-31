@@ -19,6 +19,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import TravelerAuthPage from './pages/TravelerAuthPage';
 import CheckoutPage from './pages/CheckoutPage';
 import BookingHistoryPage from './pages/BookingHistoryPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function AppRoutes() {
   const { slug, isLoading, error } = useTenant();
@@ -58,11 +59,12 @@ function AppRoutes() {
                 <Route path="quotas" element={<QuotasPage />} />
                 <Route path="gates" element={<GatesPage />} />
                 <Route path="finance" element={<FinancePage />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </AdminLayout>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     );
   }
@@ -90,11 +92,12 @@ function AppRoutes() {
               <Route path="quotas" element={<QuotasPage />} />
               <Route path="gates" element={<GatesPage />} />
               <Route path="finance" element={<FinancePage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </AdminLayout>
         }
       />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }
