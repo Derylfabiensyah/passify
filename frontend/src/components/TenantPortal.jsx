@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -15,8 +15,6 @@ import {
   Sparkles,
   Ticket
 } from 'lucide-react';
-import BookingModal from './BookingModal';
-import ETicketModal from './ETicketModal';
 import { useTenant } from '../contexts/TenantContext';
 
 const rupiah = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
@@ -28,16 +26,6 @@ export default function TenantPortal() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('passify_user') || 'null'); } catch { return null; }
   });
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [activeOrder, setActiveOrder] = useState(null);
-  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (user && location.state?.openBooking) {
-      setIsBookingModalOpen(true);
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [location.pathname, location.state?.openBooking, navigate, user]);
 
   if (!destination) return null;
 
@@ -158,9 +146,6 @@ export default function TenantPortal() {
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[rgba(255,254,250,.94)] px-4 py-3 backdrop-blur-md lg:hidden"><button type="button" onClick={openBooking} className="btn-clay w-full"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button></div>
       <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 text-center text-xs text-[var(--ink-soft)]">{destination.name} · Didukung oleh Passify</footer>
-
-      {isBookingModalOpen && <BookingModal destination={destination} onClose={() => setIsBookingModalOpen(false)} onBookingSuccess={(order) => { setActiveOrder(order); setIsBookingModalOpen(false); setIsTicketModalOpen(true); }} />}
-      {isTicketModalOpen && activeOrder && <ETicketModal order={activeOrder} onClose={() => setIsTicketModalOpen(false)} />}
     </div>
   );
 }

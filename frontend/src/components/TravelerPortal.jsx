@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, Clock, Compass,
   Info, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Sparkles, Ticket, Users,
 } from 'lucide-react';
-import BookingModal from './BookingModal';
-import ETicketModal from './ETicketModal';
 import { DESTINATIONS } from '../data/destinations';
 
 const fallbackDestination = {
@@ -39,9 +37,6 @@ export default function TravelerPortal() {
       return null;
     }
   });
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
-  const [activeOrder, setActiveOrder] = useState(null);
 
   const destinations = Array.isArray(DESTINATIONS) && DESTINATIONS.length ? DESTINATIONS : [fallbackDestination];
   const destination = destinations[demoIndex] || destinations[0] || fallbackDestination;
@@ -51,13 +46,6 @@ export default function TravelerPortal() {
   const quotaPercentage = capacity ? Math.min(100, Math.round((booked / capacity) * 100)) : 0;
   const lowestPrice = Math.min(...(destination.ticket_categories || []).map((cat) => Number(cat.price) || 0));
   const todayLabel = new Intl.DateTimeFormat('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
-
-  useEffect(() => {
-    if (user && location.state?.openBooking) {
-      setIsBookingModalOpen(true);
-      navigate(location.pathname, { replace: true, state: null });
-    }
-  }, [location.pathname, location.state?.openBooking, navigate, user]);
 
   const handleBookNowClick = () => {
     const slug = destination.slug || destination.id || 'curug-bidadari';
@@ -226,9 +214,6 @@ export default function TravelerPortal() {
         <button type="button" onClick={handleBookNowClick} className="btn-clay w-full text-sm"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button>
       </div>
       <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 sm:px-6 lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between"><span><strong className="text-[var(--forest-deep)]">{destination.name}</strong> · Didukung Passify</span><Link to="/" className="font-semibold text-[var(--forest)] hover:text-[var(--bark)]">Kembali ke beranda Passify</Link></div></footer>
-
-      {isBookingModalOpen && <BookingModal isOpen={isBookingModalOpen} destination={destination} onClose={() => setIsBookingModalOpen(false)} onBookingSuccess={handleBookingSuccess} />}
-      {isTicketModalOpen && activeOrder && <ETicketModal order={activeOrder} onClose={() => setIsTicketModalOpen(false)} />}
     </div>
   );
 }
