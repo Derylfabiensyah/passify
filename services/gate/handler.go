@@ -157,6 +157,24 @@ func (h *GateHandler) HandleGetScanStats(c *gin.Context) {
 	response.OK(c, "Scan stats retrieved successfully", stats)
 }
 
+// HandleGetTicketStatus returns the live usage status of a ticket
+// GET /status/:code
+func (h *GateHandler) HandleGetTicketStatus(c *gin.Context) {
+	code := c.Param("code")
+	if code == "" {
+		response.BadRequest(c, "Ticket code is required", nil)
+		return
+	}
+
+	status, err := h.service.GetTicketStatus(code)
+	if err != nil {
+		response.NotFound(c, "Ticket not found")
+		return
+	}
+
+	response.OK(c, "Ticket status retrieved", status)
+}
+
 // parseDateQuery extracts date parameter from query, default today
 func parseDateQuery(c *gin.Context, paramName string) time.Time {
 	dateStr := c.Query(paramName)

@@ -8,8 +8,9 @@ import (
 
 // RegisterRoutes registers HTTP routes for the Gate Access Control Service
 func RegisterRoutes(router *gin.RouterGroup, handler *GateHandler, jwtSecret string) {
-	// Public / Device Scanner routes: ValidateTicket, GetManifest, SyncLogs
+	// Public / Device Scanner routes: ValidateTicket, GetManifest, SyncLogs, Status
 	router.POST("/validate", handler.HandleValidateTicket)
+	router.GET("/status/:code", handler.HandleGetTicketStatus)
 	router.GET("/devices/:device_id/manifest", handler.HandleGetManifest)
 	router.POST("/devices/:device_id/sync-logs", handler.HandleSyncLogs)
 

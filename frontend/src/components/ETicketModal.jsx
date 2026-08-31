@@ -24,8 +24,25 @@ export default function ETicketModal({ order, onClose }) {
   const [secondsLeft, setSecondsLeft] = useState(600); // 10 minutes default
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
+  const [isUsed, setIsUsed] = useState(order?.status === 'used');
+  const [usedAt, setUsedAt] = useState(order?.usedAt || null);
+
+  const checkLiveStatus = useCallback(async () => {
+    if (!order?.ticketCode || isUsed) return;
+    try {
+      const res = await fetch(`http://localhost:8086/api/v1/gate/status/${order.ticketCode}`);
+      if (res.ok) {
+        const payload = await res.json();
+        if (payload?.data?.status === 'used') {
+          setIsUsed(true);
+          setUsedAt(payload.data.used_at || new Date().toISOString());
+        }
+      }
+    } catch (_) {}
+  }, [order?.ticketCode, isUsed]);
 
   const fetchLiveQR = useCallback(async () => {
+    if (isUsed) return;
     if (!order?.ticketId) {
       setQrData(`PASSIFY:${order?.ticketCode || 'DEMO-TICKET'}:000000`);
       return;
@@ -48,13 +65,22 @@ export default function ETicketModal({ order, onClose }) {
     } finally {
       setIsRefreshing(false);
     }
-  }, [order]);
+  }, [order, isUsed]);
 
   useEffect(() => {
     fetchLiveQR();
-  }, [fetchLiveQR]);
+    checkLiveStatus();
+  }, [fetchLiveQR, checkLiveStatus]);
+
+  // Real-time gate scan listener polling every 2 seconds
+  useEffect(() => {
+    if (isUsed) return;
+    const statusInterval = setInterval(checkLiveStatus, 2000);
+    return () => clearInterval(statusInterval);
+  }, [checkLiveStatus, isUsed]);
 
   useEffect(() => {
+    if (isUsed) return;
     const interval = setInterval(() => {
       setSecondsLeft((previous) => {
         if (previous <= 1) {
@@ -65,7 +91,7 @@ export default function ETicketModal({ order, onClose }) {
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [fetchLiveQR]);
+  }, [fetchLiveQR, isUsed]);
 
   if (!order) return null;
 
@@ -104,93 +130,116 @@ export default function ETicketModal({ order, onClose }) {
           >
             <X className="h-4 w-4" />
           </button>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]">
-            <CheckCircle2 className="h-3.5 w-3.5 text-[var(--forest)]" /> E-Ticket Aktif
-          </span>
+          {isUsed ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-900">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Sudah Digunakan
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]">
+              <CheckCircle2 className="h-3.5 w-3.5 text-[var(--forest)]" /> E-Ticket Aktif
+            </span>
+          )}
           <h2 className="mt-3 font-serif text-2xl font-bold text-white">{order.destinationName}</h2>
           <p className="mt-1 font-mono text-xs text-white/70">Kode Reservasi #{order.orderNumber}</p>
         </header>
 
         <div className="p-6 sm:p-7 space-y-5">
-          {/* Dynamic QR Display Box */}
-          <div className="rounded-3xl bg-[var(--fog)] p-5 text-center space-y-4">
-            <div
-              className="relative mx-auto grid h-52 w-52 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm select-none"
-              onContextMenu={(e) => e.preventDefault()}
-            >
-              {qrData ? (
-                <QRCodeSVG
-                  value={qrData}
-                  size={185}
-                  bgColor="#ffffff"
-                  fgColor="#102d20"
-                  level="M"
-                  includeMargin={false}
-                />
-              ) : (
-                <RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" />
-              )}
-              {isRefreshing && (
-                <div className="absolute inset-0 grid place-items-center bg-white/80">
-                  <RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" />
-                </div>
-              )}
-              <span className="absolute bottom-2 rounded-md bg-[var(--forest-deep)] px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-white">
-                DYNAMIC TOTP
-              </span>
+          {/* Dynamic QR or Used Display Box */}
+          {isUsed ? (
+            <div className="rounded-3xl bg-emerald-50/80 border border-emerald-200/60 p-6 text-center space-y-3">
+              <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <CheckCircle2 className="w-10 h-10" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold text-emerald-950">Tiket Berhasil Dipindai & Masuk</h3>
+                <p className="text-xs text-emerald-800 mt-1 max-w-xs mx-auto">
+                  Tiket telah tervalidasi di gerbang masuk. Selamat menikmati petualangan wisata alam Anda!
+                </p>
+              </div>
+              <div className="pt-2 text-[11px] font-mono text-emerald-700">
+                Waktu Masuk: {usedAt ? new Date(usedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Hari ini'}
+              </div>
             </div>
-
-            {/* 10-Minute Countdown Indicator */}
-            <div className="flex items-center justify-center gap-3">
-              <div className="relative h-10 w-10">
-                <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
-                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#d6e2cf" strokeWidth="3" />
-                  <circle
-                    cx="18"
-                    cy="18"
-                    r="15.9"
-                    fill="none"
-                    stroke={expiring ? '#dc2626' : '#1e4b35'}
-                    strokeWidth="3"
-                    strokeDasharray={`${percentage} 100`}
-                    strokeLinecap="round"
+          ) : (
+            <div className="rounded-3xl bg-[var(--fog)] p-5 text-center space-y-4">
+              <div
+                className="relative mx-auto grid h-52 w-52 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm select-none"
+                onContextMenu={(e) => e.preventDefault()}
+              >
+                {qrData ? (
+                  <QRCodeSVG
+                    value={qrData}
+                    size={185}
+                    bgColor="#ffffff"
+                    fgColor="#102d20"
+                    level="M"
+                    includeMargin={false}
                   />
-                </svg>
-                <span
-                  className={`absolute inset-0 grid place-items-center text-[10px] font-mono font-extrabold ${
-                    expiring ? 'text-red-600 animate-pulse' : 'text-[var(--forest-deep)]'
-                  }`}
-                >
-                  {formatTimer(secondsLeft)}
+                ) : (
+                  <RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" />
+                )}
+                {isRefreshing && (
+                  <div className="absolute inset-0 grid place-items-center bg-white/80">
+                    <RefreshCw className="h-8 w-8 animate-spin text-[var(--forest)]" />
+                  </div>
+                )}
+                <span className="absolute bottom-2 rounded-md bg-[var(--forest-deep)] px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-white">
+                  DYNAMIC TOTP
                 </span>
               </div>
-              <div className="text-left">
-                <p className="flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)]">
-                  <ShieldCheck className="h-4 w-4 text-[var(--forest)]" />
-                  QR Berganti Tiap 10 Menit
-                </p>
-                <p className="text-[10px] text-[var(--ink-soft)]">
-                  Sisa waktu aktif: <strong>{formatTimer(secondsLeft)}</strong>
-                </p>
+
+              {/* 10-Minute Countdown Indicator */}
+              <div className="flex items-center justify-center gap-3">
+                <div className="relative h-10 w-10">
+                  <svg viewBox="0 0 36 36" className="h-full w-full -rotate-90">
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#d6e2cf" strokeWidth="3" />
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="15.9"
+                      fill="none"
+                      stroke={expiring ? '#dc2626' : '#1e4b35'}
+                      strokeWidth="3"
+                      strokeDasharray={`${percentage} 100`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span
+                    className={`absolute inset-0 grid place-items-center text-[10px] font-mono font-extrabold ${
+                      expiring ? 'text-red-600 animate-pulse' : 'text-[var(--forest-deep)]'
+                    }`}
+                  >
+                    {formatTimer(secondsLeft)}
+                  </span>
+                </div>
+                <div className="text-left">
+                  <p className="flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)]">
+                    <ShieldCheck className="h-4 w-4 text-[var(--forest)]" />
+                    QR Berganti Tiap 10 Menit
+                  </p>
+                  <p className="text-[10px] text-[var(--ink-soft)]">
+                    Sisa waktu aktif: <strong>{formatTimer(secondsLeft)}</strong>
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Anti-Fraud / Anti-Screenshot Notice */}
-            <div className="rounded-2xl bg-amber-50 p-3 text-left flex items-start gap-2.5 text-[11px] leading-4 text-amber-900">
-              <ShieldAlert className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
-              <span>
-                <strong>Anti-Calo & Anti-Screenshot:</strong> QR ini berubah tiap 10 menit. Foto atau screenshot statis
-                tidak dapat dipindai di pintu gerbang. Harap buka langsung halaman tiket ini.
-              </span>
-            </div>
+              {/* Anti-Fraud / Anti-Screenshot Notice */}
+              <div className="rounded-2xl bg-amber-50 p-3 text-left flex items-start gap-2.5 text-[11px] leading-4 text-amber-900">
+                <ShieldAlert className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
+                <span>
+                  <strong>Anti-Calo & Anti-Screenshot:</strong> QR ini berubah tiap 10 menit. Foto atau screenshot statis
+                  tidak dapat dipindai di pintu gerbang. Harap buka langsung halaman tiket ini.
+                </span>
+              </div>
 
-            {error && (
-              <p role="alert" className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-left text-xs text-red-800">
-                <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
-                {error}
-              </p>
-            )}
-          </div>
+              {error && (
+                <p role="alert" className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-left text-xs text-red-800">
+                  <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                  {error}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Ticket Details Summary */}
           <div className="rounded-2xl bg-[var(--fog)] p-4 text-xs space-y-2.5">

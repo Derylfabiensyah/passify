@@ -101,6 +101,13 @@ type ScanStatsResponse struct {
 	ByGate       []GateScanStat `json:"by_gate"`
 }
 
+// TicketStatusResponse holds live ticket status
+type TicketStatusResponse struct {
+	TicketCode string     `json:"ticket_code"`
+	Status     string     `json:"status"`
+	UsedAt     *time.Time `json:"used_at,omitempty"`
+}
+
 // GateService interface definition
 type GateService interface {
 	RegisterDevice(tenantID uuid.UUID, req RegisterDeviceRequest) (*models.GateDevice, error)
@@ -109,6 +116,7 @@ type GateService interface {
 	ValidateTicketOnline(req OnlineValidateRequest) (*ValidateResponse, error)
 	SyncOfflineLogs(req SyncLogsRequest) (*SyncResponse, error)
 	GetScanStats(destinationID uuid.UUID, date time.Time) (*ScanStatsResponse, error)
+	GetTicketStatus(code string) (*TicketStatusResponse, error)
 }
 
 type gateService struct {
@@ -576,6 +584,19 @@ func (s *gateService) GetScanStats(destinationID uuid.UUID, date time.Time) (*Sc
 		InvalidScans: invalidScans,
 		OfflineScans: offlineScans,
 		ByGate:       byGate,
+	}, nil
+}
+
+// GetTicketStatus returns the live status of a ticket by code
+func (s *gateService) GetTicketStatus(code string) (*TicketStatusResponse, error) {
+	ticket, err := s.repo.GetTicketByCode(code)
+	if err != nil || ticket == nil {
+		return nil, fmt.Errorf("ticket not found")
+	}
+	return &TicketStatusResponse{
+		TicketCode: ticket.TicketCode,
+		Status:     ticket.Status,
+		UsedAt:     ticket.UsedAt,
 	}, nil
 }
 

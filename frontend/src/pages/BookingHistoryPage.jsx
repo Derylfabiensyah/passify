@@ -75,6 +75,42 @@ export default function BookingHistoryPage() {
     }
   }, []);
 
+  // Real-time live status sync with Gate Access Control Service
+  useEffect(() => {
+    if (!tickets.length) return;
+    const hasActiveTickets = tickets.some((t) => (t.status || 'active') === 'active');
+    if (!hasActiveTickets) return;
+
+    const syncLiveStatus = async () => {
+      let isUpdated = false;
+      const updatedList = await Promise.all(
+        tickets.map(async (ticket) => {
+          if (ticket.status === 'used' || !ticket.ticketCode) return ticket;
+          try {
+            const res = await fetch(`http://localhost:8086/api/v1/gate/status/${ticket.ticketCode}`);
+            if (res.ok) {
+              const resData = await res.json();
+              if (resData?.data?.status === 'used') {
+                isUpdated = true;
+                return { ...ticket, status: 'used', usedAt: resData.data.used_at };
+              }
+            }
+          } catch (_) {}
+          return ticket;
+        })
+      );
+
+      if (isUpdated) {
+        setTickets(updatedList);
+        localStorage.setItem('passify_my_tickets', JSON.stringify(updatedList));
+      }
+    };
+
+    syncLiveStatus();
+    const interval = setInterval(syncLiveStatus, 2500);
+    return () => clearInterval(interval);
+  }, [tickets]);
+
   const handleLogout = () => {
     localStorage.removeItem('passify_user');
     localStorage.removeItem('passify_token');
