@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../providers/auth_provider.dart';
 import '../providers/sync_provider.dart';
+import '../providers/theme_provider.dart';
 import 'booth/booth_pos_screen.dart';
 import 'gate/gate_scanner_screen.dart';
 import 'gate/gate_stats_screen.dart';
@@ -180,6 +181,31 @@ class _HomeScreenState extends State<HomeScreen> {
         foregroundColor: AppColors.ink,
         elevation: 0,
         actions: [
+          Consumer<ThemeProvider>(
+            builder: (context, theme, _) {
+              return IconButton(
+                icon: Icon(
+                  theme.isNightMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                  color: theme.isNightMode ? AppColors.leaf : AppColors.inkSoft,
+                ),
+                tooltip: theme.isNightMode ? 'Matikan Mode Malam' : 'Mode Malam / Sunrise Gate',
+                onPressed: () {
+                  theme.toggleNightMode();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        theme.isNightMode
+                            ? 'Mode Malam (Sunrise/Outdoor Gate) Aktif'
+                            : 'Mode Terang Standar Aktif',
+                      ),
+                      duration: const Duration(seconds: 2),
+                      backgroundColor: theme.isNightMode ? AppColors.forestDeep : AppColors.forest,
+                    ),
+                  );
+                },
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: AppColors.inkSoft),
             tooltip: 'Pengaturan Server',

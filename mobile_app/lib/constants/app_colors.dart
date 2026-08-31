@@ -23,6 +23,15 @@ class AppColors {
   static const Color inkSoft = Color(0xFF586D5D);
   static const Color textMuted = Color(0xFF556859); // Adjusted for WCAG AA >= 4.5:1 contrast against light background
 
+  // Dark Theme Tokens (Night Gate / Sunrise Outdoor Ops)
+  static const Color darkCanvas = Color(0xFF0D1712);
+  static const Color darkSurface = Color(0xFF15241D);
+  static const Color darkElevated = Color(0xFF1C3127);
+  static const Color darkBorder = Color(0xFF284638);
+  static const Color darkInk = Color(0xFFF3F7F2);
+  static const Color darkInkSoft = Color(0xFFA5C4B0);
+  static const Color darkTextMuted = Color(0xFF83A28F);
+
   // Status & Feedback
   static const Color success = Color(0xFF2E7D32);
   static const Color successBg = Color(0xFFE8F5E9);
