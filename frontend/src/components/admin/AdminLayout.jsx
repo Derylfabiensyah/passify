@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bell, CalendarClock, ChevronDown, ChevronLeft, ChevronRight,
@@ -16,13 +16,6 @@ const menuItems = [
   { id: 'quotas', label: 'Kuota & Sesi', icon: CalendarClock, path: '/admin/quotas' },
   { id: 'gates', label: 'Perangkat Gerbang', icon: ScanLine, path: '/admin/gates' },
   { id: 'finance', label: 'Keuangan & Payout', icon: Landmark, path: '/admin/finance' },
-];
-
-const AVAILABLE_TENANTS = [
-  { slug: 'curug-bidadari', name: 'Curug Bidadari Eco Park', location: 'Bogor, Jawa Barat' },
-  { slug: 'kawah-ijen', name: 'Kawah Ijen Geopark & Blue Fire', location: 'Banyuwangi, Jawa Timur' },
-  { slug: 'baluran', name: 'Taman Nasional Baluran', location: 'Situbondo, Jawa Timur' },
-  { slug: 'tangkuban-parahu', name: 'Tangkuban Parahu Geotourism', location: 'Subang, Jawa Barat' },
 ];
 
 const adminThemeStyles = `
@@ -166,22 +159,6 @@ export default function AdminLayout({ children }) {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [userDropdownOpen]);
-
-  const handleSwitchTenant = (tenant) => {
-    try {
-      localStorage.setItem('passify_current_tenant', tenant.slug);
-      const savedUser = JSON.parse(localStorage.getItem('passify_user') || '{}');
-      savedUser.tenant_slug = tenant.slug;
-      savedUser.tenant_name = tenant.name;
-      localStorage.setItem('passify_user', JSON.stringify(savedUser));
-
-      if (refetch) refetch();
-      toast.success(`Beralih ke kawasan: ${tenant.name}`);
-      setUserDropdownOpen(false);
-    } catch (_) {
-      toast.error('Gagal mengganti kawasan');
-    }
-  };
 
   const handleLogout = () => {
     try {
@@ -333,36 +310,21 @@ export default function AdminLayout({ children }) {
                     </div>
                   </div>
 
-                  {/* Tenant Switcher Section */}
-                  <div className="p-2 border-b border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-[var(--ink-muted)] flex items-center gap-1.5">
-                        <Building2 className="h-3 w-3 text-[var(--forest)]" />
-                        Ganti Kawasan Konservasi
+                  {/* Managed Conservation Area Info */}
+                  <div className="p-3 border-b border-gray-100 bg-white">
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <Building2 className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
+                        Kawasan Yang Dikelola
                       </span>
                     </div>
-                    <div className="space-y-1">
-                      {AVAILABLE_TENANTS.map((t) => {
-                        const isCurrent = t.slug === activeTenantSlug;
-                        return (
-                          <button
-                            key={t.slug}
-                            type="button"
-                            onClick={() => handleSwitchTenant(t)}
-                            className={`w-full flex items-center justify-between gap-2 p-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                              isCurrent
-                                ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200'
-                                : 'text-gray-700 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="min-w-0">
-                              <span className="block truncate text-xs">{t.name}</span>
-                              <span className="block text-[10px] text-gray-500 truncate">{t.location}</span>
-                            </div>
-                            {isCurrent && <Check className="h-4 w-4 text-emerald-600 shrink-0" />}
-                          </button>
-                        );
-                      })}
+                    <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-2.5">
+                      <span className="block text-xs font-bold text-emerald-950 truncate">
+                        {tenantDisplayName}
+                      </span>
+                      <span className="block text-[10px] text-emerald-700 font-mono truncate mt-0.5">
+                        Domain: {activeTenantSlug || adminUser.tenant_slug || 'wisata'}.passify.id
+                      </span>
                     </div>
                   </div>
 
