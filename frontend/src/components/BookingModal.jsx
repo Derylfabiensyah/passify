@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, Ticket, User, Users, X } from 'lucide-react';
+import ModalWrapper from './ModalWrapper';
 
 const steps = [
   { number: '01', label: 'Jadwal' },
@@ -20,12 +21,6 @@ export default function BookingModal({ isOpen = true, destination, onClose, onBo
   const [visitors, setVisitors] = useState([{ name: '', nik: '' }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationMessage, setValidationMessage] = useState('');
-
-  useEffect(() => {
-    const handleKeyDown = (event) => event.key === 'Escape' && onClose?.();
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
 
   useEffect(() => {
     const total = Object.values(quantities).reduce((sum, qty) => sum + qty, 0);
@@ -107,10 +102,25 @@ export default function BookingModal({ isOpen = true, destination, onClose, onBo
   };
 
   return (
-    <div className="modal-overlay" role="presentation" onClick={(event) => event.target === event.currentTarget && onClose?.()}>
-      <div className="modal-content card relative max-w-2xl overflow-hidden bg-[var(--sand)]">
-        <div className="border-b border-[var(--border)] bg-[var(--forest-deep)] px-5 pb-5 pt-6 text-white sm:px-7 sm:pt-7">
-          <button id="close-booking-modal-btn" type="button" onClick={onClose} className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20" aria-label="Tutup pemesanan"><X className="h-4 w-4" /></button>
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      size="2xl"
+      showCloseButton={false}
+      className="p-0 overflow-hidden bg-[var(--sand)] card"
+      ariaLabel={`Reservasi Tiket ${destination?.name || ''}`}
+    >
+      <div>
+        <div className="border-b border-[var(--border)] bg-[var(--forest-deep)] px-5 pb-5 pt-6 text-white sm:px-7 sm:pt-7 relative">
+          <button
+            id="close-booking-modal-btn"
+            type="button"
+            onClick={onClose}
+            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-white/20 bg-white/10 text-white transition-colors hover:bg-white/20 cursor-pointer"
+            aria-label="Tutup pemesanan"
+          >
+            <X className="h-4 w-4" />
+          </button>
           <p className="text-[10px] font-extrabold uppercase tracking-[.15em] text-[var(--leaf)]">Reservasi kunjungan</p>
           <h2 className="mt-2 max-w-md pr-10 font-serif text-2xl font-bold text-white sm:text-3xl">{destination.name}</h2>
           <div className="mt-6 grid grid-cols-3 gap-2 border-t border-white/15 pt-4">
@@ -150,6 +160,6 @@ export default function BookingModal({ isOpen = true, destination, onClose, onBo
           </div>
         </form>
       </div>
-    </div>
+    </ModalWrapper>
   );
 }

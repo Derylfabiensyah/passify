@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Check, Lock, AlertCircle, Sparkles } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
+import ModalWrapper from './ModalWrapper';
 
 /**
  * SeatMapModal - Interactive seat selection component with live seat lock timer.
@@ -72,9 +73,15 @@ export default function SeatMapModal({ isOpen, onClose, destinationId, onSeatsSe
   const seconds = countdown % 60;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content card relative max-w-2xl w-full rounded-[20px] border border-[#cddac8] bg-[#fffdf8] p-0 shadow-[0_24px_60px_rgba(23,59,50,0.22)] overflow-hidden">
-        
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      size="2xl"
+      showCloseButton={false}
+      className="p-0 overflow-hidden bg-[#fffdf8] border-[#cddac8]"
+      ariaLabel="Seat Map Interaktif Passify"
+    >
+      <div>
         {/* Header */}
         <div className="bg-[#173b32] px-6 py-5 text-white flex items-center justify-between">
           <div>
@@ -85,8 +92,10 @@ export default function SeatMapModal({ isOpen, onClose, destinationId, onSeatsSe
             <h2 className="font-['Outfit'] text-xl font-bold">Pilih Kursi &amp; Zona Amfiteater</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white cursor-pointer"
+            aria-label="Tutup pemilihan kursi"
           >
             <X className="w-5 h-5" />
           </button>
@@ -220,6 +229,6 @@ export default function SeatMapModal({ isOpen, onClose, destinationId, onSeatsSe
           </div>
         </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 }

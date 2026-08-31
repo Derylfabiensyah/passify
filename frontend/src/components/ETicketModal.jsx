@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useToast } from '../contexts/ToastContext';
+import ModalWrapper from './ModalWrapper';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083';
 
@@ -83,15 +84,22 @@ export default function ETicketModal({ order, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" role="presentation" onClick={(e) => e.target === e.currentTarget && onClose?.()}>
-      <div className="modal-content card relative max-w-md overflow-hidden bg-white shadow-2xl rounded-3xl">
+    <ModalWrapper
+      isOpen={true}
+      onClose={onClose}
+      size="md"
+      showCloseButton={false}
+      className="p-0 overflow-hidden bg-white shadow-2xl rounded-3xl"
+      ariaLabel={`E-Ticket ${order.destinationName}`}
+    >
+      <div>
         {/* Header */}
-        <header className="bg-[var(--forest-deep)] px-6 pb-6 pt-7 text-center text-white sm:px-7">
+        <header className="bg-[var(--forest-deep)] px-6 pb-6 pt-7 text-center text-white sm:px-7 relative">
           <button
             id="close-ticket-modal-btn"
             type="button"
             onClick={onClose}
-            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+            className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 cursor-pointer"
             aria-label="Tutup tiket"
           >
             <X className="h-4 w-4" />
@@ -220,6 +228,6 @@ export default function ETicketModal({ order, onClose }) {
           </button>
         </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 }

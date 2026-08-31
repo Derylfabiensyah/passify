@@ -16,6 +16,7 @@ import {
   History,
   ShieldCheck
 } from 'lucide-react';
+import ModalWrapper from './ModalWrapper';
 
 export default function WalletModal({ walletBalance, onTopUp, onClose }) {
   const [activeTab, setActiveTab] = useState('nfc'); // 'nfc' | 'qr' | 'refund' | 'topup'
@@ -112,13 +113,22 @@ export default function WalletModal({ walletBalance, onTopUp, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="modal-content card relative p-6 sm:p-8 max-w-lg w-full bg-white border border-gray-200 rounded-2xl shadow-xl overflow-y-auto max-h-[90vh]">
+    <ModalWrapper
+      isOpen={true}
+      onClose={onClose}
+      size="lg"
+      showCloseButton={false}
+      className="p-6 sm:p-8"
+      ariaLabel="Dompet Non-Tunai Passify"
+    >
+      <div className="relative">
         {/* Close Button */}
         <button
           id="close-wallet-modal-btn"
+          type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 hover:bg-gray-200 flex items-center justify-center transition-colors"
+          className="absolute -top-2 -right-2 w-8 h-8 rounded-lg bg-gray-100 text-gray-500 hover:text-gray-900 hover:bg-gray-200 flex items-center justify-center transition-colors cursor-pointer"
+          aria-label="Tutup dompet"
         >
           <X className="w-4 h-4" />
         </button>
@@ -437,6 +447,6 @@ export default function WalletModal({ walletBalance, onTopUp, onClose }) {
           </div>
         </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 }
