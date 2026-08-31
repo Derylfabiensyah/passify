@@ -315,7 +315,7 @@ func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*Validate
 					TenantID:      dest.TenantID,
 					DestinationID: dest.ID,
 					Name:          "Tiket Masuk Reguler",
-					TicketType:    "reguler",
+					TicketType:    "visitor_domestic",
 					BasePrice:     35000,
 					InsuranceFee:  3000,
 					RetribusiFee:  2000,
@@ -325,23 +325,35 @@ func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*Validate
 				catID = newCat.ID
 			}
 
-			newTxID := uuid.New()
-			dummyTx := models.Transaction{
-				BaseModel:        models.BaseModel{ID: newTxID, CreatedAt: time.Now(), UpdatedAt: time.Now()},
-				TenantID:         dest.TenantID,
-				UserID:           dest.TenantID,
-				OrderNumber:      fmt.Sprintf("ORD-%s", ticketCodeToLookup),
-				VisitDate:        scannedAt,
-				DestinationID:    dest.ID,
-				VisitorCount:     1,
-				Subtotal:         35000,
-				PlatformFee:      2500,
-				TotalPlatformFee: 2500,
-				GrandTotal:       37500,
-				NetPayoutAmount:  35000,
-				PaymentStatus:    "paid",
+			var dbUser models.User
+			_ = s.db.First(&dbUser)
+			userID := dbUser.ID
+			if userID == uuid.Nil {
+				userID = dest.TenantID
 			}
-			_ = s.db.Create(&dummyTx)
+
+			newTxID := uuid.New()
+			var existingTx models.Transaction
+			if s.db.Where("order_number LIKE ?", fmt.Sprintf("%%%s%%", ticketCodeToLookup)).First(&existingTx).Error == nil {
+				newTxID = existingTx.ID
+			} else {
+				dummyTx := models.Transaction{
+					BaseModel:        models.BaseModel{ID: newTxID, CreatedAt: time.Now(), UpdatedAt: time.Now()},
+					TenantID:         dest.TenantID,
+					UserID:           userID,
+					OrderNumber:      fmt.Sprintf("ORD-%s-%d", ticketCodeToLookup, time.Now().UnixNano()%100000),
+					VisitDate:        scannedAt,
+					DestinationID:    dest.ID,
+					VisitorCount:     1,
+					Subtotal:         35000,
+					PlatformFee:      2500,
+					TotalPlatformFee: 2500,
+					GrandTotal:       37500,
+					NetPayoutAmount:  35000,
+					PaymentStatus:    "paid",
+				}
+				_ = s.db.Create(&dummyTx)
+			}
 
 			visitorName := "Wisatawan Terverifikasi"
 			newTicket := models.Ticket{

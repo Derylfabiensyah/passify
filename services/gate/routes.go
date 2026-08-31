@@ -8,11 +8,15 @@ import (
 
 // RegisterRoutes registers HTTP routes for the Gate Access Control Service
 func RegisterRoutes(router *gin.RouterGroup, handler *GateHandler, jwtSecret string) {
-	// All routes require authentication
+	// Public / Device Scanner routes: ValidateTicket, GetManifest, SyncLogs
+	router.POST("/validate", handler.HandleValidateTicket)
+	router.GET("/devices/:device_id/manifest", handler.HandleGetManifest)
+	router.POST("/devices/:device_id/sync-logs", handler.HandleSyncLogs)
+
+	// Protected Admin & Gate Officer routes
 	authGroup := router.Group("")
 	authGroup.Use(middleware.AuthMiddleware(jwtSecret))
 
-	// Admin / Gate Officer routes: RegisterDevice, GetScanStats
 	adminOrGate := authGroup.Group("")
 	adminOrGate.Use(middleware.RoleMiddleware(
 		models.RoleSuperAdmin,
@@ -21,17 +25,6 @@ func RegisterRoutes(router *gin.RouterGroup, handler *GateHandler, jwtSecret str
 	))
 	adminOrGate.POST("/devices", handler.HandleRegisterDevice)
 	adminOrGate.GET("/destinations/:destination_id/stats", handler.HandleGetScanStats)
-
-	// Gate Officer routes: GetManifest, ValidateTicket, SyncLogs
-	gateOfficer := authGroup.Group("")
-	gateOfficer.Use(middleware.RoleMiddleware(
-		models.RoleSuperAdmin,
-		models.RoleTenantAdmin,
-		models.RoleGateOfficer,
-	))
-	gateOfficer.GET("/devices/:device_id/manifest", handler.HandleGetManifest)
-	gateOfficer.POST("/validate", handler.HandleValidateTicket)
-	gateOfficer.POST("/devices/:device_id/sync-logs", handler.HandleSyncLogs)
 
 	// Admin only routes: ListDevices
 	adminOnly := authGroup.Group("")

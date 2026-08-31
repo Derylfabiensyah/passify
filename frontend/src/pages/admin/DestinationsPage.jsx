@@ -771,7 +771,7 @@ export default function DestinationsPage() {
         body: {
           destination_id: destId,
           name: categoryData.name,
-          ticket_type: 'reguler',
+          ticket_type: 'visitor_domestic',
           base_price: Number(categoryData.price || 0),
           insurance_fee: Number(categoryData.insurance || 0),
           retribusi_fee: Number(categoryData.retribusi || 0),
