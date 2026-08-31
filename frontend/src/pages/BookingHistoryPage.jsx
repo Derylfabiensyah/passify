@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock,
+  Compass,
   Download,
   FileText,
   History,
@@ -20,52 +21,12 @@ import {
   Sparkles,
   Ticket,
   User,
-  Users
+  Users,
+  Leaf
 } from 'lucide-react';
 import ETicketModal from '../components/ETicketModal';
 import { useToast } from '../contexts/ToastContext';
-
-const DEFAULT_SAMPLE_TICKETS = [
-  {
-    orderNumber: 'TWA-20260828-8921',
-    ticketId: 'tkt-curug-001',
-    ticketCode: 'TWA-QR-89210',
-    destinationName: 'Curug Bidadari Eco Park',
-    tenantName: 'PT Wisata Alam Mandiri',
-    location: 'Sentul Paradise Park, Bogor, Jawa Barat',
-    image: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80',
-    visitDate: new Date().toISOString().split('T')[0],
-    timeSlotLabel: 'Sesi Pagi (07:00 - 11:30)',
-    totalQty: 2,
-    grandTotal: 77500,
-    paymentMethod: 'QRIS',
-    status: 'active', // 'active' | 'used' | 'expired'
-    visitors: [
-      { name: 'Budi Santoso', nik: '3201123456780001' },
-      { name: 'Siti Aminah', nik: '3201123456780002' },
-    ],
-    visitorName: 'Budi Santoso',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    orderNumber: 'TWA-20260815-4102',
-    ticketId: 'tkt-kawah-002',
-    ticketCode: 'TWA-QR-41020',
-    destinationName: 'Kawah Putih Ciwidey',
-    tenantName: 'Perum Perhutani Unit III',
-    location: 'Ciwidey, Bandung, Jawa Barat',
-    image: 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=800&q=80',
-    visitDate: '2026-08-15',
-    timeSlotLabel: 'Sesi Pagi (07:00 - 12:00)',
-    totalQty: 1,
-    grandTotal: 47500,
-    paymentMethod: 'VA BCA',
-    status: 'used',
-    visitors: [{ name: 'Budi Santoso', nik: '3201123456780001' }],
-    visitorName: 'Budi Santoso',
-    createdAt: '2026-08-14T10:00:00Z',
-  },
-];
+import { useTenant } from '../contexts/TenantContext';
 
 function formatRupiah(num) {
   return `Rp ${Number(num || 0).toLocaleString('id-ID')}`;
@@ -73,6 +34,7 @@ function formatRupiah(num) {
 
 export default function BookingHistoryPage() {
   const { toast } = useToast();
+  const { slug, destination } = useTenant();
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'active' | 'used' | 'expired'
@@ -88,28 +50,29 @@ export default function BookingHistoryPage() {
     }
   });
 
-  // Load bookings from LocalStorage or default sample
+  // Load bookings exclusively from LocalStorage (pure real user orders)
   useEffect(() => {
     try {
       const stored = localStorage.getItem('passify_my_tickets');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Merge with default sample so user always has rich interactive data
-          const merged = [...parsed];
-          DEFAULT_SAMPLE_TICKETS.forEach((sample) => {
-            if (!merged.some((m) => m.orderNumber === sample.orderNumber)) {
-              merged.push(sample);
-            }
-          });
-          setTickets(merged);
+        if (Array.isArray(parsed)) {
+          // Filter out any legacy dummy sample tickets
+          const realTickets = parsed.filter(
+            (t) =>
+              t.ticketId !== 'tkt-curug-001' &&
+              t.ticketId !== 'tkt-kawah-002' &&
+              t.orderNumber !== 'TWA-20260828-8921' &&
+              t.orderNumber !== 'TWA-20260815-4102'
+          );
+          setTickets(realTickets);
+          localStorage.setItem('passify_my_tickets', JSON.stringify(realTickets));
           return;
         }
       }
-      setTickets(DEFAULT_SAMPLE_TICKETS);
-      localStorage.setItem('passify_my_tickets', JSON.stringify(DEFAULT_SAMPLE_TICKETS));
+      setTickets([]);
     } catch (_) {
-      setTickets(DEFAULT_SAMPLE_TICKETS);
+      setTickets([]);
     }
   }, []);
 
@@ -142,21 +105,33 @@ export default function BookingHistoryPage() {
   const usedCount = tickets.filter((t) => t.status === 'used').length;
   const expiredCount = tickets.filter((t) => t.status === 'expired').length;
 
+  const homeUrl = slug ? `/?tenant=${slug}` : '/';
+  const brandName = destination?.name || (slug ? slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'passify');
+
   return (
     <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-xs border-b border-gray-100">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline">
-            passify
+          <Link to={homeUrl} className="flex items-center gap-2 text-xl font-bold tracking-tight text-[var(--forest-deep)] no-underline">
+            {slug ? (
+              <>
+                <div className="h-8 w-8 rounded-xl bg-[var(--forest)] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+                  <Leaf className="h-4 w-4" />
+                </div>
+                <span>{brandName}</span>
+              </>
+            ) : (
+              <span className="text-2xl tracking-[-.05em]">passify</span>
+            )}
           </Link>
 
           <nav className="flex items-center gap-4 text-xs font-bold">
-            <Link to="/jelajah" className="text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors">
-              Jelajahi Wisata
+            <Link to={homeUrl} className="text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors">
+              {slug ? 'Beranda Destinasi' : 'Jelajahi Wisata'}
             </Link>
             <Link
-              to="/riwayat-pesanan"
+              to={slug ? `/riwayat-pesanan?tenant=${slug}` : '/riwayat-pesanan'}
               className="text-[var(--forest-deep)] font-extrabold bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl"
             >
               Tiket Saya
@@ -263,10 +238,10 @@ export default function BookingHistoryPage() {
               </p>
             </div>
             <Link
-              to="/jelajah"
+              to={homeUrl}
               className="inline-flex items-center justify-center gap-2 btn-primary px-5 py-2.5 rounded-2xl text-xs font-bold no-underline"
             >
-              Jelajahi Destinasi Wisata <ArrowRight className="h-4 w-4" />
+              {slug ? 'Kembali ke Beranda Destinasi' : 'Jelajahi Destinasi Wisata'} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         ) : (
