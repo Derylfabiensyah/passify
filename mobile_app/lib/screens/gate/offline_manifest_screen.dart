@@ -103,13 +103,13 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                 filled: true,
                 fillColor: AppColors.inputBg,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.border),
+                border: const OutlineInputBorder(
+                  borderRadius: AppRadius.radiusMd,
+                  borderSide: BorderSide(color: AppColors.border),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: const BorderSide(color: AppColors.border),
+                enabledBorder: const OutlineInputBorder(
+                  borderRadius: AppRadius.radiusMd,
+                  borderSide: BorderSide(color: AppColors.border),
                 ),
               ),
             ),
@@ -160,7 +160,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                     : ListView.separated(
                         padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                         itemCount: _tickets.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (ctx, idx) {
                           final item = _tickets[idx];
                           final isUsed = item.status == 'used';
@@ -169,7 +169,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                             elevation: 0,
                             color: AppColors.surface,
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: AppRadius.radiusLg,
                               side: BorderSide(color: isUsed ? AppColors.border : AppColors.borderHover),
                             ),
                             child: Padding(
@@ -182,7 +182,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                                     height: 42,
                                     decoration: BoxDecoration(
                                       color: isUsed ? AppColors.inputBg : AppColors.leafPale,
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: AppRadius.radiusMd,
                                     ),
                                     child: Icon(
                                       isUsed ? Icons.done_all : Icons.confirmation_number_outlined,
@@ -225,7 +225,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                         minimumSize: Size.zero,
                                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusSm),
                                       ),
                                       child: const Text('Check-In', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                                     )

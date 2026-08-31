@@ -25,7 +25,7 @@ class ScanResultSheet extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -43,7 +43,7 @@ class ScanResultSheet extends StatelessWidget {
               decoration: BoxDecoration(
                 color: bgColor,
                 shape: BoxShape.circle,
-                border: Border.all(color: color.withOpacity(0.3), width: 2),
+                border: Border.all(color: color.withValues(alpha: 0.3), width: 2),
               ),
               child: Icon(
                 isValid ? Icons.check_circle : Icons.cancel,
@@ -82,7 +82,7 @@ class ScanResultSheet extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.canvas,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: AppRadius.radiusLg,
               border: Border.all(color: AppColors.border),
             ),
             child: Column(
@@ -110,7 +110,7 @@ class ScanResultSheet extends StatelessWidget {
               backgroundColor: isValid ? AppColors.forest : AppColors.ink,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
               elevation: 0,
             ),
           ),

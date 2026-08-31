@@ -146,7 +146,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
               border: const Border(top: BorderSide(color: AppColors.border)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 10,
                   offset: const Offset(0, -3),
                 ),
@@ -283,14 +283,14 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
   Widget _buildKeypadButton({String? label, IconData? icon, Color? color, Color? textColor, required VoidCallback onTap}) {
     return Material(
       color: color ?? AppColors.surface,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: AppRadius.radiusMd,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadius.radiusMd,
         child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(14),
+          decoration: const BoxDecoration(
+            border: Border.fromBorderSide(BorderSide(color: AppColors.border)),
+            borderRadius: AppRadius.radiusMd,
           ),
           alignment: Alignment.center,
           child: label != null
@@ -327,7 +327,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: pos.products.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (ctx, idx) {
         final product = pos.products[idx];
         final inCartItem = pos.cart.firstWhere(
@@ -338,9 +338,9 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
         return Card(
           elevation: 0,
           color: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(color: AppColors.border),
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.radiusLg,
+            side: BorderSide(color: AppColors.border),
           ),
           child: Padding(
             padding: const EdgeInsets.all(12),
@@ -349,9 +349,9 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                 Container(
                   width: 48,
                   height: 48,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.leafPale,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: AppRadius.radiusMd,
                   ),
                   child: const Icon(Icons.fastfood, color: AppColors.forest),
                 ),
@@ -375,7 +375,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                       ),
                       Text('${inCartItem.quantity}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                       IconButton(
-                        icon: const Icon(Icons.add_circle_outline, color: AppColors.forest, size: 22),
+                        icon: const Icon(Icons.add_circle, color: AppColors.forest, size: 22),
                         onPressed: () => pos.addToCart(product),
                       ),
                     ],
@@ -386,7 +386,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.forest,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusSm),
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       minimumSize: Size.zero,
                     ),

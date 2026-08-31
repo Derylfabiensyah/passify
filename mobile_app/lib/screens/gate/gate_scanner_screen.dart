@@ -187,9 +187,9 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           margin: const EdgeInsets.only(right: 6),
                           decoration: BoxDecoration(
                             color: _isContinuousMode
-                                ? const Color(0xFF059669).withOpacity(0.9)
+                                ? const Color(0xFF059669).withValues(alpha: 0.9)
                                 : Colors.black54,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadius.radiusXl,
                             border: Border.all(
                               color: _isContinuousMode ? AppColors.leaf : Colors.white30,
                             ),
@@ -223,7 +223,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             color: scannerProvider.forceOfflineMode ? AppColors.bark : AppColors.forest,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: AppRadius.radiusXl,
                             border: Border.all(color: Colors.white30),
                           ),
                           child: Row(
@@ -305,7 +305,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                       : 'Mendukung Dynamic TOTP & Tiket Reguler (< 500ms)',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 12,
                     shadows: const [Shadow(color: Colors.black54, blurRadius: 6)],
                   ),
@@ -326,7 +326,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
               decoration: const BoxDecoration(
                 color: AppColors.forestDeep,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -355,7 +355,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           label: const Text('Cache Tiket', style: TextStyle(color: Colors.white, fontSize: 12)),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Colors.white24),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
                           ),
                         ),
                       ),
@@ -371,7 +371,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           label: const Text('Statistik Gate', style: TextStyle(color: Colors.white, fontSize: 12)),
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Colors.white24),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
                           ),
                         ),
                       ),
@@ -389,7 +389,9 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
   Widget _buildHudToast(ValidateResultModel result) {
     final isValid = result.valid;
     final statusColor = isValid ? const Color(0xFF10B981) : const Color(0xFFEF4444);
-    final bgCardColor = isValid ? const Color(0xFF064E3B).withOpacity(0.94) : const Color(0xFF7F1D1D).withOpacity(0.94);
+    final bgCardColor = isValid
+        ? const Color(0xFF064E3B).withValues(alpha: 0.94)
+        : const Color(0xFF7F1D1D).withValues(alpha: 0.94);
 
     return Positioned(
       top: 90,
@@ -402,11 +404,11 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: bgCardColor,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: AppRadius.radiusLg,
             border: Border.all(color: statusColor, width: 2),
             boxShadow: [
               BoxShadow(
-                color: statusColor.withOpacity(0.35),
+                color: statusColor.withValues(alpha: 0.35),
                 blurRadius: 18,
                 spreadRadius: 2,
                 offset: const Offset(0, 4),
@@ -420,7 +422,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.25),
+                  color: statusColor.withValues(alpha: 0.25),
                   shape: BoxShape.circle,
                   border: Border.all(color: statusColor, width: 2),
                 ),
@@ -454,9 +456,9 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                         if (result.isOffline)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.white24,
-                              borderRadius: BorderRadius.circular(5),
+                              borderRadius: AppRadius.radiusSm,
                             ),
                             child: const Text(
                               'OFFLINE',
@@ -468,8 +470,8 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                     const SizedBox(height: 2),
                     Text(
                       result.visitorName.isNotEmpty
-                          ? '${result.visitorName} • ${result.categoryName}'
-                          : result.message,
+                          ? result.visitorName
+                          : (isValid ? 'Pengunjung Terverifikasi' : 'Tiket Tidak Dikenal'),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -482,7 +484,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                       Text(
                         result.ticketCode,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 10,
                           fontFamily: 'monospace',
                         ),
@@ -495,7 +497,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
               const SizedBox(width: 8),
               Icon(
                 Icons.chevron_right,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 size: 20,
               ),
             ],

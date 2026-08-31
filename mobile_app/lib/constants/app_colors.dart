@@ -33,3 +33,16 @@ class AppColors {
   static const Color info = Color(0xFF1976D2);
   static const Color infoBg = Color(0xFFE3F2FD);
 }
+
+/// 4-Tier Standardized Border Radius System (8, 12, 16, 24px)
+class AppRadius {
+  static const double sm = 8.0;   // Chips, badges, small buttons, tags
+  static const double md = 12.0;  // Input fields, standard buttons, list items
+  static const double lg = 16.0;  // Cards, standard sheets, dialogs
+  static const double xl = 24.0;  // Modal tops, large hero cards, floating containers
+
+  static const BorderRadius radiusSm = BorderRadius.all(Radius.circular(sm));
+  static const BorderRadius radiusMd = BorderRadius.all(Radius.circular(md));
+  static const BorderRadius radiusLg = BorderRadius.all(Radius.circular(lg));
+  static const BorderRadius radiusXl = BorderRadius.all(Radius.circular(xl));
+}

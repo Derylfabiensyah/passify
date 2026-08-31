@@ -126,7 +126,7 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: AppRadius.radiusLg,
                   border: Border.all(color: AppColors.border),
                 ),
                 child: const Text('Belum ada tiket yang di-scan pada sesi ini.', style: TextStyle(color: AppColors.textMuted)),
@@ -136,15 +136,15 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: scannerProvider.scanHistory.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 8),
+                separatorBuilder: (_, _) => const SizedBox(height: 8),
                 itemBuilder: (ctx, idx) {
                   final log = scannerProvider.scanHistory[idx];
                   return Card(
                     elevation: 0,
                     color: AppColors.surface,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: AppColors.border),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: AppRadius.radiusMd,
+                      side: BorderSide(color: AppColors.border),
                     ),
                     child: ListTile(
                       leading: Icon(
@@ -178,7 +178,7 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: AppRadius.radiusLg,
         border: Border.all(color: AppColors.border),
       ),
       child: Column(

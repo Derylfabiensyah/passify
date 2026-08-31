@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../../constants/app_colors.dart';
 import '../../widgets/scanner_overlay.dart';
 
 class WalletScannerScreen extends StatefulWidget {
@@ -93,7 +94,7 @@ class _WalletScannerScreenState extends State<WalletScannerScreen> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.black87,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: AppRadius.radiusLg,
                 border: Border.all(color: Colors.white24),
               ),
               child: const Text(

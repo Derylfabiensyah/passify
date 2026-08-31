@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusLg),
           backgroundColor: AppColors.surface,
           title: Row(
             children: [
@@ -61,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppColors.error.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppRadius.radiusMd,
                 ),
                 child: const Icon(Icons.logout_rounded, color: AppColors.error, size: 22),
               ),
@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: AppColors.warningBg,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: AppRadius.radiusMd,
                     border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
                   ),
                   child: Row(
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
               child: const Text('Ya, Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: AppColors.forestDeep,
-                  borderRadius: BorderRadius.circular(18),
+                  borderRadius: AppRadius.radiusLg,
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.forestDeep.withValues(alpha: 0.2),
@@ -261,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: AppRadius.radiusLg,
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
@@ -314,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         backgroundColor: AppColors.forestSoft,
                         foregroundColor: Colors.white,
                         minimumSize: const Size.fromHeight(42),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
                         elevation: 0,
                       ),
                     ),
@@ -421,13 +421,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       elevation: 0,
       color: AppColors.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.border),
+      shape: const RoundedRectangleBorder(
+        borderRadius: AppRadius.radiusLg,
+        side: BorderSide(color: AppColors.border),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadius.radiusLg,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -439,7 +439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 44,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppRadius.radiusMd,
                 ),
                 child: Icon(icon, color: color, size: 24),
               ),
