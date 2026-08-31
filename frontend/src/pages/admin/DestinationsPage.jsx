@@ -26,10 +26,142 @@ import {
   FileText
 } from 'lucide-react';
 import AdminStatCard from '../../components/admin/AdminStatCard';
+import ModalWrapper from '../../components/ModalWrapper';
+import { useToast } from '../../contexts/ToastContext';
 import { ADMIN_DESTINATIONS } from '../../data/adminData';
 import { useTenant } from '../../contexts/TenantContext';
 import { fetchAdminDestinations } from '../../api/admin';
 import { apiRequest } from '../../api/client';
+
+function FacilityTagInput({ value = [], onChange }) {
+  const [inputVal, setInputVal] = useState('');
+
+  const suggestions = [
+    'Area Parkir',
+    'Toilet Bersih',
+    'Musholla',
+    'Pos Pemandu',
+    'Pos P3K',
+    'Gazebo',
+    'Kantin Alam',
+    'Sewa Tenda & Camping',
+    'Spot Foto Panorama',
+    'Jalur Tracking'
+  ];
+
+  const handleAdd = (tag) => {
+    const trimmed = tag.trim();
+    if (!trimmed) return;
+    if (!value.includes(trimmed)) {
+      onChange([...value, trimmed]);
+    }
+    setInputVal('');
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      handleAdd(inputVal);
+    }
+  };
+
+  const handleRemove = (tagToRemove) => {
+    onChange(value.filter((t) => t !== tagToRemove));
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1.5 min-h-[42px] p-2 bg-[var(--canvas)] rounded-xl border border-[var(--border)]">
+        {value.map((tag) => (
+          <span
+            key={tag}
+            className="inline-flex items-center gap-1.5 bg-[var(--surface)] text-[var(--forest-deep)] border border-[var(--border)] px-2.5 py-1 rounded-lg text-xs font-semibold shadow-2xs"
+          >
+            <span>{tag}</span>
+            <button
+              type="button"
+              onClick={() => handleRemove(tag)}
+              className="text-[var(--ink-soft)] hover:text-red-600 transition-colors"
+              aria-label={`Hapus fasilitas ${tag}`}
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </span>
+        ))}
+        <input
+          type="text"
+          value={inputVal}
+          onChange={(e) => setInputVal(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onBlur={() => inputVal && handleAdd(inputVal)}
+          placeholder={value.length === 0 ? 'Ketik fasilitas lalu tekan Enter...' : 'Tambah fasilitas...'}
+          className="flex-1 min-w-[140px] bg-transparent text-xs text-[var(--ink)] placeholder-[var(--ink-soft)] focus:outline-none px-1 py-0.5"
+        />
+      </div>
+
+      {/* Suggested Quick Add Chips */}
+      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-soft)] mr-1">
+          Rekomendasi Cepat:
+        </span>
+        {suggestions
+          .filter((s) => !value.includes(s))
+          .slice(0, 5)
+          .map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => handleAdd(s)}
+              className="inline-flex items-center gap-1 text-[11px] font-medium bg-[var(--surface)] hover:bg-[var(--leaf-pale)] text-[var(--ink-soft)] hover:text-[var(--forest-deep)] border border-[var(--border)] rounded-md px-2 py-0.5 transition-colors cursor-pointer"
+            >
+              <Plus className="w-2.5 h-2.5" />
+              <span>{s}</span>
+            </button>
+          ))}
+      </div>
+    </div>
+  );
+}
+
+function DeleteCategoryConfirmationModal({ isOpen, onClose, onConfirm, categoryName }) {
+  return (
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      size="sm"
+      ariaLabel="Konfirmasi Hapus Kategori Tiket"
+    >
+      <div className="p-6 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 border border-red-200 mx-auto flex items-center justify-center">
+          <Trash2 className="w-6 h-6" />
+        </div>
+        <div>
+          <h3 className="text-base font-bold text-[var(--forest-deep)] font-heading">Hapus Kategori Tiket</h3>
+          <p className="text-xs text-[var(--ink-soft)] mt-1.5 leading-relaxed">
+            Apakah Anda yakin ingin menghapus kategori tiket{' '}
+            <strong className="text-[var(--ink)]">{categoryName}</strong>? Wisatawan tidak akan dapat lagi memilih tiket ini di website portal.
+          </p>
+        </div>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-secondary px-4 py-2 rounded-xl text-xs font-bold"
+          >
+            Batal
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="px-5 py-2 rounded-xl text-xs font-bold bg-red-600 hover:bg-red-700 text-white shadow-xs transition-colors"
+          >
+            Ya, Hapus Kategori
+          </button>
+        </div>
+      </div>
+    </ModalWrapper>
+  );
+}
 
 function TicketCategoryRow({ cat, onEdit, onDelete }) {
   return (
@@ -221,13 +353,19 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
     province: '',
     cover_image_url: '',
     max_daily_capacity: 1000,
-    facilities: '',
+    facilities: [],
     rules: '',
     primary_color: '#102d20',
   });
 
   useEffect(() => {
     if (dest) {
+      const facilityArr = Array.isArray(dest.facilities)
+        ? dest.facilities
+        : typeof dest.facilities === 'string'
+        ? dest.facilities.split(',').map((f) => f.trim()).filter(Boolean)
+        : [];
+
       setFormData({
         name: dest.name || '',
         description: dest.description || '',
@@ -235,7 +373,7 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
         province: dest.province || 'Indonesia',
         cover_image_url: dest.cover_image_url || '',
         max_daily_capacity: dest.max_daily_capacity || 1000,
-        facilities: Array.isArray(dest.facilities) ? dest.facilities.join(', ') : (dest.facilities || ''),
+        facilities: facilityArr,
         rules: dest.rules || '',
         primary_color: dest.primary_color || '#102d20',
       });
@@ -246,16 +384,13 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const facilityList = formData.facilities
-      .split(',')
-      .map((f) => f.trim())
-      .filter(Boolean);
-
     onSave({
       ...dest,
       ...formData,
       max_daily_capacity: Number(formData.max_daily_capacity),
-      facilities: facilityList.length ? facilityList : ['Area Parkir', 'Pusat Informasi', 'Toilet Bersih', 'Pos P3K'],
+      facilities: formData.facilities.length
+        ? formData.facilities
+        : ['Area Parkir', 'Pusat Informasi', 'Toilet Bersih', 'Pos P3K'],
     });
   };
 
@@ -273,7 +408,7 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
           <button
             type="button"
             onClick={onClose}
-            className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white"
+            className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>
@@ -314,7 +449,7 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
 
           <div>
             <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-              Lokasi & Alamat Lengkap
+              Lokasi &amp; Alamat Lengkap
             </label>
             <input
               type="text"
@@ -350,7 +485,7 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
 
           <div>
             <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-              Deskripsi Wisata & Cerita Kawasan
+              Deskripsi Wisata &amp; Cerita Kawasan
             </label>
             <textarea
               rows={3}
@@ -364,20 +499,17 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
 
           <div>
             <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-              Fasilitas Kawasan (Pisahkan dengan koma)
+              Fasilitas Kawasan Wisata
             </label>
-            <input
-              type="text"
+            <FacilityTagInput
               value={formData.facilities}
-              onChange={(e) => setFormData({ ...formData, facilities: e.target.value })}
-              className="field-control"
-              placeholder="Area Parkir, Pos Pemandu, Toilet Bersih, Musholla, Pos P3K, Gazebo"
+              onChange={(tags) => setFormData({ ...formData, facilities: tags })}
             />
           </div>
 
           <div>
             <label className="block font-bold uppercase tracking-wider text-gray-500 mb-1.5">
-              Aturan & Etika Kawasan Wisata Alam
+              Aturan &amp; Etika Kawasan Wisata Alam
             </label>
             <textarea
               rows={2}
@@ -393,13 +525,13 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
             <button
               type="button"
               onClick={onClose}
-              className="btn-secondary px-5 py-2.5 rounded-xl font-bold"
+              className="btn-secondary px-5 py-2.5 rounded-xl font-bold cursor-pointer"
             >
               Batal
             </button>
             <button
               type="submit"
-              className="btn-primary px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md"
+              className="btn-primary px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md cursor-pointer"
             >
               <Save className="h-4 w-4" /> Simpan Perubahan Halaman
             </button>
@@ -558,6 +690,7 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
 // MAIN DESTINATIONS PAGE COMPONENT
 // =========================================================================
 export default function DestinationsPage() {
+  const { toast } = useToast();
   const { slug, refetch } = useTenant();
   const [destinations, setDestinations] = useState(() => {
     try {
@@ -573,7 +706,7 @@ export default function DestinationsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingDest, setEditingDest] = useState(null);
   const [editingCatContext, setEditingCatContext] = useState(null); // { destId, cat }
-  const [toastMessage, setToastMessage] = useState('');
+  const [deleteConfirmContext, setDeleteConfirmContext] = useState(null); // { destId, catId, catName }
 
   // Fetch real destinations from microservices
   useEffect(() => {
@@ -594,11 +727,6 @@ export default function DestinationsPage() {
     loadRealDestinations();
   }, [slug]);
 
-  const showToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 4000);
-  };
-
   const saveDestinationsList = (updated) => {
     setDestinations(updated);
     localStorage.setItem('passify_admin_destinations', JSON.stringify(updated));
@@ -613,7 +741,7 @@ export default function DestinationsPage() {
     const updated = destinations.map((d) => (d.id === updatedDest.id ? updatedDest : d));
     saveDestinationsList(updated);
     setEditingDest(null);
-    showToast(`Halaman "${updatedDest.name}" berhasil diperbarui!`);
+    toast.success(`Halaman "${updatedDest.name}" berhasil diperbarui!`);
 
     // Sync to backend destination endpoint if available
     try {
@@ -642,7 +770,7 @@ export default function DestinationsPage() {
 
     saveDestinationsList(updated);
     setEditingCatContext(null);
-    showToast('Kategori tiket berhasil disimpan!');
+    toast.success('Kategori tiket berhasil disimpan!');
 
     // Sync to ticket microservice
     try {
@@ -656,8 +784,20 @@ export default function DestinationsPage() {
     } catch (_) {}
   };
 
-  const handleDeleteCategory = async (destId, catId) => {
-    if (!window.confirm('Hapus kategori tiket ini?')) return;
+  const handleDeleteCategory = (destId, catId) => {
+    const dest = destinations.find((d) => d.id === destId);
+    const cat = (dest?.ticket_categories || []).find((c) => c.id === catId);
+    setDeleteConfirmContext({
+      destId,
+      catId,
+      catName: cat?.name || 'Kategori Tiket'
+    });
+  };
+
+  const handleConfirmDeleteCategory = async () => {
+    if (!deleteConfirmContext) return;
+    const { destId, catId } = deleteConfirmContext;
+
     const updated = destinations.map((d) => {
       if (d.id !== destId) return d;
       return {
@@ -665,8 +805,10 @@ export default function DestinationsPage() {
         ticket_categories: (d.ticket_categories || []).filter((c) => c.id !== catId),
       };
     });
+
     saveDestinationsList(updated);
-    showToast('Kategori tiket telah dihapus.');
+    setDeleteConfirmContext(null);
+    toast.success('Kategori tiket telah dihapus.');
 
     // Sync deletion to backend
     try {
@@ -688,14 +830,6 @@ export default function DestinationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-5 right-5 z-50 bg-[var(--forest-deep)] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 text-xs font-bold animate-fade-in border border-[var(--leaf)]">
-          <CheckCircle2 className="h-5 w-5 text-[var(--leaf)]" />
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
         <div>
@@ -785,6 +919,14 @@ export default function DestinationsPage() {
         isOpen={Boolean(editingCatContext)}
         onClose={() => setEditingCatContext(null)}
         onSave={handleSaveCategory}
+      />
+
+      {/* Branded Delete Category Confirmation Modal */}
+      <DeleteCategoryConfirmationModal
+        isOpen={Boolean(deleteConfirmContext)}
+        onClose={() => setDeleteConfirmContext(null)}
+        onConfirm={handleConfirmDeleteCategory}
+        categoryName={deleteConfirmContext?.catName || ''}
       />
     </div>
   );
