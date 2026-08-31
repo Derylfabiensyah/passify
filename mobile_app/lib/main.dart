@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'constants/app_colors.dart';
 import 'providers/auth_provider.dart';
@@ -57,7 +58,7 @@ class _PassifyAppState extends State<PassifyApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        fontFamily: 'Inter',
+        textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.forest,
           primary: AppColors.forest,
