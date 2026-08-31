@@ -349,66 +349,123 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
 
               const SizedBox(height: 24),
-              const Text(
-                'Menu Operasional',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Menu Operasional',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
+                  ),
+                  if (user != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.elevated,
+                        borderRadius: AppRadius.radiusSm,
+                        border: Border.all(color: AppColors.border),
+                      ),
+                      child: Text(
+                        'Role: ${user.role.replaceAll('_', ' ').toUpperCase()}',
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.forest),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 14),
 
-              // Feature Cards Grid
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 14,
-                crossAxisSpacing: 14,
-                childAspectRatio: 1.05,
-                children: [
-                  _buildMenuCard(
-                    title: 'Gate Access Scanner',
-                    subtitle: 'Scan QR Tiket & Validasi Gerbang',
-                    icon: Icons.qr_code_scanner,
-                    color: AppColors.forest,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const GateScannerScreen()),
-                      );
-                    },
-                  ),
-                  _buildMenuCard(
-                    title: 'Kasir Booth Cashless',
-                    subtitle: 'Terima Bayar QR Wallet Stan',
-                    icon: Icons.point_of_sale,
-                    color: AppColors.bark,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const BoothPosScreen()),
-                      );
-                    },
-                  ),
-                  _buildMenuCard(
-                    title: 'Manifest Tiket Offline',
-                    subtitle: 'Daftar & Check-in Manual',
-                    icon: Icons.checklist_rtl,
-                    color: AppColors.forestSoft,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
-                      );
-                    },
-                  ),
-                  _buildMenuCard(
-                    title: 'Statistik Pintu Masuk',
-                    subtitle: 'Laporan Kuota & Total Scan',
-                    icon: Icons.insights,
-                    color: AppColors.ink,
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const GateStatsScreen()),
-                      );
-                    },
-                  ),
-                ],
+              // Dynamic Role-Filtered Menu Cards Grid
+              Builder(
+                builder: (context) {
+                  final role = user?.role.toLowerCase() ?? '';
+                  final isVendorOnly = role == 'vendor';
+                  final isGateOnly = role == 'gate_officer';
+
+                  final List<Widget> cards = [];
+
+                  // Gate Scanner (Accessible by gate officers, admins, staff)
+                  if (!isVendorOnly) {
+                    cards.add(
+                      _buildMenuCard(
+                        title: 'Gate Access Scanner',
+                        subtitle: 'Scan QR Tiket & Validasi Gerbang',
+                        icon: Icons.qr_code_scanner,
+                        color: AppColors.forest,
+                        tag: 'Gerbang',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const GateScannerScreen()),
+                          );
+                        },
+                      ),
+                    );
+                  }
+
+                  // Booth POS (Accessible by vendor, booth cashier, admins, staff)
+                  if (!isGateOnly) {
+                    cards.add(
+                      _buildMenuCard(
+                        title: 'Kasir Booth Cashless',
+                        subtitle: 'Terima Bayar QR Wallet Stan',
+                        icon: Icons.point_of_sale,
+                        color: AppColors.bark,
+                        tag: 'Stan POS',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const BoothPosScreen()),
+                          );
+                        },
+                      ),
+                    );
+                  }
+
+                  // Offline Manifest (Accessible by gate officers, admins, staff)
+                  if (!isVendorOnly) {
+                    cards.add(
+                      _buildMenuCard(
+                        title: 'Manifest Tiket Offline',
+                        subtitle: 'Daftar & Check-in Manual',
+                        icon: Icons.checklist_rtl,
+                        color: AppColors.forestSoft,
+                        tag: 'Offline',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
+                          );
+                        },
+                      ),
+                    );
+
+                    // Gate Stats (Accessible by gate officers, admins, staff)
+                    cards.add(
+                      _buildMenuCard(
+                        title: 'Statistik Pintu Masuk',
+                        subtitle: 'Laporan Kuota & Total Scan',
+                        icon: Icons.insights,
+                        color: AppColors.ink,
+                        tag: 'Laporan',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const GateStatsScreen()),
+                          );
+                        },
+                      ),
+                    );
+                  }
+
+                  if (cards.length == 1) {
+                    return cards.first;
+                  }
+
+                  return GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    mainAxisSpacing: 14,
+                    crossAxisSpacing: 14,
+                    childAspectRatio: 1.05,
+                    children: cards,
+                  );
+                },
               ),
             ],
           ),
@@ -442,6 +499,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required String subtitle,
     required IconData icon,
     required Color color,
+    String? tag,
     required VoidCallback onTap,
   }) {
     return Card(
@@ -460,14 +518,35 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  borderRadius: AppRadius.radiusMd,
-                ),
-                child: Icon(icon, color: color, size: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.12),
+                      borderRadius: AppRadius.radiusMd,
+                    ),
+                    child: Icon(icon, color: color, size: 24),
+                  ),
+                  if (tag != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.08),
+                        borderRadius: AppRadius.radiusSm,
+                      ),
+                      child: Text(
+                        tag,
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -479,8 +558,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 10, color: AppColors.inkSoft),
-                    maxLines: 2,
+                    style: const TextStyle(fontSize: 11, color: AppColors.inkSoft),
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
