@@ -38,6 +38,14 @@ void main() {
 
       pos.backspaceKeypad();
       expect(pos.totalPayable, 2500.0);
+
+      // Max limit clamp test
+      pos.setCustomAmount(20000000.0);
+      expect(pos.totalPayable, BoothPosProvider.maxKeypadAmount);
+
+      pos.clearKeypad();
+      pos.appendKeypadDigit('9999999999');
+      expect(pos.totalPayable, BoothPosProvider.maxKeypadAmount);
     });
 
     test('ManifestEntry and OfflineScanModel serialization works properly', () {

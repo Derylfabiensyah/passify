@@ -41,8 +41,10 @@ class BoothPosProvider with ChangeNotifier {
     return _customAmount;
   }
 
+  static const double maxKeypadAmount = 10000000.0; // Max Rp 10.000.000 per POS transaction
+
   void setCustomAmount(double amount) {
-    _customAmount = amount;
+    _customAmount = amount.clamp(0.0, maxKeypadAmount);
     notifyListeners();
   }
 
@@ -53,8 +55,15 @@ class BoothPosProvider with ChangeNotifier {
     } else {
       currentStr += digit;
     }
-    _customAmount = double.tryParse(currentStr) ?? _customAmount;
-    notifyListeners();
+    final parsed = double.tryParse(currentStr);
+    if (parsed != null) {
+      if (parsed > maxKeypadAmount) {
+        _customAmount = maxKeypadAmount;
+      } else {
+        _customAmount = parsed;
+      }
+      notifyListeners();
+    }
   }
 
   void clearKeypad() {
