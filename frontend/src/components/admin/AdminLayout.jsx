@@ -8,7 +8,7 @@ import {
 import { getAdminUser } from '../../api/admin';
 import { useTenant } from '../../contexts/TenantContext';
 import { useToast } from '../../contexts/ToastContext';
-import ModalWrapper from '../ModalWrapper';
+import ModalWrapper from '../common/ModalWrapper';
 
 const menuItems = [
   { id: 'dashboard', label: 'Ringkasan', icon: LayoutDashboard, path: '/admin' },

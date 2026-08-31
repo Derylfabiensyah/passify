@@ -1,16 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, Ticket, User, Users, X } from 'lucide-react';
-import ModalWrapper from './ModalWrapper';
+import ModalWrapper from './common/ModalWrapper';
+import { formatRupiah } from '../api/client';
 
 const steps = [
   { number: '01', label: 'Jadwal' },
   { number: '02', label: 'Tiket & tamu' },
   { number: '03', label: 'Tinjau' },
 ];
-
-function formatRupiah(value) {
-  return `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
-}
 
 export default function BookingModal({ isOpen = true, destination, onClose, onBookingSuccess }) {
   const todayStr = new Date().toISOString().split('T')[0];

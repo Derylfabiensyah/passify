@@ -4,6 +4,7 @@ import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, Clock, Compass,
   Info, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Sparkles, Ticket, Users,
 } from 'lucide-react';
+import { formatRupiah } from '../api/client';
 import { DESTINATIONS } from '../data/destinations';
 
 const fallbackDestination = {
@@ -20,10 +21,6 @@ const fallbackDestination = {
   time_slots: [{ id: 'morning', label: 'Sesi Pagi', max_capacity: 1200, booked: 850 }],
   ticket_categories: [{ id: 'regular', name: 'Tiket Reguler', price: 35000, insurance: 3000, retribusi: 5000 }],
 };
-
-function formatRupiah(value) {
-  return `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
-}
 
 export default function TravelerPortal() {
   const location = useLocation();

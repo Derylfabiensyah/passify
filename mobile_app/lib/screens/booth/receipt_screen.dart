@@ -16,7 +16,6 @@ class ReceiptScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
     final tx = receipt['transaction'] as Map<String, dynamic>? ?? {};
     final wallet = receipt['wallet'] as Map<String, dynamic>? ?? {};
     final remainingBalance = (wallet['balance'] as num?)?.toDouble() ?? 0.0;
@@ -82,7 +81,7 @@ class ReceiptScreen extends StatelessWidget {
                           const Text('Total Pembayaran', style: TextStyle(fontSize: 12, color: AppColors.inkSoft)),
                           const SizedBox(height: 6),
                           Text(
-                            currencyFormat.format(amount),
+                            AppFormatters.formatRupiah(amount),
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -99,7 +98,7 @@ class ReceiptScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                           _buildReceiptRow('Metode', 'Passify Cashless Wallet'),
                           const SizedBox(height: 8),
-                          _buildReceiptRow('Sisa Saldo Pengunjung', currencyFormat.format(remainingBalance), isHighlight: true),
+                          _buildReceiptRow('Sisa Saldo Pengunjung', AppFormatters.formatRupiah(remainingBalance), isHighlight: true),
                         ],
                       ),
                     ),

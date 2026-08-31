@@ -17,7 +17,6 @@ class BoothPosScreen extends StatefulWidget {
 
 class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final currencyFormat = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0);
 
   @override
   void initState() {
@@ -136,14 +135,14 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink),
                                   ),
                                   Text(
-                                    '@ ${currencyFormat.format(item.product.price)}',
+                                    '@ ${AppFormatters.formatRupiah(item.product.price)}',
                                     style: const TextStyle(fontSize: 11, color: AppColors.inkSoft),
                                   ),
                                 ],
                               ),
                             ),
                             Text(
-                              currencyFormat.format(item.subtotal),
+                              AppFormatters.formatRupiah(item.subtotal),
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink),
                             ),
                           ],
@@ -170,7 +169,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                           ],
                         ),
                         Text(
-                          currencyFormat.format(pos.customAmount),
+                          AppFormatters.formatRupiah(pos.customAmount),
                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: AppColors.forestDeep),
                         ),
                       ],
@@ -193,7 +192,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink),
                       ),
                       Text(
-                        currencyFormat.format(pos.totalPayable),
+                        AppFormatters.formatRupiah(pos.totalPayable),
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.forestDeep),
                       ),
                     ],
@@ -346,7 +345,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                     children: [
                       const Text('Total Transaksi:', style: TextStyle(fontSize: 13, color: AppColors.inkSoft)),
                       Text(
-                        currencyFormat.format(pos.totalPayable),
+                        AppFormatters.formatRupiah(pos.totalPayable),
                         style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.forestDeep),
                       ),
                     ],
@@ -403,7 +402,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                 const Text('Nominal Pembayaran', style: TextStyle(fontSize: 12, color: AppColors.inkSoft)),
                 const SizedBox(height: 4),
                 Text(
-                  currencyFormat.format(pos.customAmount),
+                  AppFormatters.formatRupiah(pos.customAmount),
                   style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -446,7 +445,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
             spacing: 8,
             children: presets.map((val) {
               return ActionChip(
-                label: Text(currencyFormat.format(val), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                label: Text(AppFormatters.formatRupiah(val), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                 backgroundColor: AppColors.surface,
                 side: const BorderSide(color: AppColors.border),
                 onPressed: () => pos.setCustomAmount(val),
@@ -573,7 +572,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                     children: [
                       Text(product.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.ink)),
                       const SizedBox(height: 2),
-                      Text(currencyFormat.format(product.price), style: const TextStyle(fontSize: 13, color: AppColors.forest, fontWeight: FontWeight.w600)),
+                      Text(AppFormatters.formatRupiah(product.price), style: const TextStyle(fontSize: 13, color: AppColors.forest, fontWeight: FontWeight.w600)),
                     ],
                   ),
                 ),

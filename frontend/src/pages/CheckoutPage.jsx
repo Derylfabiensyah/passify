@@ -24,10 +24,7 @@ import {
 } from 'lucide-react';
 import { fetchDestinationBySlug } from '../api/tenant';
 import { useTenant } from '../contexts/TenantContext';
-
-function formatRupiah(num) {
-  return `Rp ${Number(num || 0).toLocaleString('id-ID')}`;
-}
+import { formatRupiah } from '../api/client';
 
 export default function CheckoutPage() {
   const { tenantSlug, destinationId } = useParams();

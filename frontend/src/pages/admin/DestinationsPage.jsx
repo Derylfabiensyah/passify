@@ -26,7 +26,7 @@ import {
   FileText
 } from 'lucide-react';
 import AdminStatCard from '../../components/admin/AdminStatCard';
-import ModalWrapper from '../../components/ModalWrapper';
+import ModalWrapper from '../../components/common/ModalWrapper';
 import { useToast } from '../../contexts/ToastContext';
 import { ADMIN_DESTINATIONS } from '../../data/adminData';
 import { useTenant } from '../../contexts/TenantContext';

@@ -16,7 +16,7 @@ import {
   History,
   ShieldCheck
 } from 'lucide-react';
-import ModalWrapper from './ModalWrapper';
+import ModalWrapper from './common/ModalWrapper';
 
 export default function WalletModal({ walletBalance, onTopUp, onClose }) {
   const [activeTab, setActiveTab] = useState('nfc'); // 'nfc' | 'qr' | 'refund' | 'topup'

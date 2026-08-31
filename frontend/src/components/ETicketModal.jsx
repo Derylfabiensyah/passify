@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useToast } from '../contexts/ToastContext';
-import ModalWrapper from './ModalWrapper';
+import ModalWrapper from './common/ModalWrapper';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083';
 

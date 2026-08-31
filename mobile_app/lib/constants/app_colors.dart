@@ -55,3 +55,9 @@ class AppRadius {
   static const BorderRadius radiusLg = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius radiusXl = BorderRadius.all(Radius.circular(xl));
 }
+
+class AppFormatters {
+  static String formatRupiah(num value) {
+    return 'Rp ${value.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+  }
+}

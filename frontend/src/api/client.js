@@ -12,6 +12,13 @@ export const SERVICE_URLS = {
 export const API_BASE_URL = SERVICE_URLS.tenant;
 
 /**
+ * Shared currency formatter for IDR (Rupiah)
+ */
+export function formatRupiah(num) {
+  return `Rp ${Number(num || 0).toLocaleString('id-ID')}`;
+}
+
+/**
  * Resolves the appropriate service base URL based on endpoint path
  */
 export function resolveServiceUrl(endpoint) {

@@ -27,10 +27,7 @@ import {
 import ETicketModal from '../components/ETicketModal';
 import { useToast } from '../contexts/ToastContext';
 import { useTenant } from '../contexts/TenantContext';
-
-function formatRupiah(num) {
-  return `Rp ${Number(num || 0).toLocaleString('id-ID')}`;
-}
+import { formatRupiah } from '../api/client';
 
 export default function BookingHistoryPage() {
   const { toast } = useToast();

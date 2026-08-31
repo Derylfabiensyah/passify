@@ -14,23 +14,8 @@ func RegisterRoutes(router *gin.RouterGroup, handler *GateHandler, jwtSecret str
 	router.POST("/devices/:device_id/sync-logs", handler.HandleSyncLogs)
 
 	// Protected Admin & Gate Officer routes
-	authGroup := router.Group("")
-	authGroup.Use(middleware.AuthMiddleware(jwtSecret))
-
-	adminOrGate := authGroup.Group("")
-	adminOrGate.Use(middleware.RoleMiddleware(
-		models.RoleSuperAdmin,
-		models.RoleTenantAdmin,
-		models.RoleGateOfficer,
-	))
-	adminOrGate.POST("/devices", handler.HandleRegisterDevice)
-	adminOrGate.GET("/destinations/:destination_id/stats", handler.HandleGetScanStats)
-
-	// Admin only routes: ListDevices
-	adminOnly := authGroup.Group("")
-	adminOnly.Use(middleware.RoleMiddleware(
-		models.RoleSuperAdmin,
-		models.RoleTenantAdmin,
-	))
-	adminOnly.GET("/destinations/:destination_id/devices", handler.HandleListDevices)
+	auth := router.Group("", middleware.AuthMiddleware(jwtSecret))
+	auth.POST("/devices", middleware.RoleMiddleware(models.RoleSuperAdmin, models.RoleTenantAdmin, models.RoleGateOfficer), handler.HandleRegisterDevice)
+	auth.GET("/destinations/:destination_id/stats", middleware.RoleMiddleware(models.RoleSuperAdmin, models.RoleTenantAdmin, models.RoleGateOfficer), handler.HandleGetScanStats)
+	auth.GET("/destinations/:destination_id/devices", middleware.RoleMiddleware(models.RoleSuperAdmin, models.RoleTenantAdmin), handler.HandleListDevices)
 }
