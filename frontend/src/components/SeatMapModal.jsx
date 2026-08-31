@@ -130,51 +130,56 @@ export default function SeatMapModal({ isOpen, onClose, destinationId, onSeatsSe
             </span>
           </div>
 
-          {/* Seat Grid */}
+          {/* Seat Grid with min 44x44px touch targets */}
           <div className="bg-[var(--surface)] p-5 rounded-2xl border border-[var(--border)] space-y-3 shadow-inner">
-            {rows.map((row) => (
-              <div key={row} className="flex items-center justify-center gap-2">
-                <span className="w-4 text-xs font-bold text-[var(--ink-soft)]">{row}</span>
-                <div className="flex gap-1.5">
-                  {cols.map((col) => {
-                    const seatCode = `${row}-${col}`;
-                    const isBooked = bookedSeats.includes(seatCode);
-                    const isSelected = selectedSeats.some(s => s.code === seatCode);
+            <div className="overflow-x-auto pb-2">
+              <div className="min-w-[500px] space-y-2.5">
+                {rows.map((row) => (
+                  <div key={row} className="flex items-center justify-center gap-3">
+                    <span className="w-5 text-center text-xs font-bold text-[var(--ink-soft)]">{row}</span>
+                    <div className="flex gap-2">
+                      {cols.map((col) => {
+                        const seatCode = `${row}-${col}`;
+                        const isBooked = bookedSeats.includes(seatCode);
+                        const isSelected = selectedSeats.some(s => s.code === seatCode);
 
-                    return (
-                      <button
-                        key={seatCode}
-                        type="button"
-                        disabled={isBooked}
-                        onClick={() => handleSeatClick(seatCode)}
-                        title={`Kursi ${seatCode} - ${isBooked ? 'Sudah Terisi' : 'Tersedia'}`}
-                        className={`h-7 w-7 rounded-md text-[10px] font-bold flex items-center justify-center transition-all ${
-                          isBooked
-                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            : isSelected
-                            ? 'bg-[var(--bark)] text-white ring-2 ring-[var(--bark)] ring-offset-1 scale-105'
-                            : 'bg-[var(--leaf-pale)] text-[var(--forest-deep)] hover:bg-[var(--border)] hover:scale-105'
-                        }`}
-                      >
-                        {col}
-                      </button>
-                    );
-                  })}
-                </div>
-                <span className="w-4 text-xs font-bold text-[var(--ink-soft)]">{row}</span>
+                        return (
+                          <button
+                            key={seatCode}
+                            type="button"
+                            disabled={isBooked}
+                            onClick={() => handleSeatClick(seatCode)}
+                            title={`Kursi ${seatCode} - ${isBooked ? 'Sudah Terisi' : 'Tersedia'}`}
+                            aria-label={`Kursi ${seatCode}, ${isBooked ? 'Sudah Terisi' : isSelected ? 'Dipilih' : 'Tersedia'}`}
+                            className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
+                              isBooked
+                                ? 'bg-[var(--canvas)] text-[var(--ink-soft)]/40 border border-[var(--border)] cursor-not-allowed opacity-60'
+                                : isSelected
+                                ? 'bg-[var(--bark)] text-white ring-2 ring-[var(--bark)] ring-offset-2 scale-105 shadow-xs'
+                                : 'bg-[var(--leaf-pale)] text-[var(--forest-deep)] border border-[var(--border)] hover:bg-[var(--border)] hover:scale-105 shadow-2xs'
+                            }`}
+                          >
+                            {col}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <span className="w-5 text-center text-xs font-bold text-[var(--ink-soft)]">{row}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
 
             {/* Legend */}
-            <div className="pt-3 border-t border-[var(--border)] flex items-center justify-center gap-5 text-xs text-[var(--ink-soft)]">
+            <div className="pt-3 border-t border-[var(--border)] flex flex-wrap items-center justify-center gap-5 text-xs text-[var(--ink-soft)]">
               <span className="flex items-center gap-1.5">
-                <span className="h-3.5 w-3.5 rounded bg-[var(--leaf-pale)] border border-[var(--border)]" /> Tersedia
+                <span className="h-4 w-4 rounded-md bg-[var(--leaf-pale)] border border-[var(--border)]" /> Tersedia
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-3.5 w-3.5 rounded bg-[var(--bark)]" /> Terpilih
+                <span className="h-4 w-4 rounded-md bg-[var(--bark)]" /> Terpilih
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="h-3.5 w-3.5 rounded bg-gray-200" /> Terisi (Booked)
+                <span className="h-4 w-4 rounded-md bg-[var(--canvas)] border border-[var(--border)] opacity-60" /> Terisi (Booked)
               </span>
             </div>
           </div>
