@@ -46,7 +46,7 @@ function Brand({ collapsed = false }) {
   );
 }
 
-function SidebarContent({ collapsed, location, onNavigate, onToggle, onOpenUserMenu }) {
+function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout }) {
   const adminUser = getAdminUser();
   const { destination } = useTenant();
   const tenantDisplayName = adminUser.tenant_name || destination?.name || 'Kawasan Konservasi Alam';
@@ -85,22 +85,27 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onOpenUserM
       </nav>
       <div className="border-t border-[var(--border)] p-3">
         {!collapsed && (
-          <button
-            type="button"
-            onClick={onOpenUserMenu}
-            className="mb-2 flex w-full items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--fog)] p-2.5 text-left transition-colors hover:bg-[var(--leaf-pale)] cursor-pointer"
-            aria-label="Buka profil pengelola"
-          >
-            <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white">
-              {userInitial}
-              <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-xs font-bold text-[var(--forest-deep)]">{adminUser.name}</span>
-              <span className="block truncate text-[10px] text-[var(--ink-soft)]">{tenantDisplayName}</span>
-            </span>
-            <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--ink-soft)]" />
-          </button>
+          <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--fog)] p-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white shadow-2xs">
+                {userInitial}
+                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-emerald-500" />
+              </span>
+              <div className="min-w-0">
+                <span className="block truncate text-xs font-bold text-[var(--forest-deep)]">{adminUser.name}</span>
+                <span className="block truncate text-[10px] text-[var(--ink-soft)]">{tenantDisplayName}</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onLogout}
+              title="Keluar (Logout)"
+              className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+              aria-label="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         )}
         {onToggle && (
           <button
@@ -120,45 +125,19 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onOpenUserM
 export default function AdminLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const dropdownRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { slug: currentSlug, destination, refetch } = useTenant();
+  const { slug: currentSlug, destination } = useTenant();
 
   const adminUser = getAdminUser();
-  const tenantDisplayName = adminUser.tenant_name || destination?.name || 'Kawasan Konservasi Alam';
-  const activeTenantSlug = currentSlug || adminUser.tenant_slug || 'curug-bidadari';
-  const userInitial = (adminUser.name || 'P').charAt(0).toUpperCase();
+  const activeTenantSlug = currentSlug || adminUser.tenant_slug || 'wisata';
 
   const currentItem = menuItems.find(
     (item) => location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))
   );
-
-  // Close dropdown on outside click or Escape
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setUserDropdownOpen(false);
-      }
-    }
-    function handleKeyDown(event) {
-      if (event.key === 'Escape') {
-        setUserDropdownOpen(false);
-      }
-    }
-    if (userDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [userDropdownOpen]);
 
   const handleLogout = () => {
     try {
@@ -166,11 +145,10 @@ export default function AdminLayout({ children }) {
       localStorage.removeItem('passify_user');
       localStorage.removeItem('passify_current_tenant');
       setShowLogoutModal(false);
-      setUserDropdownOpen(false);
       toast.success('Berhasil keluar dari sesi pengelola.');
       navigate('/masuk');
     } catch (_) {
-      navigate('/masuk');
+      toast.error('Gagal keluar.');
     }
   };
 
@@ -187,7 +165,7 @@ export default function AdminLayout({ children }) {
           collapsed={collapsed}
           location={location}
           onToggle={() => setCollapsed((v) => !v)}
-          onOpenUserMenu={() => setUserDropdownOpen(true)}
+          onLogout={() => setShowLogoutModal(true)}
         />
       </aside>
 
@@ -219,9 +197,9 @@ export default function AdminLayout({ children }) {
           collapsed={false}
           location={location}
           onNavigate={() => setMobileOpen(false)}
-          onOpenUserMenu={() => {
+          onLogout={() => {
             setMobileOpen(false);
-            setUserDropdownOpen(true);
+            setShowLogoutModal(true);
           }}
         />
       </aside>
@@ -249,7 +227,9 @@ export default function AdminLayout({ children }) {
           <div className="flex shrink-0 items-center gap-2.5">
             {/* View Public Portal Link */}
             <Link
-              to="/"
+              to={`/?tenant=${activeTenantSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--sand)] px-3.5 py-2 text-xs font-bold text-[var(--forest)] no-underline transition-colors hover:bg-[var(--leaf-pale)] sm:inline-flex"
             >
               <ExternalLink className="h-3.5 w-3.5" />
@@ -266,106 +246,17 @@ export default function AdminLayout({ children }) {
               <Bell className="h-4 w-4" />
             </button>
 
-            {/* User Menu Trigger & Dropdown */}
-            <div className="relative" ref={dropdownRef}>
-              <button
-                type="button"
-                id="admin-user-menu-btn"
-                onClick={() => setUserDropdownOpen((v) => !v)}
-                aria-expanded={userDropdownOpen}
-                aria-haspopup="true"
-                className="flex items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--sand)] p-1 pr-3 text-left transition-all hover:bg-[var(--leaf-pale)] cursor-pointer"
-              >
-                <span className="relative grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white">
-                  {userInitial}
-                  <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-emerald-500" />
-                </span>
-                <span className="hidden text-xs font-bold text-[var(--forest-deep)] sm:inline max-w-[120px] truncate">
-                  {adminUser.name}
-                </span>
-                <ChevronDown className={`h-3.5 w-3.5 text-[var(--ink-soft)] transition-transform duration-200 ${userDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {/* User Dropdown Menu */}
-              {userDropdownOpen && (
-                <div
-                  className="absolute right-0 top-full mt-2 w-72 sm:w-80 rounded-2xl border border-[var(--border)] bg-white p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150"
-                  role="menu"
-                  aria-orientation="vertical"
-                >
-                  {/* User Profile Header */}
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--fog)] border border-[var(--border)] mb-2">
-                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-sm font-bold text-white shadow-2xs">
-                      {userInitial}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="block truncate text-xs font-bold text-[var(--forest-deep)]">{adminUser.name}</span>
-                        <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
-                      </div>
-                      <span className="block truncate text-[11px] text-[var(--ink-soft)]">{adminUser.email}</span>
-                      <span className="mt-1 inline-block rounded-md bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-800 uppercase tracking-wide">
-                        {adminUser.role === 'super_admin' ? 'Super Admin' : 'Pengelola Kawasan'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Managed Conservation Area Info */}
-                  <div className="p-3 border-b border-gray-100 bg-white">
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <Building2 className="h-3.5 w-3.5 text-emerald-700 shrink-0" />
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider text-gray-400">
-                        Kawasan Yang Dikelola
-                      </span>
-                    </div>
-                    <div className="rounded-xl bg-emerald-50/80 border border-emerald-200/70 p-2.5">
-                      <span className="block text-xs font-bold text-emerald-950 truncate">
-                        {tenantDisplayName}
-                      </span>
-                      <span className="block text-[10px] text-emerald-700 font-mono truncate mt-0.5">
-                        Domain: {activeTenantSlug || adminUser.tenant_slug || 'wisata'}.passify.id
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Links Section */}
-                  <div className="p-1 space-y-0.5 border-b border-gray-100">
-                    <Link
-                      to="/jelajah"
-                      onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4 text-gray-500" />
-                      <span>Jelajah Wisata Alam</span>
-                    </Link>
-                    <Link
-                      to="/riwayat-pesanan"
-                      onClick={() => setUserDropdownOpen(false)}
-                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
-                    >
-                      <CalendarClock className="h-4 w-4 text-gray-500" />
-                      <span>Tiket & Reservasi Saya</span>
-                    </Link>
-                  </div>
-
-                  {/* Logout Button */}
-                  <div className="p-1 pt-1.5">
-                    <button
-                      type="button"
-                      id="admin-logout-btn"
-                      onClick={() => {
-                        setUserDropdownOpen(false);
-                        setShowLogoutModal(true);
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Keluar (Logout)</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Logout Button */}
+            <button
+              type="button"
+              id="admin-logout-btn"
+              onClick={() => setShowLogoutModal(true)}
+              title="Keluar (Logout)"
+              className="flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50/80 px-3.5 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-100 cursor-pointer"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Keluar</span>
+            </button>
           </div>
         </header>
 
