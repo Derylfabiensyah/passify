@@ -9,6 +9,8 @@ import {
   Loader2, 
   Mail, 
   Lock, 
+  Eye,
+  EyeOff,
   User, 
   Phone, 
   Globe, 
@@ -18,6 +20,8 @@ import {
 
 export default function RegisterTenantPage() {
   const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -302,13 +306,21 @@ export default function RegisterTenantPage() {
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-3 h-4 w-4 text-[var(--ink-soft)]" />
                     <input
-                      type="password"
+                      type={showPassword ? 'text' : 'password'}
                       required
                       placeholder="Minimal 6 karakter"
                       value={formData.password}
                       onChange={e => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white pl-10 pr-4 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none"
+                      className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white pl-10 pr-10 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                      className="absolute right-3 top-2.5 p-0.5 text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
                   {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                 </div>
@@ -320,13 +332,21 @@ export default function RegisterTenantPage() {
                   <div className="relative">
                     <Lock className="absolute left-3.5 top-3 h-4 w-4 text-[var(--ink-soft)]" />
                     <input
-                      type="password"
+                      type={showConfirmPassword ? 'text' : 'password'}
                       required
                       placeholder="Ulangi kata sandi"
                       value={formData.confirm_password}
                       onChange={e => setFormData({ ...formData, confirm_password: e.target.value })}
-                      className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white pl-10 pr-4 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none"
+                      className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white pl-10 pr-10 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      aria-label={showConfirmPassword ? 'Sembunyikan konfirmasi kata sandi' : 'Tampilkan konfirmasi kata sandi'}
+                      className="absolute right-3 top-2.5 p-0.5 text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                   </div>
                   {errors.confirm_password && <p className="mt-1 text-xs text-red-500">{errors.confirm_password}</p>}
                 </div>

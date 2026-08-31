@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowRight, Compass, Lock, Mail, Phone, ShieldCheck, User, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowRight, Compass, Lock, Mail, Phone, ShieldCheck, User, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const AUTH_API = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8081/api/v1/auth';
 const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN || 'passify.com';
@@ -11,6 +11,8 @@ export default function TravelerAuthPage({ mode }) {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [login, setLogin] = useState({ email: '', password: '' });
   const [registration, setRegistration] = useState({ name: '', email: '', phone: '', password: '' });
 
@@ -283,13 +285,21 @@ export default function TravelerAuthPage({ mode }) {
                   <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" />
                   <input
                     id="login-password-input"
-                    type="password"
-                    className="field-control pl-10 text-xs font-medium"
+                    type={showLoginPassword ? 'text' : 'password'}
+                    className="field-control pl-10 pr-10 text-xs font-medium"
                     value={login.password}
                     onChange={(e) => setLogin({ ...login, password: e.target.value })}
                     placeholder="••••••••"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    aria-label={showLoginPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+                  >
+                    {showLoginPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -372,13 +382,21 @@ export default function TravelerAuthPage({ mode }) {
                   <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--bark)]" />
                   <input
                     id="register-password-input"
-                    type="password"
-                    className="field-control pl-10 text-xs font-medium"
+                    type={showRegisterPassword ? 'text' : 'password'}
+                    className="field-control pl-10 pr-10 text-xs font-medium"
                     value={registration.password}
                     onChange={(e) => setRegistrationValue('password', e.target.value)}
                     placeholder="Minimal 6 karakter"
                     required
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                    aria-label={showRegisterPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+                  >
+                    {showRegisterPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
                 </div>
               </div>
 
