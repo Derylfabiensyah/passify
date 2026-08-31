@@ -365,8 +365,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={DollarSign}
           label="Pendapatan Hari Ini"
-          value={`Rp ${(stats.today.revenue / 1000000).toFixed(1)}jt`}
-          subValue={`Kemarin: Rp ${(stats.yesterday.revenue / 1000000).toFixed(1)}jt`}
+          value={`Rp ${Number(stats.today.revenue || 0).toLocaleString('id-ID')}`}
+          subValue={`Kemarin: Rp ${Number(stats.yesterday.revenue || 0).toLocaleString('id-ID')}`}
           trend={revGrowth}
           badgeText="FINANCE"
           isLoading={isRefreshing}
@@ -374,8 +374,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={Ticket}
           label="Tiket Terjual Hari Ini"
-          value={stats.today.tickets_sold.toLocaleString('id-ID')}
-          subValue={`Kemarin: ${stats.yesterday.tickets_sold} tiket`}
+          value={(stats.today.tickets_sold || 0).toLocaleString('id-ID')}
+          subValue={`Kemarin: ${stats.yesterday.tickets_sold || 0} tiket`}
           trend={ticketGrowth}
           badgeText="SALES"
           isLoading={isRefreshing}
@@ -383,8 +383,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={Users}
           label="Pengunjung Di Dalam Kawasan"
-          value={(stats.today.visitors_entered || 289).toLocaleString('id-ID')}
-          subValue={`Kapasitas Maks: ${(stats.today.total_capacity || 2752).toLocaleString('id-ID')}`}
+          value={(stats.today.visitors_entered || 0).toLocaleString('id-ID')}
+          subValue={`Kapasitas Maks: ${(stats.today.total_capacity || 1000).toLocaleString('id-ID')}`}
           progress={quotaUsedPct}
           badgeText="CROWD"
           isLoading={isRefreshing}
@@ -392,8 +392,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={Wallet}
           label="Transaksi Cashless (NFC/QR)"
-          value={`Rp ${((stats.today.wallet_topups || 4250000) / 1000000).toFixed(1)}jt`}
-          subValue="45 transaksi merchant"
+          value={`Rp ${Number(stats.today.wallet_topups || 0).toLocaleString('id-ID')}`}
+          subValue={`${stats.today.vendor_transactions || 0} transaksi merchant`}
           badgeText="TENANT"
           isLoading={isRefreshing}
         />
