@@ -467,7 +467,14 @@ export default function DashboardOverview() {
                       {(cat.sold || 0).toLocaleString('id-ID')} tiket ({cat.percentage || 0}%)
                     </span>
                   </div>
-                  <div className="w-full h-2 rounded-full bg-gray-100 overflow-hidden">
+                  <div
+                    className="w-full h-2 rounded-full bg-gray-100 overflow-hidden"
+                    role="progressbar"
+                    aria-valuenow={cat.percentage || 0}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Persentase penjualan ${cat.name}`}
+                  >
                     <div
                       className="h-full rounded-full bg-emerald-600 transition-all duration-500"
                       style={{ width: `${cat.percentage || 0}%` }}

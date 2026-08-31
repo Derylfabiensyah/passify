@@ -228,7 +228,22 @@ export default function LandingPage() {
 
             <aside className="rounded-2xl bg-[rgba(255,254,250,.96)] p-5 text-[var(--ink)] shadow-[0_20px_46px_rgba(0,0,0,.24)] backdrop-blur-md sm:p-6 lg:mb-3">
               <div className="flex items-start justify-between gap-4 pb-4"><div><Eyebrow>Contoh operasional</Eyebrow><p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Taman Nasional Bromo Tengger Semeru</p></div><span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Normal</span></div>
-              <div className="mt-5"><div className="flex items-end justify-between"><span className="text-xs font-semibold text-[var(--ink-soft)]">Kuota sesi sunrise</span><strong className="text-2xl font-extrabold tracking-[-.04em] text-[var(--forest-deep)]">71%</strong></div><div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"><div className="h-full w-[71%] rounded-full bg-[var(--leaf)]" /></div></div>
+              <div className="mt-5">
+                <div className="flex items-end justify-between">
+                  <span className="text-xs font-semibold text-[var(--ink-soft)]">Kuota sesi sunrise</span>
+                  <strong className="text-2xl font-extrabold tracking-[-.04em] text-[var(--forest-deep)]">71%</strong>
+                </div>
+                <div
+                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"
+                  role="progressbar"
+                  aria-valuenow={71}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="Persentase kuota sesi sunrise"
+                >
+                  <div className="h-full w-[71%] rounded-full bg-[var(--leaf)]" />
+                </div>
+              </div>
               <dl className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kunjungan</dt><dd className="mt-1 text-xl font-extrabold tracking-[-.04em] text-[var(--forest-deep)]">58 orang</dd></div><div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Gate utama</dt><dd className="mt-1 text-sm font-extrabold text-[var(--forest)]">Siap menerima</dd></div></dl>
               <p className="mt-4 text-[11px] leading-5 text-[var(--ink-soft)]">Simulasi status yang membantu tim memutuskan sebelum kawasan menjadi terlalu penuh.</p>
             </aside>

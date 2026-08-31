@@ -138,7 +138,33 @@ export default function TenantPortal() {
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(105deg,rgba(16,45,32,.98),rgba(16,45,32,.7))]" />
           <div className="grid gap-8 px-6 py-9 sm:px-9 sm:py-11 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end lg:px-12 lg:py-14">
             <div className="max-w-2xl"><span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white/90"><MapPin className="h-3.5 w-3.5 text-[var(--leaf)]" />{destination.location || destination.province}</span><p className="eyebrow mt-6 !text-[var(--leaf)]">Rencanakan perjalanan Anda</p><h1 className="mt-3 text-4xl font-bold leading-[.98] text-white sm:text-5xl lg:text-6xl">{destination.name}</h1><p className="mt-5 max-w-xl text-sm leading-6 text-white/80 sm:text-[15px]">{destination.description}</p><div className="mt-7 flex flex-wrap items-center gap-4"><button type="button" onClick={openBooking} className="btn-clay px-5 py-3.5 text-sm"><Ticket className="h-4 w-4" />Pesan tiket<ArrowRight className="h-4 w-4" /></button><span className="flex items-center gap-2 text-xs font-medium text-white/75"><ShieldCheck className="h-4 w-4 text-[var(--leaf)]" />QR aman untuk gerbang</span></div></div>
-            <div className="rounded-2xl bg-[rgba(255,254,250,.96)] p-5 shadow-[0_16px_36px_rgba(0,0,0,.15)]"><p className="eyebrow">Ketersediaan hari ini</p><div className="mt-4 flex items-end justify-between"><span className="text-xs font-bold text-[var(--ink-soft)]">Kuota terisi</span><strong className="text-2xl font-extrabold text-[var(--forest-deep)]">{used}%</strong></div><div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"><div className="h-full rounded-full bg-[var(--leaf)]" style={{ width: `${used}%` }} /></div><div className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Tersisa</span><strong className="mt-1 block text-xl font-extrabold text-[var(--forest-deep)]">{remaining.toLocaleString('id-ID')}</strong></div><div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Mulai dari</span><strong className="mt-1 block text-lg font-extrabold text-[var(--bark)]">{rupiah(startingPrice)}</strong></div></div></div>
+            <div className="rounded-2xl bg-[rgba(255,254,250,.96)] p-5 shadow-[0_16px_36px_rgba(0,0,0,.15)]">
+              <p className="eyebrow">Ketersediaan hari ini</p>
+              <div className="mt-4 flex items-end justify-between">
+                <span className="text-xs font-bold text-[var(--ink-soft)]">Kuota terisi</span>
+                <strong className="text-2xl font-extrabold text-[var(--forest-deep)]">{used}%</strong>
+              </div>
+              <div
+                className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"
+                role="progressbar"
+                aria-valuenow={used}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label="Persentase kuota terisi hari ini"
+              >
+                <div className="h-full rounded-full bg-[var(--leaf)]" style={{ width: `${used}%` }} />
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs">
+                  <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Tersisa</span>
+                  <strong className="mt-1 block text-xl font-extrabold text-[var(--forest-deep)]">{remaining.toLocaleString('id-ID')}</strong>
+                </div>
+                <div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs">
+                  <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Mulai dari</span>
+                  <strong className="mt-1 block text-lg font-extrabold text-[var(--bark)]">{rupiah(startingPrice)}</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

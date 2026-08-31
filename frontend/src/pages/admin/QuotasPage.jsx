@@ -78,7 +78,14 @@ function QuotaDayCard({ day, onEditQuota, onToggleClose }) {
         </div>
       ) : (
         <>
-          <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2.5">
+          <div
+            className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden mb-2.5"
+            role="progressbar"
+            aria-valuenow={Math.round(usedPct)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`Persentase kuota terisi tanggal ${day.date}: ${Math.round(usedPct)}%`}
+          >
             <div
               className="h-full rounded-full bg-emerald-600 transition-all duration-500"
               style={{ width: `${usedPct}%` }}
