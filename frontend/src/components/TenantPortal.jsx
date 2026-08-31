@@ -39,7 +39,9 @@ export default function TenantPortal() {
   const booked = Number(destination.booked_today || 0);
   const remaining = Math.max(0, capacity - booked);
   const used = capacity ? Math.round((booked / capacity) * 100) : 0;
-  const startingPrice = Math.min(...(destination.ticket_categories || []).map((category) => Number(category.price || 0)));
+  const startingPrice = destination.ticket_categories && destination.ticket_categories.length > 0
+    ? Math.min(...destination.ticket_categories.map((category) => Number(category.price || 0)))
+    : 0;
 
   const openBooking = () => {
     navigate(`/pesan/${destination.slug || destination.id}`);

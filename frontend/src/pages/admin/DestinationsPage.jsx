@@ -770,7 +770,14 @@ export default function DestinationsPage() {
         method: 'POST',
         body: {
           destination_id: destId,
-          ...categoryData,
+          name: categoryData.name,
+          ticket_type: 'reguler',
+          base_price: Number(categoryData.price || 0),
+          insurance_fee: Number(categoryData.insurance || 0),
+          retribusi_fee: Number(categoryData.retribusi || 0),
+          is_mandatory: true,
+          is_per_person: true,
+          max_qty_per_order: 10,
         },
       }).catch(() => null);
     } catch (_) {}

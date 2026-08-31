@@ -61,7 +61,43 @@ export async function fetchDestinationBySlug(slug) {
 
     if (response.ok) {
       const { data } = await response.json();
-      if (data) return data;
+      if (data) {
+        let categories = [];
+
+        // 1. Fetch live categories from ticket-service
+        try {
+          const catRes = await fetch(`http://localhost:8083/api/v1/tickets/destinations/${data.id}/categories`);
+          if (catRes.ok) {
+            const catData = await catRes.json();
+            if (catData && Array.isArray(catData.data) && catData.data.length > 0) {
+              categories = catData.data.map((c) => ({
+                id: c.id,
+                name: c.name,
+                price: Number(c.base_price || 0),
+                insurance: Number(c.insurance_fee || 0),
+                retribusi: Number(c.retribusi_fee || 0),
+                is_active: c.is_active !== false,
+              }));
+            }
+          }
+        } catch (_) {}
+
+        // 2. Fallback to localStorage saved categories from admin portal
+        if (categories.length === 0) {
+          try {
+            const savedAdminDestinations = JSON.parse(localStorage.getItem('passify_admin_destinations') || '[]');
+            const matched = savedAdminDestinations.find((d) => d.id === data.id || d.slug === slug);
+            if (matched && Array.isArray(matched.ticket_categories) && matched.ticket_categories.length > 0) {
+              categories = matched.ticket_categories;
+            }
+          } catch (_) {}
+        }
+
+        return {
+          ...data,
+          ticket_categories: categories,
+        };
+      }
     }
   } catch (_) {}
 
