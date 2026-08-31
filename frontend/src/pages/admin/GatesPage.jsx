@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ScanLine,
   Plus,
@@ -168,7 +168,7 @@ function AddEditGateModal({ device, destinations, onClose, onSave }) {
   const [formData, setFormData] = useState({
     device_name: device?.device_name || '',
     device_code: device?.device_code || `GATE-${Math.random().toString(36).substring(2, 6).toUpperCase()}-01`,
-    destination: device?.destination || destinations[0] || 'Taman Nasional Bromo Tengger Semeru',
+    destination: device?.destination || destinations[0] || 'Kawasan Wisata',
     gate_type: device?.gate_type || 'entrance',
     hmac_key: device?.hmac_key || Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
     is_active: device?.is_active !== undefined ? device.is_active : true
