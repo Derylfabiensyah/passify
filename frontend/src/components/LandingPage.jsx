@@ -18,6 +18,7 @@ import {
   PhoneCall,
   Layers
 } from 'lucide-react';
+import LegalModal from './common/LegalModal';
 
 const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1800&q=88';
 const trailImage = 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=85';
@@ -38,6 +39,11 @@ function SectionHeading({ eyebrow, title, children, className = '' }) {
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [legalModal, setLegalModal] = useState({ open: false, type: 'privacy' });
+
+  const openLegal = (type) => {
+    setLegalModal({ open: true, type });
+  };
 
   // Close drawer on Escape key and handle body scroll lock
   useEffect(() => {
@@ -426,13 +432,37 @@ export default function LandingPage() {
           <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
             <p>© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
             <div className="flex gap-6 font-medium">
-              <a href="#white-label" className="hover:text-white transition-colors">Kebijakan Privasi</a>
-              <a href="#masalah" className="hover:text-white transition-colors">Syarat Penggunaan</a>
-              <a href="#contact" className="hover:text-white transition-colors">Pusat Bantuan</a>
+              <button
+                type="button"
+                onClick={() => openLegal('privacy')}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Kebijakan Privasi
+              </button>
+              <button
+                type="button"
+                onClick={() => openLegal('terms')}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Syarat Penggunaan
+              </button>
+              <button
+                type="button"
+                onClick={() => openLegal('help')}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                Pusat Bantuan
+              </button>
             </div>
           </div>
         </div>
       </footer>
+
+      <LegalModal
+        isOpen={legalModal.open}
+        onClose={() => setLegalModal({ ...legalModal, open: false })}
+        type={legalModal.type}
+      />
     </div>
   );
 }

@@ -1,33 +1,65 @@
-import React from 'react';
-import { Mountain, Heart } from 'lucide-react';
+import React, { useState } from 'react';
+import { Mountain } from 'lucide-react';
+import LegalModal from './common/LegalModal';
 
 export default function Footer() {
+  const [legalModal, setLegalModal] = useState({ open: false, type: 'privacy' });
+
+  const openModal = (type) => {
+    setLegalModal({ open: true, type });
+  };
+
   return (
-    <footer className="border-t border-gray-100 bg-white py-14 px-4 lg:px-8 text-gray-500 text-xs">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center text-white font-bold">
-            <Mountain className="w-3.5 h-3.5" />
+    <>
+      <footer className="border-t border-[var(--border)] bg-[var(--surface)] py-12 px-4 lg:px-8 text-[var(--ink-soft)] text-xs">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[var(--forest-deep)] flex items-center justify-center text-[var(--leaf)] font-bold shadow-xs">
+              <Mountain className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[var(--forest-deep)] font-bold text-base font-heading tracking-tight">Passify</span>
+              <p className="text-[11px] text-[var(--ink-soft)]">White-Label Cloud E-Ticketing &amp; Reservation Engine</p>
+            </div>
           </div>
-          <div>
-            <span className="text-gray-900 font-bold text-base font-['Outfit'] tracking-tight">Passify</span>
-            <p className="text-[11px] text-gray-400">White-Label Cloud E-Ticketing & Reservation Engine</p>
+
+          <div className="flex flex-wrap items-center justify-center gap-5 text-[var(--ink-soft)] font-medium">
+            <a href="#katalog" className="hover:text-[var(--forest-deep)] transition-colors">Demo Destinasi</a>
+            <button
+              type="button"
+              onClick={() => openModal('privacy')}
+              className="hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+            >
+              Kebijakan Privasi
+            </button>
+            <button
+              type="button"
+              onClick={() => openModal('terms')}
+              className="hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+            >
+              Syarat &amp; Ketentuan
+            </button>
+            <button
+              type="button"
+              onClick={() => openModal('help')}
+              className="hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+            >
+              Pusat Bantuan
+            </button>
+          </div>
+
+          <div className="text-center md:text-right text-[11px] text-[var(--ink-soft)]">
+            &copy; {new Date().getFullYear()} Passify Ecosystem. All rights reserved. <br />
+            Engineered for White-Label Ecotourism &amp; Conservation.
           </div>
         </div>
+      </footer>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 text-gray-500 font-medium">
-          <a href="#catalog-section" className="hover:text-gray-900 transition-colors">Demo Venue</a>
-          <a href="#" className="hover:text-gray-900 transition-colors">Arsitektur Cloud</a>
-          <a href="#" className="hover:text-gray-900 transition-colors">API & SDK Docs</a>
-          <a href="#" className="hover:text-gray-900 transition-colors">Keamanan Offline</a>
-          <a href="#" className="hover:text-gray-900 transition-colors">Kebijakan Privasi</a>
-        </div>
-
-        <div className="text-center md:text-right text-[11px] text-gray-400">
-          © {new Date().getFullYear()} Passify Cloud OS. All rights reserved. <br />
-          Engineered for White-Label Ecotourism & Conservation.
-        </div>
-      </div>
-    </footer>
+      <LegalModal
+        isOpen={legalModal.open}
+        onClose={() => setLegalModal({ ...legalModal, open: false })}
+        type={legalModal.type}
+      />
+    </>
   );
 }
