@@ -16,31 +16,16 @@ export function TenantProvider({ children }) {
     const hostname = window.location.hostname;
     
     try {
-      // Step 1: Resolve tenant slug from hostname or query param
-      let slug = await resolveTenantFromHostname(hostname);
-
-      if (!slug) {
-        // Check if user is logged in as a tenant admin or has active tenant selected
-        try {
-          const savedUser = JSON.parse(localStorage.getItem('passify_user') || 'null');
-          const currentTenant = localStorage.getItem('passify_current_tenant');
-          if (savedUser && (savedUser.role === 'tenant_admin' || savedUser.role === 'pengelola' || savedUser.role === 'super_admin')) {
-            const userTenantSlug = savedUser.tenant_slug || savedUser.tenant?.slug || savedUser.tenant?.subdomain;
-            if (userTenantSlug) slug = userTenantSlug;
-          }
-          if (!slug && currentTenant) {
-            slug = currentTenant;
-          }
-        } catch (_) {}
-      }
+      // Step 1: Resolve tenant slug strictly from hostname or ?tenant= query param
+      const slug = await resolveTenantFromHostname(hostname);
       
       if (!slug) {
-        // Root domain - no tenant context needed
+        // Root domain (http://localhost:5173 or passify.com) - show main Passify Landing Page
         setTenant({ slug: null, destination: null, isLoading: false, error: null });
         return;
       }
 
-      // Step 2: Fetch destination data for the tenant
+      // Step 2: Fetch destination data for the tenant subdomain / custom domain
       const destination = await fetchDestinationBySlug(slug);
       setTenant({ slug, destination, isLoading: false, error: null });
     } catch (error) {
