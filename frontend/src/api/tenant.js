@@ -80,7 +80,7 @@ export async function fetchDestinationBySlug(slug) {
     cover_image_url: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1200&q=80',
     description: `Selamat datang di portal reservasi resmi ${title}. Nikmati pengalaman wisata alam yang teratur, aman, dan menjaga kelestarian daya dukung lingkungan.`,
     max_daily_capacity: 1000,
-    booked_today: 145,
+    booked_today: 0,
     ticket_categories: [
       { id: `cat-wni-${slug}`, name: 'Tiket Masuk Domestik (WNI)', price: 35000, insurance: 3000, retribusi: 2000 },
       { id: `cat-wna-${slug}`, name: 'Tiket Wisatawan Mancanegara (WNA)', price: 100000, insurance: 5000, retribusi: 5000 },
