@@ -19,47 +19,11 @@ import {
   Wallet,
   Building2,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Leaf
 } from 'lucide-react';
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
-
-const MOCK_DESTINATIONS = [
-  {
-    id: 'dest-curug-bidadari',
-    slug: 'curug-bidadari',
-    name: 'Curug Bidadari Eco Park',
-    tenant_name: 'PT Wisata Alam Mandiri',
-    location: 'Sentul Paradise Park, Bogor, Jawa Barat',
-    image: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=800&q=80',
-    ticket_categories: [
-      { id: 'cat-wni', name: 'Tiket Masuk Dewasa (WNI)', price: 35000, insurance: 3000, retribusi: 2000 },
-      { id: 'cat-wna', name: 'Tiket Wisatawan Mancanegara (WNA)', price: 100000, insurance: 5000, retribusi: 5000 },
-      { id: 'cat-anak', name: 'Tiket Anak-Anak (< 10 th)', price: 20000, insurance: 2000, retribusi: 1000 },
-    ],
-    time_slots: [
-      { id: 'slot-1', label: 'Sesi Pagi (07:00 - 11:30)', max_capacity: 400, booked: 184 },
-      { id: 'slot-2', label: 'Sesi Siang (11:30 - 15:30)', max_capacity: 400, booked: 298 },
-      { id: 'slot-3', label: 'Sesi Sore (15:30 - 18:00)', max_capacity: 300, booked: 85 },
-    ],
-  },
-  {
-    id: 'dest-kawah-putih',
-    slug: 'kawah-putih',
-    name: 'Kawah Putih Ciwidey',
-    tenant_name: 'Perum Perhutani Unit III',
-    location: 'Ciwidey, Bandung, Jawa Barat',
-    image: 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=800&q=80',
-    ticket_categories: [
-      { id: 'cat-wni-kp', name: 'Tiket Masuk Domestik (WNI)', price: 40000, insurance: 3000, retribusi: 2000 },
-      { id: 'cat-wna-kp', name: 'Tiket Mancanegara (WNA)', price: 120000, insurance: 5000, retribusi: 5000 },
-    ],
-    time_slots: [
-      { id: 'slot-kp-1', label: 'Sesi Pagi (07:00 - 12:00)', max_capacity: 500, booked: 210 },
-      { id: 'slot-kp-2', label: 'Sesi Sore (12:00 - 17:00)', max_capacity: 500, booked: 145 },
-    ],
-  },
-];
+import { fetchDestinationBySlug } from '../api/tenant';
+import { useTenant } from '../contexts/TenantContext';
 
 function formatRupiah(num) {
   return `Rp ${Number(num || 0).toLocaleString('id-ID')}`;
@@ -68,6 +32,7 @@ function formatRupiah(num) {
 export default function CheckoutPage() {
   const { tenantSlug, destinationId } = useParams();
   const [searchParams] = useSearchParams();
+  const { slug: contextSlug, destination: contextDest } = useTenant();
   const navigate = useNavigate();
 
   // Destination & Tenant State
@@ -97,37 +62,71 @@ export default function CheckoutPage() {
   // Success Result State
   const [completedOrder, setCompletedOrder] = useState(null);
 
-  // Load Destination Data
+  // Load Destination Data (Dynamic real tenant / destination)
   useEffect(() => {
-    setIsLoading(true);
-    const slug = tenantSlug || destinationId || searchParams.get('dest') || 'curug-bidadari';
-    const found = MOCK_DESTINATIONS.find(
-      (d) => d.slug === slug || d.id === slug || d.id === destinationId
-    ) || MOCK_DESTINATIONS[0];
+    async function loadDest() {
+      setIsLoading(true);
+      const targetSlug =
+        tenantSlug ||
+        destinationId ||
+        searchParams.get('tenant') ||
+        searchParams.get('dest') ||
+        contextSlug ||
+        'curug-cibereum';
 
-    setDestination(found);
-    setSelectedSlotId(found.time_slots?.[0]?.id || '');
-    const initialQty = {};
-    if (found.ticket_categories?.[0]) {
-      initialQty[found.ticket_categories[0].id] = 1;
-    }
-    setQuantities(initialQty);
-
-    // Auto-fill user contact if logged in
-    try {
-      const savedUser = JSON.parse(localStorage.getItem('passify_user') || 'null');
-      if (savedUser) {
-        setContact({
-          name: savedUser.full_name || savedUser.name || '',
-          email: savedUser.email || '',
-          phone: savedUser.phone || '',
-        });
-        setVisitors([{ name: savedUser.full_name || savedUser.name || '', nik: '' }]);
+      let dest = null;
+      if (contextDest && (contextDest.slug === targetSlug || !tenantSlug)) {
+        dest = contextDest;
+      } else {
+        dest = await fetchDestinationBySlug(targetSlug);
       }
-    } catch (_) {}
 
-    setIsLoading(false);
-  }, [tenantSlug, destinationId, searchParams]);
+      if (!dest) {
+        const title = targetSlug.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        dest = {
+          id: `dest-${targetSlug}`,
+          slug: targetSlug,
+          name: title,
+          tenant_name: title,
+          location: 'Kawasan Konservasi Alam, Indonesia',
+          cover_image_url: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1200&q=80',
+          ticket_categories: [
+            { id: `cat-reguler-${targetSlug}`, name: 'Tiket Masuk Reguler', price: 35000, insurance: 3000, retribusi: 2000 }
+          ],
+          time_slots: [
+            { id: 'slot-1', label: 'Sesi Pagi (07:00 - 11:30)', max_capacity: 500, booked: 0 },
+            { id: 'slot-2', label: 'Sesi Siang (11:30 - 15:30)', max_capacity: 500, booked: 0 },
+            { id: 'slot-3', label: 'Sesi Sore (15:30 - 18:00)', max_capacity: 500, booked: 0 }
+          ]
+        };
+      }
+
+      setDestination(dest);
+      setSelectedSlotId(dest.time_slots?.[0]?.id || 'slot-1');
+      const initialQty = {};
+      if (dest.ticket_categories && dest.ticket_categories[0]) {
+        initialQty[dest.ticket_categories[0].id] = 1;
+      }
+      setQuantities(initialQty);
+
+      // Auto-fill user contact if logged in
+      try {
+        const savedUser = JSON.parse(localStorage.getItem('passify_user') || 'null');
+        if (savedUser) {
+          setContact({
+            name: savedUser.full_name || savedUser.name || '',
+            email: savedUser.email || '',
+            phone: savedUser.phone || '',
+          });
+          setVisitors([{ name: savedUser.full_name || savedUser.name || '', nik: '' }]);
+        }
+      } catch (_) {}
+
+      setIsLoading(false);
+    }
+
+    loadDest();
+  }, [tenantSlug, destinationId, searchParams, contextSlug, contextDest]);
 
   // Adjust visitors array length when total quantity changes
   const totalQty = useMemo(() => {

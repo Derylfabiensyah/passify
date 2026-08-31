@@ -56,19 +56,21 @@ export default function BookingHistoryPage() {
       const stored = localStorage.getItem('passify_my_tickets');
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
-          // Filter out any legacy dummy sample tickets
+          // Filter out any legacy dummy sample tickets or previous test orders with fake destinations
           const realTickets = parsed.filter(
             (t) =>
               t.ticketId !== 'tkt-curug-001' &&
               t.ticketId !== 'tkt-kawah-002' &&
               t.orderNumber !== 'TWA-20260828-8921' &&
-              t.orderNumber !== 'TWA-20260815-4102'
+              t.orderNumber !== 'TWA-20260815-4102' &&
+              t.destinationName !== 'Curug Bidadari Eco Park' &&
+              t.tenantName !== 'PT Wisata Alam Mandiri' &&
+              t.destinationName !== 'Kawah Putih Ciwidey' &&
+              t.tenantName !== 'Perum Perhutani Unit III'
           );
           setTickets(realTickets);
           localStorage.setItem('passify_my_tickets', JSON.stringify(realTickets));
           return;
-        }
       }
       setTickets([]);
     } catch (_) {
