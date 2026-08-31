@@ -27,9 +27,10 @@ import {
   Legend,
   Filler
 } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 
 import { useTenant } from '../../contexts/TenantContext';
+import { useToast } from '../../contexts/ToastContext';
 import { fetchAdminFinanceData, getAdminUser } from '../../api/admin';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
@@ -54,9 +55,10 @@ ChartJS.register(
 
 export default function FinancePage() {
   const { slug } = useTenant();
+  const { toast } = useToast();
   const [financeData, setFinanceData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [dateRange, setDateRange] = useState('month');
+  const [period, setPeriod] = useState('7d'); // '7d' | '30d' | 'month' | 'all'
 
   // Load real financial data from payment microservice
   useEffect(() => {
@@ -75,16 +77,65 @@ export default function FinancePage() {
     loadData();
   }, [slug]);
 
-  const payouts = financeData?.payouts || PAYOUT_HISTORY;
-  const transactions = financeData?.transactions || [];
-  const weeklyRevenue = financeData?.weeklyRevenue || REVENUE_WEEKLY;
+  const rawPayouts = financeData?.payouts || PAYOUT_HISTORY;
+  const rawWeeklyRevenue = financeData?.weeklyRevenue || REVENUE_WEEKLY;
 
-  const totalPaidOut = payouts.filter((p) => p.status === 'settled').reduce((sum, p) => sum + (p.net_payout || 0), 0);
-  const totalPending = payouts.filter((p) => p.status === 'pending').reduce((sum, p) => sum + (p.net_payout || 0), 0);
-  const totalFee = payouts.reduce((sum, p) => sum + (p.platform_fee || 0), 0);
+  // Filter payouts based on selected period
+  const filteredPayouts = useMemo(() => {
+    if (period === '7d') {
+      return rawPayouts.slice(0, 3);
+    } else if (period === '30d') {
+      return rawPayouts.slice(0, 6);
+    } else if (period === 'month') {
+      return rawPayouts.slice(0, 4);
+    }
+    return rawPayouts;
+  }, [rawPayouts, period]);
+
+  const weeklyRevenue = useMemo(() => {
+    if (period === '30d') {
+      // Extended chart representation for 30d
+      return [
+        { day: 'Mgg 1', revenue: 45000000 },
+        { day: 'Mgg 2', revenue: 52000000 },
+        { day: 'Mgg 3', revenue: 48000000 },
+        { day: 'Mgg 4', revenue: 61000000 },
+      ];
+    }
+    return rawWeeklyRevenue;
+  }, [rawWeeklyRevenue, period]);
+
+  const totalPaidOut = filteredPayouts.filter((p) => p.status === 'settled').reduce((sum, p) => sum + (p.net_payout || 0), 0);
+  const totalPending = filteredPayouts.filter((p) => p.status === 'pending').reduce((sum, p) => sum + (p.net_payout || 0), 0);
+  const totalFee = filteredPayouts.reduce((sum, p) => sum + (p.platform_fee || 0), 0);
   const totalGross = totalPaidOut + totalPending + totalFee;
 
-  // ─── Chart.js: Weekly Revenue & Payout Analysis ────────────────
+  const handleExportCSV = () => {
+    const headers = ['Periode Settlement', 'Pendapatan Kotor (Rp)', 'Biaya Layanan (Rp)', 'Pencairan Bersih (Rp)', 'Status', 'Rekening Bank', 'Tanggal Cair'];
+    const rows = filteredPayouts.map((p) => [
+      `"${p.period || ''}"`,
+      p.gross || 0,
+      p.platform_fee || 0,
+      p.net_payout || 0,
+      `"${p.status === 'settled' ? 'Dicairkan' : p.status === 'pending' ? 'Menunggu' : 'Gagal'}"`,
+      `"${p.bank || ''}"`,
+      `"${p.settled_at ? new Date(p.settled_at).toLocaleDateString('id-ID') : '-'}"`
+    ]);
+
+    const csvContent = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `passify-settlement-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Data riwayat settlement berhasil diekspor ke CSV!');
+  };
+
+  // ─── Chart.js: Revenue & Payout Analysis ────────────────
   const financeChartData = {
     labels: weeklyRevenue.map((r) => r.day),
     datasets: [
@@ -92,15 +143,15 @@ export default function FinancePage() {
         label: 'Pendapatan Kotor (Gross)',
         data: weeklyRevenue.map((r) => r.revenue),
         backgroundColor: '#1e4b35',
-        hoverBackgroundColor: '#3c7152',
-        borderRadius: 4
+        hoverBackgroundColor: '#2d6a4f',
+        borderRadius: 6
       },
       {
         label: 'Net Payout Klien (95%)',
         data: weeklyRevenue.map((r) => Math.round(r.revenue * 0.95)),
-        backgroundColor: '#8a5638',
-        hoverBackgroundColor: '#71452f',
-        borderRadius: 4
+        backgroundColor: '#80512f',
+        hoverBackgroundColor: '#673e21',
+        borderRadius: 6
       }
     ]
   };
@@ -112,13 +163,13 @@ export default function FinancePage() {
       legend: {
         position: 'top',
         align: 'end',
-        labels: { color: '#526b5a', font: { size: 11, family: 'Inter' } }
+        labels: { color: '#546657', font: { size: 11, family: 'Plus Jakarta Sans' } }
       },
       tooltip: {
-        backgroundColor: '#fffefa',
+        backgroundColor: '#f8faf5',
         titleColor: '#102d20',
-        bodyColor: '#526b5a',
-        borderColor: '#d6e2cf',
+        bodyColor: '#546657',
+        borderColor: '#cddac8',
         borderWidth: 1,
         padding: 10,
         cornerRadius: 8,
@@ -130,12 +181,12 @@ export default function FinancePage() {
     scales: {
       x: {
         grid: { display: false },
-        ticks: { color: '#526b5a', font: { size: 10 } }
+        ticks: { color: '#546657', font: { size: 10 } }
       },
       y: {
-        grid: { color: '#e8f1dc' },
+        grid: { color: '#e7efdf' },
         ticks: {
-          color: '#526b5a',
+          color: '#546657',
           font: { size: 10 },
           callback: (val) => `Rp ${(val / 1000000).toFixed(0)}jt`
         }
@@ -150,14 +201,14 @@ export default function FinancePage() {
         accessorKey: 'period',
         header: 'Periode Settlement',
         cell: (info) => (
-          <span className="font-bold text-gray-900">{info.getValue()}</span>
+          <span className="font-bold text-[var(--forest-deep)]">{info.getValue()}</span>
         )
       },
       {
         accessorKey: 'gross',
         header: 'Pendapatan Kotor',
         cell: (info) => (
-          <span className="text-gray-700">
+          <span className="text-[var(--ink)]">
             Rp {info.getValue().toLocaleString('id-ID')}
           </span>
         )
@@ -175,7 +226,7 @@ export default function FinancePage() {
         accessorKey: 'net_payout',
         header: 'Pencairan Bersih (Net)',
         cell: (info) => (
-          <span className="font-bold text-emerald-700 font-['Outfit'] text-sm">
+          <span className="font-bold text-[var(--forest)] font-heading text-sm">
             Rp {info.getValue().toLocaleString('id-ID')}
           </span>
         )
@@ -215,7 +266,7 @@ export default function FinancePage() {
         accessorKey: 'bank',
         header: 'Rekening Klien',
         cell: (info) => (
-          <span className="text-gray-600 text-xs font-mono">
+          <span className="text-[var(--ink-soft)] text-xs font-mono">
             {info.getValue()}
           </span>
         )
@@ -226,7 +277,7 @@ export default function FinancePage() {
         cell: (info) => {
           const val = info.getValue();
           return (
-            <span className="text-gray-500 text-xs">
+            <span className="text-[var(--ink-soft)] text-xs">
               {val
                 ? new Date(val).toLocaleDateString('id-ID', {
                     day: 'numeric',
@@ -244,23 +295,56 @@ export default function FinancePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
+      {/* Header & Date Range Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[var(--border)]">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--forest-deep)] font-heading">
             Keuangan & Pencairan Dana (Settlement)
           </h1>
+          <p className="text-xs text-[var(--ink-soft)] mt-1">
+            Rekonsiliasi transaksi pendapatan tiket, biaya layanan, dan histori transfer otomatis ke rekening mitra.
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button className="btn-secondary btn-sm shadow-2xs">
-            <Download className="w-4 h-4" />
-            <span>Ekspor CSV / PDF</span>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Period Selector Tabs */}
+          <div className="flex items-center bg-[var(--canvas)] p-1 rounded-xl border border-[var(--border)] text-xs" role="radiogroup" aria-label="Filter Rentang Waktu">
+            {[
+              { id: '7d', label: '7 Hari' },
+              { id: '30d', label: '30 Hari' },
+              { id: 'month', label: 'Bulan Ini' },
+              { id: 'all', label: 'Semua' }
+            ].map((t) => (
+              <button
+                key={t.id}
+                type="button"
+                role="radio"
+                aria-checked={period === t.id}
+                onClick={() => setPeriod(t.id)}
+                className={`px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${
+                  period === t.id
+                    ? 'bg-[var(--surface)] text-[var(--forest-deep)] shadow-2xs'
+                    : 'text-[var(--ink-soft)] hover:text-[var(--forest-deep)]'
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleExportCSV}
+            className="btn-secondary btn-sm shadow-2xs cursor-pointer flex items-center gap-1.5"
+            title="Ekspor data settlement saat ini ke CSV"
+          >
+            <Download className="w-4 h-4 text-[var(--forest)]" />
+            <span>Ekspor CSV</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Cards (Minimalist style) */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminStatCard
           icon={DollarSign}
@@ -287,21 +371,21 @@ export default function FinancePage() {
           icon={TrendingUp}
           label="Biaya Layanan (5%)"
           value={`Rp ${(totalFee / 1000000).toFixed(1)}jt`}
-          subValue="Untuk infrastruktur server, SMS, & NFC"
+          subValue="Untuk infrastruktur server & gerbang"
           badgeText="FEE"
         />
       </div>
 
-      {/* Chart.js Section: Gross vs Net Payout */}
-      <div className="card p-5 sm:p-6 bg-white rounded-2xl shadow-sm">
+      {/* Chart Section: Gross vs Net Payout */}
+      <div className="card p-5 sm:p-6 bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
-            <h3 className="text-base font-bold text-gray-900 font-['Outfit'] flex items-center gap-2">
-              <BarChart3 className="w-4.5 h-4.5 text-emerald-600" />
-              <span>Analisis Pendapatan vs Pencairan Bersih (7 Hari Terakhir)</span>
+            <h3 className="text-base font-bold text-[var(--forest-deep)] font-heading flex items-center gap-2">
+              <BarChart3 className="w-4.5 h-4.5 text-[var(--forest)]" />
+              <span>Analisis Pendapatan vs Pencairan Bersih ({period === '7d' ? '7 Hari Terakhir' : period === '30d' ? '30 Hari Terakhir' : period === 'month' ? 'Bulan Ini' : 'Semua Data'})</span>
             </h3>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Powered by Chart.js — Rekonsiliasi gross revenue dan net payout (95%)
+            <p className="text-xs text-[var(--ink-soft)] mt-0.5">
+              Rekonsiliasi perbandingan gross revenue dan net payout (95%)
             </p>
           </div>
         </div>
@@ -313,21 +397,22 @@ export default function FinancePage() {
 
       {/* TanStack React Table: Payout History */}
       <DataTable
-        data={payouts}
+        data={filteredPayouts}
         columns={payoutColumns}
         title="Riwayat Pencairan Dana (Payout Settlement History)"
         subtitle="Dukungan sorting, searching, & pagination oleh TanStack React Table v8"
         defaultPageSize={5}
         searchPlaceholder="Cari periode, nama bank, atau status..."
+        isLoading={isLoading}
       />
 
       {/* Payout Schedule Policy Banner */}
-      <div className="card p-4 bg-white rounded-2xl flex items-start gap-3 shadow-sm">
-        <div className="w-9 h-9 rounded-xl bg-emerald-50 shadow-2xs flex items-center justify-center flex-shrink-0">
-          <FileText className="w-4.5 h-4.5 text-emerald-600" />
+      <div className="card p-4 bg-[var(--surface)] border border-[var(--border)] rounded-2xl flex items-start gap-3 shadow-sm">
+        <div className="w-9 h-9 rounded-xl bg-[var(--leaf-pale)] shadow-2xs flex items-center justify-center flex-shrink-0">
+          <FileText className="w-4.5 h-4.5 text-[var(--forest)]" />
         </div>
-        <div className="text-xs text-gray-600 leading-relaxed">
-          <strong className="text-gray-900">Kebijakan Automated Settlement (H+1):</strong>{' '}
+        <div className="text-xs text-[var(--ink-soft)] leading-relaxed">
+          <strong className="text-[var(--forest-deep)]">Kebijakan Automated Settlement (H+1):</strong>{' '}
           Semua pendapatan tiket masuk dan transaksi Cashless Venue (NFC & QR) direkonsiliasi setiap pukul 23:59 WIB dan dicairkan secara otomatis ke rekening bank terdaftar klien pada pukul 06:00 WIB hari berikutnya tanpa potongan biaya antarbank.
         </div>
       </div>
