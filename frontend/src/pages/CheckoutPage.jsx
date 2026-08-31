@@ -285,26 +285,8 @@ export default function CheckoutPage() {
         orderData,
       });
 
-      // If midtrans snap script is loaded on window
-      if (window.snap && typeof window.snap.pay === 'function') {
-        window.snap.pay(mockSnapToken, {
-          onSuccess: function (result) {
-            finalizeBookingSuccess(orderData);
-          },
-          onPending: function (result) {
-            finalizeBookingSuccess(orderData);
-          },
-          onError: function (result) {
-            setFormError('Pembayaran Midtrans dibatalkan atau terjadi kesalahan.');
-          },
-          onClose: function () {
-            setIsProcessingPayment(false);
-          },
-        });
-      } else {
-        // Show interactive Midtrans Snap UI modal
-        setShowSnapModal(true);
-      }
+      // Show interactive Midtrans Snap UI modal
+      setShowSnapModal(true);
     } catch (err) {
       setFormError(err.message || 'Pembayaran gagal diproses. Silakan coba lagi.');
     } finally {
