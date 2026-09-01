@@ -256,164 +256,6 @@ function DestinationCard({
   );
 }
 
-function AddDestinationModal({ isOpen, onClose, onSave }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    location: '',
-    province: 'Jawa Barat',
-    max_daily_capacity: 1000,
-    ticket_price: 35000,
-  });
-
-  if (!isOpen) return null;
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const slug = formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    onSave({
-      id: `dest-${Date.now()}`,
-      name: formData.name,
-      slug,
-      location: formData.location,
-      address: formData.location,
-      province: formData.province,
-      max_daily_capacity: Number(formData.max_daily_capacity),
-      cover_image_url: 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
-      description: `Selamat datang di portal reservasi resmi ${formData.name}. Nikmati pengalaman wisata alam yang teratur, aman, dan menjaga kelestarian daya dukung lingkungan.`,
-      facilities: ['Area Parkir', 'Toilet Bersih', 'Musholla', 'Pusat Informasi'],
-      rules: 'Patuhi batas daya dukung lingkungan, buang sampah pada tempatnya, dan tunjukkan E-Ticket QR saat di gerbang.',
-      ticket_categories: [
-        {
-          id: `cat-${Date.now()}-1`,
-          name: 'Tiket Masuk Domestik (WNI)',
-          price: Number(formData.ticket_price),
-          insurance: 3000,
-          retribusi: 2000,
-          is_active: true,
-        },
-      ],
-      is_new: true,
-    });
-  };
-
-  return (
-    <div className="modal-overlay z-50 flex items-center justify-center p-4">
-      <div className="modal-content bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col">
-        <div className="bg-[var(--forest-deep)] text-white p-5 flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
-              Kawasan Destinasi Baru
-            </span>
-            <h3 className="text-base font-bold font-serif mt-0.5">Tambah Kawasan Destinasi</h3>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
-          <div>
-            <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
-              Nama Destinasi Wisata
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="field-control font-bold"
-              placeholder="Contoh: Curug Citambur"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
-                Alamat / Lokasi
-              </label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="field-control"
-                placeholder="Contoh: Pasirkuda, Cianjur"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
-                Provinsi
-              </label>
-              <input
-                type="text"
-                value={formData.province}
-                onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                className="field-control"
-                placeholder="Contoh: Jawa Barat"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
-                Kapasitas Harian (Pax)
-              </label>
-              <input
-                type="number"
-                value={formData.max_daily_capacity}
-                onChange={(e) => setFormData({ ...formData, max_daily_capacity: e.target.value })}
-                className="field-control"
-                min="10"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
-                Tarif Tiket Awal (Rp)
-              </label>
-              <input
-                type="number"
-                value={formData.ticket_price}
-                onChange={(e) => setFormData({ ...formData, ticket_price: e.target.value })}
-                className="field-control"
-                min="0"
-                step="1000"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="p-3 bg-[var(--fog)] rounded-xl text-[11px] text-[var(--ink-soft)]">
-            💡 <em>Setelah disimpan, Anda dapat mengustomisasi foto sampul, cerita kawasan, dan warna di menu <strong>Portal &amp; Tampilan</strong>.</em>
-          </div>
-
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border)]">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-secondary px-4 py-2 rounded-xl font-bold cursor-pointer"
-            >
-              Batal
-            </button>
-            <button
-              type="submit"
-              className="btn-primary px-5 py-2 rounded-xl font-bold shadow-xs cursor-pointer"
-            >
-              Buat Destinasi
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
-
 function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
   const [formData, setFormData] = useState({
     name: '',
@@ -534,6 +376,7 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
             </div>
           </div>
 
+          {/* Grand Total Preview */}
           <div className="p-4 rounded-2xl bg-[var(--fog)] flex items-baseline justify-between border border-[var(--border)]">
             <span className="font-bold text-[var(--forest-deep)]">Total per Pengunjung:</span>
             <span className="text-base font-extrabold text-[var(--bark)]">
@@ -573,19 +416,17 @@ export default function DestinationsPage() {
       return [];
     }
   });
-  const [expandedId, setExpandedId] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showAddDestModal, setShowAddDestModal] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [editingCatContext, setEditingCatContext] = useState(null);
   const [deleteConfirmContext, setDeleteConfirmContext] = useState(null);
 
+  // Fetch destination from microservices
   useEffect(() => {
     async function loadRealDestinations() {
       try {
         const realList = await fetchAdminDestinations(slug);
         if (realList && realList.length > 0) {
           setDestinations(realList);
-          setExpandedId((prev) => prev || realList[0].id);
           if (realList[0].slug) {
             localStorage.setItem('passify_current_tenant', realList[0].slug);
           }
@@ -606,66 +447,26 @@ export default function DestinationsPage() {
     refetch?.();
   };
 
-  const handleSaveNewDestination = async (newDest) => {
-    const updated = [newDest, ...destinations];
-    saveDestinationsList(updated);
-    setExpandedId(newDest.id);
-    setShowAddDestModal(false);
-    toast.success(`Kawasan "${newDest.name}" berhasil dibuat!`);
-
-    try {
-      const user = getAdminUser();
-      const tenantId = user.tenant_id || '002bdabd-c79d-40b4-b624-4fbcdc31d390';
-      const payload = {
-        name: newDest.name,
-        description: newDest.description || '',
-        destination_type: 'wisata_alam',
-        address: newDest.location || 'Indonesia',
-        city: newDest.location || 'Indonesia',
-        province: newDest.province || 'Indonesia',
-        cover_image_url: newDest.cover_image_url,
-        max_daily_capacity: Number(newDest.max_daily_capacity || 1000),
-        facilities: newDest.facilities || [],
-        rules: newDest.rules || '',
-      };
-      const res = await apiRequest(`/api/v1/tenants/${tenantId}/destinations`, {
-        method: 'POST',
-        body: payload,
-      });
-      if (res?.data?.id) {
-        const syncedDest = {
-          ...newDest,
-          id: res.data.id,
-          slug: res.data.slug || newDest.slug,
-        };
-        const syncedList = updated.map((d) => (d.id === newDest.id ? syncedDest : d));
-        saveDestinationsList(syncedList);
-      }
-    } catch (err) {
-      console.warn('Backend destination sync error:', err.message);
-    }
-  };
+  const dest = destinations[0] || null;
+  const destId = dest?.id || 'dest-main';
 
   const handleSaveCategory = async (categoryData) => {
-    if (!editingCatContext?.destId) return;
-    const destId = editingCatContext.destId;
+    if (!dest) return;
 
-    const updated = destinations.map((d) => {
-      if (d.id !== destId) return d;
-      const categories = [...(d.ticket_categories || [])];
-      const existingIdx = categories.findIndex((c) => c.id === categoryData.id);
-      if (existingIdx >= 0) {
-        categories[existingIdx] = categoryData;
-      } else {
-        categories.push(categoryData);
-      }
-      return { ...d, ticket_categories: categories };
-    });
+    const categories = [...(dest.ticket_categories || [])];
+    const existingIdx = categories.findIndex((c) => c.id === categoryData.id);
+    if (existingIdx >= 0) {
+      categories[existingIdx] = categoryData;
+    } else {
+      categories.push(categoryData);
+    }
 
-    saveDestinationsList(updated);
+    const updatedDest = { ...dest, ticket_categories: categories };
+    saveDestinationsList([updatedDest]);
     setEditingCatContext(null);
     toast.success('Kategori tarif tiket berhasil disimpan!');
 
+    // Sync to ticket microservice
     try {
       await apiRequest('/api/v1/tickets/categories', {
         method: 'POST',
@@ -684,29 +485,22 @@ export default function DestinationsPage() {
     } catch (_) {}
   };
 
-  const handleDeleteCategory = (destId, catId) => {
-    const dest = destinations.find((d) => d.id === destId);
+  const handleDeleteCategory = (catId) => {
     const cat = (dest?.ticket_categories || []).find((c) => c.id === catId);
     setDeleteConfirmContext({
-      destId,
       catId,
       catName: cat?.name || 'Kategori Tiket',
     });
   };
 
   const handleConfirmDeleteCategory = async () => {
-    if (!deleteConfirmContext) return;
-    const { destId, catId } = deleteConfirmContext;
+    if (!deleteConfirmContext || !dest) return;
+    const { catId } = deleteConfirmContext;
 
-    const updated = destinations.map((d) => {
-      if (d.id !== destId) return d;
-      return {
-        ...d,
-        ticket_categories: (d.ticket_categories || []).filter((c) => c.id !== catId),
-      };
-    });
+    const updatedCategories = (dest.ticket_categories || []).filter((c) => c.id !== catId);
+    const updatedDest = { ...dest, ticket_categories: updatedCategories };
 
-    saveDestinationsList(updated);
+    saveDestinationsList([updatedDest]);
     setDeleteConfirmContext(null);
     toast.success('Kategori tiket telah dihapus.');
 
@@ -717,131 +511,69 @@ export default function DestinationsPage() {
     } catch (_) {}
   };
 
-  const filteredDests = destinations.filter(
-    (d) =>
-      d.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.location?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const totalCapacity = destinations.reduce((s, d) => s + (Number(d.max_daily_capacity) || 0), 0);
-  const totalBooked = destinations.reduce((s, d) => s + (Number(d.booked_today) || 0), 0);
-  const overallPct = totalCapacity ? Math.round((totalBooked / totalCapacity) * 100) : 0;
-  const totalCategories = destinations.reduce((s, d) => s + (d.ticket_categories || []).length, 0);
+  const capacity = Number(dest?.max_daily_capacity || 1000);
+  const booked = Number(dest?.booked_today || 0);
+  const quotaPct = capacity ? Math.round((booked / capacity) * 100) : 0;
+  const ticketCategories = dest?.ticket_categories || [];
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--forest-deep)] font-serif">
-            Destinasi &amp; Manajemen Tiket
-          </h1>
-          <p className="text-xs text-[var(--ink-soft)] mt-1">
-            Kelola kategori tarif tiket resmi, komponen asuransi &amp; retribusi, serta batas daya dukung kuota harian pengunjung.
-          </p>
-        </div>
-
-        <button
-          id="add-destination-btn"
-          type="button"
-          onClick={() => setShowAddDestModal(true)}
-          className="btn-primary btn-sm shadow-xs shrink-0 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah Destinasi Baru</span>
-        </button>
+      {/* Top Header */}
+      <div className="pb-4 border-b border-[var(--border)]">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--forest-deep)] font-serif">
+          Destinasi &amp; Manajemen Tiket
+        </h1>
+        <p className="text-xs text-[var(--ink-soft)] mt-1">
+          Kelola kategori tarif tiket resmi, komponen asuransi &amp; retribusi, serta kuota harian pengunjung kawasan.
+        </p>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <AdminStatCard
           icon={Compass}
-          label="Total Kawasan Wisata"
-          value={`${destinations.length} Kawasan`}
-          subValue="Dikelola oleh akun tenant Anda"
-          badgeText="VENUES"
+          label="Destinasi Wisata"
+          value={dest?.name || 'Kawasan Wisata'}
+          subValue={dest?.location || 'Kawasan Konservasi Alam'}
+          badgeText="DESTINASI"
         />
         <AdminStatCard
           icon={CheckCircle2}
           label="Status Website"
-          value={destinations.length > 0 ? "Online & Aktif" : "Menunggu Setup"}
-          subValue={destinations.length > 0 ? "Menerima reservasi e-ticket" : "Tambahkan destinasi pertama"}
+          value="Online & Aktif"
+          subValue="Menerima reservasi e-ticket"
           badgeText="PORTAL"
         />
         <AdminStatCard
           icon={Users}
           label="Total Daya Dukung Alam"
-          value={`${totalCapacity.toLocaleString('id-ID')} pax`}
-          subValue={`Terisi: ${totalBooked.toLocaleString('id-ID')} pax hari ini`}
-          progress={overallPct}
+          value={`${capacity.toLocaleString('id-ID')} pax`}
+          subValue={`Terisi: ${booked.toLocaleString('id-ID')} pax hari ini`}
+          progress={quotaPct}
           badgeText="KUOTA"
         />
         <AdminStatCard
           icon={Ticket}
           label="Kategori Tarif Tiket"
-          value={`${totalCategories} Tipe Tarif`}
+          value={`${ticketCategories.length} Tipe Tarif`}
           subValue="WNI, WNA, Asuransi & Retribusi"
           badgeText="TARIF"
         />
       </div>
 
-      {/* Search & Filter */}
-      {destinations.length > 0 && (
-        <div className="flex items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Cari nama destinasi atau lokasi..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="field-control pl-10 pr-4 text-xs"
-            />
-          </div>
-        </div>
+      {/* Destination Card & Ticket Management */}
+      {dest && (
+        <DestinationCard
+          dest={dest}
+          isExpanded={isExpanded}
+          onToggleExpand={() => setIsExpanded((prev) => !prev)}
+          onAddCategory={() => setEditingCatContext({ cat: null })}
+          onEditCategory={(_, cat) => setEditingCatContext({ cat })}
+          onDeleteCategory={(_, catId) => handleDeleteCategory(catId)}
+        />
       )}
 
-      {filteredDests.length === 0 ? (
-        <div className="card p-10 text-center flex flex-col items-center justify-center border border-dashed border-[var(--border)] bg-white/50 backdrop-blur-sm">
-          <div className="h-14 w-14 rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest)] grid place-items-center mb-4 shadow-xs">
-            <Compass className="w-7 h-7" />
-          </div>
-          <h3 className="text-lg font-bold text-[var(--forest-deep)] font-serif">
-            Belum Ada Destinasi Wisata
-          </h3>
-          <p className="text-xs text-[var(--ink-soft)] max-w-md mt-1.5 mb-6">
-            Kawasan Anda belum memiliki data destinasi. Tambahkan destinasi pertama untuk mengatur kuota harian dan kategori tarif tiket masuk.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowAddDestModal(true)}
-            className="btn-primary shadow-xs cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tambah Destinasi Pertama</span>
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-5">
-          {filteredDests.map((dest) => (
-            <DestinationCard
-              key={dest.id}
-              dest={dest}
-              isExpanded={expandedId === dest.id}
-              onToggleExpand={(id) => setExpandedId((prev) => (prev === id ? null : id))}
-              onAddCategory={(destId) => setEditingCatContext({ destId, cat: null })}
-              onEditCategory={(destId, cat) => setEditingCatContext({ destId, cat })}
-              onDeleteCategory={handleDeleteCategory}
-            />
-          ))}
-        </div>
-      )}
-
-      <AddDestinationModal
-        isOpen={showAddDestModal}
-        onClose={() => setShowAddDestModal(false)}
-        onSave={handleSaveNewDestination}
-      />
-
+      {/* Modal Edit Ticket Category */}
       <EditCategoryModal
         cat={editingCatContext?.cat}
         isOpen={Boolean(editingCatContext)}
@@ -849,6 +581,7 @@ export default function DestinationsPage() {
         onSave={handleSaveCategory}
       />
 
+      {/* Branded Delete Category Confirmation Modal */}
       <DeleteCategoryConfirmationModal
         isOpen={Boolean(deleteConfirmContext)}
         onClose={() => setDeleteConfirmContext(null)}

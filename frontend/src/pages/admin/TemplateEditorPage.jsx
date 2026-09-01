@@ -474,24 +474,6 @@ export default function TemplateEditorPage() {
                 </p>
               </div>
             </div>
-
-            {/* Destination Selector if multiple destinations */}
-            {destinations.length > 1 && (
-              <div className="flex items-center gap-2 self-start sm:self-auto bg-[var(--canvas)] p-2 rounded-xl border border-[var(--border)]">
-                <span className="text-xs font-bold text-[var(--forest-deep)]">Kawasan:</span>
-                <select
-                  value={selectedDestId || ''}
-                  onChange={(e) => handleSelectDestination(e.target.value)}
-                  className="field-control text-xs py-1 px-2.5 rounded-lg w-auto font-bold text-[var(--forest-deep)]"
-                >
-                  {destinations.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
           </div>
 
           {/* Section 1: Hero Banner & Story */}
