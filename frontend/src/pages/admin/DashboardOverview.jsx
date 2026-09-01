@@ -5,7 +5,6 @@ import {
   Users,
   DollarSign,
   Wallet,
-  Clock,
   Activity,
   AlertTriangle,
   RefreshCw,
@@ -342,22 +341,10 @@ export default function DashboardOverview() {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
-        <div>
-          <div className="text-xs text-emerald-700 uppercase tracking-widest font-bold flex items-center gap-2 mb-1">
-            <span className="status-dot" />
-            <span>Passify Cloud Engine • White-Label SaaS Telemetry</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
-            Dasbor Analitik Kawasan Tenant
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-600 bg-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-2xs">
-            <Clock className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Sinkronisasi Live Tiap 60s</span>
-          </span>
-        </div>
+      <div className="pb-3 border-b border-[var(--border)]">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--forest-deep)] font-display">
+          Dasbor Analitik
+        </h1>
       </div>
 
       {/* Top Stats Grid (Minimalist KPI Cards) */}
