@@ -163,18 +163,10 @@ function DestinationCard({
                   to={`/?tenant=${dest.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-secondary text-xs px-3 py-1.5 rounded-xl flex items-center gap-1.5 no-underline font-bold"
+                  className="btn-secondary text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 no-underline font-bold"
                   title="Lihat Halaman Website Resmi"
                 >
                   <Eye className="w-3.5 h-3.5" /> Pratinjau Website <ExternalLink className="w-3 h-3" />
-                </Link>
-
-                <Link
-                  to={`/admin/template?dest=${dest.id}`}
-                  className="btn-primary text-xs px-3.5 py-1.5 rounded-xl flex items-center gap-1.5 shadow-xs font-bold no-underline"
-                  title="Atur Tampilan, Foto & Desain Halaman"
-                >
-                  <Palette className="w-3.5 h-3.5" /> Atur Tampilan Portal
                 </Link>
               </div>
             </div>
