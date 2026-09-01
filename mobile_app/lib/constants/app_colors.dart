@@ -1,42 +1,42 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color forestDeep = Color(0xFF394032);
-  static const Color forest = Color(0xFF454F2D);
-  static const Color forestSoft = Color(0xFF797F3E);
-  static const Color leaf = Color(0xFF797F3E);
-  static const Color leafPale = Color(0xFFECEBD9);
-  static const Color bark = Color(0xFF534332);
-  static const Color barkPale = Color(0xFFEEE6D9);
+  static const Color forestDeep = Color(0xFF1F2B1A);
+  static const Color forest = Color(0xFF394032);
+  static const Color forestSoft = Color(0xFF454F2D);
+  static const Color leaf = Color(0xFF586834);
+  static const Color leafPale = Color(0xFFE5EAD7);
+  static const Color bark = Color(0xFF4A3E2D);
+  static const Color barkPale = Color(0xFFF1ECE4);
   static const Color gold = Color(0xFF9F7E4A);
 
-  static const Color canvas = Color(0xFFF5F3EA);
-  static const Color surface = Color(0xFFFCFBF6);
-  static const Color elevated = Color(0xFFEFEDE2);
-  static const Color inputBg = Color(0xFFF8F7F0);
-  static const Color border = Color(0xFFD7D5BC);
-  static const Color borderHover = Color(0xFF9CA06D);
+  static const Color canvas = Color(0xFFF6F5EE);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color elevated = Color(0xFFEFECE1);
+  static const Color inputBg = Color(0xFFF9F8F2);
+  static const Color border = Color(0xFFDCD8C6);
+  static const Color borderHover = Color(0xFF8F975C);
 
-  static const Color ink = Color(0xFF2C3027);
-  static const Color inkSoft = Color(0xFF58614E);
-  static const Color textMuted = Color(0xFF68705F);
+  static const Color ink = Color(0xFF1C201A);
+  static const Color inkSoft = Color(0xFF52594B);
+  static const Color textMuted = Color(0xFF707768);
 
-  static const Color darkCanvas = Color(0xFF20231C);
-  static const Color darkSurface = Color(0xFF2C3027);
-  static const Color darkElevated = Color(0xFF394032);
-  static const Color darkBorder = Color(0xFF555B42);
-  static const Color darkInk = Color(0xFFF9F7EC);
-  static const Color darkInkSoft = Color(0xFFD4D7B8);
-  static const Color darkTextMuted = Color(0xFFB7B99B);
+  static const Color darkCanvas = Color(0xFF191E16);
+  static const Color darkSurface = Color(0xFF22291E);
+  static const Color darkElevated = Color(0xFF2C3527);
+  static const Color darkBorder = Color(0xFF45503E);
+  static const Color darkInk = Color(0xFFF6F7F0);
+  static const Color darkInkSoft = Color(0xFFD4D8C4);
+  static const Color darkTextMuted = Color(0xFF9EA48E);
 
   // Status & Feedback
-  static const Color success = Color(0xFF2E7D32);
+  static const Color success = Color(0xFF257335);
   static const Color successBg = Color(0xFFE8F5E9);
-  static const Color error = Color(0xFFD32F2F);
+  static const Color error = Color(0xFFC62828);
   static const Color errorBg = Color(0xFFFFEBEE);
-  static const Color warning = Color(0xFFF57C00);
+  static const Color warning = Color(0xFFE65100);
   static const Color warningBg = Color(0xFFFFF3E0);
-  static const Color info = Color(0xFF1976D2);
+  static const Color info = Color(0xFF1565C0);
   static const Color infoBg = Color(0xFFE3F2FD);
 }
 

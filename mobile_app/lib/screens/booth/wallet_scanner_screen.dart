@@ -16,6 +16,7 @@ class _WalletScannerScreenState extends State<WalletScannerScreen> {
     facing: CameraFacing.back,
   );
   bool _hasScanned = false;
+  bool _isTorchOn = false;
 
   @override
   void dispose() {
@@ -39,9 +40,9 @@ class _WalletScannerScreenState extends State<WalletScannerScreen> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final scanWindowSize = screenSize.width * 0.7;
+    final scanWindowSize = screenSize.width * 0.72;
     final scanWindow = Rect.fromCenter(
-      center: Offset(screenSize.width / 2, screenSize.height * 0.45),
+      center: Offset(screenSize.width / 2, screenSize.height * 0.42),
       width: scanWindowSize,
       height: scanWindowSize,
     );
@@ -57,50 +58,91 @@ class _WalletScannerScreenState extends State<WalletScannerScreen> {
           ),
           ScannerOverlay(scanWindow: scanWindow),
 
+          // Floating Glassmorphic Top Bar
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                    backgroundColor: Colors.black45,
-                    child: IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  borderRadius: BorderRadius.circular(AppRadius.xl),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
-                  ),
-                  const Text(
-                    'Scan QR Wallet Pengunjung',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                  ),
-                  CircleAvatar(
-                    backgroundColor: Colors.black45,
-                    child: IconButton(
-                      icon: const Icon(Icons.flash_on, color: Colors.white),
-                      onPressed: () => _controller.toggleTorch(),
+                    const Text(
+                      'Scan Wallet / Gelang',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
                     ),
-                  ),
-                ],
+                    IconButton(
+                      icon: Icon(
+                        _isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                        color: _isTorchOn ? AppColors.gold : Colors.white,
+                        size: 22,
+                      ),
+                      onPressed: () {
+                        setState(() => _isTorchOn = !_isTorchOn);
+                        _controller.toggleTorch();
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
 
+          // Bottom Instruction Banner
           Positioned(
-            bottom: 40,
+            bottom: 36,
             left: 20,
             right: 20,
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
-                color: Colors.black87,
-                borderRadius: AppRadius.radiusLg,
-                border: Border.all(color: Colors.white24),
+                color: const Color(0xFF1F2B1A).withValues(alpha: 0.92),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-              child: const Text(
-                'Arahkan kamera ke QR Dompet Digital pada HP Pengunjung atau Gelang Pengunjung untuk konfirmasi pembayaran.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 13),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.leafPale.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Arahkan kamera ke kode QR di layar ponsel atau gelang RFID pengunjung.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

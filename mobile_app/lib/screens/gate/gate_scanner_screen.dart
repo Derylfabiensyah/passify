@@ -150,10 +150,14 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // Back / Close
-                  CircleAvatar(
-                    backgroundColor: Colors.black45,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                    ),
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
                   ),
@@ -165,40 +169,29 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                       // Continuous Mode Toggle
                       GestureDetector(
                         onTap: () {
+                          HapticFeedback.selectionClick();
                           setState(() {
                             _isContinuousMode = !_isContinuousMode;
                             _hudResult = null;
                           });
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                _isContinuousMode
-                                    ? '⚡ Mode Kontinu Aktif (HUD Cepat & Auto-Dismiss)'
-                                    : '📋 Mode Detail Aktif (Modal Sheet)',
-                              ),
-                              duration: const Duration(seconds: 1),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           margin: const EdgeInsets.only(right: 6),
                           decoration: BoxDecoration(
                             color: _isContinuousMode
-                                ? const Color(0xFF059669).withValues(alpha: 0.9)
+                                ? AppColors.forestSoft.withValues(alpha: 0.9)
                                 : Colors.black54,
-                            borderRadius: AppRadius.radiusXl,
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(
-                              color: _isContinuousMode ? AppColors.leaf : Colors.white30,
+                              color: _isContinuousMode ? AppColors.leafPale : Colors.white24,
                             ),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                _isContinuousMode ? Icons.bolt : Icons.view_agenda_outlined,
+                                _isContinuousMode ? Icons.bolt_rounded : Icons.view_agenda_rounded,
                                 color: Colors.white,
                                 size: 14,
                               ),
@@ -207,7 +200,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                 _isContinuousMode ? 'KONTINU' : 'DETAIL',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 10,
+                                  fontSize: 10.5,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -218,19 +211,22 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
 
                       // Offline/Online Mode Indicator
                       GestureDetector(
-                        onTap: () => scannerProvider.toggleOfflineMode(),
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          scannerProvider.toggleOfflineMode();
+                        },
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                           decoration: BoxDecoration(
                             color: scannerProvider.forceOfflineMode ? AppColors.bark : AppColors.forest,
-                            borderRadius: AppRadius.radiusXl,
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
                             border: Border.all(color: Colors.white30),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
-                                scannerProvider.forceOfflineMode ? Icons.cloud_off : Icons.cloud_done,
+                                scannerProvider.forceOfflineMode ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
                                 color: Colors.white,
                                 size: 14,
                               ),
@@ -239,8 +235,8 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                 scannerProvider.forceOfflineMode ? 'OFFLINE' : 'ONLINE',
                                 style: const TextStyle(
                                   color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w800,
                                 ),
                               ),
                             ],
@@ -253,25 +249,38 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                   // Torch & Switch Camera Controls
                   Row(
                     children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.black45,
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                        ),
                         child: IconButton(
                           icon: Icon(
-                            scannerProvider.isTorchOn ? Icons.flash_on : Icons.flash_off,
-                            color: scannerProvider.isTorchOn ? Colors.amber : Colors.white,
+                            scannerProvider.isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                            color: scannerProvider.isTorchOn ? AppColors.gold : Colors.white,
+                            size: 20,
                           ),
                           onPressed: () {
+                            HapticFeedback.selectionClick();
                             _scannerController.toggleTorch();
                             scannerProvider.toggleTorch();
                           },
                         ),
                       ),
                       const SizedBox(width: 6),
-                      CircleAvatar(
-                        backgroundColor: Colors.black45,
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                        ),
                         child: IconButton(
-                          icon: const Icon(Icons.flip_camera_ios, color: Colors.white),
-                          onPressed: () => _scannerController.switchCamera(),
+                          icon: const Icon(Icons.flip_camera_ios_rounded, color: Colors.white, size: 20),
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            _scannerController.switchCamera();
+                          },
                         ),
                       ),
                     ],
@@ -289,25 +298,26 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
             child: Column(
               children: [
                 const Text(
-                  'Arahkan kamera ke QR Code Tiket Wisata',
+                  'Arahkan kamera ke QR Code Tiket Pengunjung',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    shadows: [Shadow(color: Colors.black54, blurRadius: 6)],
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    shadows: [Shadow(color: Colors.black87, blurRadius: 8)],
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _isContinuousMode
-                      ? '⚡ Mode Kontinu Aktif • Scan instan tanpa jeda modal'
-                      : 'Mendukung Dynamic TOTP & Tiket Reguler (< 500ms)',
+                      ? '⚡ Mode Kontinu Aktif • Scan instan otomatis'
+                      : 'Mendukung Dynamic QR & Tiket Fisik',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.8),
+                    color: Colors.white.withValues(alpha: 0.85),
                     fontSize: 12,
-                    shadows: const [Shadow(color: Colors.black54, blurRadius: 6)],
+                    fontWeight: FontWeight.w500,
+                    shadows: const [Shadow(color: Colors.black87, blurRadius: 8)],
                   ),
                 ),
               ],
@@ -323,10 +333,17 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
             left: 0,
             right: 0,
             child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-              decoration: const BoxDecoration(
-                color: AppColors.forestDeep,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              decoration: BoxDecoration(
+                color: AppColors.forestDeep.withValues(alpha: 0.96),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 16,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -336,7 +353,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                     children: [
                       _buildStatItem('Total Scan', '${scannerProvider.sessionTotal}', Colors.white),
                       _buildStatDivider(),
-                      _buildStatItem('Tiket Valid', '${scannerProvider.sessionValid}', AppColors.leaf),
+                      _buildStatItem('Tiket Valid', '${scannerProvider.sessionValid}', AppColors.leafPale),
                       _buildStatDivider(),
                       _buildStatItem('Ditolak', '${scannerProvider.sessionInvalid}', Colors.redAccent),
                     ],
@@ -351,11 +368,12 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                               MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
                             );
                           },
-                          icon: const Icon(Icons.storage, size: 16, color: Colors.white),
-                          label: const Text('Cache Tiket', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          icon: const Icon(Icons.storage_rounded, size: 16, color: Colors.white),
+                          label: const Text('Cache Offline', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white24),
-                            shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+                            side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
                         ),
                       ),
@@ -367,11 +385,12 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                               MaterialPageRoute(builder: (_) => const GateStatsScreen()),
                             );
                           },
-                          icon: const Icon(Icons.bar_chart, size: 16, color: Colors.white),
-                          label: const Text('Statistik Gate', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          icon: const Icon(Icons.bar_chart_rounded, size: 16, color: Colors.white),
+                          label: const Text('Statistik Gate', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white24),
-                            shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+                            side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
                         ),
                       ),
@@ -390,8 +409,8 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
     final isValid = result.valid;
     final statusColor = isValid ? const Color(0xFF10B981) : const Color(0xFFEF4444);
     final bgCardColor = isValid
-        ? const Color(0xFF064E3B).withValues(alpha: 0.94)
-        : const Color(0xFF7F1D1D).withValues(alpha: 0.94);
+        ? const Color(0xFF1B3B24).withValues(alpha: 0.96)
+        : const Color(0xFF5A1E1E).withValues(alpha: 0.96);
 
     return Positioned(
       top: 90,
@@ -404,7 +423,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             color: bgCardColor,
-            borderRadius: AppRadius.radiusLg,
+            borderRadius: BorderRadius.circular(AppRadius.lg),
             border: Border.all(color: statusColor, width: 2),
             boxShadow: [
               BoxShadow(
@@ -440,38 +459,20 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            isValid ? 'TIKET VALID • MASUK' : 'TIKET DITOLAK',
-                            style: TextStyle(
-                              color: statusColor,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                        ),
-                        if (result.isOffline)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-                            decoration: const BoxDecoration(
-                              color: Colors.white24,
-                              borderRadius: AppRadius.radiusSm,
-                            ),
-                            child: const Text(
-                              'OFFLINE',
-                              style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                      ],
+                    Text(
+                      isValid ? 'TIKET VALID • DIPERBOLEHKAN MASUK' : 'TIKET DITOLAK',
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       result.visitorName.isNotEmpty
-                          ? result.visitorName
-                          : (isValid ? 'Pengunjung Terverifikasi' : 'Tiket Tidak Dikenal'),
+                          ? '${result.visitorName} (${result.categoryName.isNotEmpty ? result.categoryName : 'Pengunjung'})'
+                          : result.message,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -480,25 +481,8 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (result.ticketCode.isNotEmpty)
-                      Text(
-                        result.ticketCode,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.7),
-                          fontSize: 10,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
                   ],
                 ),
-              ),
-
-              // Tap hint icon
-              const SizedBox(width: 8),
-              Icon(
-                Icons.chevron_right,
-                color: Colors.white.withValues(alpha: 0.5),
-                size: 20,
               ),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../models/manifest_model.dart';
@@ -67,17 +68,17 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusLg),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
           backgroundColor: AppColors.surface,
           title: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppColors.leafPale,
-                  borderRadius: AppRadius.radiusMd,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: const Icon(Icons.how_to_reg_rounded, color: AppColors.forest, size: 22),
+                child: const Icon(Icons.how_to_reg_rounded, color: AppColors.forestDeep, size: 22),
               ),
               const SizedBox(width: 12),
               const Expanded(
@@ -85,8 +86,8 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                   'Check-In Manual',
                   style: TextStyle(
                     fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.ink,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.forestDeep,
                   ),
                 ),
               ),
@@ -105,43 +106,20 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.canvas,
-                  borderRadius: AppRadius.radiusMd,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Pengunjung:', style: TextStyle(fontSize: 11, color: AppColors.inkSoft)),
-                        Text(
-                          ticket.visitorName.isNotEmpty ? ticket.visitorName : 'Umum',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.ink),
-                        ),
-                      ],
+                    Text(
+                      ticket.visitorName.isNotEmpty ? ticket.visitorName : 'Pengunjung Umum',
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.forestDeep),
                     ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Kode Tiket:', style: TextStyle(fontSize: 11, color: AppColors.inkSoft)),
-                        Text(
-                          ticket.ticketCode,
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.forest),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Kategori:', style: TextStyle(fontSize: 11, color: AppColors.inkSoft)),
-                        Text(
-                          ticket.categoryName.isNotEmpty ? ticket.categoryName : '-',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.ink),
-                        ),
-                      ],
+                    const SizedBox(height: 2),
+                    Text(
+                      '${ticket.ticketCode} • ${ticket.categoryName}',
+                      style: const TextStyle(fontSize: 12, color: AppColors.inkSoft),
                     ),
                   ],
                 ),
@@ -156,7 +134,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                 foregroundColor: AppColors.inkSoft,
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               ),
-              child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.w700)),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(ctx).pop(true),
@@ -164,10 +142,10 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                 backgroundColor: AppColors.forest,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               ),
-              child: const Text('Ya, Check-In', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('Ya, Check-In', style: TextStyle(fontWeight: FontWeight.w800)),
             ),
           ],
         );
@@ -207,10 +185,14 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
-        title: const Text('Manifest Tiket Offline', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text(
+          'Manifest Tiket Offline',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.forestDeep),
+        ),
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink,
         elevation: 0,
+        centerTitle: false,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
           child: Divider(height: 1, color: AppColors.border),
@@ -225,12 +207,14 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
+              style: const TextStyle(fontSize: 13.5, color: AppColors.ink, fontWeight: FontWeight.w600),
               decoration: InputDecoration(
                 hintText: 'Cari nama pengunjung atau kode tiket...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.forestSoft),
+                hintStyle: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                prefixIcon: const Icon(Icons.search_rounded, color: AppColors.forestSoft, size: 22),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: const Icon(Icons.clear_rounded, size: 20),
                         onPressed: () {
                           _searchController.clear();
                           _loadTickets();
@@ -240,13 +224,17 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                 filled: true,
                 fillColor: AppColors.inputBg,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                border: const OutlineInputBorder(
-                  borderRadius: AppRadius.radiusMd,
-                  borderSide: BorderSide(color: AppColors.border),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderSide: const BorderSide(color: AppColors.border),
                 ),
-                enabledBorder: const OutlineInputBorder(
-                  borderRadius: AppRadius.radiusMd,
-                  borderSide: BorderSide(color: AppColors.border),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  borderSide: const BorderSide(color: AppColors.forest, width: 1.5),
                 ),
               ),
             ),
@@ -259,11 +247,11 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${_tickets.length} Tiket Ditemukan di Cache',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.inkSoft),
+                  '${_tickets.length} Tiket di Cache Offline',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.inkSoft),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.refresh, size: 18, color: AppColors.forest),
+                  icon: const Icon(Icons.refresh_rounded, size: 20, color: AppColors.forest),
                   onPressed: () => _loadTickets(query: _searchController.text),
                   tooltip: 'Segarkan',
                 ),
@@ -280,16 +268,23 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.inventory_2_outlined, size: 48, color: Colors.grey.shade400),
-                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: const BoxDecoration(
+                                color: AppColors.leafPale,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.inventory_2_outlined, size: 40, color: AppColors.forest),
+                            ),
+                            const SizedBox(height: 16),
                             const Text(
                               'Belum ada tiket di cache offline',
-                              style: TextStyle(fontSize: 14, color: AppColors.inkSoft, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: 14.5, color: AppColors.forestDeep, fontWeight: FontWeight.w800),
                             ),
                             const SizedBox(height: 4),
                             const Text(
                               'Lakukan sinkronisasi di dashboard untuk mengunduh tiket hari ini.',
-                              style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                              style: TextStyle(fontSize: 12, color: AppColors.inkSoft),
                             ),
                           ],
                         ),
@@ -306,7 +301,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                             elevation: 0,
                             color: AppColors.surface,
                             shape: RoundedRectangleBorder(
-                              borderRadius: AppRadius.radiusLg,
+                              borderRadius: BorderRadius.circular(AppRadius.lg),
                               side: BorderSide(color: isUsed ? AppColors.border : AppColors.borderHover),
                             ),
                             child: Padding(
@@ -315,14 +310,14 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                                 children: [
                                   // Leading Status Icon
                                   Container(
-                                    width: 42,
-                                    height: 42,
+                                    width: 44,
+                                    height: 44,
                                     decoration: BoxDecoration(
                                       color: isUsed ? AppColors.inputBg : AppColors.leafPale,
-                                      borderRadius: AppRadius.radiusMd,
+                                      borderRadius: BorderRadius.circular(AppRadius.md),
                                     ),
                                     child: Icon(
-                                      isUsed ? Icons.done_all : Icons.confirmation_number_outlined,
+                                      isUsed ? Icons.check_circle_rounded : Icons.confirmation_number_outlined,
                                       color: isUsed ? AppColors.textMuted : AppColors.forest,
                                       size: 22,
                                     ),
@@ -336,7 +331,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                                       children: [
                                         Text(
                                           item.visitorName.isNotEmpty ? item.visitorName : 'Pengunjung Umum',
-                                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.ink),
+                                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.forestDeep),
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
@@ -344,32 +339,46 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                                           style: const TextStyle(fontSize: 12, color: AppColors.inkSoft),
                                         ),
                                         if (item.timeSlot.isNotEmpty)
-                                          Text(
-                                            'Sesi: ${item.timeSlot}',
-                                            style: const TextStyle(fontSize: 11, color: AppColors.forestSoft, fontWeight: FontWeight.w500),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 2),
+                                            child: Text(
+                                              'Sesi: ${item.timeSlot}',
+                                              style: const TextStyle(fontSize: 11, color: AppColors.forestSoft, fontWeight: FontWeight.w600),
+                                            ),
                                           ),
                                       ],
                                     ),
                                   ),
 
-                                  // Action Button
+                                  // Action Button / Status Badge
                                   if (!isUsed)
                                     ElevatedButton(
-                                      onPressed: () => _confirmAndValidate(item),
+                                      onPressed: () {
+                                        HapticFeedback.selectionClick();
+                                        _confirmAndValidate(item);
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: AppColors.forest,
                                         foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                         minimumSize: Size.zero,
                                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                        shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusSm),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
                                       ),
-                                      child: const Text('Check-In', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                      child: const Text('Check-In', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
                                     )
                                   else
-                                    const Text(
-                                      'SUDAH MASUK',
-                                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textMuted),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.leafPale.withValues(alpha: 0.5),
+                                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                                        border: Border.all(color: AppColors.border),
+                                      ),
+                                      child: const Text(
+                                        'SUDAH MASUK',
+                                        style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.forestSoft),
+                                      ),
                                     ),
                                 ],
                               ),
