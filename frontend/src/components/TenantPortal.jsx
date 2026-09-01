@@ -140,13 +140,17 @@ export default function TenantPortal() {
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
         <section className="tenant-primary relative isolate overflow-hidden rounded-[2rem] shadow-[var(--shadow-lift)]">
-          <img src={destination.cover_image_url} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02]" />
+          <img
+            src={destination.cover_image_url || destination.cover_image || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80'}
+            alt={destination.name || 'Pemandangan Wisata Alam'}
+            className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02]"
+          />
           <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 via-black/70 to-black/85" />
           <div className={`grid gap-8 px-6 py-10 sm:px-9 sm:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12 lg:py-14 ${template.show_availability === false ? 'lg:grid-cols-1' : ''}`}>
             <div className="max-w-2xl">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md shadow-xs">
                 <MapPin className="h-3.5 w-3.5 text-emerald-300" />
-                {destination.location || destination.province}
+                {destination.location || [destination.address, destination.city, destination.province].filter(Boolean).join(', ') || destination.province || destination.city || 'Indonesia'}
               </span>
               <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300 drop-shadow-xs">
                 {portalEyebrow}

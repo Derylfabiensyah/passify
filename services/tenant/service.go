@@ -59,6 +59,7 @@ type CreateDestinationRequest struct {
 	ClosingTime      string             `json:"closing_time"`
 	Facilities       models.StringArray `json:"facilities"`
 	Rules            string             `json:"rules"`
+	CoverImageURL    string             `json:"cover_image_url"`
 }
 
 type UpdateDestinationRequest struct {
@@ -68,6 +69,7 @@ type UpdateDestinationRequest struct {
 	Address          *string             `json:"address"`
 	City             *string             `json:"city"`
 	Province         *string             `json:"province"`
+	CoverImageURL    *string             `json:"cover_image_url"`
 	Latitude         *float64            `json:"latitude"`
 	Longitude        *float64            `json:"longitude"`
 	MaxDailyCapacity *int                `json:"max_daily_capacity"`
@@ -252,6 +254,7 @@ func (s *service) CreateDestination(tenantID uuid.UUID, req CreateDestinationReq
 		Address:          stringPtr(req.Address),
 		City:             stringPtr(req.City),
 		Province:         stringPtr(req.Province),
+		CoverImageURL:    stringPtr(req.CoverImageURL),
 		Latitude:         req.Latitude,
 		Longitude:        req.Longitude,
 		MaxDailyCapacity: req.MaxDailyCapacity,
@@ -301,6 +304,9 @@ func (s *service) UpdateDestination(id uuid.UUID, req UpdateDestinationRequest) 
 	}
 	if req.Province != nil {
 		dest.Province = req.Province
+	}
+	if req.CoverImageURL != nil {
+		dest.CoverImageURL = req.CoverImageURL
 	}
 	if req.Latitude != nil {
 		dest.Latitude = req.Latitude

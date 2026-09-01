@@ -783,6 +783,7 @@ export default function DestinationsPage() {
           address: cleanDest.location || cleanDest.address || 'Kawasan Wisata Alam',
           city: cleanDest.location || 'Indonesia',
           province: cleanDest.province || 'Indonesia',
+          cover_image_url: cleanDest.cover_image_url || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
           max_daily_capacity: Number(cleanDest.max_daily_capacity || 1000),
           opening_time: cleanDest.opening_time || '07:00:00',
           closing_time: cleanDest.closing_time || '17:00:00',
@@ -794,14 +795,30 @@ export default function DestinationsPage() {
           body: payload,
         });
         if (res?.data?.id) {
-          const syncedDest = { ...cleanDest, id: res.data.id, slug: res.data.slug };
+          const syncedDest = {
+            ...cleanDest,
+            id: res.data.id,
+            slug: res.data.slug,
+            cover_image_url: res.data.cover_image_url || cleanDest.cover_image_url,
+          };
           const syncedList = updated.map((d) => (d.id === cleanDest.id ? syncedDest : d));
           saveDestinationsList(syncedList);
         }
       } else if (cleanDest.id && !cleanDest.id.startsWith('dest-')) {
         await apiRequest(`/api/v1/destinations/${cleanDest.id}`, {
           method: 'PUT',
-          body: cleanDest,
+          body: {
+            name: cleanDest.name,
+            description: cleanDest.description,
+            destination_type: cleanDest.destination_type || 'lainnya',
+            address: cleanDest.location || cleanDest.address,
+            city: cleanDest.location || cleanDest.city,
+            province: cleanDest.province,
+            cover_image_url: cleanDest.cover_image_url,
+            max_daily_capacity: Number(cleanDest.max_daily_capacity || 1000),
+            facilities: cleanDest.facilities,
+            rules: cleanDest.rules,
+          },
         });
       }
     } catch (err) {
