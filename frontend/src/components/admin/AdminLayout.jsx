@@ -80,9 +80,8 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
         {!collapsed && (
           <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--fog)] p-2.5">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="relative grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white shadow-2xs">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white shadow-2xs">
                 {userInitial}
-                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-emerald-500" />
               </span>
               <div className="min-w-0">
                 <span className="block truncate text-xs font-bold text-[var(--forest-deep)]">{adminUser.name}</span>
