@@ -48,11 +48,14 @@
   --accent-hover: var(--forest-deep);
   --accent-muted: rgba(69, 79, 45, 0.12);
 
-  --radius-xs: .75rem;
-  --radius-sm: 1rem;
-  --radius: 1.5rem;
-  --radius-lg: 2rem;
-  --radius-xl: 2.5rem;
+  --radius-xs: .25rem;   /* 4px */
+  --radius-sm: .375rem;  /* 6px */
+  --radius-md: .5rem;    /* 8px */
+  --radius: .75rem;      /* 12px */
+  --radius-lg: .875rem;  /* 14px */
+  --radius-xl: 1rem;     /* 16px */
+  --radius-2xl: 1.375rem;/* 22px */
+  --radius-3xl: 1.75rem; /* 28px */
   --shadow-soft: 0 8px 30px rgba(45, 52, 38, 0.08);
   --shadow-lift: 0 20px 48px rgba(45, 52, 38, 0.14);
 
