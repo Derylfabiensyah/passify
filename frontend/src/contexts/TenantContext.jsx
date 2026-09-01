@@ -37,8 +37,14 @@ export function TenantProvider({ children }) {
     refetch();
   }, []);
 
+  const updatePortalTemplate = (template) => {
+    setTenant((current) => current.destination
+      ? { ...current, destination: { ...current.destination, portal_template: template } }
+      : current);
+  };
+
   return (
-    <TenantContext.Provider value={{ ...tenant, refetch }}>
+    <TenantContext.Provider value={{ ...tenant, refetch, updatePortalTemplate }}>
       {children}
     </TenantContext.Provider>
   );

@@ -33,5 +33,6 @@ mobile_app/build/
 .DS_Store
 .idea/
 .vscode/
-*.swp
-
+# Python
+__pycache__/
+*.pyc

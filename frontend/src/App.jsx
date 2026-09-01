@@ -8,6 +8,7 @@ import TenantPortal from './components/TenantPortal';
 import AdminLayout from './components/admin/AdminLayout';
 import DashboardOverview from './pages/admin/DashboardOverview';
 import DestinationsPage from './pages/admin/DestinationsPage';
+import TemplateEditorPage from './pages/admin/TemplateEditorPage';
 import QuotasPage from './pages/admin/QuotasPage';
 import GatesPage from './pages/admin/GatesPage';
 import FinancePage from './pages/admin/FinancePage';
@@ -56,6 +57,7 @@ function AppRoutes() {
               <Routes>
                 <Route index element={<DashboardOverview />} />
                 <Route path="destinations" element={<DestinationsPage />} />
+                <Route path="template" element={<TemplateEditorPage />} />
                 <Route path="quotas" element={<QuotasPage />} />
                 <Route path="gates" element={<GatesPage />} />
                 <Route path="finance" element={<FinancePage />} />
@@ -89,6 +91,7 @@ function AppRoutes() {
             <Routes>
               <Route index element={<DashboardOverview />} />
               <Route path="destinations" element={<DestinationsPage />} />
+              <Route path="template" element={<TemplateEditorPage />} />
               <Route path="quotas" element={<QuotasPage />} />
               <Route path="gates" element={<GatesPage />} />
               <Route path="finance" element={<FinancePage />} />

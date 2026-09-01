@@ -1,6 +1,7 @@
 package tenant
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -45,19 +46,19 @@ type UpdateTenantRequest struct {
 
 // DTO Requests for Destination operations
 type CreateDestinationRequest struct {
-	Name             string              `json:"name" binding:"required"`
-	Description      string              `json:"description"`
-	DestinationType  string              `json:"destination_type"`
-	Address          string              `json:"address"`
-	City             string              `json:"city"`
-	Province         string              `json:"province"`
-	Latitude         *float64            `json:"latitude"`
-	Longitude        *float64            `json:"longitude"`
-	MaxDailyCapacity int                 `json:"max_daily_capacity" binding:"required"`
-	OpeningTime      string              `json:"opening_time"`
-	ClosingTime      string              `json:"closing_time"`
-	Facilities       models.StringArray  `json:"facilities"`
-	Rules            string              `json:"rules"`
+	Name             string             `json:"name" binding:"required"`
+	Description      string             `json:"description"`
+	DestinationType  string             `json:"destination_type"`
+	Address          string             `json:"address"`
+	City             string             `json:"city"`
+	Province         string             `json:"province"`
+	Latitude         *float64           `json:"latitude"`
+	Longitude        *float64           `json:"longitude"`
+	MaxDailyCapacity int                `json:"max_daily_capacity" binding:"required"`
+	OpeningTime      string             `json:"opening_time"`
+	ClosingTime      string             `json:"closing_time"`
+	Facilities       models.StringArray `json:"facilities"`
+	Rules            string             `json:"rules"`
 }
 
 type UpdateDestinationRequest struct {
@@ -396,6 +397,18 @@ func (s *service) GetPublicDestinationByTenantSlug(slug string) (*models.Destina
 	}
 	dest, err := s.repo.GetFirstActiveDestinationByTenantID(tenant.ID)
 	if err == nil {
+		settings, settingsErr := s.repo.GetTenantSettings(tenant.ID)
+		if settingsErr == nil {
+			for _, setting := range settings {
+				if setting.SettingKey == "portal_template" {
+					var template models.TenantPortalTemplate
+					if json.Unmarshal([]byte(setting.SettingValue), &template) == nil {
+						dest.PortalTemplate = &template
+					}
+					break
+				}
+			}
+		}
 		return dest, nil
 	}
 

@@ -1,36 +1,33 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Core Nature Brand Palette
-  static const Color forestDeep = Color(0xFF102D20);
-  static const Color forest = Color(0xFF1E4B35);
-  static const Color forestSoft = Color(0xFF3C7152);
-  static const Color leaf = Color(0xFF9CBD72);
-  static const Color leafPale = Color(0xFFE8F1DC);
-  static const Color bark = Color(0xFF8A5638);
-  static const Color barkPale = Color(0xFFF2E5DA);
+  static const Color forestDeep = Color(0xFF394032);
+  static const Color forest = Color(0xFF454F2D);
+  static const Color forestSoft = Color(0xFF797F3E);
+  static const Color leaf = Color(0xFF797F3E);
+  static const Color leafPale = Color(0xFFECEBD9);
+  static const Color bark = Color(0xFF534332);
+  static const Color barkPale = Color(0xFFEEE6D9);
+  static const Color gold = Color(0xFF9F7E4A);
 
-  // Surfaces & Backgrounds
-  static const Color canvas = Color(0xFFF8FBF5);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color elevated = Color(0xFFF1F6EC);
-  static const Color inputBg = Color(0xFFF6F9F2);
-  static const Color border = Color(0xFFD6E2CF);
-  static const Color borderHover = Color(0xFFA9C598);
+  static const Color canvas = Color(0xFFF5F3EA);
+  static const Color surface = Color(0xFFFCFBF6);
+  static const Color elevated = Color(0xFFEFEDE2);
+  static const Color inputBg = Color(0xFFF8F7F0);
+  static const Color border = Color(0xFFD7D5BC);
+  static const Color borderHover = Color(0xFF9CA06D);
 
-  // Typography
-  static const Color ink = Color(0xFF193024);
-  static const Color inkSoft = Color(0xFF586D5D);
-  static const Color textMuted = Color(0xFF556859); // Adjusted for WCAG AA >= 4.5:1 contrast against light background
+  static const Color ink = Color(0xFF2C3027);
+  static const Color inkSoft = Color(0xFF58614E);
+  static const Color textMuted = Color(0xFF68705F);
 
-  // Dark Theme Tokens (Night Gate / Sunrise Outdoor Ops)
-  static const Color darkCanvas = Color(0xFF0D1712);
-  static const Color darkSurface = Color(0xFF15241D);
-  static const Color darkElevated = Color(0xFF1C3127);
-  static const Color darkBorder = Color(0xFF284638);
-  static const Color darkInk = Color(0xFFF3F7F2);
-  static const Color darkInkSoft = Color(0xFFA5C4B0);
-  static const Color darkTextMuted = Color(0xFF83A28F);
+  static const Color darkCanvas = Color(0xFF20231C);
+  static const Color darkSurface = Color(0xFF2C3027);
+  static const Color darkElevated = Color(0xFF394032);
+  static const Color darkBorder = Color(0xFF555B42);
+  static const Color darkInk = Color(0xFFF9F7EC);
+  static const Color darkInkSoft = Color(0xFFD4D7B8);
+  static const Color darkTextMuted = Color(0xFFB7B99B);
 
   // Status & Feedback
   static const Color success = Color(0xFF2E7D32);

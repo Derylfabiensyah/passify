@@ -12,9 +12,9 @@ import (
 
 // BaseModel provides common fields for all models
 type BaseModel struct {
-	ID        uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
+	ID        uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // ========================================================================
@@ -50,12 +50,23 @@ func (Tenant) TableName() string { return "tenants" }
 // TenantSetting stores key-value configuration for a tenant
 type TenantSetting struct {
 	BaseModel
-	TenantID    uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
-	SettingKey   string   `json:"setting_key" gorm:"size:100;not null"`
-	SettingValue string   `json:"setting_value" gorm:"not null"`
+	TenantID     uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
+	SettingKey   string    `json:"setting_key" gorm:"size:100;not null"`
+	SettingValue string    `json:"setting_value" gorm:"not null"`
 }
 
 func (TenantSetting) TableName() string { return "tenant_settings" }
+
+type TenantPortalTemplate struct {
+	Eyebrow          string `json:"eyebrow"`
+	HeroHeading      string `json:"hero_heading"`
+	HeroCopy         string `json:"hero_copy"`
+	PrimaryColor     string `json:"primary_color"`
+	AccentColor      string `json:"accent_color"`
+	ShowAvailability bool   `json:"show_availability"`
+	ShowFacilities   bool   `json:"show_facilities"`
+	ShowRules        bool   `json:"show_rules"`
+}
 
 // ========================================================================
 // User & Authentication
@@ -113,29 +124,30 @@ func (RefreshToken) TableName() string { return "refresh_tokens" }
 // Destination represents a nature tourism site
 type Destination struct {
 	BaseModel
-	TenantID        uuid.UUID  `json:"tenant_id" gorm:"type:uuid;not null"`
-	Name            string     `json:"name" gorm:"size:255;not null"`
-	Slug            string     `json:"slug" gorm:"size:255;not null"`
-	Description     *string    `json:"description,omitempty"`
-	DestinationType string     `json:"destination_type" gorm:"type:destination_type;default:'lainnya'"`
-	Address         *string    `json:"address,omitempty"`
-	City            *string    `json:"city,omitempty" gorm:"size:100"`
-	Province        *string    `json:"province,omitempty" gorm:"size:100"`
-	Latitude        *float64   `json:"latitude,omitempty"`
-	Longitude       *float64   `json:"longitude,omitempty"`
-	MaxDailyCapacity int       `json:"max_daily_capacity" gorm:"not null"`
-	OpeningTime     string     `json:"opening_time" gorm:"type:time;default:'06:00:00'"`
-	ClosingTime     string     `json:"closing_time" gorm:"type:time;default:'17:00:00'"`
-	CoverImageURL   *string    `json:"cover_image_url,omitempty"`
-	GalleryURLs     StringArray `json:"gallery_urls,omitempty" gorm:"type:text[]"`
-	Facilities      StringArray `json:"facilities,omitempty" gorm:"type:text[]"`
-	Rules           *string    `json:"rules,omitempty"`
-	IsActive        bool       `json:"is_active" gorm:"default:true"`
+	TenantID         uuid.UUID             `json:"tenant_id" gorm:"type:uuid;not null"`
+	Name             string                `json:"name" gorm:"size:255;not null"`
+	Slug             string                `json:"slug" gorm:"size:255;not null"`
+	Description      *string               `json:"description,omitempty"`
+	DestinationType  string                `json:"destination_type" gorm:"type:destination_type;default:'lainnya'"`
+	Address          *string               `json:"address,omitempty"`
+	City             *string               `json:"city,omitempty" gorm:"size:100"`
+	Province         *string               `json:"province,omitempty" gorm:"size:100"`
+	Latitude         *float64              `json:"latitude,omitempty"`
+	Longitude        *float64              `json:"longitude,omitempty"`
+	MaxDailyCapacity int                   `json:"max_daily_capacity" gorm:"not null"`
+	OpeningTime      string                `json:"opening_time" gorm:"type:time;default:'06:00:00'"`
+	ClosingTime      string                `json:"closing_time" gorm:"type:time;default:'17:00:00'"`
+	CoverImageURL    *string               `json:"cover_image_url,omitempty"`
+	GalleryURLs      StringArray           `json:"gallery_urls,omitempty" gorm:"type:text[]"`
+	Facilities       StringArray           `json:"facilities,omitempty" gorm:"type:text[]"`
+	Rules            *string               `json:"rules,omitempty"`
+	IsActive         bool                  `json:"is_active" gorm:"default:true"`
+	PortalTemplate   *TenantPortalTemplate `json:"portal_template,omitempty" gorm:"-"`
 
 	// Relations
-	Tenant          *Tenant          `json:"tenant,omitempty" gorm:"foreignKey:TenantID"`
+	Tenant           *Tenant          `json:"tenant,omitempty" gorm:"foreignKey:TenantID"`
 	TicketCategories []TicketCategory `json:"ticket_categories,omitempty" gorm:"foreignKey:DestinationID"`
-	TimeSlots       []TimeSlot       `json:"time_slots,omitempty" gorm:"foreignKey:DestinationID"`
+	TimeSlots        []TimeSlot       `json:"time_slots,omitempty" gorm:"foreignKey:DestinationID"`
 }
 
 func (Destination) TableName() string { return "destinations" }
@@ -147,21 +159,21 @@ func (Destination) TableName() string { return "destinations" }
 // TicketCategory represents a type of ticket with pricing
 type TicketCategory struct {
 	BaseModel
-	DestinationID uuid.UUID `json:"destination_id" gorm:"type:uuid;not null"`
-	TenantID      uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
-	Name          string    `json:"name" gorm:"size:150;not null"`
-	Description   *string   `json:"description,omitempty"`
-	TicketType    string    `json:"ticket_type" gorm:"type:ticket_type;not null"`
-	BasePrice     float64   `json:"base_price" gorm:"type:decimal(12,2);not null;default:0"`
-	WeekendPrice  *float64  `json:"weekend_price,omitempty" gorm:"type:decimal(12,2)"`
-	HolidayPrice  *float64  `json:"holiday_price,omitempty" gorm:"type:decimal(12,2)"`
-	InsuranceFee  float64   `json:"insurance_fee" gorm:"type:decimal(12,2);default:0"`
-	RetribusiFee  float64   `json:"retribusi_fee" gorm:"type:decimal(12,2);default:0"`
-	IsMandatory   bool      `json:"is_mandatory" gorm:"default:false"`
-	IsPerPerson   bool      `json:"is_per_person" gorm:"default:true"`
-	MaxQtyPerOrder int      `json:"max_qty_per_order" gorm:"default:10"`
-	SortOrder     int       `json:"sort_order" gorm:"default:0"`
-	IsActive      bool      `json:"is_active" gorm:"default:true"`
+	DestinationID  uuid.UUID `json:"destination_id" gorm:"type:uuid;not null"`
+	TenantID       uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
+	Name           string    `json:"name" gorm:"size:150;not null"`
+	Description    *string   `json:"description,omitempty"`
+	TicketType     string    `json:"ticket_type" gorm:"type:ticket_type;not null"`
+	BasePrice      float64   `json:"base_price" gorm:"type:decimal(12,2);not null;default:0"`
+	WeekendPrice   *float64  `json:"weekend_price,omitempty" gorm:"type:decimal(12,2)"`
+	HolidayPrice   *float64  `json:"holiday_price,omitempty" gorm:"type:decimal(12,2)"`
+	InsuranceFee   float64   `json:"insurance_fee" gorm:"type:decimal(12,2);default:0"`
+	RetribusiFee   float64   `json:"retribusi_fee" gorm:"type:decimal(12,2);default:0"`
+	IsMandatory    bool      `json:"is_mandatory" gorm:"default:false"`
+	IsPerPerson    bool      `json:"is_per_person" gorm:"default:true"`
+	MaxQtyPerOrder int       `json:"max_qty_per_order" gorm:"default:10"`
+	SortOrder      int       `json:"sort_order" gorm:"default:0"`
+	IsActive       bool      `json:"is_active" gorm:"default:true"`
 }
 
 func (TicketCategory) TableName() string { return "ticket_categories" }
@@ -200,12 +212,12 @@ func (TimeSlot) TableName() string { return "time_slots" }
 
 // SlotQuota tracks the booking capacity for a specific time slot on a specific date
 type SlotQuota struct {
-	ID          uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	ID           uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
 	DailyQuotaID uuid.UUID `json:"daily_quota_id" gorm:"type:uuid;not null"`
-	TimeSlotID  uuid.UUID `json:"time_slot_id" gorm:"type:uuid;not null"`
-	TenantID    uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
-	BookedQuota int       `json:"booked_quota" gorm:"default:0"`
-	IsClosed    bool      `json:"is_closed" gorm:"default:false"`
+	TimeSlotID   uuid.UUID `json:"time_slot_id" gorm:"type:uuid;not null"`
+	TenantID     uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
+	BookedQuota  int       `json:"booked_quota" gorm:"default:0"`
+	IsClosed     bool      `json:"is_closed" gorm:"default:false"`
 }
 
 func (SlotQuota) TableName() string { return "slot_quotas" }
@@ -217,25 +229,25 @@ func (SlotQuota) TableName() string { return "slot_quotas" }
 // Transaction represents a complete ticket purchase order
 type Transaction struct {
 	BaseModel
-	TenantID         uuid.UUID  `json:"tenant_id" gorm:"type:uuid;not null"`
-	UserID           uuid.UUID  `json:"user_id" gorm:"type:uuid;not null"`
-	OrderNumber      string     `json:"order_number" gorm:"size:50;uniqueIndex;not null"`
-	VisitDate        time.Time  `json:"visit_date" gorm:"type:date;not null"`
-	TimeSlotID       *uuid.UUID `json:"time_slot_id,omitempty" gorm:"type:uuid"`
-	DestinationID    uuid.UUID  `json:"destination_id" gorm:"type:uuid;not null"`
-	VisitorCount     int        `json:"visitor_count" gorm:"not null;default:1"`
-	Subtotal         float64    `json:"subtotal" gorm:"type:decimal(12,2);not null"`
-	PlatformFee      float64    `json:"platform_fee" gorm:"type:decimal(12,2);not null;default:2500"`
-	TotalPlatformFee float64    `json:"total_platform_fee" gorm:"type:decimal(12,2);not null"`
-	GrandTotal       float64    `json:"grand_total" gorm:"type:decimal(12,2);not null"`
-	NetPayoutAmount  float64    `json:"net_payout_amount" gorm:"type:decimal(12,2);not null"`
-	PaymentStatus    string     `json:"payment_status" gorm:"type:payment_status;default:'pending'"`
-	PaymentMethod    *string    `json:"payment_method,omitempty" gorm:"size:50"`
-	PaymentGatewayRef *string   `json:"payment_gateway_ref,omitempty" gorm:"size:255"`
-	PaymentURL       *string    `json:"payment_url,omitempty"`
-	PaidAt           *time.Time `json:"paid_at,omitempty"`
-	ExpiredAt        *time.Time `json:"expired_at,omitempty"`
-	Notes            *string    `json:"notes,omitempty"`
+	TenantID          uuid.UUID  `json:"tenant_id" gorm:"type:uuid;not null"`
+	UserID            uuid.UUID  `json:"user_id" gorm:"type:uuid;not null"`
+	OrderNumber       string     `json:"order_number" gorm:"size:50;uniqueIndex;not null"`
+	VisitDate         time.Time  `json:"visit_date" gorm:"type:date;not null"`
+	TimeSlotID        *uuid.UUID `json:"time_slot_id,omitempty" gorm:"type:uuid"`
+	DestinationID     uuid.UUID  `json:"destination_id" gorm:"type:uuid;not null"`
+	VisitorCount      int        `json:"visitor_count" gorm:"not null;default:1"`
+	Subtotal          float64    `json:"subtotal" gorm:"type:decimal(12,2);not null"`
+	PlatformFee       float64    `json:"platform_fee" gorm:"type:decimal(12,2);not null;default:2500"`
+	TotalPlatformFee  float64    `json:"total_platform_fee" gorm:"type:decimal(12,2);not null"`
+	GrandTotal        float64    `json:"grand_total" gorm:"type:decimal(12,2);not null"`
+	NetPayoutAmount   float64    `json:"net_payout_amount" gorm:"type:decimal(12,2);not null"`
+	PaymentStatus     string     `json:"payment_status" gorm:"type:payment_status;default:'pending'"`
+	PaymentMethod     *string    `json:"payment_method,omitempty" gorm:"size:50"`
+	PaymentGatewayRef *string    `json:"payment_gateway_ref,omitempty" gorm:"size:255"`
+	PaymentURL        *string    `json:"payment_url,omitempty"`
+	PaidAt            *time.Time `json:"paid_at,omitempty"`
+	ExpiredAt         *time.Time `json:"expired_at,omitempty"`
+	Notes             *string    `json:"notes,omitempty"`
 
 	// Relations
 	User        *User        `json:"user,omitempty" gorm:"foreignKey:UserID"`
@@ -428,17 +440,17 @@ func (GateDevice) TableName() string { return "gate_devices" }
 
 // ScanLog records each QR code scan at a gate
 type ScanLog struct {
-	ID           uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	TenantID     uuid.UUID  `json:"tenant_id" gorm:"type:uuid;not null"`
-	GateDeviceID uuid.UUID  `json:"gate_device_id" gorm:"type:uuid;not null"`
-	TicketID     *uuid.UUID `json:"ticket_id,omitempty" gorm:"type:uuid"`
-	TicketCode   *string    `json:"ticket_code,omitempty" gorm:"size:20"`
-	ScannedAt    time.Time  `json:"scanned_at" gorm:"not null"`
-	ScanResult   string     `json:"scan_result" gorm:"type:scan_result;not null"`
-	IsOfflineScan bool      `json:"is_offline_scan" gorm:"default:false"`
-	SyncedAt     *time.Time `json:"synced_at,omitempty"`
-	RawQRPayload *string    `json:"raw_qr_payload,omitempty"`
-	CreatedAt    time.Time  `json:"created_at"`
+	ID            uuid.UUID  `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	TenantID      uuid.UUID  `json:"tenant_id" gorm:"type:uuid;not null"`
+	GateDeviceID  uuid.UUID  `json:"gate_device_id" gorm:"type:uuid;not null"`
+	TicketID      *uuid.UUID `json:"ticket_id,omitempty" gorm:"type:uuid"`
+	TicketCode    *string    `json:"ticket_code,omitempty" gorm:"size:20"`
+	ScannedAt     time.Time  `json:"scanned_at" gorm:"not null"`
+	ScanResult    string     `json:"scan_result" gorm:"type:scan_result;not null"`
+	IsOfflineScan bool       `json:"is_offline_scan" gorm:"default:false"`
+	SyncedAt      *time.Time `json:"synced_at,omitempty"`
+	RawQRPayload  *string    `json:"raw_qr_payload,omitempty"`
+	CreatedAt     time.Time  `json:"created_at"`
 }
 
 func (ScanLog) TableName() string { return "scan_logs" }
@@ -450,14 +462,14 @@ func (ScanLog) TableName() string { return "scan_logs" }
 // SeatZone represents a section/zone in a venue (e.g. VIP Front, Tribune A, Festival Area)
 type SeatZone struct {
 	BaseModel
-	DestinationID uuid.UUID `json:"destination_id" gorm:"type:uuid;not null"`
-	TenantID      uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
-	Name          string    `json:"name" gorm:"size:100;not null"`
-	CategoryType  string    `json:"category_type" gorm:"size:50;default:'tribune'"` // 'vip', 'tribune', 'festival', 'camping'
-	PriceMultiplier float64 `json:"price_multiplier" gorm:"type:decimal(5,2);default:1.0"`
-	TotalRows     int       `json:"total_rows" gorm:"default:10"`
-	SeatsPerRow   int       `json:"seats_per_row" gorm:"default:20"`
-	IsActive      bool      `json:"is_active" gorm:"default:true"`
+	DestinationID   uuid.UUID `json:"destination_id" gorm:"type:uuid;not null"`
+	TenantID        uuid.UUID `json:"tenant_id" gorm:"type:uuid;not null"`
+	Name            string    `json:"name" gorm:"size:100;not null"`
+	CategoryType    string    `json:"category_type" gorm:"size:50;default:'tribune'"` // 'vip', 'tribune', 'festival', 'camping'
+	PriceMultiplier float64   `json:"price_multiplier" gorm:"type:decimal(5,2);default:1.0"`
+	TotalRows       int       `json:"total_rows" gorm:"default:10"`
+	SeatsPerRow     int       `json:"seats_per_row" gorm:"default:20"`
+	IsActive        bool      `json:"is_active" gorm:"default:true"`
 
 	// Relations
 	Seats []Seat `json:"seats,omitempty" gorm:"foreignKey:ZoneID"`
@@ -467,13 +479,13 @@ func (SeatZone) TableName() string { return "seat_zones" }
 
 // Seat represents an individual numbered seat within a zone
 type Seat struct {
-	ID        uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
-	ZoneID    uuid.UUID `json:"zone_id" gorm:"type:uuid;not null"`
-	RowLabel  string    `json:"row_label" gorm:"size:10;not null"`
-	SeatNumber int      `json:"seat_number" gorm:"not null"`
-	SeatCode  string    `json:"seat_code" gorm:"size:50;not null"` // e.g. "VIP-A-12"
-	Status    string    `json:"status" gorm:"size:20;default:'available'"` // 'available', 'locked', 'booked', 'maintenance'
-	Price     float64   `json:"price" gorm:"type:decimal(12,2);not null;default:0"`
+	ID         uuid.UUID `json:"id" gorm:"type:uuid;primary_key;default:gen_random_uuid()"`
+	ZoneID     uuid.UUID `json:"zone_id" gorm:"type:uuid;not null"`
+	RowLabel   string    `json:"row_label" gorm:"size:10;not null"`
+	SeatNumber int       `json:"seat_number" gorm:"not null"`
+	SeatCode   string    `json:"seat_code" gorm:"size:50;not null"`         // e.g. "VIP-A-12"
+	Status     string    `json:"status" gorm:"size:20;default:'available'"` // 'available', 'locked', 'booked', 'maintenance'
+	Price      float64   `json:"price" gorm:"type:decimal(12,2);not null;default:0"`
 }
 
 func (Seat) TableName() string { return "seats" }

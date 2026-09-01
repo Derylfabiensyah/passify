@@ -59,12 +59,12 @@ class _PassifyAppState extends State<PassifyApp> {
     final lightTheme = ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.light().textTheme),
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.forest,
         brightness: Brightness.light,
         primary: AppColors.forest,
-        secondary: AppColors.leaf,
+        secondary: AppColors.gold,
         surface: AppColors.surface,
       ),
       scaffoldBackgroundColor: AppColors.canvas,
@@ -78,12 +78,12 @@ class _PassifyAppState extends State<PassifyApp> {
     final darkTheme = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
+      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme),
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.leaf,
+        seedColor: AppColors.forestSoft,
         brightness: Brightness.dark,
-        primary: AppColors.leaf,
-        secondary: AppColors.forestSoft,
+        primary: AppColors.forestSoft,
+        secondary: AppColors.gold,
         surface: AppColors.darkSurface,
       ),
       scaffoldBackgroundColor: AppColors.darkCanvas,

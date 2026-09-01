@@ -1,5 +1,41 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8082';
 const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN || 'passify.com';
+const TEMPLATE_STORAGE_PREFIX = 'passify_portal_template_';
+
+export function loadPortalTemplate(slug) {
+  if (!slug) return null;
+  try {
+    return JSON.parse(localStorage.getItem(`${TEMPLATE_STORAGE_PREFIX}${slug}`) || 'null');
+  } catch {
+    return null;
+  }
+}
+
+export async function savePortalTemplate({ tenantId, slug, template }) {
+  if (!slug) throw new Error('Tenant belum dapat diidentifikasi.');
+
+  localStorage.setItem(`${TEMPLATE_STORAGE_PREFIX}${slug}`, JSON.stringify(template));
+
+  if (!tenantId || String(tenantId).startsWith('dest-')) {
+    return { template, isSynced: false };
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/tenants/${tenantId}/settings`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('passify_token') || ''}`,
+      'X-Tenant-Slug': slug,
+    },
+    body: JSON.stringify({ key: 'portal_template', value: JSON.stringify(template) }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Pengaturan disimpan di perangkat ini, tetapi belum tersinkronkan ke server.');
+  }
+
+  return { template, isSynced: true };
+}
 
 /**
  * Resolves tenant slug from hostname
@@ -95,6 +131,7 @@ export async function fetchDestinationBySlug(slug) {
 
         return {
           ...data,
+          portal_template: loadPortalTemplate(slug) || data.portal_template || null,
           ticket_categories: categories,
         };
       }
@@ -123,5 +160,6 @@ export async function fetchDestinationBySlug(slug) {
     ],
     facilities: ['Area Parkir Terpadu', 'Pos Pemandu & Pusat Informasi', 'Toilet Bersih', 'Pos Kesehatan & P3K'],
     rules: 'Patuhi batas daya dukung lingkungan, buang sampah pada tempatnya, dan tunjukkan E-Ticket QR saat di gerbang.',
+    portal_template: loadPortalTemplate(slug),
   };
 }
