@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bell, CalendarClock, ChevronDown, ChevronLeft, ChevronRight,
-  Landmark, LayoutDashboard, MapPin, Menu, Mountain, ScanLine,
-  X, LogOut, User, Check, Building2, ExternalLink, AlertTriangle, ShieldCheck
+  Landmark, LayoutDashboard, MapPin, Menu, ScanLine,
+  X, LogOut, User, Check, Building2, ExternalLink, AlertTriangle, ShieldCheck, Palette
 } from 'lucide-react';
 import { getAdminUser } from '../../api/admin';
 import { useTenant } from '../../contexts/TenantContext';
@@ -13,6 +13,7 @@ import ModalWrapper from '../common/ModalWrapper';
 const menuItems = [
   { id: 'dashboard', label: 'Ringkasan', icon: LayoutDashboard, path: '/admin' },
   { id: 'destinations', label: 'Destinasi & Tiket', icon: MapPin, path: '/admin/destinations' },
+  { id: 'template', label: 'Portal & Tampilan', icon: Palette, path: '/admin/template' },
   { id: 'quotas', label: 'Kuota & Sesi', icon: CalendarClock, path: '/admin/quotas' },
   { id: 'gates', label: 'Perangkat Gerbang', icon: ScanLine, path: '/admin/gates' },
   { id: 'finance', label: 'Keuangan & Payout', icon: Landmark, path: '/admin/finance' },
@@ -30,18 +31,10 @@ const adminThemeStyles = `
 
 function Brand({ collapsed = false }) {
   return (
-    <div className={`flex items-center gap-3 ${collapsed ? 'justify-center' : ''}`}>
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[var(--forest-deep)] text-white shadow-[0_6px_14px_rgba(16,45,32,.15)]">
-        <Mountain className="h-4 w-4" />
+    <div className={`flex items-center ${collapsed ? 'justify-center' : 'px-1'}`}>
+      <span className="font-serif text-xl font-bold tracking-tight text-[var(--forest-deep)]">
+        {collapsed ? 'P' : 'Passify'}
       </span>
-      {!collapsed && (
-        <span className="min-w-0">
-          <span className="block truncate font-serif text-lg font-bold text-[var(--forest-deep)]">Passify</span>
-          <span className="block truncate text-[9px] font-extrabold uppercase tracking-[.14em] text-[var(--ink-soft)]">
-            Console Pengelola
-          </span>
-        </span>
-      )}
     </div>
   );
 }
