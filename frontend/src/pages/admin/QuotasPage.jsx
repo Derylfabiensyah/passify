@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   CalendarOff,
   CalendarCheck,
-  CheckCircle2
+  CheckCircle2,
+  MapPin
 } from 'lucide-react';
 import { useTenant } from '../../contexts/TenantContext';
 import { fetchAdminDestinations, fetchAdminQuotas } from '../../api/admin';
