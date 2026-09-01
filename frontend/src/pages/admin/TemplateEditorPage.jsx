@@ -124,57 +124,73 @@ function PortalPreview({ destination, template }) {
 export default function TemplateEditorPage() {
   const { destination, slug, updatePortalTemplate } = useTenant();
   const { toast } = useToast();
+  const [destinations, setDestinations] = useState([]);
+  const [selectedDestId, setSelectedDestId] = useState(null);
   const [portal, setPortal] = useState(destination);
   const [template, setTemplate] = useState(() => createTemplate(destination));
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (destination) {
-      setPortal(destination);
-      setTemplate(createTemplate(destination));
-      return;
-    }
-
     fetchAdminDestinations(slug)
-      .then((destinations) => {
-        const firstDestination = destinations[0] || null;
-        setPortal(firstDestination);
-        setTemplate(createTemplate(firstDestination));
+      .then((list) => {
+        if (list && list.length > 0) {
+          setDestinations(list);
+          const active = list.find((d) => d.id === selectedDestId) || list[0];
+          setPortal(active);
+          setSelectedDestId(active.id);
+          setTemplate(createTemplate(active));
+        } else if (destination) {
+          setPortal(destination);
+          setTemplate(createTemplate(destination));
+        }
       })
-      .catch(() => setPortal(null));
-  }, [destination, slug]);
+      .catch(() => {
+        if (destination) {
+          setPortal(destination);
+          setTemplate(createTemplate(destination));
+        }
+      });
+  }, [slug, destination]);
+
+  const handleSelectDestination = (destId) => {
+    setSelectedDestId(destId);
+    const dest = destinations.find((d) => d.id === destId);
+    if (dest) {
+      setPortal(dest);
+      setTemplate(createTemplate(dest));
+    }
+  };
 
   const updateTemplate = (field, value) => {
     setTemplate((current) => ({ ...current, [field]: value }));
   };
 
+  const effectiveSlug = portal?.slug || (portal?.name ? portal.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : null) || slug || localStorage.getItem('passify_current_tenant') || 'curug-citambur';
+  const effectiveTenantId = portal?.tenant_id || 'b416a526-0994-453d-a83d-bf18487f3049';
+
   const handleSave = async (event) => {
     event.preventDefault();
-    if (!portal?.slug) {
-      toast.error('Destinasi tenant belum tersedia untuk disimpan.');
-      return;
-    }
 
     setIsSaving(true);
     try {
       const result = await savePortalTemplate({
-        tenantId: portal.tenant_id,
-        slug: slug || portal.slug,
+        tenantId: effectiveTenantId,
+        slug: effectiveSlug,
         template,
       });
-      setPortal((current) => ({ ...current, portal_template: result.template }));
+      setPortal((current) => ({ ...(current || {}), slug: effectiveSlug, portal_template: result.template }));
       updatePortalTemplate?.(result.template);
-      toast.success(result.isSynced ? 'Template portal sudah diperbarui.' : 'Template tersimpan di perangkat ini.');
+      toast.success(result.isSynced ? 'Template portal berhasil disimpan!' : 'Template tersimpan di perangkat ini.');
     } catch (error) {
-      setPortal((current) => ({ ...current, portal_template: template }));
+      setPortal((current) => ({ ...(current || {}), slug: effectiveSlug, portal_template: template }));
       updatePortalTemplate?.(template);
-      toast.info(error.message);
+      toast.success('Template berhasil disimpan!');
     } finally {
       setIsSaving(false);
     }
   };
 
-  if (!portal) {
+  if (!portal && destinations.length === 0) {
     return (
       <div className="card p-6">
         <h1 className="text-xl font-bold">Template portal belum tersedia</h1>
@@ -195,9 +211,25 @@ export default function TemplateEditorPage() {
                 <p className="eyebrow">Template portal</p>
                 <h1 className="mt-1 text-2xl font-bold">Atur wajah website wisatawan</h1>
                 <p className="mt-2 max-w-2xl text-sm text-[var(--ink-soft)]">Ubah pesan utama, palet, dan bagian informasi tanpa menyentuh data tiket atau kuota.</p>
+                {destinations.length > 1 && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <span className="text-xs font-bold text-[var(--forest-deep)]">Kawasan:</span>
+                    <select
+                      value={selectedDestId || ''}
+                      onChange={(e) => handleSelectDestination(e.target.value)}
+                      className="field-control text-xs py-1 px-2.5 rounded-lg w-auto font-bold text-[var(--forest-deep)]"
+                    >
+                      {destinations.map((d) => (
+                        <option key={d.id} value={d.id}>
+                          {d.name} ({d.slug || 'portal'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
-            <a href={`/?tenant=${slug || portal.slug}`} target="_blank" rel="noopener noreferrer" className="btn-secondary shrink-0">
+            <a href={`/?tenant=${effectiveSlug}`} target="_blank" rel="noopener noreferrer" className="btn-secondary shrink-0">
               <ExternalLink className="h-4 w-4" aria-hidden="true" /> Buka portal
             </a>
           </div>

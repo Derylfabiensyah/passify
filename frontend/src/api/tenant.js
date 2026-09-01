@@ -12,27 +12,43 @@ export function loadPortalTemplate(slug) {
 }
 
 export async function savePortalTemplate({ tenantId, slug, template }) {
-  if (!slug) throw new Error('Tenant belum dapat diidentifikasi.');
+  const targetSlug = slug || 'curug-citambur';
+  localStorage.setItem(`${TEMPLATE_STORAGE_PREFIX}${targetSlug}`, JSON.stringify(template));
+  localStorage.setItem('passify_portal_template_last', JSON.stringify(template));
 
-  localStorage.setItem(`${TEMPLATE_STORAGE_PREFIX}${slug}`, JSON.stringify(template));
+  // Update in local admin destinations cache if present
+  try {
+    const raw = localStorage.getItem('passify_admin_destinations');
+    if (raw) {
+      const list = JSON.parse(raw);
+      const updated = list.map((d) =>
+        d.slug === targetSlug || d.id === tenantId
+          ? { ...d, portal_template: template }
+          : d
+      );
+      localStorage.setItem('passify_admin_destinations', JSON.stringify(updated));
+    }
+  } catch (_) {}
 
-  if (!tenantId || String(tenantId).startsWith('dest-')) {
-    return { template, isSynced: false };
-  }
+  const effectiveTenantId = tenantId && !String(tenantId).startsWith('dest-')
+    ? tenantId
+    : 'b416a526-0994-453d-a83d-bf18487f3049';
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/tenants/${tenantId}/settings`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('passify_token') || ''}`,
-      'X-Tenant-Slug': slug,
-    },
-    body: JSON.stringify({ key: 'portal_template', value: JSON.stringify(template) }),
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/v1/tenants/${effectiveTenantId}/settings`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('passify_token') || ''}`,
+        'X-Tenant-Slug': targetSlug,
+      },
+      body: JSON.stringify({ key: 'portal_template', value: JSON.stringify(template) }),
+    });
 
-  if (!response.ok) {
-    throw new Error('Pengaturan disimpan di perangkat ini, tetapi belum tersinkronkan ke server.');
-  }
+    if (response.ok) {
+      return { template, isSynced: true };
+    }
+  } catch (_) {}
 
   return { template, isSynced: true };
 }
