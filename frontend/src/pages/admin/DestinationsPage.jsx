@@ -403,7 +403,9 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
               Kustomisasi Halaman Website Wisata
             </span>
-            <h2 className="text-xl font-bold font-serif mt-0.5">Edit Informasi {dest.name}</h2>
+            <h2 className="text-xl font-bold font-serif mt-0.5">
+              {dest.is_new ? 'Tambah Kawasan Destinasi Baru' : `Edit Informasi ${dest.name}`}
+            </h2>
           </div>
           <button
             type="button"
@@ -533,7 +535,8 @@ function EditDestinationModal({ dest, isOpen, onClose, onSave }) {
               type="submit"
               className="btn-primary px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md cursor-pointer"
             >
-              <Save className="h-4 w-4" /> Simpan Perubahan Halaman
+              <Save className="h-4 w-4" />
+              {dest.is_new ? 'Buat Destinasi Baru' : 'Simpan Perubahan Halaman'}
             </button>
           </div>
         </form>
@@ -725,22 +728,59 @@ export default function DestinationsPage() {
     refetch?.();
   };
 
+  const handleOpenAddModal = () => {
+    setEditingDest({
+      id: `dest-${Date.now()}`,
+      name: '',
+      description: '',
+      location: '',
+      province: 'Indonesia',
+      cover_image_url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+      max_daily_capacity: 1000,
+      facilities: ['Area Parkir', 'Pusat Informasi', 'Toilet Bersih', 'Pos P3K'],
+      rules: 'Dilarang membuang sampah sembarangan dan wajib menjaga kelestarian alam.',
+      ticket_categories: [
+        { id: `cat-${Date.now()}-1`, name: 'Tiket Masuk Reguler (WNI)', price: 25000, insurance: 3000, retribusi: 2000, is_active: true }
+      ],
+      is_new: true,
+    });
+  };
+
   const toggleExpand = (id) => {
     setExpandedId((prev) => (prev === id ? null : id));
   };
 
   const handleSaveDestination = async (updatedDest) => {
-    const updated = destinations.map((d) => (d.id === updatedDest.id ? updatedDest : d));
+    const isNew = updatedDest.is_new || !destinations.some((d) => d.id === updatedDest.id);
+    const cleanDest = { ...updatedDest };
+    delete cleanDest.is_new;
+
+    const updated = isNew
+      ? [cleanDest, ...destinations]
+      : destinations.map((d) => (d.id === cleanDest.id ? cleanDest : d));
+
     saveDestinationsList(updated);
+    if (isNew) setExpandedId(cleanDest.id);
     setEditingDest(null);
-    toast.success(`Halaman "${updatedDest.name}" berhasil diperbarui!`);
+    toast.success(isNew ? `Kawasan "${cleanDest.name}" berhasil ditambahkan!` : `Halaman "${cleanDest.name}" berhasil diperbarui!`);
 
     // Sync to backend destination endpoint if available
     try {
-      await apiRequest(`/api/v1/destinations/${updatedDest.id}`, {
-        method: 'PUT',
-        body: updatedDest,
-      }).catch(() => null);
+      if (isNew) {
+        const user = getAdminUser();
+        const tenantId = user.tenant_id;
+        if (tenantId) {
+          await apiRequest(`/api/v1/tenants/${tenantId}/destinations`, {
+            method: 'POST',
+            body: cleanDest,
+          }).catch(() => null);
+        }
+      } else {
+        await apiRequest(`/api/v1/destinations/${cleanDest.id}`, {
+          method: 'PUT',
+          body: cleanDest,
+        }).catch(() => null);
+      }
     } catch (_) {}
   };
 
@@ -830,15 +870,25 @@ export default function DestinationsPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border)]">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-serif">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--forest-deep)] font-serif">
             Manajemen Destinasi & Kustomisasi Halaman Website
           </h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-[var(--ink-soft)] mt-1">
             Ubah nama wisata, foto pemandangan, deskripsi, fasilitas, dan harga tiket yang tampil di website resmi Anda.
           </p>
         </div>
+
+        <button
+          id="add-destination-btn"
+          type="button"
+          onClick={handleOpenAddModal}
+          className="btn-primary btn-sm shadow-xs shrink-0 cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Tambah Destinasi Baru</span>
+        </button>
       </div>
 
       {/* KPI Cards */}
@@ -853,8 +903,8 @@ export default function DestinationsPage() {
         <AdminStatCard
           icon={CheckCircle2}
           label="Status Website"
-          value="Online & Aktif"
-          subValue="Menerima reservasi e-ticket"
+          value={destinations.length > 0 ? "Online & Aktif" : "Menunggu Setup"}
+          subValue={destinations.length > 0 ? "Menerima reservasi e-ticket" : "Tambahkan destinasi pertama"}
           badgeText="PORTAL"
         />
         <AdminStatCard
@@ -875,34 +925,58 @@ export default function DestinationsPage() {
       </div>
 
       {/* Search & Filter */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Cari nama destinasi atau lokasi..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-emerald-600 shadow-2xs"
-          />
+      {destinations.length > 0 && (
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Cari nama destinasi atau lokasi..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="field-control pl-10 pr-4 text-xs"
+            />
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Destination Cards List */}
-      <div className="space-y-5">
-        {filteredDests.map((dest) => (
-          <DestinationCard
-            key={dest.id}
-            dest={dest}
-            isExpanded={expandedId === dest.id}
-            onToggleExpand={toggleExpand}
-            onEditDest={(d) => setEditingDest(d)}
-            onAddCategory={(destId) => setEditingCatContext({ destId, cat: null })}
-            onEditCategory={(destId, cat) => setEditingCatContext({ destId, cat })}
-            onDeleteCategory={handleDeleteCategory}
-          />
-        ))}
-      </div>
+      {/* Destination Cards List / Empty State */}
+      {filteredDests.length === 0 ? (
+        <div className="card p-10 text-center flex flex-col items-center justify-center border border-dashed border-[var(--border)] bg-white/50 backdrop-blur-sm">
+          <div className="h-14 w-14 rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest)] grid place-items-center mb-4 shadow-xs">
+            <Compass className="w-7 h-7" />
+          </div>
+          <h3 className="text-lg font-bold text-[var(--forest-deep)] font-serif">
+            Belum Ada Destinasi Wisata
+          </h3>
+          <p className="text-xs text-[var(--ink-soft)] max-w-md mt-1.5 mb-6">
+            Kawasan Anda belum memiliki data destinasi. Tambahkan destinasi pertama untuk mengatur kuota harian, tiket, dan portal website wisatawan.
+          </p>
+          <button
+            type="button"
+            onClick={handleOpenAddModal}
+            className="btn-primary shadow-xs cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah Destinasi Pertama</span>
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-5">
+          {filteredDests.map((dest) => (
+            <DestinationCard
+              key={dest.id}
+              dest={dest}
+              isExpanded={expandedId === dest.id}
+              onToggleExpand={toggleExpand}
+              onEditDest={(d) => setEditingDest(d)}
+              onAddCategory={(destId) => setEditingCatContext({ destId, cat: null })}
+              onEditCategory={(destId, cat) => setEditingCatContext({ destId, cat })}
+              onDeleteCategory={handleDeleteCategory}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Modal Edit Destination */}
       <EditDestinationModal
