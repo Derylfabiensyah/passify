@@ -74,24 +74,44 @@ function PortalPreview({ destination, template }) {
             </button>
           </div>
 
-          <div className="space-y-4 p-5 bg-[var(--sand)] min-h-[300px]">
+          <div className="space-y-4 p-5 bg-[var(--canvas)] min-h-[300px]">
             {template.show_availability && (
-              <div className="rounded-2xl bg-white shadow-sm border border-[var(--border)] p-4">
-                <div className="h-4 w-1/2 bg-[var(--fog)] rounded-full mb-2"></div>
-                <div className="h-3 w-3/4 bg-[var(--fog)] rounded-full"></div>
+              <div className="rounded-2xl bg-[var(--forest-deep)]/90 border border-white/15 p-4 text-white shadow-md">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Ketersediaan Hari Ini</span>
+                  <span className="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full">Sistem Aktif</span>
+                </div>
+                <div className="mt-3 flex items-end justify-between">
+                  <span className="text-[11px] text-white/70">Kuota terisi</span>
+                  <strong className="text-xl font-extrabold text-white">42%</strong>
+                </div>
+                <div className="mt-1.5 h-2 w-full bg-white/15 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full w-[42%]" />
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <div className="rounded-lg bg-white/10 p-2 border border-white/10">
+                    <span className="block text-[9px] uppercase tracking-wider text-white/60">Tersisa</span>
+                    <span className="font-extrabold text-sm text-white">580</span>
+                  </div>
+                  <div className="rounded-lg bg-white/10 p-2 border border-white/10">
+                    <span className="block text-[9px] uppercase tracking-wider text-white/60">Mulai dari</span>
+                    <span className="font-extrabold text-sm text-[#E8C58C]">Rp 35.000</span>
+                  </div>
+                </div>
               </div>
             )}
             {template.show_facilities && (
-              <div className="rounded-2xl bg-white shadow-sm border border-[var(--border)] p-4">
-                <div className="h-4 w-1/3 bg-[var(--fog)] rounded-full mb-2"></div>
-                <div className="h-3 w-full bg-[var(--fog)] rounded-full mb-1"></div>
-                <div className="h-3 w-5/6 bg-[var(--fog)] rounded-full"></div>
+              <div className="rounded-2xl bg-white/80 backdrop-blur-sm shadow-xs border border-white/60 p-4">
+                <p className="text-xs font-bold text-[var(--forest-deep)] mb-2">Fasilitas kawasan</p>
+                <div className="h-2.5 w-full bg-[var(--fog)] rounded-full mb-1.5"></div>
+                <div className="h-2.5 w-4/5 bg-[var(--fog)] rounded-full"></div>
               </div>
             )}
             {template.show_rules && (
-              <div className="rounded-2xl bg-white shadow-sm border border-[var(--border)] p-4">
-                <div className="h-4 w-1/4 bg-[var(--fog)] rounded-full mb-2"></div>
-                <div className="h-3 w-full bg-[var(--fog)] rounded-full"></div>
+              <div className="rounded-2xl bg-white/80 backdrop-blur-sm shadow-xs border border-white/60 p-4">
+                <p className="text-xs font-bold text-[var(--forest-deep)] mb-2">Etika berkunjung</p>
+                <div className="h-2.5 w-full bg-[var(--fog)] rounded-full mb-1.5"></div>
+                <div className="h-2.5 w-3/4 bg-[var(--fog)] rounded-full"></div>
               </div>
             )}
           </div>
