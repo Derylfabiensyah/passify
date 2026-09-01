@@ -238,18 +238,6 @@ export default function AdminLayout({ children }) {
             >
               <Bell className="h-4 w-4" />
             </button>
-
-            {/* Logout Button */}
-            <button
-              type="button"
-              id="admin-logout-btn"
-              onClick={() => setShowLogoutModal(true)}
-              title="Keluar (Logout)"
-              className="flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50/80 px-3.5 py-2 text-xs font-bold text-red-600 transition-colors hover:bg-red-100 cursor-pointer"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Keluar</span>
-            </button>
           </div>
         </header>
 
