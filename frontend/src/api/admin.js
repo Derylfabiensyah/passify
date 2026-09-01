@@ -90,7 +90,7 @@ export async function fetchAdminDestinations(slug) {
   } catch (_) {}
 
   const user = getAdminUser();
-  const currentSlug = slug || user.tenant_slug || 'curug-cibereum';
+  const currentSlug = slug || user.tenant_slug || getActiveAdminTenant()?.slug || 'curug-citambur';
 
   let backendDests = [];
   if (currentSlug) {
@@ -104,7 +104,15 @@ export async function fetchAdminDestinations(slug) {
           try {
             const catRes = await apiRequest(`/api/v1/tickets/destinations/${dest.id}/categories`);
             if (catRes && (catRes.data || Array.isArray(catRes))) {
-              dest.ticket_categories = catRes.data || catRes;
+              const rawCats = catRes.data || catRes;
+              dest.ticket_categories = (Array.isArray(rawCats) ? rawCats : []).map((c) => ({
+                id: c.id,
+                name: c.name,
+                price: Number(c.base_price ?? c.price ?? 0),
+                insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
+                retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
+                is_active: c.is_active !== false,
+              }));
             }
           } catch (_) {}
         }

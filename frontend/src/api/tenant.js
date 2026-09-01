@@ -125,34 +125,57 @@ export async function fetchDestinationBySlug(slug) {
       if (data) {
         let categories = [];
 
-        // 1. Fetch live categories from ticket-service
-        try {
-          const catRes = await fetch(`http://localhost:8083/api/v1/tickets/destinations/${data.id}/categories`);
-          if (catRes.ok) {
-            const catData = await catRes.json();
-            if (catData && Array.isArray(catData.data) && catData.data.length > 0) {
-              categories = catData.data.map((c) => ({
-                id: c.id,
-                name: c.name,
-                price: Number(c.base_price || 0),
-                insurance: Number(c.insurance_fee || 0),
-                retribusi: Number(c.retribusi_fee || 0),
-                is_active: c.is_active !== false,
-              }));
-            }
-          }
-        } catch (_) {}
+        // 1. Direct categories from destination response if populated
+        if (data.ticket_categories && Array.isArray(data.ticket_categories) && data.ticket_categories.length > 0) {
+          categories = data.ticket_categories.map((c) => ({
+            id: c.id,
+            name: c.name,
+            price: Number(c.base_price ?? c.price ?? 0),
+            insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
+            retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
+            is_active: c.is_active !== false,
+          }));
+        }
 
-        // 2. Fallback to localStorage saved categories from admin portal
+        // 2. Fetch live categories from ticket-service if not in response
+        if (categories.length === 0) {
+          try {
+            const catRes = await fetch(`http://localhost:8083/api/v1/tickets/destinations/${data.id}/categories`);
+            if (catRes.ok) {
+              const catData = await catRes.json();
+              if (catData && Array.isArray(catData.data) && catData.data.length > 0) {
+                categories = catData.data.map((c) => ({
+                  id: c.id,
+                  name: c.name,
+                  price: Number(c.base_price ?? c.price ?? 0),
+                  insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
+                  retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
+                  is_active: c.is_active !== false,
+                }));
+              }
+            }
+          } catch (_) {}
+        }
+
+        // 3. Fallback to localStorage saved categories from admin portal
         if (categories.length === 0 && localDest?.ticket_categories?.length > 0) {
           categories = localDest.ticket_categories;
+        }
+
+        // 4. Default fallback categories so tourist booking is always available
+        if (categories.length === 0) {
+          categories = [
+            { id: `cat-wni-${slug}`, name: 'Tiket Masuk Reguler (WNI)', price: 35000, insurance: 3000, retribusi: 2000, is_active: true },
+            { id: `cat-wna-${slug}`, name: 'Tiket Wisatawan Mancanegara (WNA)', price: 100000, insurance: 5000, retribusi: 5000, is_active: true },
+          ];
         }
 
         return {
           ...data,
           ...(localDest || {}),
+          max_daily_capacity: Number(data.max_daily_capacity || localDest?.max_daily_capacity || 500),
           portal_template: loadPortalTemplate(slug) || localDest?.portal_template || data.portal_template || null,
-          ticket_categories: categories.length > 0 ? categories : (localDest?.ticket_categories || []),
+          ticket_categories: categories,
         };
       }
     }
