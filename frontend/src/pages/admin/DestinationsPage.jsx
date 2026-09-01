@@ -695,7 +695,14 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
 export default function DestinationsPage() {
   const { toast } = useToast();
   const { slug, refetch } = useTenant();
-  const [destinations, setDestinations] = useState([]);
+  const [destinations, setDestinations] = useState(() => {
+    try {
+      const raw = localStorage.getItem('passify_admin_destinations');
+      return raw ? JSON.parse(raw) : [];
+    } catch (_) {
+      return [];
+    }
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -711,7 +718,7 @@ export default function DestinationsPage() {
         const realList = await fetchAdminDestinations(slug);
         if (realList && realList.length > 0) {
           setDestinations(realList);
-          setExpandedId(realList[0].id);
+          setExpandedId((prev) => prev || realList[0].id);
         }
       } catch (err) {
         console.warn('Real destinations load error:', err);
@@ -764,24 +771,42 @@ export default function DestinationsPage() {
     setEditingDest(null);
     toast.success(isNew ? `Kawasan "${cleanDest.name}" berhasil ditambahkan!` : `Halaman "${cleanDest.name}" berhasil diperbarui!`);
 
-    // Sync to backend destination endpoint if available
+    // Sync to backend destination endpoint
     try {
+      const user = getAdminUser();
+      const tenantId = user.tenant_id || 'b416a526-0994-453d-a83d-bf18487f3049';
       if (isNew) {
-        const user = getAdminUser();
-        const tenantId = user.tenant_id;
-        if (tenantId) {
-          await apiRequest(`/api/v1/tenants/${tenantId}/destinations`, {
-            method: 'POST',
-            body: cleanDest,
-          }).catch(() => null);
+        const payload = {
+          name: cleanDest.name,
+          description: cleanDest.description || '',
+          destination_type: cleanDest.destination_type || 'lainnya',
+          address: cleanDest.location || cleanDest.address || 'Kawasan Wisata Alam',
+          city: cleanDest.location || 'Indonesia',
+          province: cleanDest.province || 'Indonesia',
+          max_daily_capacity: Number(cleanDest.max_daily_capacity || 1000),
+          opening_time: cleanDest.opening_time || '07:00:00',
+          closing_time: cleanDest.closing_time || '17:00:00',
+          facilities: cleanDest.facilities || [],
+          rules: cleanDest.rules || '',
+        };
+        const res = await apiRequest(`/api/v1/tenants/${tenantId}/destinations`, {
+          method: 'POST',
+          body: payload,
+        });
+        if (res?.data?.id) {
+          const syncedDest = { ...cleanDest, id: res.data.id, slug: res.data.slug };
+          const syncedList = updated.map((d) => (d.id === cleanDest.id ? syncedDest : d));
+          saveDestinationsList(syncedList);
         }
-      } else {
+      } else if (cleanDest.id && !cleanDest.id.startsWith('dest-')) {
         await apiRequest(`/api/v1/destinations/${cleanDest.id}`, {
           method: 'PUT',
           body: cleanDest,
-        }).catch(() => null);
+        });
       }
-    } catch (_) {}
+    } catch (err) {
+      console.warn('Backend destination sync error:', err.message);
+    }
   };
 
   const handleSaveCategory = async (categoryData) => {

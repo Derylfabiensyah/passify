@@ -100,9 +100,14 @@ export async function apiRequest(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const body = (options.body && typeof options.body === 'object' && !(options.body instanceof FormData))
+    ? JSON.stringify(options.body)
+    : options.body;
+
   const response = await fetch(targetUrl, {
     ...options,
     headers,
+    body,
   });
 
   if (!response.ok) {

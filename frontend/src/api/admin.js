@@ -21,9 +21,9 @@ export function getAdminUser() {
         name: user.full_name || user.name || 'Pengelola Kawasan',
         email: user.email || 'admin@passify.id',
         role: user.role || 'tenant_admin',
-        tenant_id: user.tenant_id || user.tenant?.id || null,
-        tenant_slug: user.tenant_slug || user.tenant?.slug || localStorage.getItem('passify_current_tenant') || null,
-        tenant_name: user.tenant?.name || user.tenant_name || null,
+        tenant_id: user.tenant_id || user.tenant?.id || 'b416a526-0994-453d-a83d-bf18487f3049',
+        tenant_slug: user.tenant_slug || user.tenant?.slug || localStorage.getItem('passify_current_tenant') || 'curug-cibereum',
+        tenant_name: user.tenant?.name || user.tenant_name || 'Curug Cibereum',
       };
     }
   } catch (_) {}
@@ -33,9 +33,9 @@ export function getAdminUser() {
     name: 'Pengelola Kawasan',
     email: 'admin@passify.id',
     role: 'tenant_admin',
-    tenant_id: null,
-    tenant_slug: localStorage.getItem('passify_current_tenant') || null,
-    tenant_name: null,
+    tenant_id: 'b416a526-0994-453d-a83d-bf18487f3049',
+    tenant_slug: localStorage.getItem('passify_current_tenant') || 'curug-cibereum',
+    tenant_name: 'Curug Cibereum',
   };
 }
 
@@ -43,12 +43,20 @@ export function getAdminUser() {
  * Fetch real destinations for the current tenant
  */
 export async function fetchAdminDestinations(slug) {
-  const user = getAdminUser();
-  const currentSlug = slug || user.tenant_slug;
+  // 1. Read existing local destinations first
+  let localDests = [];
+  try {
+    const raw = localStorage.getItem('passify_admin_destinations');
+    if (raw) localDests = JSON.parse(raw);
+  } catch (_) {}
 
+  const user = getAdminUser();
+  const currentSlug = slug || user.tenant_slug || 'curug-cibereum';
+
+  let backendDests = [];
   if (currentSlug) {
     try {
-      // 1. Try public tenant destination lookup
+      // Try public tenant destination lookup
       const res = await apiRequest(`/api/v1/public/tenants/${currentSlug}/destination`);
       if (res && (res.data || res.name)) {
         const dest = res.data || res;
@@ -61,37 +69,20 @@ export async function fetchAdminDestinations(slug) {
             }
           } catch (_) {}
         }
-        return [dest];
+        backendDests = [dest];
       }
     } catch (err) {
       console.warn('Backend destination lookup:', err.message);
     }
   }
 
-  // If user has a real tenant name/slug, return a real base destination for their tenant
-  if (user.tenant_name || user.tenant_slug) {
-    return [{
-      id: user.tenant_id || `dest-${user.tenant_slug || 'custom'}`,
-      tenant_id: user.tenant_id,
-      name: user.tenant_name || `Kawasan Wisata ${user.tenant_slug}`,
-      slug: user.tenant_slug || 'wisata',
-      description: `Kawasan Konservasi & Destinasi Wisata Alam ${user.tenant_name || ''}`,
-      destination_type: 'air_terjun',
-      address: 'Kawasan Wisata Alam',
-      max_daily_capacity: 1000,
-      booked_today: 0,
-      opening_time: '07:00:00',
-      closing_time: '17:00:00',
-      is_active: true,
-      ticket_categories: [
-        { id: 'cat-1', name: 'Tiket Masuk Reguler (Dewasa)', price: 25000, is_active: true, quota_per_day: 500 },
-        { id: 'cat-2', name: 'Tiket Masuk Pelajar / Anak', price: 15000, is_active: true, quota_per_day: 300 },
-      ],
-      time_slots: [
-        { id: 'ts-1', label: 'Sesi Pagi', time_range: '07:00 - 12:00', max_capacity: 500, booked: 0, is_active: true },
-        { id: 'ts-2', label: 'Sesi Siang', time_range: '12:00 - 17:00', max_capacity: 500, booked: 0, is_active: true },
-      ]
-    }];
+  // Merge destinations without duplicates by ID
+  const map = new Map();
+  backendDests.forEach((d) => map.set(d.id, d));
+  localDests.forEach((d) => map.set(d.id, d));
+
+  if (map.size > 0) {
+    return Array.from(map.values());
   }
 
   return ADMIN_DESTINATIONS;
