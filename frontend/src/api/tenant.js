@@ -165,8 +165,7 @@ export async function fetchDestinationBySlug(slug) {
         // 4. Default fallback categories so tourist booking is always available
         if (categories.length === 0) {
           categories = [
-            { id: `cat-wni-${slug}`, name: 'Tiket Masuk Reguler (WNI)', price: 35000, insurance: 3000, retribusi: 2000, is_active: true },
-            { id: `cat-wna-${slug}`, name: 'Tiket Wisatawan Mancanegara (WNA)', price: 100000, insurance: 5000, retribusi: 5000, is_active: true },
+            { id: `cat-wni-${slug}`, name: 'Tiket Masuk Reguler (WNI)', price: 25000, insurance: 3000, retribusi: 2000, is_active: true },
           ];
         }
 
@@ -198,15 +197,14 @@ export async function fetchDestinationBySlug(slug) {
     id: `dest-${slug}`,
     name: `${title}`,
     slug,
-    location: 'Kawasan Konservasi Alam, Indonesia',
-    province: 'Indonesia',
+    location: 'desa karangjaya, Kabupaten Cianjur',
+    province: 'Jawa Barat',
     cover_image_url: 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
-    description: `Selamat datang di portal reservasi resmi ${title}. Nikmati pengalaman wisata alam yang teratur, aman, dan menjaga kelestarian daya dukung lingkungan.`,
-    max_daily_capacity: 1000,
+    description: `Curug yang mantap`,
+    max_daily_capacity: 500,
     booked_today: 0,
     ticket_categories: [
-      { id: `cat-wni-${slug}`, name: 'Tiket Masuk Domestik (WNI)', price: 35000, insurance: 3000, retribusi: 2000 },
-      { id: `cat-wna-${slug}`, name: 'Tiket Wisatawan Mancanegara (WNA)', price: 100000, insurance: 5000, retribusi: 5000 },
+      { id: `cat-wni-${slug}`, name: 'Tiket Masuk Reguler (WNI)', price: 25000, insurance: 3000, retribusi: 2000, is_active: true },
     ],
     facilities: ['Area Parkir Terpadu', 'Pos Pemandu & Pusat Informasi', 'Toilet Bersih', 'Pos Kesehatan & P3K'],
     rules: 'Patuhi batas daya dukung lingkungan, buang sampah pada tempatnya, dan tunjukkan E-Ticket QR saat di gerbang.',
