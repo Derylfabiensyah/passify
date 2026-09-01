@@ -106,6 +106,15 @@ export async function resolveTenantFromHostname(hostname) {
  * Fetches destination data by tenant slug
  */
 export async function fetchDestinationBySlug(slug) {
+  let localDest = null;
+  try {
+    const raw = localStorage.getItem('passify_admin_destinations');
+    if (raw) {
+      const list = JSON.parse(raw);
+      localDest = list.find((d) => d.slug === slug || d.id === slug || d.name?.toLowerCase().includes((slug || '').replace(/-/g, ' ')));
+    }
+  } catch (_) {}
+
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/public/tenants/${slug}/destination`, {
       headers: { 'X-Tenant-Slug': slug },
@@ -135,24 +144,26 @@ export async function fetchDestinationBySlug(slug) {
         } catch (_) {}
 
         // 2. Fallback to localStorage saved categories from admin portal
-        if (categories.length === 0) {
-          try {
-            const savedAdminDestinations = JSON.parse(localStorage.getItem('passify_admin_destinations') || '[]');
-            const matched = savedAdminDestinations.find((d) => d.id === data.id || d.slug === slug);
-            if (matched && Array.isArray(matched.ticket_categories) && matched.ticket_categories.length > 0) {
-              categories = matched.ticket_categories;
-            }
-          } catch (_) {}
+        if (categories.length === 0 && localDest?.ticket_categories?.length > 0) {
+          categories = localDest.ticket_categories;
         }
 
         return {
           ...data,
-          portal_template: loadPortalTemplate(slug) || data.portal_template || null,
-          ticket_categories: categories,
+          ...(localDest || {}),
+          portal_template: loadPortalTemplate(slug) || localDest?.portal_template || data.portal_template || null,
+          ticket_categories: categories.length > 0 ? categories : (localDest?.ticket_categories || []),
         };
       }
     }
   } catch (_) {}
+
+  if (localDest) {
+    return {
+      ...localDest,
+      portal_template: loadPortalTemplate(slug) || localDest.portal_template || null,
+    };
+  }
 
   // Fallback for newly created or offline tenants
   const title = (slug || 'wisata-alam')
@@ -166,7 +177,7 @@ export async function fetchDestinationBySlug(slug) {
     slug,
     location: 'Kawasan Konservasi Alam, Indonesia',
     province: 'Indonesia',
-    cover_image_url: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1200&q=80',
+    cover_image_url: 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
     description: `Selamat datang di portal reservasi resmi ${title}. Nikmati pengalaman wisata alam yang teratur, aman, dan menjaga kelestarian daya dukung lingkungan.`,
     max_daily_capacity: 1000,
     booked_today: 0,
