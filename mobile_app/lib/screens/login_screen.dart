@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../providers/auth_provider.dart';
@@ -17,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _showDemoAccounts = false;
 
   @override
   void dispose() {
@@ -27,7 +27,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
-    // Dismiss keyboard
     FocusScope.of(context).unfocus();
 
     if (!_formKey.currentState!.validate()) {
@@ -48,11 +47,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _fillDemoAccount(String email, String password) {
+    HapticFeedback.selectionClick();
     setState(() {
       _emailController.text = email;
       _passwordController.text = password;
     });
-    // Trigger validation update
     _formKey.currentState?.validate();
   }
 
@@ -82,25 +81,25 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
         body: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Brand Icon
+                  // Brand Logo Badge
                   Center(
                     child: Container(
-                      width: 80,
-                      height: 80,
+                      width: 76,
+                      height: 76,
                       decoration: BoxDecoration(
-                        color: AppColors.forest,
-                        borderRadius: AppRadius.radiusXl,
+                        color: AppColors.forestDeep,
+                        borderRadius: BorderRadius.circular(AppRadius.xl),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.forest.withValues(alpha: 0.3),
-                            blurRadius: 16,
+                            color: AppColors.forestDeep.withValues(alpha: 0.25),
+                            blurRadius: 18,
                             offset: const Offset(0, 6),
                           ),
                         ],
@@ -108,33 +107,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Icon(
                         Icons.forest_rounded,
                         color: Colors.white,
-                        size: 44,
+                        size: 40,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 16),
 
-                  // Title
+                  // Title & Tagline
                   const Text(
                     'Passify Field Ops',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
                       color: AppColors.forestDeep,
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   const Text(
-                    'Gate Scanner & Cashless POS Venue',
+                    'Sistem Validasi Tiket & Kasir Wisata Alam',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: AppColors.inkSoft,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
 
                   // Error banner
                   if (auth.errorMessage != null) ...[
@@ -142,17 +142,17 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: AppColors.errorBg,
-                        borderRadius: AppRadius.radiusMd,
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                          const Icon(Icons.info_outline_rounded, color: AppColors.error, size: 20),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               auth.errorMessage!,
-                              style: const TextStyle(color: AppColors.error, fontSize: 13),
+                              style: const TextStyle(color: AppColors.error, fontSize: 12.5, fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -161,16 +161,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16),
                   ],
 
-                  // Card Container with Form Fields
+                  // Form Container Card
                   Container(
-                    padding: const EdgeInsets.all(22),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: AppColors.surface,
-                      borderRadius: AppRadius.radiusXl,
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                       border: Border.all(color: AppColors.border),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
+                          color: Colors.black.withValues(alpha: 0.03),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -184,189 +184,162 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink),
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Email petugas wajib diisi';
-                            }
-                            final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-                            if (!emailRegex.hasMatch(value.trim())) {
-                              return 'Format email tidak valid';
                             }
                             return null;
                           },
                           decoration: InputDecoration(
                             labelText: 'Email Petugas',
-                            hintText: 'nama@wisata.com',
+                            labelStyle: const TextStyle(fontSize: 13, color: AppColors.inkSoft),
+                            hintText: 'budi@gmail.com',
                             prefixIcon: const Icon(Icons.email_outlined, color: AppColors.forestSoft, size: 20),
                             filled: true,
                             fillColor: AppColors.inputBg,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               borderSide: const BorderSide(color: AppColors.border),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               borderSide: const BorderSide(color: AppColors.border),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               borderSide: const BorderSide(color: AppColors.forest, width: 1.5),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppColors.error),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 14),
 
                         // Password Field
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           textInputAction: TextInputAction.done,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink),
                           onFieldSubmitted: (_) => _handleLogin(),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Password wajib diisi';
                             }
-                            if (value.length < 6) {
-                              return 'Password minimal 6 karakter';
-                            }
                             return null;
                           },
                           decoration: InputDecoration(
-                            labelText: 'Password',
+                            labelText: 'Kata Sandi',
+                            labelStyle: const TextStyle(fontSize: 13, color: AppColors.inkSoft),
                             hintText: '••••••••',
-                            prefixIcon: const Icon(Icons.lock_outline, color: AppColors.forestSoft, size: 20),
+                            prefixIcon: const Icon(Icons.lock_outline_rounded, color: AppColors.forestSoft, size: 20),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                                 color: AppColors.inkSoft,
                                 size: 20,
                               ),
-                              tooltip: _obscurePassword ? 'Tampilkan password' : 'Sembunyikan password',
                               onPressed: () {
                                 setState(() => _obscurePassword = !_obscurePassword);
                               },
                             ),
                             filled: true,
                             fillColor: AppColors.inputBg,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               borderSide: const BorderSide(color: AppColors.border),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               borderSide: const BorderSide(color: AppColors.border),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                               borderSide: const BorderSide(color: AppColors.forest, width: 1.5),
-                            ),
-                            errorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppColors.error),
-                            ),
-                            focusedErrorBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 20),
 
-                        // Login Submit Button
+                        // Submit Button
                         ElevatedButton(
                           onPressed: auth.isLoading ? null : _handleLogin,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.forest,
                             foregroundColor: Colors.white,
-                            minimumSize: const Size.fromHeight(50),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            minimumSize: const Size.fromHeight(48),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                             elevation: 0,
                           ),
                           child: auth.isLoading
                               ? const SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                                 )
                               : const Text(
                                   'Masuk ke Sistem Lapangan',
-                                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800),
                                 ),
                         ),
                       ],
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
-                  // Collapsible Demo Accounts
-                  Center(
-                    child: Column(
-                      children: [
-                        TextButton.icon(
-                          onPressed: () => setState(() => _showDemoAccounts = !_showDemoAccounts),
-                          icon: Icon(
-                            _showDemoAccounts ? Icons.expand_less : Icons.expand_more,
-                            size: 18,
-                            color: AppColors.inkSoft,
-                          ),
-                          label: Text(
-                            _showDemoAccounts ? 'Sembunyikan Akun Uji Coba' : '🧪 Pilih Akun Uji Coba (Demo)',
-                            style: const TextStyle(fontSize: 12, color: AppColors.inkSoft, fontWeight: FontWeight.w600),
-                          ),
+                  // Quick Demo Logins
+                  Column(
+                    children: [
+                      const Text(
+                        'PILIH AKUN WISATA (1-KLIK)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.1,
+                          color: AppColors.textMuted,
                         ),
-                        if (_showDemoAccounts) ...[
-                          const SizedBox(height: 8),
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            alignment: WrapAlignment.center,
-                            children: [
-                              ActionChip(
-                                avatar: const Icon(Icons.forest_rounded, size: 16, color: AppColors.forest),
-                                label: const Text('Citambur (budi)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                                backgroundColor: AppColors.leafPale,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                                  side: const BorderSide(color: AppColors.leaf),
-                                ),
-                                onPressed: () => _fillDemoAccount('budi@gmail.com', 'admin123'),
-                              ),
-                              ActionChip(
-                                avatar: const Icon(Icons.terrain_rounded, size: 16, color: AppColors.bark),
-                                label: const Text('Cikanteh (kiano)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                                backgroundColor: AppColors.barkPale,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                                  side: const BorderSide(color: AppColors.bark),
-                                ),
-                                onPressed: () => _fillDemoAccount('kiano@gmail.com', 'admin123'),
-                              ),
-                              ActionChip(
-                                avatar: const Icon(Icons.admin_panel_settings_rounded, size: 16, color: AppColors.forestDeep),
-                                label: const Text('Super Admin (deryl)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
-                                backgroundColor: AppColors.leafPale,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                                  side: const BorderSide(color: AppColors.forest),
-                                ),
-                                onPressed: () => _fillDemoAccount('derylfabien09@gmail.com', 'admin123'),
-                              ),
-                            ],
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        alignment: WrapAlignment.center,
+                        children: [
+                          ActionChip(
+                            avatar: const Icon(Icons.forest_rounded, size: 16, color: AppColors.forest),
+                            label: const Text('Citambur (budi)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                            backgroundColor: AppColors.leafPale,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                              side: const BorderSide(color: AppColors.leaf),
+                            ),
+                            onPressed: () => _fillDemoAccount('budi@gmail.com', 'admin123'),
+                          ),
+                          ActionChip(
+                            avatar: const Icon(Icons.terrain_rounded, size: 16, color: AppColors.bark),
+                            label: const Text('Cikanteh (kiano)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                            backgroundColor: AppColors.barkPale,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                              side: const BorderSide(color: AppColors.bark),
+                            ),
+                            onPressed: () => _fillDemoAccount('kiano@gmail.com', 'admin123'),
+                          ),
+                          ActionChip(
+                            avatar: const Icon(Icons.admin_panel_settings_rounded, size: 16, color: AppColors.forestDeep),
+                            label: const Text('Super Admin (deryl)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                            backgroundColor: AppColors.leafPale,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppRadius.sm),
+                              side: const BorderSide(color: AppColors.forest),
+                            ),
+                            onPressed: () => _fillDemoAccount('derylfabien09@gmail.com', 'admin123'),
                           ),
                         ],
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),

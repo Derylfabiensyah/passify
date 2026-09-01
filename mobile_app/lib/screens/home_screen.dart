@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleSync() async {
+    HapticFeedback.lightImpact();
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final sync = Provider.of<SyncProvider>(context, listen: false);
 
@@ -54,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusLg),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
           backgroundColor: AppColors.surface,
           title: Row(
             children: [
@@ -62,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: AppColors.error.withValues(alpha: 0.12),
-                  borderRadius: AppRadius.radiusMd,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: const Icon(Icons.logout_rounded, color: AppColors.error, size: 22),
               ),
@@ -70,11 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Expanded(
                 child: Text(
                   'Konfirmasi Keluar',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.ink,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.forestDeep),
                 ),
               ),
             ],
@@ -93,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: AppColors.warningBg,
-                    borderRadius: AppRadius.radiusMd,
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                     border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
                   ),
                   child: Row(
@@ -102,8 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Peringatan: Terdapat $pendingCount log scan offline yang belum disinkronkan ke server.',
-                          style: const TextStyle(fontSize: 11, color: AppColors.warning, fontWeight: FontWeight.w600),
+                          'Terdapat $pendingCount scan offline belum disinkronkan ke server.',
+                          style: const TextStyle(fontSize: 11, color: AppColors.warning, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],
@@ -116,10 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(false),
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.inkSoft,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              ),
+              style: TextButton.styleFrom(foregroundColor: AppColors.inkSoft),
               child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
             ElevatedButton(
@@ -128,8 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
                 elevation: 0,
-                shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
               ),
               child: const Text('Ya, Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -162,50 +156,27 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: AppColors.forest,
-                borderRadius: BorderRadius.circular(8),
+                color: AppColors.forestDeep,
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: const Icon(Icons.forest_rounded, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 10),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Passify Field Ops', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text('Operasional Lapangan & Offline-First', style: TextStyle(fontSize: 11, color: AppColors.inkSoft)),
+                const Text('Passify Field Ops', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.forestDeep)),
+                Text(
+                  user?.role == 'tenant_admin' ? 'Pengelola Wisata' : 'Operasional Gerbang & Kasir',
+                  style: const TextStyle(fontSize: 11, color: AppColors.inkSoft, fontWeight: FontWeight.w600),
+                ),
               ],
             ),
           ],
         ),
         backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.ink,
         elevation: 0,
         actions: [
-          Consumer<ThemeProvider>(
-            builder: (context, theme, _) {
-              return IconButton(
-                icon: Icon(
-                  theme.isNightMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                  color: theme.isNightMode ? AppColors.leaf : AppColors.inkSoft,
-                ),
-                tooltip: theme.isNightMode ? 'Matikan Mode Malam' : 'Mode Malam / Sunrise Gate',
-                onPressed: () {
-                  theme.toggleNightMode();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        theme.isNightMode
-                            ? 'Mode Malam (Sunrise/Outdoor Gate) Aktif'
-                            : 'Mode Terang Standar Aktif',
-                      ),
-                      duration: const Duration(seconds: 2),
-                      backgroundColor: theme.isNightMode ? AppColors.forestDeep : AppColors.forest,
-                    ),
-                  );
-                },
-              );
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: AppColors.inkSoft),
             tooltip: 'Pengaturan Server',
@@ -216,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.error),
+            icon: const Icon(Icons.logout_rounded, color: AppColors.error),
             tooltip: 'Keluar',
             onPressed: _showLogoutConfirmationDialog,
           ),
@@ -231,63 +202,87 @@ class _HomeScreenState extends State<HomeScreen> {
         color: AppColors.forest,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User Greeting Card
+              // Sylvan Earth Hero Officer Card
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   color: AppColors.forestDeep,
-                  borderRadius: AppRadius.radiusLg,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.forestDeep.withValues(alpha: 0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+                      color: AppColors.forestDeep.withValues(alpha: 0.25),
+                      blurRadius: 14,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: AppColors.forestSoft,
-                      child: Text(
-                        (user?.fullName.isNotEmpty == true ? user!.fullName[0] : 'P').toUpperCase(),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user?.fullName ?? 'Petugas Lapangan',
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 22,
+                          backgroundColor: AppColors.leafPale,
+                          child: Text(
+                            (user?.fullName.isNotEmpty == true ? user!.fullName[0] : 'P').toUpperCase(),
+                            style: const TextStyle(color: AppColors.forestDeep, fontWeight: FontWeight.w900, fontSize: 18),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Role: ${user?.role.toUpperCase() ?? 'STAFF'}',
-                            style: const TextStyle(color: AppColors.leaf, fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user?.fullName ?? 'Petugas Lapangan',
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                user?.email ?? 'Petugas Aktif',
+                                style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 11.5, fontWeight: FontWeight.w500),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.leafPale.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                            border: Border.all(color: AppColors.leafPale.withValues(alpha: 0.4)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
+                              const SizedBox(width: 5),
+                              const Text(
+                                'ONLINE',
+                                style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Offline Sync Status Card
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.surface,
-                  borderRadius: AppRadius.radiusLg,
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Column(
@@ -298,11 +293,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         const Row(
                           children: [
-                            Icon(Icons.sync, color: AppColors.forest, size: 20),
+                            Icon(Icons.cloud_sync_rounded, color: AppColors.forest, size: 20),
                             SizedBox(width: 8),
                             Text(
-                              'Status Cache & Offline Sync',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.ink),
+                              'Status Sinkronisasi & Cache',
+                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.forestDeep),
                             ),
                           ],
                         ),
@@ -319,28 +314,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildSyncMetric('${sync.cachedTicketsCount}', 'Tiket di Cache'),
-                        Container(width: 1, height: 28, color: AppColors.border),
+                        Container(width: 1, height: 26, color: AppColors.border),
                         _buildSyncMetric('${sync.pendingScansCount}', 'Antrean Sync', isWarning: sync.pendingScansCount > 0),
-                        Container(width: 1, height: 28, color: AppColors.border),
+                        Container(width: 1, height: 26, color: AppColors.border),
                         _buildSyncMetric(
                           sync.lastSyncTime != null ? DateFormat('HH:mm').format(sync.lastSyncTime!) : '-',
                           'Sinkron Terakhir',
                         ),
                       ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     ElevatedButton.icon(
                       onPressed: sync.isSyncing ? null : _handleSync,
-                      icon: const Icon(Icons.cloud_download_outlined, size: 18),
+                      icon: const Icon(Icons.sync_rounded, size: 18),
                       label: Text(
-                        sync.isSyncing ? 'Sedang Sinkronisasi...' : 'Sinkronkan Tiket & Log Hari Ini',
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                        sync.isSyncing ? 'Sedang Menyinkronkan...' : 'Sinkronkan Tiket & Log Lapangan',
+                        style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.forestSoft,
                         foregroundColor: Colors.white,
-                        minimumSize: const Size.fromHeight(42),
-                        shape: const RoundedRectangleBorder(borderRadius: AppRadius.radiusMd),
+                        minimumSize: const Size.fromHeight(40),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
                         elevation: 0,
                       ),
                     ),
@@ -348,124 +343,80 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Menu Operasional',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
-                  ),
-                  if (user != null)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.elevated,
-                        borderRadius: AppRadius.radiusSm,
-                        border: Border.all(color: AppColors.border),
-                      ),
-                      child: Text(
-                        'Role: ${user.role.replaceAll('_', ' ').toUpperCase()}',
-                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.forest),
-                      ),
-                    ),
-                ],
+              const SizedBox(height: 22),
+              const Text(
+                'MENU OPERASIONAL LAPANGAN',
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: AppColors.textMuted,
+                ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
-              // Dynamic Role-Filtered Menu Cards Grid
-              Builder(
-                builder: (context) {
-                  final role = user?.role.toLowerCase() ?? '';
-                  final isVendorOnly = role == 'vendor';
-                  final isGateOnly = role == 'gate_officer';
-
-                  final List<Widget> cards = [];
-
-                  // Gate Scanner (Accessible by gate officers, admins, staff)
-                  if (!isVendorOnly) {
-                    cards.add(
-                      _buildMenuCard(
-                        title: 'Gate Access Scanner',
-                        subtitle: 'Scan QR Tiket & Validasi Gerbang',
-                        icon: Icons.qr_code_scanner,
-                        color: AppColors.forest,
-                        tag: 'Gerbang',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const GateScannerScreen()),
-                          );
-                        },
-                      ),
-                    );
-                  }
-
-                  // Booth POS (Accessible by vendor, booth cashier, admins, staff)
-                  if (!isGateOnly) {
-                    cards.add(
-                      _buildMenuCard(
-                        title: 'Kasir Booth Cashless',
-                        subtitle: 'Terima Bayar QR Wallet Stan',
-                        icon: Icons.point_of_sale,
-                        color: AppColors.bark,
-                        tag: 'Stan POS',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const BoothPosScreen()),
-                          );
-                        },
-                      ),
-                    );
-                  }
-
-                  // Offline Manifest (Accessible by gate officers, admins, staff)
-                  if (!isVendorOnly) {
-                    cards.add(
-                      _buildMenuCard(
-                        title: 'Manifest Tiket Offline',
-                        subtitle: 'Daftar & Check-in Manual',
-                        icon: Icons.checklist_rtl,
-                        color: AppColors.forestSoft,
-                        tag: 'Offline',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
-                          );
-                        },
-                      ),
-                    );
-
-                    // Gate Stats (Accessible by gate officers, admins, staff)
-                    cards.add(
-                      _buildMenuCard(
-                        title: 'Statistik Pintu Masuk',
-                        subtitle: 'Laporan Kuota & Total Scan',
-                        icon: Icons.insights,
-                        color: AppColors.ink,
-                        tag: 'Laporan',
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const GateStatsScreen()),
-                          );
-                        },
-                      ),
-                    );
-                  }
-
-                  if (cards.length == 1) {
-                    return cards.first;
-                  }
-
-                  return GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 14,
-                    crossAxisSpacing: 14,
-                    childAspectRatio: 1.05,
-                    children: cards,
-                  );
-                },
+              // Operational Cards Grid
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 12,
+                crossAxisSpacing: 12,
+                childAspectRatio: 1.05,
+                children: [
+                  _buildMenuCard(
+                    title: 'Gate Scanner',
+                    subtitle: 'Scan QR Tiket Pengunjung',
+                    icon: Icons.qr_code_scanner_rounded,
+                    color: AppColors.forest,
+                    tag: 'Gerbang',
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const GateScannerScreen()),
+                      );
+                    },
+                  ),
+                  _buildMenuCard(
+                    title: 'Kasir Booth POS',
+                    subtitle: 'Pembayaran Stan & Gelang',
+                    icon: Icons.point_of_sale_rounded,
+                    color: AppColors.bark,
+                    tag: 'Stan / POS',
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const BoothPosScreen()),
+                      );
+                    },
+                  ),
+                  _buildMenuCard(
+                    title: 'Manifest Offline',
+                    subtitle: 'Daftar & Check-In Manual',
+                    icon: Icons.storage_rounded,
+                    color: AppColors.forestSoft,
+                    tag: 'Cache',
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
+                      );
+                    },
+                  ),
+                  _buildMenuCard(
+                    title: 'Statistik Gate',
+                    subtitle: 'Laporan Kuota & Total Masuk',
+                    icon: Icons.bar_chart_rounded,
+                    color: AppColors.forestDeep,
+                    tag: 'Laporan',
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const GateStatsScreen()),
+                      );
+                    },
+                  ),
+                ],
               ),
             ],
           ),
@@ -480,15 +431,15 @@ class _HomeScreenState extends State<HomeScreen> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: isWarning ? AppColors.warning : AppColors.forest,
+            fontSize: 17,
+            fontWeight: FontWeight.w900,
+            color: isWarning ? AppColors.warning : AppColors.forestDeep,
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.inkSoft),
+          style: const TextStyle(fontSize: 11, color: AppColors.inkSoft, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -505,15 +456,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       elevation: 0,
       color: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: AppRadius.radiusLg,
-        side: BorderSide(color: AppColors.border),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: const BorderSide(color: AppColors.border),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: AppRadius.radiusLg,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -522,26 +473,26 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
                       color: color.withValues(alpha: 0.12),
-                      borderRadius: AppRadius.radiusMd,
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
-                    child: Icon(icon, color: color, size: 24),
+                    child: Icon(icon, color: color, size: 22),
                   ),
                   if (tag != null)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: color.withValues(alpha: 0.08),
-                        borderRadius: AppRadius.radiusSm,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                       ),
                       child: Text(
                         tag,
                         style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w800,
                           color: color,
                         ),
                       ),
@@ -553,12 +504,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.ink),
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.forestDeep),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(fontSize: 11, color: AppColors.inkSoft),
+                    style: const TextStyle(fontSize: 10.5, color: AppColors.inkSoft, fontWeight: FontWeight.w500),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
