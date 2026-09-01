@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_model.dart';
@@ -73,8 +74,19 @@ class AuthProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return true;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        _errorMessage = 'Email atau kata sandi tidak sesuai. Pastikan akun petugas telah terdaftar.';
+      } else if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.connectionError) {
+        _errorMessage = 'Gagal terhubung ke server. Periksa koneksi Wi-Fi atau IP server di menu Pengaturan.';
+      } else {
+        _errorMessage = e.response?.data?['message'] ?? 'Terjadi kendala saat menghubungi server.';
+      }
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
-      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      _errorMessage = 'Gagal masuk: $e';
       _isLoading = false;
       notifyListeners();
       return false;

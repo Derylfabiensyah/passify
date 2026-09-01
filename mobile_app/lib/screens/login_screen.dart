@@ -333,18 +333,34 @@ class _LoginScreenState extends State<LoginScreen> {
                             alignment: WrapAlignment.center,
                             children: [
                               ActionChip(
-                                avatar: const Icon(Icons.admin_panel_settings_outlined, size: 16, color: AppColors.forest),
-                                label: const Text('Super Admin', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                avatar: const Icon(Icons.forest_rounded, size: 16, color: AppColors.forest),
+                                label: const Text('Citambur (budi)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                                 backgroundColor: AppColors.leafPale,
-                                side: const BorderSide(color: AppColors.leaf),
-                                onPressed: () => _fillDemoAccount('derylfabien09@gmail.com', 'admin123'),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                                  side: const BorderSide(color: AppColors.leaf),
+                                ),
+                                onPressed: () => _fillDemoAccount('budi@gmail.com', 'admin123'),
                               ),
                               ActionChip(
-                                avatar: const Icon(Icons.storefront_outlined, size: 16, color: AppColors.bark),
-                                label: const Text('Tenant Admin (Curug)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                avatar: const Icon(Icons.terrain_rounded, size: 16, color: AppColors.bark),
+                                label: const Text('Cikanteh (kiano)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                                 backgroundColor: AppColors.barkPale,
-                                side: const BorderSide(color: AppColors.bark),
-                                onPressed: () => _fillDemoAccount('hendra@curugbidadari.com', 'password123'),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                                  side: const BorderSide(color: AppColors.bark),
+                                ),
+                                onPressed: () => _fillDemoAccount('kiano@gmail.com', 'admin123'),
+                              ),
+                              ActionChip(
+                                avatar: const Icon(Icons.admin_panel_settings_rounded, size: 16, color: AppColors.forestDeep),
+                                label: const Text('Super Admin (deryl)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
+                                backgroundColor: AppColors.leafPale,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                                  side: const BorderSide(color: AppColors.forest),
+                                ),
+                                onPressed: () => _fillDemoAccount('derylfabien09@gmail.com', 'admin123'),
                               ),
                             ],
                           ),
