@@ -18,7 +18,7 @@ export default function ErrorScreen({ error }) {
           <button onClick={refetch} className="btn-primary">
             Coba lagi <ArrowRight className="h-4 w-4" />
           </button>
-          <a href="https://passify.com" className="btn-secondary">
+          <a href="/" className="btn-secondary">
             <Home className="h-4 w-4" />
             Beranda
           </a>

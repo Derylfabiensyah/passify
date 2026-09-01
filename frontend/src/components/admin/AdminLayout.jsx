@@ -129,7 +129,7 @@ export default function AdminLayout({ children }) {
   const { slug: currentSlug } = useTenant();
 
   const activeTenant = getActiveAdminTenant();
-  const activeTenantSlug = currentSlug || activeTenant.slug || 'curug-citambur';
+  const activeTenantSlug = activeTenant.slug || currentSlug || 'curug-citambur';
 
   const currentItem = menuItems.find(
     (item) => location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))

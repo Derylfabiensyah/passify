@@ -106,12 +106,17 @@ export async function resolveTenantFromHostname(hostname) {
  * Fetches destination data by tenant slug
  */
 export async function fetchDestinationBySlug(slug) {
+  if (!slug) return null;
+
+  // 1. Check local destinations cache only if it matches the EXACT requested slug
   let localDest = null;
   try {
     const raw = localStorage.getItem('passify_admin_destinations');
     if (raw) {
       const list = JSON.parse(raw);
-      localDest = list.find((d) => d.slug === slug || d.id === slug || d.name?.toLowerCase().includes((slug || '').replace(/-/g, ' ')));
+      if (Array.isArray(list)) {
+        localDest = list.find((d) => d.slug === slug);
+      }
     }
   } catch (_) {}
 
@@ -157,57 +162,40 @@ export async function fetchDestinationBySlug(slug) {
           } catch (_) {}
         }
 
-        // 3. Fallback to localStorage saved categories from admin portal
+        // 3. Fallback to localStorage saved categories ONLY if localDest matches the exact slug
         if (categories.length === 0 && localDest?.ticket_categories?.length > 0) {
           categories = localDest.ticket_categories;
         }
 
-        // 4. Default fallback categories so tourist booking is always available
-        if (categories.length === 0) {
-          categories = [
-            { id: `cat-wni-${slug}`, name: 'Tiket Masuk Reguler (WNI)', price: 25000, insurance: 3000, retribusi: 2000, is_active: true },
-          ];
-        }
-
         return {
           ...data,
-          ...(localDest || {}),
-          max_daily_capacity: Number(data.max_daily_capacity || localDest?.max_daily_capacity || 500),
-          portal_template: loadPortalTemplate(slug) || localDest?.portal_template || data.portal_template || null,
+          portal_template: loadPortalTemplate(slug) || data.portal_template || null,
           ticket_categories: categories,
         };
       }
+    } else if (response.status === 404) {
+      // If backend explicitly returned 404 Not Found, only return localDest if it matches exact slug
+      if (localDest && localDest.slug === slug) {
+        return {
+          ...localDest,
+          portal_template: loadPortalTemplate(slug) || localDest.portal_template || null,
+        };
+      }
+      // Tenant does NOT exist: return null so 404 / ErrorScreen is shown
+      return null;
     }
-  } catch (_) {}
+  } catch (err) {
+    console.warn('Backend destination lookup failed:', err);
+  }
 
-  if (localDest) {
+  // If backend was unreachable (e.g. offline dev), only fallback if localDest matches exact slug
+  if (localDest && localDest.slug === slug) {
     return {
       ...localDest,
       portal_template: loadPortalTemplate(slug) || localDest.portal_template || null,
     };
   }
 
-  // Fallback for newly created or offline tenants
-  const title = (slug || 'wisata-alam')
-    .split('-')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ');
-
-  return {
-    id: `dest-${slug}`,
-    name: `${title}`,
-    slug,
-    location: 'desa karangjaya, Kabupaten Cianjur',
-    province: 'Jawa Barat',
-    cover_image_url: 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
-    description: `Curug yang mantap`,
-    max_daily_capacity: 500,
-    booked_today: 0,
-    ticket_categories: [
-      { id: `cat-wni-${slug}`, name: 'Tiket Masuk Reguler (WNI)', price: 25000, insurance: 3000, retribusi: 2000, is_active: true },
-    ],
-    facilities: ['Area Parkir Terpadu', 'Pos Pemandu & Pusat Informasi', 'Toilet Bersih', 'Pos Kesehatan & P3K'],
-    rules: 'Patuhi batas daya dukung lingkungan, buang sampah pada tempatnya, dan tunjukkan E-Ticket QR saat di gerbang.',
-    portal_template: loadPortalTemplate(slug),
-  };
+  // Tenant does not exist! Do NOT fabricate dummy mock data.
+  return null;
 }
