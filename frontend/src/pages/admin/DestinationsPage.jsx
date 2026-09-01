@@ -236,8 +236,25 @@ function DestinationCard({
 
           <div className="space-y-2.5">
             {(dest.ticket_categories || []).length === 0 ? (
-              <div className="p-4 rounded-xl border border-dashed border-[var(--border)] text-center text-xs text-[var(--ink-soft)]">
-                Belum ada kategori tiket. Klik "Tambah Kategori Tiket" untuk menambahkan tiket pertama.
+              <div className="p-8 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--canvas)] text-center flex flex-col items-center justify-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest)] flex items-center justify-center shadow-xs">
+                  <Ticket className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[var(--forest-deep)] font-serif">
+                    Belum Ada Kategori Tiket
+                  </h4>
+                  <p className="text-xs text-[var(--ink-soft)] max-w-sm mt-1 leading-relaxed">
+                    Kawasan Anda belum memiliki tarif tiket masuk. Tambahkan kategori tiket pertama (misal: Tiket Masuk Reguler) agar wisatawan dapat memesan tiket.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onAddCategory(dest.id)}
+                  className="btn-primary text-xs px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-xs font-bold cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" /> Tambah Kategori Tiket Pertama
+                </button>
               </div>
             ) : (
               (dest.ticket_categories || []).map((cat) => (
@@ -408,13 +425,22 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
 export default function DestinationsPage() {
   const { toast } = useToast();
   const { slug, refetch } = useTenant();
+  const adminUser = getAdminUser();
+  const activeSlug = slug || adminUser.tenant_slug || 'curug-citambur';
+
   const [destinations, setDestinations] = useState(() => {
     try {
       const raw = localStorage.getItem('passify_admin_destinations');
-      return raw ? JSON.parse(raw) : [];
-    } catch (_) {
-      return [];
-    }
+      if (raw) {
+        const list = JSON.parse(raw);
+        if (Array.isArray(list) && list.length > 0) {
+          if (!adminUser.tenant_slug || list[0].slug === adminUser.tenant_slug) {
+            return list;
+          }
+        }
+      }
+    } catch (_) {}
+    return [];
   });
   const [isExpanded, setIsExpanded] = useState(true);
   const [editingCatContext, setEditingCatContext] = useState(null);
@@ -424,7 +450,7 @@ export default function DestinationsPage() {
   useEffect(() => {
     async function loadRealDestinations() {
       try {
-        const realList = await fetchAdminDestinations(slug);
+        const realList = await fetchAdminDestinations(activeSlug);
         if (realList && realList.length > 0) {
           setDestinations(realList);
           if (realList[0].slug) {
@@ -436,7 +462,7 @@ export default function DestinationsPage() {
       }
     }
     loadRealDestinations();
-  }, [slug]);
+  }, [activeSlug]);
 
   const saveDestinationsList = (updated) => {
     setDestinations(updated);
@@ -447,12 +473,22 @@ export default function DestinationsPage() {
     refetch?.();
   };
 
-  const dest = destinations[0] || null;
-  const destId = dest?.id || 'dest-main';
+  const rawDest = destinations[0] || null;
+  const dest = rawDest || {
+    id: adminUser.tenant_id || `dest-${Date.now()}`,
+    name: adminUser.tenant_name || 'Kawasan Wisata Anda',
+    slug: adminUser.tenant_slug || 'kawasan-wisata',
+    location: 'Kawasan Wisata Alam, Indonesia',
+    province: 'Indonesia',
+    description: `Portal tiket resmi ${adminUser.tenant_name || 'kawasan wisata'}.`,
+    max_daily_capacity: 500,
+    booked_today: 0,
+    ticket_categories: [],
+    facilities: ['Area Parkir', 'Toilet Bersih', 'Pusat Informasi'],
+  };
+  const destId = dest.id;
 
   const handleSaveCategory = async (categoryData) => {
-    if (!dest) return;
-
     const categories = [...(dest.ticket_categories || [])];
     const existingIdx = categories.findIndex((c) => c.id === categoryData.id);
     if (existingIdx >= 0) {
@@ -486,7 +522,7 @@ export default function DestinationsPage() {
   };
 
   const handleDeleteCategory = (catId) => {
-    const cat = (dest?.ticket_categories || []).find((c) => c.id === catId);
+    const cat = (dest.ticket_categories || []).find((c) => c.id === catId);
     setDeleteConfirmContext({
       catId,
       catName: cat?.name || 'Kategori Tiket',
@@ -494,7 +530,7 @@ export default function DestinationsPage() {
   };
 
   const handleConfirmDeleteCategory = async () => {
-    if (!deleteConfirmContext || !dest) return;
+    if (!deleteConfirmContext) return;
     const { catId } = deleteConfirmContext;
 
     const updatedCategories = (dest.ticket_categories || []).filter((c) => c.id !== catId);
@@ -511,10 +547,10 @@ export default function DestinationsPage() {
     } catch (_) {}
   };
 
-  const capacity = Number(dest?.max_daily_capacity || 1000);
-  const booked = Number(dest?.booked_today || 0);
+  const capacity = Number(dest.max_daily_capacity || 500);
+  const booked = Number(dest.booked_today || 0);
   const quotaPct = capacity ? Math.round((booked / capacity) * 100) : 0;
-  const ticketCategories = dest?.ticket_categories || [];
+  const ticketCategories = dest.ticket_categories || [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -533,8 +569,8 @@ export default function DestinationsPage() {
         <AdminStatCard
           icon={Compass}
           label="Destinasi Wisata"
-          value={dest?.name || 'Kawasan Wisata'}
-          subValue={dest?.location || 'Kawasan Konservasi Alam'}
+          value={dest.name}
+          subValue={dest.location || 'Kawasan Konservasi Alam'}
           badgeText="DESTINASI"
         />
         <AdminStatCard
@@ -562,16 +598,14 @@ export default function DestinationsPage() {
       </div>
 
       {/* Destination Card & Ticket Management */}
-      {dest && (
-        <DestinationCard
-          dest={dest}
-          isExpanded={isExpanded}
-          onToggleExpand={() => setIsExpanded((prev) => !prev)}
-          onAddCategory={() => setEditingCatContext({ cat: null })}
-          onEditCategory={(_, cat) => setEditingCatContext({ cat })}
-          onDeleteCategory={(_, catId) => handleDeleteCategory(catId)}
-        />
-      )}
+      <DestinationCard
+        dest={dest}
+        isExpanded={isExpanded}
+        onToggleExpand={() => setIsExpanded((prev) => !prev)}
+        onAddCategory={() => setEditingCatContext({ cat: null })}
+        onEditCategory={(_, cat) => setEditingCatContext({ cat })}
+        onDeleteCategory={(_, catId) => handleDeleteCategory(catId)}
+      />
 
       {/* Modal Edit Ticket Category */}
       <EditCategoryModal

@@ -31,6 +31,15 @@ export default function TravelerAuthPage({ mode }) {
     if (isManager) {
       if (tenantSlug) {
         localStorage.setItem('passify_current_tenant', tenantSlug);
+        try {
+          const raw = localStorage.getItem('passify_admin_destinations');
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list) && list.length > 0 && list[0].slug !== tenantSlug) {
+              localStorage.removeItem('passify_admin_destinations');
+            }
+          }
+        } catch (_) {}
       }
       navigate('/admin');
       return;

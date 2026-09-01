@@ -12,44 +12,68 @@ import {
  * Returns current authenticated admin user from localStorage
  */
 export function getAdminUser() {
-  let defaultSlug = localStorage.getItem('passify_current_tenant') || null;
-  let defaultName = null;
+  let user = null;
+  try {
+    const raw = localStorage.getItem('passify_user');
+    if (raw) user = JSON.parse(raw);
+  } catch (_) {}
 
+  // 1. Logged in user's explicit tenant info (Highest Priority)
+  const userTenant = user?.tenant || {};
+  const userTenantName = userTenant.name || user?.tenant_name || null;
+  const userTenantSlug = userTenant.slug || userTenant.subdomain || user?.tenant_slug || null;
+  const userTenantId = user?.tenant_id || userTenant.id || null;
+
+  // 2. Local destinations cache (Secondary Priority)
+  let localDest = null;
   try {
     const rawDests = localStorage.getItem('passify_admin_destinations');
     if (rawDests) {
       const dests = JSON.parse(rawDests);
       if (Array.isArray(dests) && dests.length > 0) {
-        defaultSlug = dests[0].slug || defaultSlug;
-        defaultName = dests[0].name || defaultName;
+        // Only use localDest if it matches user's slug or user has no specific slug
+        if (!userTenantSlug || dests[0].slug === userTenantSlug) {
+          localDest = dests[0];
+        }
       }
     }
   } catch (_) {}
 
-  try {
-    const raw = localStorage.getItem('passify_user');
-    if (raw) {
-      const user = JSON.parse(raw);
-      return {
-        id: user.id || 'usr-admin',
-        name: user.full_name || user.name || 'Pengelola Kawasan',
-        email: user.email || 'admin@passify.id',
-        role: user.role || 'tenant_admin',
-        tenant_id: user.tenant_id || user.tenant?.id || '002bdabd-c79d-40b4-b624-4fbcdc31d390',
-        tenant_slug: defaultSlug || user.tenant_slug || user.tenant?.slug || 'curug-citambur',
-        tenant_name: defaultName || user.tenant?.name || user.tenant_name || 'Curug Citambur',
-      };
-    }
-  } catch (_) {}
+  const currentSlugStorage = localStorage.getItem('passify_current_tenant');
+  const activeTenantName = userTenantName || localDest?.name || 'Kawasan Wisata';
+  const activeTenantSlug = userTenantSlug || (currentSlugStorage && currentSlugStorage !== 'curug-citambur' ? currentSlugStorage : (localDest?.slug || 'curug-citambur'));
+  const activeTenantId = userTenantId || localDest?.id || '002bdabd-c79d-40b4-b624-4fbcdc31d390';
+
+  if (user) {
+    return {
+      id: user.id || 'usr-admin',
+      name: user.full_name || user.name || 'Pengelola Kawasan',
+      email: user.email || 'admin@passify.id',
+      role: user.role || 'tenant_admin',
+      tenant_id: activeTenantId,
+      tenant_slug: activeTenantSlug,
+      tenant_name: activeTenantName,
+      tenant: {
+        id: activeTenantId,
+        name: activeTenantName,
+        slug: activeTenantSlug,
+      },
+    };
+  }
 
   return {
     id: 'usr-admin-default',
     name: 'Pengelola Kawasan',
     email: 'admin@passify.id',
     role: 'tenant_admin',
-    tenant_id: '002bdabd-c79d-40b4-b624-4fbcdc31d390',
-    tenant_slug: defaultSlug || 'curug-citambur',
-    tenant_name: defaultName || 'Curug Citambur',
+    tenant_id: activeTenantId,
+    tenant_slug: activeTenantSlug,
+    tenant_name: activeTenantName,
+    tenant: {
+      id: activeTenantId,
+      name: activeTenantName,
+      slug: activeTenantSlug,
+    },
   };
 }
 
@@ -57,24 +81,11 @@ export function getAdminUser() {
  * Returns the active tenant slug and info for routing
  */
 export function getActiveAdminTenant() {
-  let activeSlug = localStorage.getItem('passify_current_tenant') || null;
-  let activeName = null;
-
-  try {
-    const rawDests = localStorage.getItem('passify_admin_destinations');
-    if (rawDests) {
-      const dests = JSON.parse(rawDests);
-      if (Array.isArray(dests) && dests.length > 0) {
-        activeSlug = dests[0].slug || activeSlug;
-        activeName = dests[0].name || activeName;
-      }
-    }
-  } catch (_) {}
-
   const user = getAdminUser();
   return {
-    slug: activeSlug || user.tenant_slug || 'curug-citambur',
-    name: activeName || user.tenant_name || 'Curug Citambur',
+    id: user.tenant_id,
+    name: user.tenant_name,
+    slug: user.tenant_slug,
   };
 }
 
