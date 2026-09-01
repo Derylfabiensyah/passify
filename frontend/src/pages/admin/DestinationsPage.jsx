@@ -719,6 +719,9 @@ export default function DestinationsPage() {
         if (realList && realList.length > 0) {
           setDestinations(realList);
           setExpandedId((prev) => prev || realList[0].id);
+          if (realList[0].slug) {
+            localStorage.setItem('passify_current_tenant', realList[0].slug);
+          }
         }
       } catch (err) {
         console.warn('Real destinations load error:', err);
@@ -732,6 +735,9 @@ export default function DestinationsPage() {
   const saveDestinationsList = (updated) => {
     setDestinations(updated);
     localStorage.setItem('passify_admin_destinations', JSON.stringify(updated));
+    if (updated.length > 0 && updated[0].slug) {
+      localStorage.setItem('passify_current_tenant', updated[0].slug);
+    }
     refetch?.();
   };
 

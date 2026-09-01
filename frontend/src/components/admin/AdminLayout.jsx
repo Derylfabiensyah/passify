@@ -5,7 +5,7 @@ import {
   Landmark, LayoutDashboard, MapPin, Menu, ScanLine,
   X, LogOut, User, Check, Building2, ExternalLink, AlertTriangle, ShieldCheck, Palette
 } from 'lucide-react';
-import { getAdminUser } from '../../api/admin';
+import { getAdminUser, getActiveAdminTenant } from '../../api/admin';
 import { useTenant } from '../../contexts/TenantContext';
 import { useToast } from '../../contexts/ToastContext';
 import ModalWrapper from '../common/ModalWrapper';
@@ -31,18 +31,22 @@ const adminThemeStyles = `
 
 function Brand({ collapsed = false }) {
   return (
-    <div className={`flex items-center ${collapsed ? 'justify-center' : 'px-1'}`}>
-      <span className="font-serif text-xl font-bold tracking-tight text-[var(--forest-deep)]">
+    <Link
+      to="/admin"
+      className="flex items-center gap-2.5 no-underline transition-opacity hover:opacity-85"
+      aria-label="Passify Console"
+    >
+      <span className="text-xl font-black tracking-tight text-[var(--forest-deep)] font-serif">
         {collapsed ? 'P' : 'Passify'}
       </span>
-    </div>
+    </Link>
   );
 }
 
 function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout }) {
   const adminUser = getAdminUser();
-  const { destination } = useTenant();
-  const tenantDisplayName = adminUser.tenant_name || destination?.name || 'Kawasan Konservasi Alam';
+  const activeTenant = getActiveAdminTenant();
+  const tenantDisplayName = activeTenant.name || adminUser.tenant_name || 'Curug Citambur';
   const userInitial = (adminUser.name || 'P').charAt(0).toUpperCase();
 
   return (
@@ -122,10 +126,10 @@ export default function AdminLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { slug: currentSlug, destination } = useTenant();
+  const { slug: currentSlug } = useTenant();
 
-  const adminUser = getAdminUser();
-  const activeTenantSlug = currentSlug || adminUser.tenant_slug || 'wisata';
+  const activeTenant = getActiveAdminTenant();
+  const activeTenantSlug = currentSlug || activeTenant.slug || 'curug-citambur';
 
   const currentItem = menuItems.find(
     (item) => location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))

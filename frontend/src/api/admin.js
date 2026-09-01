@@ -12,6 +12,20 @@ import {
  * Returns current authenticated admin user from localStorage
  */
 export function getAdminUser() {
+  let defaultSlug = localStorage.getItem('passify_current_tenant') || null;
+  let defaultName = null;
+
+  try {
+    const rawDests = localStorage.getItem('passify_admin_destinations');
+    if (rawDests) {
+      const dests = JSON.parse(rawDests);
+      if (Array.isArray(dests) && dests.length > 0) {
+        defaultSlug = dests[0].slug || defaultSlug;
+        defaultName = dests[0].name || defaultName;
+      }
+    }
+  } catch (_) {}
+
   try {
     const raw = localStorage.getItem('passify_user');
     if (raw) {
@@ -21,9 +35,9 @@ export function getAdminUser() {
         name: user.full_name || user.name || 'Pengelola Kawasan',
         email: user.email || 'admin@passify.id',
         role: user.role || 'tenant_admin',
-        tenant_id: user.tenant_id || user.tenant?.id || 'b416a526-0994-453d-a83d-bf18487f3049',
-        tenant_slug: user.tenant_slug || user.tenant?.slug || localStorage.getItem('passify_current_tenant') || 'curug-cibereum',
-        tenant_name: user.tenant?.name || user.tenant_name || 'Curug Cibereum',
+        tenant_id: user.tenant_id || user.tenant?.id || '002bdabd-c79d-40b4-b624-4fbcdc31d390',
+        tenant_slug: defaultSlug || user.tenant_slug || user.tenant?.slug || 'curug-citambur',
+        tenant_name: defaultName || user.tenant?.name || user.tenant_name || 'Curug Citambur',
       };
     }
   } catch (_) {}
@@ -33,9 +47,34 @@ export function getAdminUser() {
     name: 'Pengelola Kawasan',
     email: 'admin@passify.id',
     role: 'tenant_admin',
-    tenant_id: 'b416a526-0994-453d-a83d-bf18487f3049',
-    tenant_slug: localStorage.getItem('passify_current_tenant') || 'curug-cibereum',
-    tenant_name: 'Curug Cibereum',
+    tenant_id: '002bdabd-c79d-40b4-b624-4fbcdc31d390',
+    tenant_slug: defaultSlug || 'curug-citambur',
+    tenant_name: defaultName || 'Curug Citambur',
+  };
+}
+
+/**
+ * Returns the active tenant slug and info for routing
+ */
+export function getActiveAdminTenant() {
+  let activeSlug = localStorage.getItem('passify_current_tenant') || null;
+  let activeName = null;
+
+  try {
+    const rawDests = localStorage.getItem('passify_admin_destinations');
+    if (rawDests) {
+      const dests = JSON.parse(rawDests);
+      if (Array.isArray(dests) && dests.length > 0) {
+        activeSlug = dests[0].slug || activeSlug;
+        activeName = dests[0].name || activeName;
+      }
+    }
+  } catch (_) {}
+
+  const user = getAdminUser();
+  return {
+    slug: activeSlug || user.tenant_slug || 'curug-citambur',
+    name: activeName || user.tenant_name || 'Curug Citambur',
   };
 }
 
