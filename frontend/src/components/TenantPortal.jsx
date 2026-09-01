@@ -224,7 +224,38 @@ export default function TenantPortal() {
           <aside className="surface-muted h-fit p-5 lg:sticky lg:top-24"><h2 className="text-xl font-bold">Kunjungan tertata</h2><ul className="mt-4 space-y-3 text-xs leading-5 text-[var(--ink-soft)]"><li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Pilih tanggal dan sesi yang sesuai.</li><li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Isi data setiap pemegang tiket.</li><li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Tunjukkan QR aktif di gerbang.</li></ul></aside>
         </section>
 
-        {(template.show_facilities !== false || template.show_rules !== false) && <section className="mt-10 grid gap-5 md:grid-cols-2">{template.show_facilities !== false && <article className="card p-6"><div><h2 className="text-xl font-bold">Fasilitas kawasan</h2></div><ul className="mt-5 grid gap-2 sm:grid-cols-2">{(destination.facilities || []).map((facility) => <li key={facility} className="flex items-center gap-2 rounded-xl bg-[var(--canvas)] px-3 py-2.5 text-xs font-semibold text-[var(--ink-soft)] shadow-2xs"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />{facility}</li>)}</ul></article>}{template.show_rules !== false && <article className="rounded-2xl bg-[var(--bark-pale)]/55 p-6 shadow-2xs"><p className="eyebrow !text-[var(--bark)]">Etika berkunjung</p><h2 className="mt-2 text-xl font-bold">Jaga kawasan bersama</h2><p className="mt-4 text-sm leading-6 text-[var(--ink-soft)]">{destination.rules}</p></article>}</section>}
+        {(template.show_facilities !== false || template.show_rules !== false) && (
+          <section className="mt-10 grid gap-6 md:grid-cols-2">
+            {template.show_facilities !== false && (
+              <article className="card p-6 border border-[var(--border)] bg-white/80 backdrop-blur-md shadow-xs">
+                <div>
+                  <h2 className="text-xl font-bold font-serif text-[var(--forest-deep)]">Fasilitas kawasan</h2>
+                </div>
+                <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+                  {(destination.facilities || []).map((facility) => (
+                    <li
+                      key={facility}
+                      className="flex items-center gap-2 rounded-xl bg-[var(--canvas)]/80 px-3 py-2.5 text-xs font-semibold text-[var(--ink-soft)] border border-[var(--border)] shadow-2xs"
+                    >
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
+                      {facility}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            )}
+
+            {template.show_rules !== false && (
+              <article className="card p-6 border border-white/60 bg-white/70 backdrop-blur-xl shadow-xs transition-all">
+                <p className="eyebrow !text-[var(--bark)]">Etika berkunjung</p>
+                <h2 className="mt-1.5 text-xl font-bold font-serif text-[var(--forest-deep)]">Jaga kawasan bersama</h2>
+                <p className="mt-4 text-sm leading-relaxed text-[var(--ink-soft)] whitespace-pre-line">
+                  {destination.rules || 'Dilarang membuang sampah sembarangan dan wajib menjaga kelestarian alam.'}
+                </p>
+              </article>
+            )}
+          </section>
+        )}
       </main>
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[rgba(255,254,250,.94)] px-4 py-3 backdrop-blur-md lg:hidden"><button type="button" onClick={openBooking} className="btn-clay w-full"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button></div>

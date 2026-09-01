@@ -259,10 +259,11 @@ function PortalLivePreview({ destination, template }) {
 
             {/* Rules Preview */}
             {template.show_rules !== false && (
-              <div className="rounded-2xl bg-[var(--bark-pale)]/50 p-3.5 border border-[var(--border)]">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--bark)] mb-1">Etika Berkunjung</p>
-                <p className="text-[11px] leading-relaxed text-[var(--ink-soft)] italic">
-                  "{rules}"
+              <div className="rounded-2xl bg-white/70 backdrop-blur-md p-3.5 border border-white/60 shadow-2xs">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--bark)] mb-0.5">Etika Berkunjung</p>
+                <h4 className="text-xs font-bold text-[var(--forest-deep)] mb-1">Jaga Kawasan Bersama</h4>
+                <p className="text-[11px] leading-relaxed text-[var(--ink-soft)]">
+                  {rules || 'Dilarang membuang sampah sembarangan dan wajib menjaga kelestarian alam.'}
                 </p>
               </div>
             )}
