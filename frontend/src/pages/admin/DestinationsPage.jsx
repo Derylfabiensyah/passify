@@ -541,7 +541,9 @@ export default function DestinationsPage() {
         });
       }
     } catch (err) {
-      console.warn('Sync to ticket microservice warning:', err);
+      console.error('Sync to ticket microservice failed:', err);
+      toast.error(`Gagal menyimpan ke database server: ${err.message || 'Periksa koneksi atau sesi login'}`);
+      return;
     }
 
     const finalCat = { ...categoryData, id: savedId };

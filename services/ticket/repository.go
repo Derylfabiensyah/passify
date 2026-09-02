@@ -43,6 +43,12 @@ func NewTicketRepository(db *gorm.DB) TicketRepository {
 }
 
 func (r *ticketRepository) CreateTicketCategory(cat *models.TicketCategory) error {
+	if cat.TenantID == uuid.Nil {
+		var dest models.Destination
+		if err := r.db.First(&dest, "id = ?", cat.DestinationID).Error; err == nil {
+			cat.TenantID = dest.TenantID
+		}
+	}
 	return r.db.Create(cat).Error
 }
 
