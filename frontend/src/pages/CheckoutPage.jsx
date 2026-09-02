@@ -456,29 +456,55 @@ export default function CheckoutPage() {
                     <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink-soft)] mb-2">
                       Pilihan Sesi Waktu
                     </label>
-                    <div className="space-y-2">
+                    <div className="space-y-2.5">
                       {(destination.time_slots || []).map((slot) => {
-                        const remaining = Math.max(0, (slot.max_capacity || 500) - (slot.booked || 0));
+                        const maxCap = parseInt(slot.max_capacity ?? slot.capacity ?? 500, 10) || 500;
+                        const bookedCount = parseInt(slot.booked ?? slot.booked_count ?? 0, 10) || 0;
+                        const remaining = Math.max(0, maxCap - bookedCount);
                         const isSelected = selectedSlotId === slot.id;
-                        const label = slot.label || slot.slot_label || 'Sesi Kunjungan';
+                        const label = slot.label || slot.slot_label || slot.name || 'Sesi Kunjungan';
+                        const timeRange = slot.time_range || (slot.start_time && slot.end_time ? `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)} WIB` : null);
+
                         return (
                           <div
                             key={slot.id}
                             onClick={() => setSelectedSlotId(slot.id)}
-                            className={`cursor-pointer rounded-2xl p-3.5 transition-all flex items-center justify-between ${
+                            className={`cursor-pointer rounded-2xl p-4 transition-all flex items-center justify-between border ${
                               isSelected
-                                ? 'bg-[var(--forest-deep)] text-white shadow-sm'
-                                : 'bg-[var(--fog)] hover:bg-[var(--sand)] text-[var(--ink)]'
+                                ? 'bg-gradient-to-r from-emerald-50 to-teal-50/60 border-emerald-600 shadow-sm ring-1 ring-emerald-600'
+                                : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-emerald-300 text-gray-800'
                             }`}
                           >
-                            <div className="space-y-0.5">
-                              <p className="text-xs font-bold">{label}</p>
-                              <p className={`text-[11px] ${isSelected ? 'text-white/70' : 'text-[var(--ink-soft)]'}`}>
-                                Kuota Sisa: <strong className={isSelected ? 'text-[var(--leaf)]' : 'text-[var(--forest)]'}>{remaining}</strong> orang
-                              </p>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <Clock className={`w-4 h-4 ${isSelected ? 'text-emerald-600' : 'text-gray-400'}`} />
+                                <p className={`text-sm font-bold ${isSelected ? 'text-emerald-950 font-serif' : 'text-gray-900'}`}>
+                                  {label}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 pl-6">
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold ${
+                                  isSelected
+                                    ? 'bg-emerald-600 text-white shadow-xs'
+                                    : 'bg-emerald-50 text-emerald-800 border border-emerald-200/70'
+                                }`}>
+                                  Sisa Kuota: {remaining.toLocaleString('id-ID')} orang
+                                </span>
+                                {timeRange && !label.includes(timeRange) && (
+                                  <span className="text-[11px] text-gray-500 font-medium">
+                                    ({timeRange})
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${isSelected ? 'border-[var(--leaf)] bg-[var(--leaf)]' : 'border-gray-400'}`}>
-                              {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-[var(--forest-deep)]" />}
+
+                            {/* Radio indicator */}
+                            <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${
+                              isSelected
+                                ? 'border-emerald-600 bg-emerald-600'
+                                : 'border-gray-300 bg-white'
+                            }`}>
+                              {isSelected && <div className="h-2 w-2 rounded-full bg-white" />}
                             </div>
                           </div>
                         );
@@ -683,7 +709,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-[var(--ink-soft)]">
                     <span>Sesi Waktu</span>
-                    <strong className="text-[var(--forest-deep)] text-right">{selectedSlot?.label || '-'}</strong>
+                    <strong className="text-[var(--forest-deep)] text-right">{selectedSlot?.label || selectedSlot?.slot_label || '-'}</strong>
                   </div>
                   <div className="flex justify-between text-[var(--ink-soft)]">
                     <span>Total Pengunjung</span>
