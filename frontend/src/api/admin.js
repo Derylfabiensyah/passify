@@ -135,7 +135,19 @@ export async function fetchAdminQuotas(destinationId) {
     ]);
 
     const quotas = quotasRes.status === 'fulfilled' && quotasRes.value?.data ? quotasRes.value.data : [];
-    const timeSlots = slotsRes.status === 'fulfilled' && slotsRes.value?.data ? slotsRes.value.data : [];
+    let timeSlots = slotsRes.status === 'fulfilled' && slotsRes.value?.data ? slotsRes.value.data : [];
+
+    if (Array.isArray(timeSlots) && timeSlots.length > 0) {
+      timeSlots = timeSlots.map((s) => ({
+        id: s.id,
+        label: s.slot_label || s.label || 'Sesi Kunjungan',
+        slot_label: s.slot_label || s.label,
+        time_range: s.time_range || (s.start_time && s.end_time ? `${s.start_time.slice(0, 5)} - ${s.end_time.slice(0, 5)} WIB` : ''),
+        max_capacity: Number(s.max_capacity || 500),
+        booked: Number(s.booked || 0),
+        is_active: s.is_active !== false,
+      }));
+    }
 
     return { quotas, timeSlots };
   } catch (err) {

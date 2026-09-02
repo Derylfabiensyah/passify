@@ -123,15 +123,17 @@ function TimeSlotCard({ slot, onEdit, onDelete }) {
           </div>
           <div>
             <div className="text-xs font-bold text-gray-900 flex items-center gap-1.5">
-              <span>{slot.label}</span>
+              <span>{slot.label || slot.slot_label || 'Sesi Kunjungan'}</span>
               {!slot.is_active && (
                 <span className="text-[9px] bg-gray-100 text-gray-600 font-semibold px-1.5 py-0.5 rounded shadow-2xs">
                   Nonaktif
                 </span>
               )}
             </div>
-            {slot.time_range && (
-              <div className="text-[10px] text-gray-500">{slot.time_range}</div>
+            {(slot.time_range || (slot.start_time && slot.end_time)) && (
+              <div className="text-[10px] text-gray-500">
+                {slot.time_range || `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)} WIB`}
+              </div>
             )}
           </div>
         </div>
@@ -408,9 +410,10 @@ export default function QuotasPage() {
 
           // Fetch quota calendar and time slots
           const { quotas, timeSlots } = await fetchAdminQuotas(dests[0].id);
-          if (timeSlots && timeSlots.length > 0) {
+          const finalSlots = (timeSlots && timeSlots.length > 0) ? timeSlots : (dests[0].time_slots || []);
+          if (finalSlots.length > 0) {
             setDestinations((prev) =>
-              prev.map((d, idx) => (idx === 0 ? { ...d, time_slots: timeSlots } : d))
+              prev.map((d, idx) => (idx === 0 ? { ...d, time_slots: finalSlots } : d))
             );
           }
           if (quotas && quotas.length > 0) {
