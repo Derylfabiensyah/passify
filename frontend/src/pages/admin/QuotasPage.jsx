@@ -472,16 +472,32 @@ export default function QuotasPage() {
     showToast(`Sesi "${updatedSlot.label}" berhasil disimpan!`);
     setEditingSlot(null);
 
-    // Sync with ticket service
+    // Sync with ticket service & localStorage
     try {
       await apiRequest('/api/v1/tickets/time-slots', {
         method: 'POST',
         body: {
           destination_id: selectedDest.id,
-          ...updatedSlot,
+          slot_label: updatedSlot.label,
+          label: updatedSlot.label,
+          time_range: updatedSlot.time_range,
+          max_capacity: Number(updatedSlot.max_capacity || 500),
         },
-      }).catch(() => null);
-    } catch (_) {}
+      });
+
+      // Update local storage destinations cache
+      const raw = localStorage.getItem('passify_admin_destinations');
+      if (raw) {
+        const list = JSON.parse(raw);
+        const idx = list.findIndex((d) => d.id === selectedDest.id || d.slug === selectedDest.slug);
+        if (idx >= 0) {
+          list[idx].time_slots = (list[idx].time_slots || []).filter((s) => s.id !== updatedSlot.id).concat(updatedSlot);
+          localStorage.setItem('passify_admin_destinations', JSON.stringify(list));
+        }
+      }
+    } catch (err) {
+      console.warn('Sync time slot warning:', err);
+    }
   };
 
   const handleDeleteTimeSlot = (slotId) => {

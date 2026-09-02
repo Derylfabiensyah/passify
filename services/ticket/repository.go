@@ -111,6 +111,12 @@ func (r *ticketRepository) ListDailyQuotas(destinationID uuid.UUID, startDate, e
 }
 
 func (r *ticketRepository) CreateTimeSlot(slot *models.TimeSlot) error {
+	if slot.TenantID == uuid.Nil {
+		var dest models.Destination
+		if err := r.db.First(&dest, "id = ?", slot.DestinationID).Error; err == nil {
+			slot.TenantID = dest.TenantID
+		}
+	}
 	return r.db.Create(slot).Error
 }
 

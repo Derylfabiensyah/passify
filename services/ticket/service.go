@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/big"
 	"crypto/rand"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -47,9 +48,11 @@ type UpdateCategoryRequest struct {
 
 type CreateTimeSlotRequest struct {
 	DestinationID uuid.UUID `json:"destination_id" binding:"required"`
-	SlotLabel     string    `json:"slot_label" binding:"required"`
-	StartTime     string    `json:"start_time" binding:"required"`
-	EndTime       string    `json:"end_time" binding:"required"`
+	SlotLabel     string    `json:"slot_label,omitempty"`
+	Label         string    `json:"label,omitempty"`
+	TimeRange     string    `json:"time_range,omitempty"`
+	StartTime     string    `json:"start_time,omitempty"`
+	EndTime       string    `json:"end_time,omitempty"`
 	MaxCapacity   int       `json:"max_capacity" binding:"required"`
 }
 
@@ -238,13 +241,44 @@ func (s *ticketService) DeleteCategory(id uuid.UUID) error {
 }
 
 func (s *ticketService) CreateTimeSlot(tenantID uuid.UUID, req CreateTimeSlotRequest) (*models.TimeSlot, error) {
+	label := req.SlotLabel
+	if label == "" {
+		label = req.Label
+	}
+	if label == "" {
+		label = "Sesi Kunjungan"
+	}
+
+	startTime := req.StartTime
+	endTime := req.EndTime
+	if startTime == "" || endTime == "" {
+		if req.TimeRange != "" {
+			parts := strings.Split(req.TimeRange, "-")
+			if len(parts) >= 2 {
+				startTime = strings.TrimSpace(parts[0])
+				endTime = strings.TrimSpace(parts[1])
+			}
+		}
+	}
+	if startTime == "" {
+		startTime = "08:00:00"
+	} else if len(startTime) == 5 {
+		startTime += ":00"
+	}
+	if endTime == "" {
+		endTime = "17:00:00"
+	} else if len(endTime) == 5 {
+		endTime += ":00"
+	}
+
 	slot := &models.TimeSlot{
 		TenantID:      tenantID,
 		DestinationID: req.DestinationID,
-		SlotLabel:     req.SlotLabel,
-		StartTime:     req.StartTime,
-		EndTime:       req.EndTime,
+		SlotLabel:     label,
+		StartTime:     startTime,
+		EndTime:       endTime,
 		MaxCapacity:   req.MaxCapacity,
+		IsActive:      true,
 	}
 	if err := s.repo.CreateTimeSlot(slot); err != nil {
 		return nil, err

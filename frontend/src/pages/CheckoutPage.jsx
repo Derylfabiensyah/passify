@@ -458,8 +458,9 @@ export default function CheckoutPage() {
                     </label>
                     <div className="space-y-2">
                       {(destination.time_slots || []).map((slot) => {
-                        const remaining = Math.max(0, slot.max_capacity - slot.booked);
+                        const remaining = Math.max(0, (slot.max_capacity || 500) - (slot.booked || 0));
                         const isSelected = selectedSlotId === slot.id;
+                        const label = slot.label || slot.slot_label || 'Sesi Kunjungan';
                         return (
                           <div
                             key={slot.id}
@@ -471,7 +472,7 @@ export default function CheckoutPage() {
                             }`}
                           >
                             <div className="space-y-0.5">
-                              <p className="text-xs font-bold">{slot.label}</p>
+                              <p className="text-xs font-bold">{label}</p>
                               <p className={`text-[11px] ${isSelected ? 'text-white/70' : 'text-[var(--ink-soft)]'}`}>
                                 Kuota Sisa: <strong className={isSelected ? 'text-[var(--leaf)]' : 'text-[var(--forest)]'}>{remaining}</strong> orang
                               </p>

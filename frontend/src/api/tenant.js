@@ -167,10 +167,37 @@ export async function fetchDestinationBySlug(slug) {
           categories = localDest.ticket_categories;
         }
 
+        // 4. Fetch live time slots from ticket-service
+        let slots = [];
+        if (data.id) {
+          try {
+            const slotRes = await fetch(`http://localhost:8083/api/v1/tickets/destinations/${data.id}/time-slots`);
+            if (slotRes.ok) {
+              const slotData = await slotRes.json();
+              if (slotData && Array.isArray(slotData.data) && slotData.data.length > 0) {
+                slots = slotData.data.map((s) => ({
+                  id: s.id,
+                  label: s.slot_label || s.label || `${s.start_time?.slice(0, 5)} - ${s.end_time?.slice(0, 5)}`,
+                  slot_label: s.slot_label || s.label,
+                  time_range: `${s.start_time?.slice(0, 5)} - ${s.end_time?.slice(0, 5)}`,
+                  max_capacity: Number(s.max_capacity || 500),
+                  booked: Number(s.booked || 0),
+                  is_active: s.is_active !== false,
+                }));
+              }
+            }
+          } catch (_) {}
+        }
+
+        if (slots.length === 0 && localDest?.time_slots?.length > 0) {
+          slots = localDest.time_slots;
+        }
+
         return {
           ...data,
           portal_template: loadPortalTemplate(slug) || data.portal_template || null,
           ticket_categories: categories,
+          time_slots: slots,
         };
       }
     } else if (response.status === 404) {
