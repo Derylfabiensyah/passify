@@ -393,20 +393,31 @@ export default function CheckoutPage() {
             {/* Left 2 Cols: Form Sections */}
             <div className="lg:col-span-2 space-y-6">
               {/* Destination Card Banner */}
-              <div className="rounded-3xl bg-white p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-start sm:items-center">
+              <div className="rounded-3xl bg-white p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-start sm:items-center border border-[var(--border)]">
                 <img
-                  src={destination.image}
+                  src={
+                    destination.cover_image_url ||
+                    destination.cover_image ||
+                    destination.image ||
+                    'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=400&q=80'
+                  }
                   alt={destination.name}
-                  className="h-24 w-full sm:w-28 rounded-2xl object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=400&q=80';
+                  }}
+                  className="h-24 w-full sm:w-28 rounded-2xl object-cover bg-gray-100 shrink-0"
                 />
                 <div className="space-y-1 flex-1">
                   <span className="inline-block rounded-full bg-[var(--leaf-pale)] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]">
-                    {destination.tenant_name}
+                    {destination.tenant_name || destination.name}
                   </span>
-                  <h1 className="text-xl sm:text-2xl font-bold text-[var(--forest-deep)]">
+                  <h1 className="text-xl sm:text-2xl font-bold text-[var(--forest-deep)] font-serif">
                     {destination.name}
                   </h1>
-                  <p className="text-xs text-[var(--ink-soft)]">{destination.location}</p>
+                  <p className="text-xs text-[var(--ink-soft)]">
+                    {destination.location || [destination.address, destination.city, destination.province].filter(Boolean).join(', ') || 'Kawasan Wisata Alam, Indonesia'}
+                  </p>
                 </div>
               </div>
 

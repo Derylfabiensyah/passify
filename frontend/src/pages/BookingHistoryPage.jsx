@@ -294,13 +294,14 @@ export default function BookingHistoryPage() {
                   {/* Card Header with Image */}
                   <div>
                     <div className="relative h-36 w-full bg-[var(--forest-deep)] overflow-hidden">
-                      {ticket.image && (
-                        <img
-                          src={ticket.image}
-                          alt={ticket.destinationName}
-                          className="h-full w-full object-cover opacity-60"
-                        />
-                      )}
+                      <img
+                        src={ticket.image || ticket.cover_image_url || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=400&q=80'}
+                        alt={ticket.destinationName}
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=400&q=80';
+                        }}
+                        className="h-full w-full object-cover opacity-60"
+                      />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
                       {/* Status Badge */}
