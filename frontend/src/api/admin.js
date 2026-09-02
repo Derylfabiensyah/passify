@@ -153,25 +153,39 @@ export async function fetchAdminDestinations(slug) {
   }
 
   // Merge destinations: real backend data MUST override stale localStorage!
-  const map = new Map();
-  localDests.forEach((d) => map.set(d.id, d));
-  backendDests.forEach((d) => {
-    const existing = map.get(d.id);
-    map.set(d.id, {
-      ...existing,
-      ...d,
-      ticket_categories: (d.ticket_categories && d.ticket_categories.length > 0)
-        ? d.ticket_categories
-        : (existing?.ticket_categories || []),
-    });
-  });
+  if (backendDests.length > 0) {
+    const backendDest = backendDests[0];
+    // Find matching local entry by slug, id, or tenant_id
+    const matchingLocal = localDests.find(
+      (ld) => ld.slug === backendDest.slug || ld.id === backendDest.id || ld.id === backendDest.tenant_id
+    );
 
-  if (map.size > 0) {
-    const mergedList = Array.from(map.values());
+    const mergedCategories = (backendDest.ticket_categories && backendDest.ticket_categories.length > 0)
+      ? backendDest.ticket_categories
+      : (matchingLocal?.ticket_categories || []);
+
+    const unifiedDest = {
+      ...(matchingLocal || {}),
+      ...backendDest,
+      id: backendDest.id, // Guarantee real PostgreSQL UUID
+      max_daily_capacity: Number(backendDest.max_daily_capacity || matchingLocal?.max_daily_capacity || 1000),
+      ticket_categories: mergedCategories,
+    };
+
+    // Remove any stale/duplicate local versions of this destination
+    const remainingLocal = localDests.filter(
+      (ld) => ld.id !== unifiedDest.id && ld.slug !== unifiedDest.slug && ld.id !== backendDest.tenant_id
+    );
+
+    const mergedList = [unifiedDest, ...remainingLocal];
     try {
       localStorage.setItem('passify_admin_destinations', JSON.stringify(mergedList));
     } catch (_) {}
     return mergedList;
+  }
+
+  if (localDests.length > 0) {
+    return localDests;
   }
 
   return ADMIN_DESTINATIONS;

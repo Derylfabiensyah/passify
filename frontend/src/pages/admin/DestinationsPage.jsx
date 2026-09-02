@@ -473,7 +473,10 @@ export default function DestinationsPage() {
     refetch?.();
   };
 
-  const rawDest = destinations[0] || null;
+  const rawDest = destinations.find((d) => d.slug === activeSlug && d.ticket_categories?.length > 0)
+    || destinations.find((d) => d.slug === activeSlug)
+    || destinations[0]
+    || null;
   const dest = rawDest || {
     id: adminUser.tenant_id || `dest-${Date.now()}`,
     name: adminUser.tenant_name || 'Kawasan Wisata Anda',
@@ -481,7 +484,7 @@ export default function DestinationsPage() {
     location: 'Kawasan Wisata Alam, Indonesia',
     province: 'Indonesia',
     description: `Portal tiket resmi ${adminUser.tenant_name || 'kawasan wisata'}.`,
-    max_daily_capacity: 500,
+    max_daily_capacity: 1000,
     booked_today: 0,
     ticket_categories: [],
     facilities: ['Area Parkir', 'Toilet Bersih', 'Pusat Informasi'],
