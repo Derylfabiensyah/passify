@@ -489,36 +489,71 @@ export default function DestinationsPage() {
   const destId = dest.id;
 
   const handleSaveCategory = async (categoryData) => {
-    const categories = [...(dest.ticket_categories || [])];
-    const existingIdx = categories.findIndex((c) => c.id === categoryData.id);
-    if (existingIdx >= 0) {
-      categories[existingIdx] = categoryData;
-    } else {
-      categories.push(categoryData);
+    let effectiveDestId = destId;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(effectiveDestId)) {
+      try {
+        const destRes = await apiRequest(`/api/v1/public/tenants/${dest.slug || activeSlug}/destination`);
+        if (destRes?.data?.id) {
+          effectiveDestId = destRes.data.id;
+        }
+      } catch (_) {}
     }
 
-    const updatedDest = { ...dest, ticket_categories: categories };
+    const isNew = !categoryData.id || String(categoryData.id).startsWith('cat-');
+    let savedId = categoryData.id;
+
+    try {
+      if (isNew) {
+        const res = await apiRequest('/api/v1/tickets/categories', {
+          method: 'POST',
+          body: {
+            destination_id: effectiveDestId,
+            name: categoryData.name,
+            ticket_type: 'visitor_domestic',
+            base_price: Number(categoryData.price || 0),
+            insurance_fee: Number(categoryData.insurance || 0),
+            retribusi_fee: Number(categoryData.retribusi || 0),
+            is_mandatory: true,
+            is_per_person: true,
+            max_qty_per_order: 10,
+          },
+        });
+        if (res?.data?.id) {
+          savedId = res.data.id;
+        }
+      } else {
+        await apiRequest(`/api/v1/tickets/categories/${categoryData.id}`, {
+          method: 'PUT',
+          body: {
+            name: categoryData.name,
+            ticket_type: 'visitor_domestic',
+            base_price: Number(categoryData.price || 0),
+            insurance_fee: Number(categoryData.insurance || 0),
+            retribusi_fee: Number(categoryData.retribusi || 0),
+            is_mandatory: true,
+            is_per_person: true,
+            max_qty_per_order: 10,
+          },
+        });
+      }
+    } catch (err) {
+      console.warn('Sync to ticket microservice warning:', err);
+    }
+
+    const finalCat = { ...categoryData, id: savedId };
+    const categories = [...(dest.ticket_categories || [])];
+    const existingIdx = categories.findIndex((c) => c.id === categoryData.id || c.id === savedId);
+    if (existingIdx >= 0) {
+      categories[existingIdx] = finalCat;
+    } else {
+      categories.push(finalCat);
+    }
+
+    const updatedDest = { ...dest, id: effectiveDestId, ticket_categories: categories };
     saveDestinationsList([updatedDest]);
     setEditingCatContext(null);
     toast.success('Kategori tarif tiket berhasil disimpan!');
-
-    // Sync to ticket microservice
-    try {
-      await apiRequest('/api/v1/tickets/categories', {
-        method: 'POST',
-        body: {
-          destination_id: destId,
-          name: categoryData.name,
-          ticket_type: 'visitor_domestic',
-          base_price: Number(categoryData.price || 0),
-          insurance_fee: Number(categoryData.insurance || 0),
-          retribusi_fee: Number(categoryData.retribusi || 0),
-          is_mandatory: true,
-          is_per_person: true,
-          max_qty_per_order: 10,
-        },
-      }).catch(() => null);
-    } catch (_) {}
   };
 
   const handleDeleteCategory = (catId) => {
@@ -540,11 +575,13 @@ export default function DestinationsPage() {
     setDeleteConfirmContext(null);
     toast.success('Kategori tiket telah dihapus.');
 
-    try {
-      await apiRequest(`/api/v1/tickets/categories/${catId}`, {
-        method: 'DELETE',
-      }).catch(() => null);
-    } catch (_) {}
+    if (!String(catId).startsWith('cat-')) {
+      try {
+        await apiRequest(`/api/v1/tickets/categories/${catId}`, {
+          method: 'DELETE',
+        }).catch(() => null);
+      } catch (_) {}
+    }
   };
 
   const capacity = Number(dest.max_daily_capacity || 500);

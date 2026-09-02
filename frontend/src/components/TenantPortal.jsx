@@ -37,7 +37,11 @@ export default function TenantPortal() {
   const remaining = Math.max(0, capacity - booked);
   const used = capacity ? Math.round((booked / capacity) * 100) : 0;
   const startingPrice = destination.ticket_categories && destination.ticket_categories.length > 0
-    ? Math.min(...destination.ticket_categories.map((category) => Number(category.price || 0)))
+    ? Math.min(
+        ...destination.ticket_categories.map((c) =>
+          Number(c.price || 0) + Number(c.insurance || 0) + Number(c.retribusi || 0)
+        )
+      )
     : 0;
   const template = destination.portal_template || {};
   const primaryColor = isPortalColor(template.primary_color, ['#394032', '#454F2D'], '#394032');
@@ -220,8 +224,78 @@ export default function TenantPortal() {
           </div>
         </section>
 
-        <section className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]"><div><p className="eyebrow">Pilih tiket</p><h2 className="mt-2 text-3xl font-bold">Satu perjalanan, satu tiket resmi</h2><p className="mt-2 text-sm text-[var(--ink-soft)]">Pilih tiket yang sesuai, kemudian lengkapi jadwal dan data pengunjung dalam tiga langkah singkat.</p><div className="mt-6 grid gap-4 md:grid-cols-2">{(destination.ticket_categories || []).map((category) => { const total = Number(category.price || 0) + Number(category.insurance || 0) + Number(category.retribusi || 0); return <article key={category.id} className="card flex min-h-[200px] flex-col justify-between p-5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]"><div><h3 className="text-xl font-bold">{category.name}</h3><p className="mt-2 text-xs text-[var(--ink-soft)]">Termasuk komponen resmi sesuai kebijakan kawasan.</p></div><div className="mt-5 flex items-end justify-between border-t border-[var(--border)] pt-4"><div><span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Total per orang</span><strong className="mt-1 block text-xl font-extrabold text-[var(--bark)]">{rupiah(total)}</strong></div><button type="button" onClick={openBooking} className="btn-primary btn-sm rounded-xl">Pilih<ArrowRight className="h-3.5 w-3.5" /></button></div></article>; })}</div></div>
-          <aside className="surface-muted h-fit p-5 lg:sticky lg:top-24"><h2 className="text-xl font-bold">Kunjungan tertata</h2><ul className="mt-4 space-y-3 text-xs leading-5 text-[var(--ink-soft)]"><li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Pilih tanggal dan sesi yang sesuai.</li><li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Isi data setiap pemegang tiket.</li><li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Tunjukkan QR aktif di gerbang.</li></ul></aside>
+        <section className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div>
+            <p className="eyebrow">Pilih tiket</p>
+            <h2 className="mt-2 text-3xl font-bold">Satu perjalanan, satu tiket resmi</h2>
+            <p className="mt-2 text-sm text-[var(--ink-soft)]">
+              Pilih tiket yang sesuai, kemudian lengkapi jadwal dan data pengunjung dalam tiga langkah singkat.
+            </p>
+            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              {(destination.ticket_categories || []).length === 0 ? (
+                <div className="col-span-full rounded-2xl border border-dashed border-[var(--border)] bg-white/60 p-8 text-center backdrop-blur-sm">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest-deep)]">
+                    <Ticket className="h-6 w-6" />
+                  </div>
+                  <h3 className="mt-3 text-base font-bold text-[var(--forest-deep)]">Pemesanan Tiket Belum Dibuka</h3>
+                  <p className="mt-1 text-xs text-[var(--ink-soft)] max-w-md mx-auto">
+                    Pengelola kawasan {destination.name} saat ini sedang mempersiapkan kategori kuota tiket online.
+                  </p>
+                </div>
+              ) : (
+                (destination.ticket_categories || []).map((category) => {
+                  const total = Number(category.price || 0) + Number(category.insurance || 0) + Number(category.retribusi || 0);
+                  return (
+                    <article
+                      key={category.id}
+                      className="card flex min-h-[200px] flex-col justify-between p-5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)] transition-all"
+                    >
+                      <div>
+                        <h3 className="text-xl font-bold">{category.name}</h3>
+                        <p className="mt-2 text-xs text-[var(--ink-soft)]">
+                          Termasuk komponen asuransi dan retribusi resmi.
+                        </p>
+                      </div>
+                      <div className="mt-5 flex items-end justify-between border-t border-[var(--border)] pt-4">
+                        <div>
+                          <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">
+                            Total per orang
+                          </span>
+                          <strong className="mt-1 block text-xl font-extrabold text-[var(--bark)]">
+                            {rupiah(total)}
+                          </strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={openBooking}
+                          className="btn-primary btn-sm rounded-xl cursor-pointer"
+                        >
+                          Pilih <ArrowRight className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })
+              )}
+            </div>
+          </div>
+          <aside className="surface-muted h-fit p-5 lg:sticky lg:top-24">
+            <h2 className="text-xl font-bold">Kunjungan tertata</h2>
+            <ul className="mt-4 space-y-3 text-xs leading-5 text-[var(--ink-soft)]">
+              <li className="flex gap-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
+                Pilih tanggal dan sesi yang sesuai.
+              </li>
+              <li className="flex gap-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
+                Isi data setiap pemegang tiket.
+              </li>
+              <li className="flex gap-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
+                Tunjukkan QR aktif di gerbang.
+              </li>
+            </ul>
+          </aside>
         </section>
 
         {(template.show_facilities !== false || template.show_rules !== false) && (

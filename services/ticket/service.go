@@ -32,17 +32,17 @@ type CreateCategoryRequest struct {
 }
 
 type UpdateCategoryRequest struct {
-	Name           *string
-	Description    *string
-	TicketType     *string
-	BasePrice      *float64
-	WeekendPrice   *float64
-	HolidayPrice   *float64
-	InsuranceFee   *float64
-	RetribusiFee   *float64
-	IsMandatory    *bool
-	IsPerPerson    *bool
-	MaxQtyPerOrder *int
+	Name           *string  `json:"name,omitempty"`
+	Description    *string  `json:"description,omitempty"`
+	TicketType     *string  `json:"ticket_type,omitempty"`
+	BasePrice      *float64 `json:"base_price,omitempty"`
+	WeekendPrice   *float64 `json:"weekend_price,omitempty"`
+	HolidayPrice   *float64 `json:"holiday_price,omitempty"`
+	InsuranceFee   *float64 `json:"insurance_fee,omitempty"`
+	RetribusiFee   *float64 `json:"retribusi_fee,omitempty"`
+	IsMandatory    *bool    `json:"is_mandatory,omitempty"`
+	IsPerPerson    *bool    `json:"is_per_person,omitempty"`
+	MaxQtyPerOrder *int     `json:"max_qty_per_order,omitempty"`
 }
 
 type CreateTimeSlotRequest struct {
