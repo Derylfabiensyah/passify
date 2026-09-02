@@ -110,23 +110,41 @@ export async function fetchAdminDestinations(slug) {
       const res = await apiRequest(`/api/v1/public/tenants/${currentSlug}/destination`);
       if (res && (res.data || res.name)) {
         const dest = res.data || res;
-        // Also fetch categories from ticket service if destination ID is present
-        if (dest.id) {
+        let categories = [];
+
+        // 1. Direct categories from destination response if populated
+        if (dest.ticket_categories && Array.isArray(dest.ticket_categories) && dest.ticket_categories.length > 0) {
+          categories = dest.ticket_categories.map((c) => ({
+            id: c.id,
+            name: c.name,
+            price: Number(c.base_price ?? c.price ?? 0),
+            insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
+            retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
+            is_active: c.is_active !== false,
+          }));
+        }
+
+        // 2. Also fetch categories from ticket service if not present
+        if (categories.length === 0 && dest.id) {
           try {
             const catRes = await apiRequest(`/api/v1/tickets/destinations/${dest.id}/categories`);
             if (catRes && (catRes.data || Array.isArray(catRes))) {
               const rawCats = catRes.data || catRes;
-              dest.ticket_categories = (Array.isArray(rawCats) ? rawCats : []).map((c) => ({
-                id: c.id,
-                name: c.name,
-                price: Number(c.base_price ?? c.price ?? 0),
-                insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
-                retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
-                is_active: c.is_active !== false,
-              }));
+              if (Array.isArray(rawCats) && rawCats.length > 0) {
+                categories = rawCats.map((c) => ({
+                  id: c.id,
+                  name: c.name,
+                  price: Number(c.base_price ?? c.price ?? 0),
+                  insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
+                  retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
+                  is_active: c.is_active !== false,
+                }));
+              }
             }
           } catch (_) {}
         }
+
+        dest.ticket_categories = categories;
         backendDests = [dest];
       }
     } catch (err) {
@@ -134,13 +152,26 @@ export async function fetchAdminDestinations(slug) {
     }
   }
 
-  // Merge destinations without duplicates by ID
+  // Merge destinations: real backend data MUST override stale localStorage!
   const map = new Map();
-  backendDests.forEach((d) => map.set(d.id, d));
   localDests.forEach((d) => map.set(d.id, d));
+  backendDests.forEach((d) => {
+    const existing = map.get(d.id);
+    map.set(d.id, {
+      ...existing,
+      ...d,
+      ticket_categories: (d.ticket_categories && d.ticket_categories.length > 0)
+        ? d.ticket_categories
+        : (existing?.ticket_categories || []),
+    });
+  });
 
   if (map.size > 0) {
-    return Array.from(map.values());
+    const mergedList = Array.from(map.values());
+    try {
+      localStorage.setItem('passify_admin_destinations', JSON.stringify(mergedList));
+    } catch (_) {}
+    return mergedList;
   }
 
   return ADMIN_DESTINATIONS;
