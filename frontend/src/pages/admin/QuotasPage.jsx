@@ -245,17 +245,47 @@ function EditQuotaModal({ day, onClose, onSave }) {
 
 function EditTimeSlotModal({ slot, onClose, onSave }) {
   const isNew = !slot?.id;
+  const initialLabel = slot?.label || slot?.slot_label || '';
+  const initialTimeRange =
+    slot?.time_range ||
+    (slot?.start_time && slot?.end_time ? `${slot.start_time.slice(0, 5)} - ${slot.end_time.slice(0, 5)}` : '');
+
   const [formData, setFormData] = useState({
-    label: slot?.label || '',
-    time_range: slot?.time_range || '',
+    label: initialLabel,
+    time_range: initialTimeRange,
     max_capacity: slot?.max_capacity !== undefined ? slot.max_capacity : 500,
-    is_active: slot?.is_active !== undefined ? slot.is_active : true
+    is_active: slot?.is_active !== undefined ? slot.is_active : true,
   });
   const [error, setError] = useState('');
 
+  const handleTimeRangeChange = (newRange) => {
+    setFormData((prev) => {
+      let newLabel = prev.label;
+      // Auto-sync time inside label parentheses e.g. "Sesi Pagi (08:00 - 11:00)" -> "Sesi Pagi (08:00 - 12:00)"
+      if (/\(\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}(?:\s*WIB)?\)/i.test(newLabel)) {
+        newLabel = newLabel.replace(/\(\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}(?:\s*WIB)?\)/i, `(${newRange})`);
+      } else if (!newLabel || newLabel.startsWith('Sesi')) {
+        const prefix = newLabel ? newLabel.split('(')[0].trim() : 'Sesi Kunjungan';
+        newLabel = `${prefix} (${newRange})`;
+      }
+      return { ...prev, time_range: newRange, label: newLabel };
+    });
+  };
+
+  const handleLabelChange = (newLabel) => {
+    setError('');
+    const match = newLabel.match(/\((\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2})\)/);
+    setFormData((prev) => ({
+      ...prev,
+      label: newLabel,
+      time_range: match ? match[1] : prev.time_range,
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.label.trim()) {
+    const finalLabel = formData.label.trim();
+    if (!finalLabel) {
       setError('Nama sesi wajib diisi.');
       return;
     }
@@ -266,8 +296,10 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
     onSave({
       ...slot,
       ...formData,
+      label: finalLabel,
+      slot_label: finalLabel,
       id: slot?.id || `ts-${Date.now()}`,
-      booked: slot?.booked || 0
+      booked: slot?.booked || 0,
     });
     onClose();
   };
@@ -301,10 +333,7 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
               required
               placeholder="Contoh: Sesi Pagi (08:00 - 12:00)"
               value={formData.label}
-              onChange={(e) => {
-                setFormData({ ...formData, label: e.target.value });
-                setError('');
-              }}
+              onChange={(e) => handleLabelChange(e.target.value)}
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
             />
           </div>
@@ -317,7 +346,7 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
               type="text"
               placeholder="Contoh: 08:00 - 12:00 WIB"
               value={formData.time_range}
-              onChange={(e) => setFormData({ ...formData, time_range: e.target.value })}
+              onChange={(e) => handleTimeRangeChange(e.target.value)}
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
             />
           </div>
@@ -458,6 +487,8 @@ export default function QuotasPage() {
   };
 
   const handleSaveTimeSlot = async (updatedSlot) => {
+    const isNew = !updatedSlot.id || String(updatedSlot.id).startsWith('ts-');
+
     setDestinations((prevDests) =>
       prevDests.map((dest) => {
         if (dest.id !== selectedDest.id) return dest;
@@ -468,7 +499,7 @@ export default function QuotasPage() {
           : [...currentSlots, { ...updatedSlot, id: updatedSlot.id || `ts-${Date.now()}`, booked: updatedSlot.booked || 0 }];
         return {
           ...dest,
-          time_slots: newSlots
+          time_slots: newSlots,
         };
       })
     );
@@ -477,16 +508,35 @@ export default function QuotasPage() {
 
     // Sync with ticket service & localStorage
     try {
-      await apiRequest('/api/v1/tickets/time-slots', {
-        method: 'POST',
+      const endpoint = isNew ? '/api/v1/tickets/time-slots' : `/api/v1/tickets/time-slots/${updatedSlot.id}`;
+      const method = isNew ? 'POST' : 'PUT';
+
+      const res = await apiRequest(endpoint, {
+        method,
         body: {
           destination_id: selectedDest.id,
           slot_label: updatedSlot.label,
           label: updatedSlot.label,
           time_range: updatedSlot.time_range,
           max_capacity: Number(updatedSlot.max_capacity || 500),
+          is_active: updatedSlot.is_active !== false,
         },
       });
+
+      const serverSlot = res?.data;
+      if (serverSlot && isNew) {
+        setDestinations((prevDests) =>
+          prevDests.map((dest) => {
+            if (dest.id !== selectedDest.id) return dest;
+            return {
+              ...dest,
+              time_slots: (dest.time_slots || []).map((s) =>
+                s.id === updatedSlot.id ? { ...s, id: serverSlot.id } : s
+              ),
+            };
+          })
+        );
+      }
 
       // Update local storage destinations cache
       const raw = localStorage.getItem('passify_admin_destinations');
@@ -494,7 +544,9 @@ export default function QuotasPage() {
         const list = JSON.parse(raw);
         const idx = list.findIndex((d) => d.id === selectedDest.id || d.slug === selectedDest.slug);
         if (idx >= 0) {
-          list[idx].time_slots = (list[idx].time_slots || []).filter((s) => s.id !== updatedSlot.id).concat(updatedSlot);
+          list[idx].time_slots = (list[idx].time_slots || [])
+            .filter((s) => s.id !== updatedSlot.id)
+            .concat({ ...updatedSlot, id: serverSlot?.id || updatedSlot.id });
           localStorage.setItem('passify_admin_destinations', JSON.stringify(list));
         }
       }
@@ -503,17 +555,27 @@ export default function QuotasPage() {
     }
   };
 
-  const handleDeleteTimeSlot = (slotId) => {
+  const handleDeleteTimeSlot = async (slotId) => {
     setDestinations((prevDests) =>
       prevDests.map((dest) => {
         if (dest.id !== selectedDest.id) return dest;
         return {
           ...dest,
-          time_slots: (dest.time_slots || []).filter((s) => s.id !== slotId)
+          time_slots: (dest.time_slots || []).filter((s) => s.id !== slotId),
         };
       })
     );
     showToast('Sesi kunjungan berhasil dihapus.');
+
+    if (slotId && !String(slotId).startsWith('ts-')) {
+      try {
+        await apiRequest(`/api/v1/tickets/time-slots/${slotId}`, {
+          method: 'DELETE',
+        });
+      } catch (err) {
+        console.warn('Failed to delete time slot on server:', err);
+      }
+    }
   };
 
   const totalWeeklyCapacity = quotaCalendar.reduce((sum, d) => sum + d.max_capacity, 0);

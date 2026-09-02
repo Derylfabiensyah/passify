@@ -61,6 +61,8 @@ func RegisterRoutes(router *gin.RouterGroup, handler *TicketHandler, jwtSecret s
 			admin.PUT("/categories/:id", handler.HandleUpdateCategory)
 			admin.DELETE("/categories/:id", handler.HandleDeleteCategory)
 			admin.POST("/time-slots", handler.HandleCreateTimeSlot)
+			admin.PUT("/time-slots/:id", handler.HandleUpdateTimeSlot)
+			admin.DELETE("/time-slots/:id", handler.HandleDeleteTimeSlot)
 			admin.GET("/destinations/:destination_id/quotas", handler.HandleListQuotas)
 		}
 	}

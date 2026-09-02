@@ -94,6 +94,38 @@ func (h *TicketHandler) HandleCreateTimeSlot(c *gin.Context) {
 	response.Success(c, http.StatusCreated, "Time slot created successfully", slot)
 }
 
+func (h *TicketHandler) HandleUpdateTimeSlot(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		response.BadRequest(c, "Invalid slot ID", err.Error())
+		return
+	}
+	var req UpdateTimeSlotRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Invalid request body", err.Error())
+		return
+	}
+	slot, err := h.service.UpdateTimeSlot(id, req)
+	if err != nil {
+		response.InternalServerError(c, "Failed to update time slot")
+		return
+	}
+	response.Success(c, http.StatusOK, "Time slot updated successfully", slot)
+}
+
+func (h *TicketHandler) HandleDeleteTimeSlot(c *gin.Context) {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		response.BadRequest(c, "Invalid slot ID", err.Error())
+		return
+	}
+	if err := h.service.DeleteTimeSlot(id); err != nil {
+		response.InternalServerError(c, "Failed to delete time slot")
+		return
+	}
+	response.Success(c, http.StatusOK, "Time slot deleted successfully", nil)
+}
+
 func (h *TicketHandler) HandleListTimeSlots(c *gin.Context) {
 	destID, err := uuid.Parse(c.Param("destination_id"))
 	if err != nil {

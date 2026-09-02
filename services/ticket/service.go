@@ -47,13 +47,24 @@ type UpdateCategoryRequest struct {
 }
 
 type CreateTimeSlotRequest struct {
-	DestinationID uuid.UUID `json:"destination_id" binding:"required"`
+	DestinationID uuid.UUID `json:"destination_id"`
 	SlotLabel     string    `json:"slot_label,omitempty"`
 	Label         string    `json:"label,omitempty"`
 	TimeRange     string    `json:"time_range,omitempty"`
 	StartTime     string    `json:"start_time,omitempty"`
 	EndTime       string    `json:"end_time,omitempty"`
-	MaxCapacity   int       `json:"max_capacity" binding:"required"`
+	MaxCapacity   int       `json:"max_capacity"`
+}
+
+type UpdateTimeSlotRequest struct {
+	DestinationID *uuid.UUID `json:"destination_id,omitempty"`
+	SlotLabel     string     `json:"slot_label,omitempty"`
+	Label         string     `json:"label,omitempty"`
+	TimeRange     string     `json:"time_range,omitempty"`
+	StartTime     string     `json:"start_time,omitempty"`
+	EndTime       string     `json:"end_time,omitempty"`
+	MaxCapacity   int        `json:"max_capacity,omitempty"`
+	IsActive      *bool      `json:"is_active,omitempty"`
 }
 
 type CheckAvailabilityRequest struct {
@@ -138,6 +149,8 @@ type TicketService interface {
 	UpdateCategory(id uuid.UUID, req UpdateCategoryRequest) (*models.TicketCategory, error)
 	DeleteCategory(id uuid.UUID) error
 	CreateTimeSlot(tenantID uuid.UUID, req CreateTimeSlotRequest) (*models.TimeSlot, error)
+	UpdateTimeSlot(id uuid.UUID, req UpdateTimeSlotRequest) (*models.TimeSlot, error)
+	DeleteTimeSlot(id uuid.UUID) error
 	ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error)
 	CheckAvailability(req CheckAvailabilityRequest) (*AvailabilityResponse, error)
 	BookTickets(tenantID, userID uuid.UUID, req BookTicketsRequest) (*BookingResponse, error)
@@ -284,6 +297,66 @@ func (s *ticketService) CreateTimeSlot(tenantID uuid.UUID, req CreateTimeSlotReq
 		return nil, err
 	}
 	return slot, nil
+}
+
+func (s *ticketService) UpdateTimeSlot(id uuid.UUID, req UpdateTimeSlotRequest) (*models.TimeSlot, error) {
+	slot, err := s.repo.GetTimeSlotByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	label := strings.TrimSpace(req.SlotLabel)
+	if label == "" {
+		label = strings.TrimSpace(req.Label)
+	}
+
+	startTime := strings.TrimSpace(req.StartTime)
+	endTime := strings.TrimSpace(req.EndTime)
+	if req.TimeRange != "" {
+		cleanRange := strings.ReplaceAll(req.TimeRange, "WIB", "")
+		cleanRange = strings.ReplaceAll(cleanRange, "wib", "")
+		cleanRange = strings.TrimSpace(cleanRange)
+		parts := strings.Split(cleanRange, "-")
+		if len(parts) >= 2 {
+			startTime = strings.TrimSpace(parts[0])
+			endTime = strings.TrimSpace(parts[1])
+		}
+	}
+
+	if startTime != "" {
+		if len(startTime) == 5 {
+			startTime += ":00"
+		}
+		slot.StartTime = startTime
+	}
+	if endTime != "" {
+		if len(endTime) == 5 {
+			endTime += ":00"
+		}
+		slot.EndTime = endTime
+	}
+
+	if label != "" {
+		slot.SlotLabel = label
+	} else if startTime != "" && endTime != "" {
+		slot.SlotLabel = fmt.Sprintf("Sesi (%s - %s)", slot.StartTime[:5], slot.EndTime[:5])
+	}
+
+	if req.MaxCapacity > 0 {
+		slot.MaxCapacity = req.MaxCapacity
+	}
+	if req.IsActive != nil {
+		slot.IsActive = *req.IsActive
+	}
+
+	if err := s.repo.UpdateTimeSlot(slot); err != nil {
+		return nil, err
+	}
+	return slot, nil
+}
+
+func (s *ticketService) DeleteTimeSlot(id uuid.UUID) error {
+	return s.repo.DeleteTimeSlot(id)
 }
 
 func (s *ticketService) ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error) {

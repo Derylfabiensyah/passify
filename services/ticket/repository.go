@@ -20,6 +20,9 @@ type TicketRepository interface {
 	DecrementBookedQuota(quotaID uuid.UUID, count int) error
 	ListDailyQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error)
 	CreateTimeSlot(slot *models.TimeSlot) error
+	GetTimeSlotByID(id uuid.UUID) (*models.TimeSlot, error)
+	UpdateTimeSlot(slot *models.TimeSlot) error
+	DeleteTimeSlot(id uuid.UUID) error
 	ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error)
 	GetOrCreateSlotQuota(dailyQuotaID, timeSlotID, tenantID uuid.UUID) (*models.SlotQuota, error)
 	IncrementSlotBookedQuota(slotQuotaID uuid.UUID, count int) error
@@ -118,6 +121,22 @@ func (r *ticketRepository) CreateTimeSlot(slot *models.TimeSlot) error {
 		}
 	}
 	return r.db.Create(slot).Error
+}
+
+func (r *ticketRepository) GetTimeSlotByID(id uuid.UUID) (*models.TimeSlot, error) {
+	var slot models.TimeSlot
+	if err := r.db.First(&slot, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &slot, nil
+}
+
+func (r *ticketRepository) UpdateTimeSlot(slot *models.TimeSlot) error {
+	return r.db.Save(slot).Error
+}
+
+func (r *ticketRepository) DeleteTimeSlot(id uuid.UUID) error {
+	return r.db.Delete(&models.TimeSlot{}, "id = ?", id).Error
 }
 
 func (r *ticketRepository) ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error) {
