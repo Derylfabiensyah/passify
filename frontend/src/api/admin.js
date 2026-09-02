@@ -1,4 +1,5 @@
 import { apiRequest } from './client';
+import { fetchDestinationBySlug } from './tenant';
 import {
   HOURLY_VISITORS,
   REVENUE_WEEKLY,
@@ -93,102 +94,32 @@ export function getActiveAdminTenant() {
  * Fetch real destinations for the current tenant
  */
 export async function fetchAdminDestinations(slug) {
-  // 1. Read existing local destinations first
+  const user = getAdminUser();
+  const currentSlug = slug || user.tenant_slug || getActiveAdminTenant()?.slug || 'curug-citambur';
+
+  // 1. Fetch authoritative destination data directly (shared with public portal)
+  try {
+    const dest = await fetchDestinationBySlug(currentSlug);
+    if (dest) {
+      const unifiedList = [dest];
+      try {
+        localStorage.setItem('passify_admin_destinations', JSON.stringify(unifiedList));
+        localStorage.setItem('passify_current_tenant', dest.slug);
+      } catch (_) {}
+      return unifiedList;
+    }
+  } catch (err) {
+    console.warn('Failed to fetch destination by slug:', err);
+  }
+
+  // 2. Fallback only if offline / network error
   let localDests = [];
   try {
     const raw = localStorage.getItem('passify_admin_destinations');
     if (raw) localDests = JSON.parse(raw);
   } catch (_) {}
 
-  const user = getAdminUser();
-  const currentSlug = slug || user.tenant_slug || getActiveAdminTenant()?.slug || 'curug-citambur';
-
-  let backendDests = [];
-  if (currentSlug) {
-    try {
-      // Try public tenant destination lookup
-      const res = await apiRequest(`/api/v1/public/tenants/${currentSlug}/destination`);
-      if (res && (res.data || res.name)) {
-        const dest = res.data || res;
-        let categories = [];
-
-        // 1. Direct categories from destination response if populated
-        if (dest.ticket_categories && Array.isArray(dest.ticket_categories) && dest.ticket_categories.length > 0) {
-          categories = dest.ticket_categories.map((c) => ({
-            id: c.id,
-            name: c.name,
-            price: Number(c.base_price ?? c.price ?? 0),
-            insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
-            retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
-            is_active: c.is_active !== false,
-          }));
-        }
-
-        // 2. Also fetch categories from ticket service if not present
-        if (categories.length === 0 && dest.id) {
-          try {
-            const catRes = await apiRequest(`/api/v1/tickets/destinations/${dest.id}/categories`);
-            if (catRes && (catRes.data || Array.isArray(catRes))) {
-              const rawCats = catRes.data || catRes;
-              if (Array.isArray(rawCats) && rawCats.length > 0) {
-                categories = rawCats.map((c) => ({
-                  id: c.id,
-                  name: c.name,
-                  price: Number(c.base_price ?? c.price ?? 0),
-                  insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
-                  retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
-                  is_active: c.is_active !== false,
-                }));
-              }
-            }
-          } catch (_) {}
-        }
-
-        dest.ticket_categories = categories;
-        backendDests = [dest];
-      }
-    } catch (err) {
-      console.warn('Backend destination lookup:', err.message);
-    }
-  }
-
-  // Merge destinations: real backend data MUST override stale localStorage!
-  if (backendDests.length > 0) {
-    const backendDest = backendDests[0];
-    // Find matching local entry by slug, id, or tenant_id
-    const matchingLocal = localDests.find(
-      (ld) => ld.slug === backendDest.slug || ld.id === backendDest.id || ld.id === backendDest.tenant_id
-    );
-
-    const mergedCategories = (backendDest.ticket_categories && backendDest.ticket_categories.length > 0)
-      ? backendDest.ticket_categories
-      : (matchingLocal?.ticket_categories || []);
-
-    const unifiedDest = {
-      ...(matchingLocal || {}),
-      ...backendDest,
-      id: backendDest.id, // Guarantee real PostgreSQL UUID
-      max_daily_capacity: Number(backendDest.max_daily_capacity || matchingLocal?.max_daily_capacity || 1000),
-      ticket_categories: mergedCategories,
-    };
-
-    // Remove any stale/duplicate local versions of this destination
-    const remainingLocal = localDests.filter(
-      (ld) => ld.id !== unifiedDest.id && ld.slug !== unifiedDest.slug && ld.id !== backendDest.tenant_id
-    );
-
-    const mergedList = [unifiedDest, ...remainingLocal];
-    try {
-      localStorage.setItem('passify_admin_destinations', JSON.stringify(mergedList));
-    } catch (_) {}
-    return mergedList;
-  }
-
-  if (localDests.length > 0) {
-    return localDests;
-  }
-
-  return ADMIN_DESTINATIONS;
+  return localDests.length > 0 ? localDests : ADMIN_DESTINATIONS;
 }
 
 /**

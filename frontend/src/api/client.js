@@ -84,9 +84,10 @@ export function getDeviceFingerprint() {
  */
 export async function apiRequest(endpoint, options = {}) {
   const targetUrl = resolveServiceUrl(endpoint);
+  const isBookingOrQueue = endpoint.includes('/book') || endpoint.includes('/queue');
   const headers = {
     'Content-Type': 'application/json',
-    'X-Device-Fingerprint': getDeviceFingerprint(),
+    ...(isBookingOrQueue ? { 'X-Device-Fingerprint': getDeviceFingerprint() } : {}),
     ...options.headers,
   };
 
