@@ -22,9 +22,11 @@ import {
   Ticket,
   User,
   Users,
-  Leaf
+  Leaf,
+  Wallet
 } from 'lucide-react';
 import ETicketModal from '../components/ETicketModal';
+import WalletModal from '../components/WalletModal';
 import { useToast } from '../contexts/ToastContext';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
@@ -38,6 +40,20 @@ export default function BookingHistoryPage() {
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'active' | 'used' | 'expired'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTicketForQR, setSelectedTicketForQR] = useState(null);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(() => {
+    const saved = localStorage.getItem('passify_wallet_balance');
+    return saved !== null ? Number(saved) : 150000;
+  });
+
+  useEffect(() => {
+    const syncWallet = () => {
+      const saved = localStorage.getItem('passify_wallet_balance');
+      if (saved !== null) setWalletBalance(Number(saved));
+    };
+    window.addEventListener('storage', syncWallet);
+    return () => window.removeEventListener('storage', syncWallet);
+  }, []);
 
   const currentTenantSlug =
     searchParams.get('tenant') ||
@@ -228,6 +244,16 @@ export default function BookingHistoryPage() {
             >
               Tiket Saya
             </Link>
+
+            <button
+              type="button"
+              onClick={() => setShowWalletModal(true)}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] border border-gray-200 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
+            >
+              <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />
+              <span className="hidden sm:inline">Dompet:</span> <span>{formatRupiah(walletBalance)}</span>
+            </button>
 
             {user ? (
               <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
@@ -497,6 +523,22 @@ export default function BookingHistoryPage() {
       {/* Dynamic 10-Minute TOTP QR Modal */}
       {selectedTicketForQR && (
         <ETicketModal order={selectedTicketForQR} onClose={() => setSelectedTicketForQR(null)} />
+      )}
+
+      {/* Cashless Wallet Modal */}
+      {showWalletModal && (
+        <WalletModal
+          walletBalance={walletBalance}
+          onTopUp={(delta) => {
+            const next = Math.max(0, walletBalance + delta);
+            setWalletBalance(next);
+            try {
+              localStorage.setItem('passify_wallet_balance', String(next));
+              window.dispatchEvent(new Event('storage'));
+            } catch (_) {}
+          }}
+          onClose={() => setShowWalletModal(false)}
+        />
       )}
 
       {/* Footer */}

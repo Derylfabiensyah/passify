@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, Clock, Compass,
-  Info, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Sparkles, Ticket, Users,
+  Info, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Sparkles, Ticket, Users, Wallet,
 } from 'lucide-react';
 import { formatRupiah } from '../api/client';
 import { DESTINATIONS } from '../data/destinations';
+import WalletModal from './WalletModal';
 
 const fallbackDestination = {
   id: 'dest-demo',
@@ -34,6 +35,20 @@ export default function TravelerPortal() {
       return null;
     }
   });
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(() => {
+    const saved = localStorage.getItem('passify_wallet_balance');
+    return saved !== null ? Number(saved) : 150000;
+  });
+
+  React.useEffect(() => {
+    const syncWallet = () => {
+      const saved = localStorage.getItem('passify_wallet_balance');
+      if (saved !== null) setWalletBalance(Number(saved));
+    };
+    window.addEventListener('storage', syncWallet);
+    return () => window.removeEventListener('storage', syncWallet);
+  }, []);
 
   const destinations = Array.isArray(DESTINATIONS) && DESTINATIONS.length ? DESTINATIONS : [fallbackDestination];
   const destination = destinations[demoIndex] || destinations[0] || fallbackDestination;
@@ -85,6 +100,16 @@ export default function TravelerPortal() {
               <span className="hidden sm:inline">Riwayat Pesanan</span>
               <span className="sm:hidden">Pesanan</span>
             </Link>
+
+            <button
+              type="button"
+              onClick={() => setShowWalletModal(true)}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
+            >
+              <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />
+              <span className="hidden sm:inline">Dompet:</span> <span>{formatRupiah(walletBalance)}</span>
+            </button>
 
             {user ? (
               <div className="flex items-center gap-2">
@@ -235,6 +260,14 @@ export default function TravelerPortal() {
         <button type="button" onClick={handleBookNowClick} className="btn-clay w-full text-sm"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button>
       </div>
       <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 sm:px-6 lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between"><span><strong className="text-[var(--forest-deep)]">{destination.name}</strong> · Didukung Passify</span><Link to="/" className="font-semibold text-[var(--forest)] hover:text-[var(--bark)]">Kembali ke beranda Passify</Link></div></footer>
+
+      {/* Passify Cashless Wallet Modal */}
+      {showWalletModal && (
+        <WalletModal
+          walletBalance={walletBalance}
+          onClose={() => setShowWalletModal(false)}
+        />
+      )}
     </div>
   );
 }

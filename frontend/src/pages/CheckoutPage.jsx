@@ -26,6 +26,7 @@ import { fetchDestinationBySlug } from '../api/tenant';
 import { fetchAdminQuotas } from '../api/admin';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
+import WalletModal from '../components/WalletModal';
 
 const getPaymentDeadline = (slug) => {
   try {
@@ -69,7 +70,11 @@ export default function CheckoutPage() {
 
   // Step 2 Payment States (PDF Spec Hal. 4 Poin 7.A: 5-Minute Redis Distributed Lock)
   const [paymentMethod, setPaymentMethod] = useState('midtrans'); // 'midtrans' | 'wallet'
-  const [walletBalance, setWalletBalance] = useState(150000);
+  const [walletBalance, setWalletBalance] = useState(() => {
+    const saved = localStorage.getItem('passify_wallet_balance');
+    return saved !== null ? Number(saved) : 150000;
+  });
+  const [showWalletModal, setShowWalletModal] = useState(false);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState(() => {
     const saved = getPaymentDeadline();
     const diff = Math.floor((saved - Date.now()) / 1000);
@@ -78,6 +83,15 @@ export default function CheckoutPage() {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showSnapModal, setShowSnapModal] = useState(false);
   const [snapData, setSnapData] = useState(null);
+
+  useEffect(() => {
+    const syncWallet = () => {
+      const saved = localStorage.getItem('passify_wallet_balance');
+      if (saved !== null) setWalletBalance(Number(saved));
+    };
+    window.addEventListener('storage', syncWallet);
+    return () => window.removeEventListener('storage', syncWallet);
+  }, []);
 
   // PDF Spec Hal. 4 Poin 7.A: Virtual Waiting Room & Queue Management States
   const [inWaitingRoom, setInWaitingRoom] = useState(false);
@@ -521,7 +535,23 @@ export default function CheckoutPage() {
       };
 
       if (paymentMethod === 'wallet') {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 800));
+        const newBal = Math.max(0, walletBalance - totals.grandTotal);
+        setWalletBalance(newBal);
+        try {
+          localStorage.setItem('passify_wallet_balance', String(newBal));
+          const txRaw = localStorage.getItem('passify_wallet_txs');
+          const txList = txRaw ? JSON.parse(txRaw) : [];
+          txList.unshift({
+            id: `TX-${Date.now()}`,
+            title: `Tiket Masuk ${destination.name || 'Wisata'} (${totals.quantity} Tiket)`,
+            amount: -totals.grandTotal,
+            type: 'ticket',
+            time: 'Baru saja'
+          });
+          localStorage.setItem('passify_wallet_txs', JSON.stringify(txList));
+          window.dispatchEvent(new Event('storage'));
+        } catch (_) {}
         finalizeBookingSuccess(orderData);
         return;
       }
@@ -1139,8 +1169,20 @@ export default function CheckoutPage() {
                         </p>
                       </div>
                     </div>
-                    <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${paymentMethod === 'wallet' ? 'bg-[var(--forest)]' : 'bg-gray-300'}`}>
-                      {paymentMethod === 'wallet' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowWalletModal(true);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-white border border-[var(--forest)]/30 text-[10px] font-bold text-[var(--forest)] hover:bg-[var(--leaf-pale)] transition-colors shadow-2xs"
+                      >
+                        + Top Up / Kelola
+                      </button>
+                      <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${paymentMethod === 'wallet' ? 'bg-[var(--forest)]' : 'bg-gray-300'}`}>
+                        {paymentMethod === 'wallet' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1464,6 +1506,22 @@ export default function CheckoutPage() {
               </button>
             </div>
           </div>
+        )}
+
+        {/* Passify Cashless Wallet Modal */}
+        {showWalletModal && (
+          <WalletModal
+            walletBalance={walletBalance}
+            onTopUp={(delta) => {
+              const next = Math.max(0, walletBalance + delta);
+              setWalletBalance(next);
+              try {
+                localStorage.setItem('passify_wallet_balance', String(next));
+                window.dispatchEvent(new Event('storage'));
+              } catch (_) {}
+            }}
+            onClose={() => setShowWalletModal(false)}
+          />
         )}
       </main>
 

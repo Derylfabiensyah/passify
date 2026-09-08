@@ -18,18 +18,53 @@ import {
 } from 'lucide-react';
 import ModalWrapper from './common/ModalWrapper';
 
-export default function WalletModal({ walletBalance, onTopUp, onClose }) {
+export default function WalletModal({ walletBalance: propBalance, onTopUp, onClose }) {
   const [activeTab, setActiveTab] = useState('nfc'); // 'nfc' | 'qr' | 'refund' | 'topup'
   const [amount, setAmount] = useState(100000);
   const [isSuccessMsg, setIsSuccessMsg] = useState('');
   const [nfcLinked, setNfcLinked] = useState(true);
   const [nfcUid] = useState('CLIENT-NFC-88219');
 
-  // Simulated transaction history state
-  const [transactions, setTransactions] = useState([
-    { id: 'TX-101', title: 'Top Up Dompet Digital', amount: 250000, type: 'topup', time: 'Hari ini, 07:15' },
-    { id: 'TX-102', title: 'Merchant Kopi & Kuliner Klien', amount: -25000, type: 'fnb', time: 'Hari ini, 08:30' }
-  ]);
+  const [localBalance, setLocalBalance] = useState(() => {
+    const saved = localStorage.getItem('passify_wallet_balance');
+    return saved !== null ? Number(saved) : 150000;
+  });
+
+  const walletBalance = propBalance !== undefined ? propBalance : localBalance;
+
+  // Simulated transaction history state with localStorage fallback
+  const [transactions, setTransactions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('passify_wallet_txs');
+      if (saved) return JSON.parse(saved);
+    } catch (_) {}
+    return [
+      { id: 'TX-101', title: 'Top Up Dompet Digital', amount: 250000, type: 'topup', time: 'Hari ini, 07:15' },
+      { id: 'TX-102', title: 'Merchant Kopi & Kuliner Klien', amount: -25000, type: 'fnb', time: 'Hari ini, 08:30' }
+    ];
+  });
+
+  const updateTransactions = (newTx) => {
+    setTransactions((prev) => {
+      const updated = [newTx, ...prev];
+      try {
+        localStorage.setItem('passify_wallet_txs', JSON.stringify(updated));
+      } catch (_) {}
+      return updated;
+    });
+  };
+
+  const applyDelta = (delta) => {
+    const nextBal = Math.max(0, walletBalance + delta);
+    setLocalBalance(nextBal);
+    try {
+      localStorage.setItem('passify_wallet_balance', String(nextBal));
+      window.dispatchEvent(new Event('storage'));
+    } catch (_) {}
+    if (onTopUp) {
+      onTopUp(delta);
+    }
+  };
 
   const presets = [50000, 100000, 250000, 500000];
 
@@ -43,17 +78,14 @@ export default function WalletModal({ walletBalance, onTopUp, onClose }) {
     e.preventDefault();
     if (amount <= 0) return;
 
-    onTopUp(amount);
-    setTransactions((prev) => [
-      {
-        id: `TX-${Date.now()}`,
-        title: 'Top Up Saldo Mandiri',
-        amount: amount,
-        type: 'topup',
-        time: 'Baru saja'
-      },
-      ...prev
-    ]);
+    applyDelta(amount);
+    updateTransactions({
+      id: `TX-${Date.now()}`,
+      title: 'Top Up Saldo Mandiri',
+      amount: amount,
+      type: 'topup',
+      time: 'Baru saja'
+    });
 
     setIsSuccessMsg(`Top-Up Rp ${amount.toLocaleString('id-ID')} berhasil ditambahkan!`);
     setTimeout(() => setIsSuccessMsg(''), 3000);
@@ -66,17 +98,14 @@ export default function WalletModal({ walletBalance, onTopUp, onClose }) {
       return;
     }
 
-    onTopUp(-merch.price);
-    setTransactions((prev) => [
-      {
-        id: `TX-${Date.now()}`,
-        title: `${merch.name} (${merch.item})`,
-        amount: -merch.price,
-        type: 'fnb',
-        time: 'Baru saja'
-      },
-      ...prev
-    ]);
+    applyDelta(-merch.price);
+    updateTransactions({
+      id: `TX-${Date.now()}`,
+      title: `${merch.name} (${merch.item})`,
+      amount: -merch.price,
+      type: 'fnb',
+      time: 'Baru saja'
+    });
 
     setIsSuccessMsg(`✓ Pembayaran Rp ${merch.price.toLocaleString('id-ID')} ke ${merch.name} berhasil!`);
     setTimeout(() => setIsSuccessMsg(''), 3500);
@@ -90,17 +119,14 @@ export default function WalletModal({ walletBalance, onTopUp, onClose }) {
     }
 
     const currentBal = walletBalance;
-    onTopUp(-currentBal);
-    setTransactions((prev) => [
-      {
-        id: `TX-${Date.now()}`,
-        title: 'Instant Refund & Payout ke Bank/E-Wallet',
-        amount: -currentBal,
-        type: 'refund',
-        time: 'Baru saja'
-      },
-      ...prev
-    ]);
+    applyDelta(-currentBal);
+    updateTransactions({
+      id: `TX-${Date.now()}`,
+      title: 'Instant Refund & Payout ke Bank/E-Wallet',
+      amount: -currentBal,
+      type: 'refund',
+      time: 'Baru saja'
+    });
 
     setIsSuccessMsg(`✓ Refund Rp ${currentBal.toLocaleString('id-ID')} telah dikirim tanpa potongan biaya!`);
     setTimeout(() => setIsSuccessMsg(''), 4000);

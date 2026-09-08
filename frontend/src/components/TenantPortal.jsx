@@ -10,10 +10,12 @@ import {
   MapPin,
   ShieldCheck,
   Ticket,
-  History
+  History,
+  Wallet
 } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
 import { PortalPageSkeleton } from './common/Skeleton';
+import WalletModal from './WalletModal';
 
 const rupiah = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
 const isPortalColor = (value, allowed, fallback) => allowed.includes(value) ? value : fallback;
@@ -25,6 +27,20 @@ export default function TenantPortal() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('passify_user') || 'null'); } catch { return null; }
   });
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(() => {
+    const saved = localStorage.getItem('passify_wallet_balance');
+    return saved !== null ? Number(saved) : 150000;
+  });
+
+  React.useEffect(() => {
+    const syncWallet = () => {
+      const saved = localStorage.getItem('passify_wallet_balance');
+      if (saved !== null) setWalletBalance(Number(saved));
+    };
+    window.addEventListener('storage', syncWallet);
+    return () => window.removeEventListener('storage', syncWallet);
+  }, []);
 
   if (isLoading) {
     return <PortalPageSkeleton />;
@@ -126,6 +142,16 @@ export default function TenantPortal() {
               <span className="hidden sm:inline">Riwayat Pesanan</span>
               <span className="sm:hidden">Pesanan</span>
             </Link>
+
+            <button
+              type="button"
+              onClick={() => setShowWalletModal(true)}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
+            >
+              <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />
+              <span className="hidden sm:inline">Dompet:</span> <span>{rupiah(walletBalance)}</span>
+            </button>
 
             {isManager && (
               <Link
@@ -394,6 +420,14 @@ export default function TenantPortal() {
         </div>
         <p>{destination.name} · Didukung oleh Passify</p>
       </footer>
+
+      {/* Passify Cashless Wallet Modal */}
+      {showWalletModal && (
+        <WalletModal
+          walletBalance={walletBalance}
+          onClose={() => setShowWalletModal(false)}
+        />
+      )}
     </div>
   );
 }
