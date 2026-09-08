@@ -251,18 +251,13 @@ export default function CheckoutPage() {
     });
   }, [totalQty]);
 
-  // 15-Minute Realtime Countdown Timer in Step 2
+  // 15-Minute Realtime Countdown Timer in Step 2 (Non-blocking)
   useEffect(() => {
     if (step !== 2) return;
     const tick = () => {
       const saved = getPaymentDeadline(destination?.slug);
       const remaining = Math.max(0, Math.floor((saved - Date.now()) / 1000));
       setTimeLeftSeconds(remaining);
-      if (remaining <= 0) {
-        clearPaymentDeadline();
-        setStep(1);
-        setFormError('Sesi pembayaran telah berakhir (15 menit). Silakan ulangi pemesanan tiket Anda.');
-      }
     };
     tick();
     const interval = setInterval(tick, 1000);
@@ -935,18 +930,28 @@ export default function CheckoutPage() {
             {/* Left 2 Cols: Payment Selection */}
             <div className="lg:col-span-2 space-y-6">
               {/* 15-Minute Countdown Alert Banner */}
-              <div className="rounded-3xl bg-[var(--forest-deep)] text-white p-5 sm:p-6 shadow-sm flex items-center justify-between gap-4">
+              <div className="rounded-3xl bg-[var(--forest-deep)] text-white p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
-                    Batas Waktu Pembayaran
-                  </span>
-                  <p className="text-xs text-white/80">Selesaikan transaksi sebelum kuota Anda dilepas otomatis.</p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
+                      Batas Waktu Pembayaran
+                    </span>
+                    <span className="bg-emerald-500/20 text-[var(--leaf)] text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
+                      Bisa Langsung Bayar
+                    </span>
+                  </div>
+                  <p className="text-xs text-white/90">
+                    <strong>Anda tidak perlu menunggu timer ini.</strong> Langsung klik tombol <strong className="text-[var(--leaf)]">"Bayar Sekarang"</strong> untuk menyelesaikan transaksi.
+                  </p>
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-2xl">
-                  <Clock className="h-5 w-5 text-[var(--leaf)] animate-pulse" />
-                  <span className="text-xl font-mono font-extrabold text-[var(--leaf)]">
-                    {formatTimer(timeLeftSeconds)}
-                  </span>
+                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-2xl shrink-0 self-start sm:self-auto">
+                  <Clock className="h-5 w-5 text-[var(--leaf)]" />
+                  <div className="text-right">
+                    <div className="text-xl font-mono font-extrabold text-[var(--leaf)] leading-none">
+                      {formatTimer(timeLeftSeconds)}
+                    </div>
+                    <span className="text-[9px] text-white/60">sisa waktu bayar</span>
+                  </div>
                 </div>
               </div>
 
@@ -1101,6 +1106,10 @@ export default function CheckoutPage() {
                 >
                   <ArrowLeft className="h-3.5 w-3.5" /> Kembali / Ubah Data Pemesanan
                 </button>
+
+                <p className="text-center text-[10px] text-emerald-700 font-bold bg-emerald-50 py-1.5 px-3 rounded-xl">
+                  ⚡ Pembayaran langsung diproses (tidak perlu menunggu timer).
+                </p>
 
                 <p className="text-center text-[10px] text-[var(--ink-soft)]">
                   Setelah berhasil, tiket otomatis masuk ke riwayat akun Anda.
