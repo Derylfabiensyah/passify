@@ -1,7 +1,16 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { resolveTenantFromHostname, fetchDestinationBySlug } from '../api/tenant';
 
-const TenantContext = createContext(null);
+const defaultTenantContext = {
+  slug: null,
+  destination: null,
+  isLoading: false,
+  error: null,
+  refetch: async () => {},
+  updatePortalTemplate: () => {},
+};
+
+const TenantContext = createContext(defaultTenantContext);
 
 export function TenantProvider({ children }) {
   const [tenant, setTenant] = useState({
@@ -54,8 +63,5 @@ export function TenantProvider({ children }) {
 
 export function useTenant() {
   const context = useContext(TenantContext);
-  if (!context) {
-    throw new Error('useTenant must be used within TenantProvider');
-  }
-  return context;
+  return context || defaultTenantContext;
 }
