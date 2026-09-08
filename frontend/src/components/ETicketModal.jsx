@@ -21,7 +21,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083';
 export default function ETicketModal({ order, onClose }) {
   const { toast } = useToast();
   const [qrData, setQrData] = useState(null);
-  const [secondsLeft, setSecondsLeft] = useState(600); // 10 minutes default
+  const [secondsLeft, setSecondsLeft] = useState(30); // 30 seconds Dynamic TOTP (PDF Spec Hal. 4 Poin 7.B)
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [isUsed, setIsUsed] = useState(order?.status === 'used');
@@ -61,11 +61,11 @@ export default function ETicketModal({ order, onClose }) {
       if (!response.ok) throw new Error('QR live belum dapat dimuat dari server');
       const payload = await response.json();
       setQrData(payload.data?.qr_payload || `PASSIFY:${order.ticketCode}:000000`);
-      setSecondsLeft(payload.data?.seconds_until_refresh || 600);
+      setSecondsLeft(payload.data?.seconds_until_refresh || 30);
     } catch {
       // Fallback dynamic generator
       setQrData(`PASSIFY:${order?.ticketCode || 'TWA-DEMO'}:${Math.floor(100000 + Math.random() * 900000)}`);
-      setSecondsLeft(600);
+      setSecondsLeft(30);
     } finally {
       setIsRefreshing(false);
     }
@@ -89,7 +89,7 @@ export default function ETicketModal({ order, onClose }) {
       setSecondsLeft((previous) => {
         if (previous <= 1) {
           fetchLiveQR();
-          return 600;
+          return 30;
         }
         return previous - 1;
       });
@@ -99,8 +99,8 @@ export default function ETicketModal({ order, onClose }) {
 
   if (!order) return null;
 
-  const expiring = secondsLeft <= 60; // warn under 1 minute
-  const percentage = Math.round((secondsLeft / 600) * 100);
+  const expiring = secondsLeft <= 10; // warn under 10 seconds
+  const percentage = Math.round((secondsLeft / 30) * 100);
   const visitDate = order.visitDate
     ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(
         new Date(`${order.visitDate}T00:00:00`)
@@ -219,7 +219,7 @@ export default function ETicketModal({ order, onClose }) {
                 <div className="text-left">
                   <p className="flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)]">
                     <ShieldCheck className="h-4 w-4 text-[var(--forest)]" />
-                    QR Berganti Tiap 10 Menit
+                    QR Berganti Tiap 30 Detik (AES-256)
                   </p>
                   <p className="text-[10px] text-[var(--ink-soft)]">
                     Sisa waktu aktif: <strong>{formatTimer(secondsLeft)}</strong>
@@ -231,8 +231,7 @@ export default function ETicketModal({ order, onClose }) {
               <div className="rounded-2xl bg-amber-50 p-3 text-left flex items-start gap-2.5 text-[11px] leading-4 text-amber-900">
                 <ShieldAlert className="h-4 w-4 text-amber-700 shrink-0 mt-0.5" />
                 <span>
-                  <strong>Anti-Calo & Anti-Screenshot:</strong> QR ini berubah tiap 10 menit. Foto atau screenshot statis
-                  tidak dapat dipindai di pintu gerbang. Harap buka langsung halaman tiket ini.
+                  <strong>Anti-Calo & Anti-Screenshot (PDF Spec Hal. 4):</strong> QR ini berganti otomatis setiap 30 detik (AES-256). Foto atau tangkapan layar (screenshot) statis otomatis kedaluwarsa di scanner pintu masuk.
                 </span>
               </div>
 

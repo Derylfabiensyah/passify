@@ -67,17 +67,23 @@ export default function CheckoutPage() {
   const [visitors, setVisitors] = useState([{ name: '', nik: '' }]);
   const [formError, setFormError] = useState('');
 
-  // Step 2 Payment States
+  // Step 2 Payment States (PDF Spec Hal. 4 Poin 7.A: 5-Minute Redis Distributed Lock)
   const [paymentMethod, setPaymentMethod] = useState('midtrans'); // 'midtrans' | 'wallet'
   const [walletBalance, setWalletBalance] = useState(150000);
   const [timeLeftSeconds, setTimeLeftSeconds] = useState(() => {
     const saved = getPaymentDeadline();
     const diff = Math.floor((saved - Date.now()) / 1000);
-    return diff > 0 ? diff : 900;
+    return diff > 0 ? diff : 300; // 5-minute lock per PDF spec
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showSnapModal, setShowSnapModal] = useState(false);
   const [snapData, setSnapData] = useState(null);
+
+  // PDF Spec Hal. 4 Poin 7.A: Virtual Waiting Room & Queue Management States
+  const [inWaitingRoom, setInWaitingRoom] = useState(false);
+  const [queuePosition, setQueuePosition] = useState(6);
+  const [queueWaitSeconds, setQueueWaitSeconds] = useState(12);
+  const [isFlashSaleMode, setIsFlashSaleMode] = useState(false);
 
   // Handle browser back button between steps
   useEffect(() => {
@@ -251,7 +257,7 @@ export default function CheckoutPage() {
     });
   }, [totalQty]);
 
-  // 15-Minute Realtime Quota Lock Countdown Timer in Step 2 (PDF Spec Hal. 1 & 4)
+  // 1. Redis Distributed Lock: 5-Minute Checkout Lock (PDF Spec Hal. 4 Poin 7.A)
   useEffect(() => {
     if (step !== 2) return;
     const tick = () => {
@@ -261,13 +267,31 @@ export default function CheckoutPage() {
       if (remaining <= 0) {
         clearPaymentDeadline();
         setStep(1);
-        setFormError('Batas waktu pembayaran (15 menit) telah berakhir. Kuota reservasi tiket Anda dilepas otomatis kembali ke sistem agar dapat dipesan wisatawan lain.');
+        setFormError('Sesi Redis Distributed Lock (5 menit) telah berakhir. Kuota reservasi tiket Anda dilepas otomatis kembali ke sistem agar dapat dipesan wisatawan lain.');
       }
     };
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [step, destination?.slug]);
+
+  // 3. Virtual Waiting Room: Queue Management Countdown (PDF Spec Hal. 4 Poin 7.A)
+  useEffect(() => {
+    if (!inWaitingRoom) return;
+    const interval = setInterval(() => {
+      setQueuePosition((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setInWaitingRoom(false);
+          enterStep2Directly();
+          return 0;
+        }
+        return prev - 1;
+      });
+      setQueueWaitSeconds((prev) => Math.max(0, prev - 2));
+    }, 1500);
+    return () => clearInterval(interval);
+  }, [inWaitingRoom]);
 
   // Totals Calculation
   const totals = useMemo(() => {
@@ -370,10 +394,21 @@ export default function CheckoutPage() {
       }
     } catch (_) {}
 
-    // Realtime 15-min payment deadline (persists across navigation/back)
+    // 1. Redis Distributed Lock: 5-Minute Checkout Lock (PDF Spec Hal. 4 Poin 7.A)
+    if (isFlashSaleMode) {
+      setQueuePosition(6);
+      setQueueWaitSeconds(12);
+      setInWaitingRoom(true);
+      return;
+    }
+
+    enterStep2Directly();
+  };
+
+  const enterStep2Directly = () => {
     const now = Date.now();
     const saved = getPaymentDeadline(destination?.slug);
-    const deadline = saved > now ? saved : now + 15 * 60 * 1000;
+    const deadline = saved > now ? saved : now + 5 * 60 * 1000;
     setPaymentDeadline(destination?.slug, deadline);
     setTimeLeftSeconds(Math.max(0, Math.floor((deadline - now) / 1000)));
 
@@ -955,6 +990,19 @@ export default function CheckoutPage() {
                   </span>
                 </div>
 
+                {/* 3. Virtual Waiting Room Simulation Toggle (PDF Spec Hal. 4 Poin 7.A) */}
+                <label className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/70 text-[11px] text-amber-950 font-medium cursor-pointer transition-colors hover:bg-amber-100/70">
+                  <input
+                    type="checkbox"
+                    checked={isFlashSaleMode}
+                    onChange={(e) => setIsFlashSaleMode(e.target.checked)}
+                    className="rounded text-[var(--forest)] accent-[var(--forest)] h-3.5 w-3.5"
+                  />
+                  <span>
+                    ⚡ <strong>Simulasi Flash Sale:</strong> Uji Ruang Tunggu Virtual
+                  </span>
+                </label>
+
                 <button
                   type="button"
                   onClick={handleProceedToPayment}
@@ -974,13 +1022,13 @@ export default function CheckoutPage() {
         )}
 
         {/* ========================================================================= */}
-        {/* STEP 2: PEMBAYARAN (15-MIN TIMER & METODE BAYAR)                         */}
+        {/* STEP 2: PEMBAYARAN (REDIS DISTRIBUTED LOCK 5 MENIT & METODE BAYAR)        */}
         {/* ========================================================================= */}
         {step === 2 && (
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 max-w-4xl mx-auto">
             {/* Left 2 Cols: Payment Selection */}
             <div className="lg:col-span-2 space-y-6">
-              {/* 15-Minute Quota Lock & Payment Deadline Banner (PDF Spec Hal. 1 & 4) */}
+              {/* 1. Redis Distributed Lock: 5-Minute Checkout Lock (PDF Spec Hal. 4 Poin 7.A) */}
               <div className="rounded-3xl bg-[var(--forest-deep)] text-white p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -988,11 +1036,11 @@ export default function CheckoutPage() {
                       Batas Waktu Pembayaran
                     </span>
                     <span className="bg-emerald-500/20 text-[var(--leaf)] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
-                      <Lock className="h-3 w-3" /> Kuota Terkunci 15 Menit
+                      <Lock className="h-3 w-3" /> Redis Distributed Lock (5 Menit)
                     </span>
                   </div>
                   <p className="text-xs text-white/90">
-                    Kuota tiket Anda telah diamankan selama <strong>15 menit</strong> untuk mencegah double-booking. Segera selesaikan transaksi sebelum batas waktu berakhir agar kuota tidak dilepas otomatis ke wisatawan lain.
+                    Kuota tiket Anda diamankan selama <strong>5 menit</strong> via Redis Distributed Lock untuk mencegah double-booking. Selesaikan transaksi sebelum batas waktu berakhir agar kuota tidak dilepas otomatis.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-2xl shrink-0 self-start sm:self-auto">
@@ -1159,7 +1207,7 @@ export default function CheckoutPage() {
                 </button>
 
                 <p className="text-center text-[10px] text-emerald-800 font-medium bg-emerald-50/80 py-1.5 px-3 rounded-xl border border-emerald-200/50">
-                  🔒 Kuota tiket dijamin selama 15 menit. Selesaikan transaksi sebelum waktu habis.
+                  🔒 Kuota terkunci via Redis Distributed Lock (5 Menit). Selesaikan transaksi sebelum waktu habis.
                 </p>
 
                 <p className="text-center text-[10px] text-[var(--ink-soft)]">
@@ -1217,13 +1265,13 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Security Notice on Dynamic QR */}
+              {/* Security Notice on Dynamic QR (PDF Spec Hal. 4 Poin 7.B) */}
               <div className="rounded-2xl bg-amber-50 p-4 text-left flex items-start gap-3 text-xs text-amber-900">
                 <ShieldCheck className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
                 <div>
-                  <strong className="block font-bold">Fitur Keamanan Dynamic TOTP QR 10 Menit:</strong>
+                  <strong className="block font-bold">Fitur Keamanan Dynamic TOTP QR 30 Detik (PDF Spec Hal. 4 Poin 7.B):</strong>
                   <p className="text-[11px] text-amber-800 mt-0.5">
-                    QR tiket diperbarui otomatis setiap 10 menit di layar HP Anda saat dibuka di gerbang. Tangkapan layar (screenshot) statis tidak akan berlaku.
+                    QR tiket diperbarui otomatis setiap 30 detik (AES-256 Token A → Token B → Token C) di layar HP Anda saat dibuka di gerbang. Tangkapan layar (screenshot) statis otomatis kedaluwarsa.
                   </p>
                 </div>
               </div>
@@ -1334,6 +1382,74 @@ export default function CheckoutPage() {
                 <Lock className="h-3 w-3 text-emerald-600" />
                 <span>Terhubung ke Gateway Backend Midtrans SHA512</span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* 3. VIRTUAL WAITING ROOM (QUEUE MANAGEMENT - PDF SPEC HAL. 4 POIN 7.A)     */}
+        {/* ========================================================================= */}
+        {inWaitingRoom && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+            <div className="w-full max-w-md rounded-3xl bg-white p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,.25)] space-y-6 animate-scale-in text-[var(--ink)] text-center">
+              <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-amber-50 text-amber-600 animate-pulse">
+                <Users className="h-8 w-8" />
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="inline-block rounded-full bg-amber-100 text-amber-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider">
+                  Virtual Waiting Room · High Traffic
+                </span>
+                <h3 className="text-xl font-bold text-[var(--forest-deep)]">
+                  Anda Berada Dalam Antrean
+                </h3>
+                <p className="text-xs text-[var(--ink-soft)] max-w-sm mx-auto">
+                  Sistem mengantrekan permintaan Anda secara otomatis untuk menjamin kuota tanpa overselling (PDF Spec Hal. 4 Poin 7.A).
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-2xl bg-[var(--fog)] p-4 text-center">
+                  <span className="text-[10px] uppercase font-bold text-[var(--ink-soft)]">Posisi Antrean</span>
+                  <div className="text-2xl font-extrabold text-[var(--forest-deep)] mt-1 font-mono">
+                    #{queuePosition}
+                  </div>
+                  <span className="text-[10px] text-[var(--ink-soft)]">dari 42 antrean aktif</span>
+                </div>
+
+                <div className="rounded-2xl bg-[var(--fog)] p-4 text-center">
+                  <span className="text-[10px] uppercase font-bold text-[var(--ink-soft)]">Estimasi Tunggu</span>
+                  <div className="text-2xl font-extrabold text-[var(--bark)] mt-1 font-mono">
+                    ~{queueWaitSeconds}s
+                  </div>
+                  <span className="text-[10px] text-[var(--ink-soft)]">detik lagi</span>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="space-y-1.5 text-left">
+                <div className="flex justify-between text-[11px] text-[var(--ink-soft)] font-medium">
+                  <span>Proses Giliran Masuk...</span>
+                  <span>{Math.round(((6 - queuePosition) / 6) * 100)}%</span>
+                </div>
+                <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+                  <div
+                    className="h-full bg-[var(--forest)] transition-all duration-500 rounded-full"
+                    style={{ width: `${Math.max(15, Math.round(((6 - queuePosition) / 6) * 100))}%` }}
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setInWaitingRoom(false);
+                  enterStep2Directly();
+                }}
+                className="w-full btn-secondary py-2.5 rounded-xl text-xs font-bold cursor-pointer"
+              >
+                Lewati Antrean (Masuk Langsung)
+              </button>
             </div>
           </div>
         )}
