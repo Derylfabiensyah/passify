@@ -150,45 +150,81 @@ export default function TravelerPortal() {
           </label>
         </section>
 
-        <section className="relative isolate overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
-          {destination.cover_image_url && <img src={destination.cover_image_url} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25 mix-blend-overlay saturate-0" />}
-          <div className="absolute inset-0 -z-10 bg-transparent" />
+        <section className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]">
+          {destination.cover_image_url && (
+            <img
+              src={destination.cover_image_url}
+              alt=""
+              className="absolute inset-0 -z-20 h-full w-full object-cover opacity-60 saturate-[.9]"
+            />
+          )}
+          <div
+            className="absolute inset-0 -z-10"
+            style={{ backgroundImage: 'linear-gradient(105deg, rgba(16,45,32,.94) 4%, rgba(16,45,32,.78) 46%, rgba(16,45,32,.35))' }}
+          />
           <div className="grid gap-8 px-6 py-8 sm:px-9 sm:py-10 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-end lg:gap-12 lg:px-12 lg:py-14">
             <div className="max-w-2xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--forest)]/20 bg-[var(--forest)]/5 px-3 py-1.5 text-[11px] font-bold text-[var(--ink)] backdrop-blur-sm"><MapPin className="h-3.5 w-3.5 text-[var(--leaf)]" />{destination.location || destination.province}</div>
-              <p className="eyebrow !text-[var(--leaf)]">Kunjungan yang terjaga</p>
-              <h1 className="mt-3 max-w-[760px] text-4xl font-bold leading-[.98] text-[var(--forest-deep)] sm:text-5xl lg:text-6xl">{destination.name}</h1>
-              <p className="mt-5 max-w-xl text-sm leading-6 text-[var(--forest-deep)]/80 sm:text-[15px] sm:leading-7">{destination.description}</p>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-[11px] font-bold text-white backdrop-blur-md">
+                <MapPin className="h-3.5 w-3.5 text-emerald-300" />
+                {destination.location || destination.province}
+              </div>
+              <p className="eyebrow !text-emerald-300">Kunjungan yang terjaga</p>
+              <h1 className="mt-3 max-w-[760px] text-4xl font-bold leading-[.98] text-white sm:text-5xl lg:text-6xl">
+                {destination.name}
+              </h1>
+              <p className="mt-5 max-w-xl text-sm leading-6 text-white/85 sm:text-[15px] sm:leading-7">
+                {destination.description}
+              </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button id="book-now-hero-btn" type="button" onClick={handleBookNowClick} className="btn-clay px-5 py-3.5 text-sm"><Ticket className="h-4 w-4" />Pesan tiket kunjungan<ArrowRight className="h-4 w-4" /></button>
-                <span className="flex items-center gap-2 text-xs font-medium text-[var(--forest-deep)]/75"><ShieldCheck className="h-4 w-4 text-[var(--leaf)]" />Kuota dan QR tiket terlindungi</span>
+                <button
+                  id="book-now-hero-btn"
+                  type="button"
+                  onClick={handleBookNowClick}
+                  className="btn-clay px-5 py-3.5 text-sm"
+                >
+                  <Ticket className="h-4 w-4" />Pesan tiket kunjungan<ArrowRight className="h-4 w-4" />
+                </button>
+                <span className="flex items-center gap-2 text-xs font-medium text-white/80">
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" />Kuota dan QR tiket terlindungi
+                </span>
               </div>
             </div>
 
-            <aside className="glass-panel p-5 text-[var(--ink)]">
-              <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] pb-4">
-                <div><p className="eyebrow">Ketersediaan hari ini</p><p className="mt-1 text-xs font-semibold text-[var(--ink-soft)]">{todayLabel}</p></div>
-                <span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Buka</span>
+            <aside className="glass-card-dark p-5 sm:p-6 text-white">
+              <div className="flex items-start justify-between gap-3 border-b border-white/20 pb-4">
+                <div>
+                  <p className="eyebrow !text-emerald-300">Ketersediaan hari ini</p>
+                  <p className="mt-1 text-xs font-semibold text-white/80">{todayLabel}</p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/15 backdrop-blur-md px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-300 border border-white/20">
+                  <span className="status-dot text-emerald-400" />Buka
+                </span>
               </div>
               <div className="mt-5">
                 <div className="flex items-end justify-between">
-                  <span className="text-xs font-bold text-[var(--ink-soft)]">Kuota terisi</span>
-                  <strong className="text-2xl font-extrabold text-[var(--forest-deep)]">{quotaPercentage}%</strong>
+                  <span className="text-xs font-bold text-white/80">Kuota terisi</span>
+                  <strong className="text-2xl font-extrabold text-white">{quotaPercentage}%</strong>
                 </div>
                 <div
-                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"
+                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/15 backdrop-blur-md"
                   role="progressbar"
                   aria-valuenow={quotaPercentage}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-label="Persentase kuota terisi destinasi"
                 >
-                  <div className="h-full rounded-full bg-[var(--leaf)]" style={{ width: `${quotaPercentage}%` }} />
+                  <div className="h-full rounded-full bg-emerald-400" style={{ width: `${quotaPercentage}%` }} />
                 </div>
               </div>
               <div className="mt-5 grid grid-cols-2 gap-3">
-                <div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kuota</span><strong className="mt-1 block text-xl font-extrabold text-[var(--forest-deep)]">{remainingQuota.toLocaleString('id-ID')}</strong></div>
-                <div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Mulai dari</span><strong className="mt-1 block text-lg font-extrabold text-[var(--bark)]">{formatRupiah(lowestPrice)}</strong></div>
+                <div className="rounded-xl bg-white/10 backdrop-blur-md p-3 border border-white/15">
+                  <span className="block text-[10px] font-extrabold uppercase tracking-wide text-white/65">Sisa kuota</span>
+                  <strong className="mt-1 block text-xl font-extrabold text-white">{remainingQuota.toLocaleString('id-ID')}</strong>
+                </div>
+                <div className="rounded-xl bg-white/10 backdrop-blur-md p-3 border border-white/15">
+                  <span className="block text-[10px] font-extrabold uppercase tracking-wide text-white/65">Mulai dari</span>
+                  <strong className="mt-1 block text-lg font-extrabold text-amber-300">{formatRupiah(lowestPrice)}</strong>
+                </div>
               </div>
             </aside>
           </div>

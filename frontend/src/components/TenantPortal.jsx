@@ -197,26 +197,26 @@ export default function TenantPortal() {
       </header>
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
-        <section className="relative isolate overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
+        <section className="tenant-primary relative isolate overflow-hidden rounded-2xl text-white shadow-[var(--shadow-lift)]">
           <img
             src={destination.cover_image_url || destination.cover_image || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80'}
             alt={destination.name || 'Pemandangan Wisata Alam'}
-            className="absolute inset-0 -z-20 h-full w-full object-cover object-center mix-blend-overlay opacity-25 saturate-0"
-          />
+            className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02] opacity-65 saturate-[.95]" />
+          <div className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.92), rgba(16,45,32,.75), rgba(16,45,32,.40))' }} />
           
           <div className={`grid gap-8 px-6 py-10 sm:px-9 sm:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12 lg:py-14 ${template.show_availability === false ? 'lg:grid-cols-1' : ''}`}>
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-[var(--forest)]/5 px-3.5 py-1.5 text-xs font-semibold text-[var(--forest-deep)] backdrop-blur-md shadow-xs">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md shadow-xs">
                 <MapPin className="h-3.5 w-3.5 text-emerald-300" />
                 {destination.location || [destination.address, destination.city, destination.province].filter(Boolean).join(', ') || destination.province || destination.city || 'Indonesia'}
               </span>
               <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300 drop-shadow-xs">
                 {portalEyebrow}
               </p>
-              <h1 className="mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--forest-deep)] sm:text-5xl lg:text-6xl drop-shadow-md">
+              <h1 className="mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-md">
                 {portalHeading}
               </h1>
-              <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-[var(--ink)] drop-shadow-xs">
+              <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-white/90 drop-shadow-xs">
                 {portalCopy}
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -230,7 +230,7 @@ export default function TenantPortal() {
                 </button>
                 <Link
                   to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-[var(--forest-deep)] bg-[var(--forest)]/5 hover:bg-white/25 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
                 >
                   <History className="h-4 w-4 text-emerald-300" />
                   Riwayat Pesanan
@@ -254,7 +254,7 @@ export default function TenantPortal() {
                   </span>
                 </div>
                 <div className="mt-4 flex items-end justify-between">
-                  <span className="text-xs font-medium text-[var(--forest-deep)]/70">Kuota terisi</span>
+                  <span className="text-xs font-medium text-white/90/70">Kuota terisi</span>
                   <strong className="text-3xl font-extrabold tracking-tight text-[var(--forest-deep)]">{used}%</strong>
                 </div>
                 <div

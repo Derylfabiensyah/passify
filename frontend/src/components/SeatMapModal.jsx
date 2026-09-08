@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { X, Check, Lock, AlertCircle, Sparkles } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
 import ModalWrapper from './common/ModalWrapper';

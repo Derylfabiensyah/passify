@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -210,44 +210,80 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="relative isolate overflow-hidden text-[var(--ink)]">
-          
-          
+        <section className="relative isolate overflow-hidden bg-[var(--forest-deep)] text-white">
+          <img
+            src={heroImage}
+            alt="Lanskap pegunungan saat pagi hari"
+            className="absolute inset-0 -z-20 h-full w-full object-cover opacity-60 saturate-[.9]"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10"
+            style={{ backgroundImage: 'linear-gradient(105deg, rgba(16,45,32,.94) 4%, rgba(16,45,32,.78) 46%, rgba(16,45,32,.35))' }}
+          />
           <div className="mx-auto grid min-h-[calc(100vh-68px)] max-w-[1240px] gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,_1fr)_22rem] lg:items-end lg:gap-14 lg:px-8 lg:py-20">
             <div className="max-w-[780px]">
               <Eyebrow className="!text-[var(--leaf)]">Untuk pengelola kawasan yang ingin menjaga ritme</Eyebrow>
-              <h1 className="mt-5 max-w-[760px] font-sans text-[clamp(2.7rem,6.4vw,5.9rem)] font-bold leading-[.93] tracking-[-.06em] text-[var(--forest-deep)]">Alam memberi batas.<br />Operasi memberi kepastian.</h1>
+              <h1 className="mt-5 max-w-[760px] font-sans text-[clamp(2.7rem,6.4vw,5.9rem)] font-bold leading-[.93] tracking-[-.06em] text-white">
+                Alam memberi batas.<br />Operasi memberi kepastian.
+              </h1>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
                   Daftarkan wisata Anda <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/jelajah" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-[var(--forest)]/10 text-[var(--forest-deep)] hover:bg-[var(--forest)]/20">
+                <Link
+                  to="/jelajah"
+                  className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/15 text-white hover:bg-white/25 backdrop-blur-md border border-white/25"
+                >
                   Jelajahi portal wisatawan <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
-              <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-[var(--forest)]/20 pt-5 text-xs font-semibold text-[var(--ink-soft)]"><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Kuota per sesi</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Gerbang siap offline</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Payout terlacak</span></div>
+              <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/20 pt-5 text-xs font-semibold text-white/80">
+                <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Kuota per sesi</span>
+                <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Gerbang siap offline</span>
+                <span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Payout terlacak</span>
+              </div>
             </div>
 
-            <aside className="glass-panel p-5 text-[var(--ink)] sm:p-6 lg:mb-3">
-              <div className="flex items-start justify-between gap-4 pb-4"><div><Eyebrow>Contoh operasional</Eyebrow><p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Taman Nasional Bromo Tengger Semeru</p></div><span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Normal</span></div>
+            <aside className="glass-card-dark p-5 sm:p-6 lg:mb-3 text-white">
+              <div className="flex items-start justify-between gap-4 pb-4">
+                <div>
+                  <Eyebrow className="!text-emerald-300">Contoh operasional</Eyebrow>
+                  <p className="mt-1 text-sm font-bold text-white">Taman Nasional Bromo Tengger Semeru</p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/15 backdrop-blur-md px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-300 border border-white/20">
+                  <span className="status-dot text-emerald-400" />Normal
+                </span>
+              </div>
               <div className="mt-5">
                 <div className="flex items-end justify-between">
-                  <span className="text-xs font-semibold text-[var(--ink-soft)]">Kuota sesi sunrise</span>
-                  <strong className="text-2xl font-extrabold tracking-[-.04em] text-[var(--forest-deep)]">71%</strong>
+                  <span className="text-xs font-semibold text-white/80">Kuota sesi sunrise</span>
+                  <strong className="text-2xl font-extrabold tracking-[-.04em] text-white">71%</strong>
                 </div>
                 <div
-                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--leaf-pale)]"
+                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/15 backdrop-blur-md"
                   role="progressbar"
                   aria-valuenow={71}
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-label="Persentase kuota sesi sunrise"
                 >
-                  <div className="h-full w-[71%] rounded-full bg-[var(--leaf)]" />
+                  <div className="h-full w-[71%] rounded-full bg-emerald-400" />
                 </div>
               </div>
-              <dl className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl bg-transparent p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kunjungan</dt><dd className="mt-1 text-xl font-extrabold tracking-[-.04em] text-[var(--forest-deep)]">58 orang</dd></div><div className="rounded-xl bg-transparent p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Gate utama</dt><dd className="mt-1 text-sm font-extrabold text-[var(--forest)]">Siap menerima</dd></div></dl>
-              <p className="mt-4 text-[11px] leading-5 text-[var(--ink-soft)]">Simulasi status yang membantu tim memutuskan sebelum kawasan menjadi terlalu penuh.</p>
+              <dl className="mt-5 grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-white/10 backdrop-blur-md p-3 border border-white/15">
+                  <dt className="text-[10px] font-extrabold uppercase tracking-wide text-white/65">Sisa kunjungan</dt>
+                  <dd className="mt-1 text-xl font-extrabold tracking-[-.04em] text-white">58 orang</dd>
+                </div>
+                <div className="rounded-xl bg-white/10 backdrop-blur-md p-3 border border-white/15">
+                  <dt className="text-[10px] font-extrabold uppercase tracking-wide text-white/65">Gate utama</dt>
+                  <dd className="mt-1 text-sm font-extrabold text-emerald-300">Siap menerima</dd>
+                </div>
+              </dl>
+              <p className="mt-4 text-[11px] leading-5 text-white/70">
+                Simulasi status yang membantu tim memutuskan sebelum kawasan menjadi terlalu penuh.
+              </p>
             </aside>
           </div>
         </section>
@@ -274,7 +310,28 @@ export default function LandingPage() {
                 { number: '02', title: 'Gerbang memvalidasi tanpa menunggu kondisi ideal', text: 'Tiket dinamis tetap dapat diperiksa di lapangan dan diselaraskan ketika koneksi tersedia kembali.' },
                 { number: '03', title: 'Pendapatan kembali dalam gambaran yang bisa ditindak', text: 'Komponen penjualan dan settlement disusun agar tim memahami apa yang terjadi, bukan sekadar melihat angka.' },
               ].map(({ number, title, text }) => <article key={number} className="grid gap-4 py-7 sm:grid-cols-[46px_1fr] sm:items-start sm:gap-5"><span className="text-2xl font-bold tracking-[-.04em] text-[var(--bark)]">{number}</span><div><h3 className="font-sans text-xl font-bold leading-snug tracking-[-.035em]">{title}</h3><p className="mt-2 max-w-xl text-sm leading-6 text-[var(--ink-soft)]">{text}</p></div></article>)}
-              <div className="mt-7 rounded-2xl bg-[var(--forest-deep)] p-5 text-[var(--forest-deep)] sm:p-6"><div className="flex items-center justify-between gap-4 pb-4"><div><Eyebrow className="!text-[var(--leaf)]">Simulasi operasional</Eyebrow><p className="mt-1 text-2xl font-bold tracking-[-.045em] text-[var(--forest-deep)]">Gerbang selatan siap menerima</p></div><CloudOff className="h-5 w-5 shrink-0 text-[var(--leaf)]" /></div><div className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-2xl bg-white/10 p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]/55">Scan terakhir</span><strong className="mt-2 block text-xl">08:42</strong></div><div className="rounded-2xl bg-white/10 p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]/55">Sesi pagi</span><strong className="mt-2 block text-xl">142 / 200</strong></div></div><p className="mt-4 text-xs leading-5 text-[var(--forest-deep)]/65">Contoh tampilan status; data akan diselaraskan saat koneksi tersedia.</p></div>
+              <div className="mt-7 rounded-2xl glass-card-dark p-5 text-white sm:p-6">
+                <div className="flex items-center justify-between gap-4 pb-4">
+                  <div>
+                    <Eyebrow className="!text-emerald-300">Simulasi operasional</Eyebrow>
+                    <p className="mt-1 text-2xl font-bold tracking-[-.045em] text-white">Gerbang selatan siap menerima</p>
+                  </div>
+                  <CloudOff className="h-5 w-5 shrink-0 text-emerald-300" />
+                </div>
+                <div className="mt-5 grid grid-cols-2 gap-3">
+                  <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wide text-white/70">Scan terakhir</span>
+                    <strong className="mt-2 block text-xl text-white">08:42</strong>
+                  </div>
+                  <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wide text-white/70">Sesi pagi</span>
+                    <strong className="mt-2 block text-xl text-white">142 / 200</strong>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs leading-5 text-white/75">
+                  Contoh tampilan status; data akan diselaraskan saat koneksi tersedia.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -296,7 +353,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            <div className="overflow-hidden rounded-2xl bg-white p-6 shadow-[var(--shadow-soft)] sm:p-8">
+            <div className="overflow-hidden rounded-2xl glass-panel p-6 sm:p-8">
               {/* Header Card */}
               <div className="flex items-start justify-between gap-4 pb-5">
                 <div className="flex items-center gap-3">
@@ -344,7 +401,7 @@ export default function LandingPage() {
                 <span className="text-[var(--ink-soft)] font-semibold">Mulai Rp35.000 / orang</span>
                 <Link
                   to="/pesan/curug-bidadari"
-                  className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-[var(--forest-deep)] transition-colors hover:bg-[var(--forest-deep)] shadow-xs no-underline font-bold"
+                  className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-white transition-colors hover:bg-[var(--forest-deep)] shadow-xs no-underline font-bold"
                 >
                   Pilih tanggal
                 </Link>
@@ -354,14 +411,25 @@ export default function LandingPage() {
         </section>
 
         <section id="contact" className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-          <div className="relative isolate overflow-hidden rounded-2xl text-[var(--ink)] shadow-[var(--shadow-lift)]"><div className="grid min-h-[390px] items-end px-7 py-9 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14"><div className="max-w-xl"><Eyebrow className="!text-[var(--leaf)]">Mulai dari kebutuhan kawasan Anda</Eyebrow><h2 className="mt-4 text-4xl font-bold leading-[.96] text-[var(--forest-deep)] sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2><p className="mt-5 text-sm leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p>                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]">
+            <img src={trailImage} alt="Jalur hutan yang tenang" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-60 saturate-[.85]" />
+            <div aria-hidden="true" className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.92), rgba(16,45,32,.72), rgba(16,45,32,.35))' }} />
+            <div className="grid min-h-[390px] items-end px-7 py-9 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14">
+              <div className="max-w-xl">
+                <Eyebrow className="!text-[var(--leaf)]">Mulai dari kebutuhan kawasan Anda</Eyebrow>
+                <h2 className="mt-4 text-4xl font-bold leading-[.96] text-white sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2>
+                <p className="mt-5 text-sm leading-6 text-white/80 sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
                     Daftarkan wisata <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <a href="mailto:hello@passify.id" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-[var(--forest)]/10 text-[var(--forest-deep)] hover:bg-[var(--forest)]/20">
+                  <a href="mailto:hello@passify.id" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/15 text-white hover:bg-white/25 backdrop-blur-md border border-white/25">
                     Bicarakan kebutuhan <ArrowUpRight className="h-4 w-4" />
                   </a>
-                </div></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
 

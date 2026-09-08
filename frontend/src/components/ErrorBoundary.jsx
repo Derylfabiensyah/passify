@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { AlertCircle, RotateCcw, Home } from 'lucide-react';
 
 export default class ErrorBoundary extends React.Component {

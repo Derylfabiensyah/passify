@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Compass, Leaf } from 'lucide-react';
 
 export default function LoadingScreen() {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect } from 'react';
 import { resolveTenantFromHostname, fetchDestinationBySlug } from '../api/tenant';
 
 const TenantContext = createContext(null);

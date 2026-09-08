@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { AlertCircle, ArrowRight, Home } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
 

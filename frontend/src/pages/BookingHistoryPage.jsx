@@ -347,7 +347,7 @@ export default function BookingHistoryPage() {
 
         {/* Tickets Grid */}
         {filteredTickets.length === 0 ? (
-          <div className="rounded-2xl bg-white p-12 text-center shadow-sm space-y-4 max-w-md mx-auto my-8">
+          <div className="rounded-2xl glass-panel p-12 text-center shadow-sm space-y-4 max-w-md mx-auto my-8">
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[var(--leaf-pale)] text-[var(--forest)]">
               <Ticket className="h-8 w-8" />
             </div>
@@ -387,7 +387,7 @@ export default function BookingHistoryPage() {
               return (
                 <div
                   key={ticket.orderNumber || index}
-                  className="rounded-2xl bg-white shadow-sm overflow-hidden flex flex-col justify-between transition-all hover:shadow-md"
+                  className="rounded-2xl glass-panel shadow-sm overflow-hidden flex flex-col justify-between transition-all hover:shadow-md"
                 >
                   {/* Card Header with Image */}
                   <div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Mountain } from 'lucide-react';
 import LegalModal from './common/LegalModal';
 

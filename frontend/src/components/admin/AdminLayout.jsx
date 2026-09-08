@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bell, CalendarClock, ChevronDown, ChevronLeft, ChevronRight,
@@ -163,7 +163,7 @@ export default function AdminLayout({ children }) {
 
       {/* Desktop Sidebar */}
       <aside
-        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-[var(--border)] bg-[var(--sand)] transition-[width] duration-200 md:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md transition-[width] duration-200 md:flex"
         style={{ width: collapsed ? 76 : 264 }}
       >
         <SidebarContent
@@ -184,7 +184,7 @@ export default function AdminLayout({ children }) {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-[var(--border)] bg-[var(--sand)] shadow-[var(--shadow-lift)] transition-transform duration-200 md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md shadow-[var(--shadow-lift)] transition-transform duration-200 md:hidden ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -212,7 +212,7 @@ export default function AdminLayout({ children }) {
       {/* Main Content Area */}
       <div className="min-h-screen transition-[margin] duration-200" style={{ marginLeft: collapsed ? 76 : 264 }}>
         {/* Sticky Header */}
-        <header className="sticky top-0 z-30 flex min-h-[68px] items-center justify-between gap-3 border-b border-[var(--border)] bg-[rgba(255,254,250,.9)] px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 flex min-h-[68px] items-center justify-between gap-3 border-b border-[var(--border)] bg-white/10 dark:bg-black/20 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
@@ -235,7 +235,7 @@ export default function AdminLayout({ children }) {
               to={`/?tenant=${activeTenantSlug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--sand)] px-3.5 py-2 text-xs font-bold text-[var(--forest)] no-underline transition-colors hover:bg-[var(--leaf-pale)] sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-full border border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md px-3.5 py-2 text-xs font-bold text-[var(--forest)] no-underline transition-colors hover:bg-[var(--leaf-pale)] sm:inline-flex"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               <span>Portal Publik</span>
@@ -245,7 +245,7 @@ export default function AdminLayout({ children }) {
             <button
               type="button"
               onClick={() => toast.info('Tidak ada notifikasi baru saat ini.')}
-              className="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] bg-[var(--sand)] text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+              className="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
               aria-label="Notifikasi"
             >
               <Bell className="h-4 w-4" />
@@ -298,3 +298,4 @@ export default function AdminLayout({ children }) {
     </div>
   );
 }
+
