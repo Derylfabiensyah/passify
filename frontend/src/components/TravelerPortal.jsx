@@ -75,17 +75,29 @@ export default function TravelerPortal() {
             </span>
           </Link>
 
-          {user ? (
-            <div className="flex items-center gap-2">
-              <span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">Halo, {user.name?.split(' ')[0] || 'Wisatawan'}</span>
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold text-[var(--forest-deep)]">{user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}</span>
-              <button type="button" onClick={handleLogout} title="Keluar" className="grid h-9 w-9 place-items-center rounded-full border border-transparent text-[var(--ink-soft)] transition-colors hover:border-[var(--border)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)]">
-                <LogOut className="h-4 w-4" /><span className="sr-only">Keluar</span>
-              </button>
-            </div>
-          ) : (
-            <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-xl px-3.5 sm:px-4"><LogIn className="h-3.5 w-3.5" /><span className="hidden sm:inline">Masuk / Daftar</span><span className="sm:hidden">Masuk</span></Link>
-          )}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              to="/riwayat-pesanan"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
+              title="Lihat riwayat pesanan dan e-tiket saya"
+            >
+              <Ticket className="h-3.5 w-3.5 text-[var(--forest)]" />
+              <span className="hidden sm:inline">Riwayat Pesanan</span>
+              <span className="sm:hidden">Pesanan</span>
+            </Link>
+
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">Halo, {user.name?.split(' ')[0] || 'Wisatawan'}</span>
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold text-[var(--forest-deep)]">{user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}</span>
+                <button type="button" onClick={handleLogout} title="Keluar" className="grid h-9 w-9 place-items-center rounded-full border border-transparent text-[var(--ink-soft)] transition-colors hover:border-[var(--border)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)]">
+                  <LogOut className="h-4 w-4" /><span className="sr-only">Keluar</span>
+                </button>
+              </div>
+            ) : (
+              <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-xl px-3.5 sm:px-4"><LogIn className="h-3.5 w-3.5" /><span className="hidden sm:inline">Masuk / Daftar</span><span className="sm:hidden">Masuk</span></Link>
+            )}
+          </div>
         </div>
       </header>
 

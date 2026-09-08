@@ -9,7 +9,8 @@ import {
   LogOut,
   MapPin,
   ShieldCheck,
-  Ticket
+  Ticket,
+  History
 } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
 import { PortalPageSkeleton } from './common/Skeleton';
@@ -105,7 +106,17 @@ export default function TenantPortal() {
             </span>
           </Link>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link
+              to="/riwayat-pesanan"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
+              title="Lihat riwayat pesanan dan e-tiket saya"
+            >
+              <Ticket className="h-3.5 w-3.5 text-[var(--forest)]" />
+              <span className="hidden sm:inline">Riwayat Pesanan</span>
+              <span className="sm:hidden">Pesanan</span>
+            </Link>
+
             {isManager && (
               <Link
                 to="/admin"
@@ -165,7 +176,7 @@ export default function TenantPortal() {
               <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-white/90 drop-shadow-xs">
                 {portalCopy}
               </p>
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
                 <button
                   type="button"
                   onClick={openBooking}
@@ -174,6 +185,13 @@ export default function TenantPortal() {
                   <Ticket className="h-4 w-4" />
                   Pesan tiket
                 </button>
+                <Link
+                  to="/riwayat-pesanan"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
+                >
+                  <History className="h-4 w-4 text-emerald-300" />
+                  Riwayat Pesanan
+                </Link>
                 <span className="inline-flex items-center gap-2 text-xs font-medium text-white/90">
                   <ShieldCheck className="h-4 w-4 text-emerald-400" />
                   QR aman untuk gerbang
@@ -332,8 +350,33 @@ export default function TenantPortal() {
         )}
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[rgba(255,254,250,.94)] px-4 py-3 backdrop-blur-md lg:hidden"><button type="button" onClick={openBooking} className="btn-clay w-full"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button></div>
-      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 text-center text-xs text-[var(--ink-soft)]">{destination.name} · Didukung oleh Passify</footer>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[rgba(255,254,250,.94)] px-4 py-3 backdrop-blur-md lg:hidden flex items-center gap-2">
+        <button type="button" onClick={openBooking} className="btn-clay flex-1 justify-center py-3">
+          <Ticket className="h-4 w-4" />
+          <span>Pesan tiket</span>
+        </button>
+        <Link
+          to="/riwayat-pesanan"
+          className="btn-secondary px-3.5 py-3 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold no-underline whitespace-nowrap"
+          title="Riwayat Pesanan"
+        >
+          <History className="h-4 w-4 text-[var(--forest)]" />
+          <span>Pesanan</span>
+        </Link>
+      </div>
+      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 text-center text-xs text-[var(--ink-soft)] space-y-2">
+        <div className="flex flex-wrap justify-center items-center gap-3 text-xs font-medium">
+          <Link to="/riwayat-pesanan" className="text-[var(--forest-deep)] hover:underline font-bold flex items-center gap-1">
+            <Ticket className="h-3.5 w-3.5" />
+            Riwayat Pesanan & E-Tiket
+          </Link>
+          <span>•</span>
+          <Link to={isManager ? "/admin" : "/masuk"} className="hover:underline">
+            {isManager ? "Portal Pengelola" : "Masuk Akun"}
+          </Link>
+        </div>
+        <p>{destination.name} · Didukung oleh Passify</p>
+      </footer>
     </div>
   );
 }
