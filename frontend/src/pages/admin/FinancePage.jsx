@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import {
   Landmark,
   TrendingUp,
@@ -136,7 +136,7 @@ export default function FinancePage() {
     toast.success('Data riwayat settlement berhasil diekspor ke CSV!');
   };
 
-  // ─── Chart.js: Revenue & Payout Analysis ────────────────
+  // â”€â”€â”€ Chart.js: Revenue & Payout Analysis â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const financeChartData = {
     labels: weeklyRevenue.map((r) => r.day),
     datasets: [
@@ -195,7 +195,7 @@ export default function FinancePage() {
     }
   };
 
-  // ─── TanStack React Table: Payout History Columns ──────────────
+  // â”€â”€â”€ TanStack React Table: Payout History Columns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const payoutColumns = useMemo(
     () => [
       {
@@ -309,7 +309,7 @@ export default function FinancePage() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Period Selector Tabs */}
-          <div className="flex items-center bg-[var(--canvas)] p-1 rounded-xl border border-[var(--border)] text-xs" role="radiogroup" aria-label="Filter Rentang Waktu">
+          <div className="flex items-center bg-transparent p-1 rounded-xl border border-[var(--border)] text-xs" role="radiogroup" aria-label="Filter Rentang Waktu">
             {[
               { id: '7d', label: '7 Hari' },
               { id: '30d', label: '30 Hari' },
@@ -420,3 +420,4 @@ export default function FinancePage() {
     </div>
   );
 }
+

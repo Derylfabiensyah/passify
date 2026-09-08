@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
@@ -603,7 +603,7 @@ export default function CheckoutPage() {
 
   if (isLoading || !destination) {
     return (
-      <div className="min-h-screen bg-[var(--canvas)] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <div className="text-center space-y-3">
           <div className="h-10 w-10 border-4 border-[var(--forest)] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm font-bold text-[var(--forest-deep)]">Memuat halaman pemesanan tiket...</p>
@@ -620,9 +620,9 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
+    <div className="min-h-screen bg-transparent text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-xs">
+      <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline">
             passify
@@ -834,7 +834,7 @@ export default function CheckoutPage() {
                             <span className="text-[10px] font-normal text-[var(--ink-soft)] ml-1">/ orang</span>
                           </p>
                           <p className="text-[10px] text-[var(--ink-soft)] mt-0.5">
-                            Asuransi: {formatRupiah(cat.insurance)} · Retribusi: {formatRupiah(cat.retribusi)}
+                            Asuransi: {formatRupiah(cat.insurance)} Â· Retribusi: {formatRupiah(cat.retribusi)}
                           </p>
                         </div>
 
@@ -846,7 +846,7 @@ export default function CheckoutPage() {
                             disabled={qty === 0}
                             className="h-8 w-8 rounded-xl bg-white text-[var(--forest)] font-bold shadow-xs hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                           >
-                            −
+                            âˆ’
                           </button>
                           <span className="w-5 text-center text-sm font-extrabold">{qty}</span>
                           <button
@@ -1041,7 +1041,7 @@ export default function CheckoutPage() {
                     className="rounded text-[var(--forest)] accent-[var(--forest)] h-3.5 w-3.5"
                   />
                   <span>
-                    ⚡ <strong>Simulasi Flash Sale:</strong> Uji Ruang Tunggu Virtual
+                    âš¡ <strong>Simulasi Flash Sale:</strong> Uji Ruang Tunggu Virtual
                   </span>
                 </label>
 
@@ -1261,7 +1261,7 @@ export default function CheckoutPage() {
                 </button>
 
                 <p className="text-center text-[10px] text-emerald-800 font-medium bg-emerald-50/80 py-1.5 px-3 rounded-xl border border-emerald-200/50">
-                  🔒 Kuota terkunci via Redis Distributed Lock (5 Menit). Selesaikan transaksi sebelum waktu habis.
+                  ðŸ”’ Kuota terkunci via Redis Distributed Lock (5 Menit). Selesaikan transaksi sebelum waktu habis.
                 </p>
 
                 <p className="text-center text-[10px] text-[var(--ink-soft)]">
@@ -1325,7 +1325,7 @@ export default function CheckoutPage() {
                 <div>
                   <strong className="block font-bold">Fitur Keamanan Dynamic TOTP QR 30 Detik (PDF Spec Hal. 4 Poin 7.B):</strong>
                   <p className="text-[11px] text-amber-800 mt-0.5">
-                    QR tiket diperbarui otomatis setiap 30 detik (AES-256 Token A → Token B → Token C) di layar HP Anda saat dibuka di gerbang. Tangkapan layar (screenshot) statis otomatis kedaluwarsa.
+                    QR tiket diperbarui otomatis setiap 30 detik (AES-256 Token A â†’ Token B â†’ Token C) di layar HP Anda saat dibuka di gerbang. Tangkapan layar (screenshot) statis otomatis kedaluwarsa.
                   </p>
                 </div>
               </div>
@@ -1370,7 +1370,7 @@ export default function CheckoutPage() {
                   onClick={() => setShowSnapModal(false)}
                   className="h-8 w-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center text-xs font-bold"
                 >
-                  ✕
+                  âœ•
                 </button>
               </div>
 
@@ -1452,7 +1452,7 @@ export default function CheckoutPage() {
 
               <div className="space-y-1.5">
                 <span className="inline-block rounded-full bg-amber-100 text-amber-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider">
-                  Virtual Waiting Room · High Traffic
+                  Virtual Waiting Room Â· High Traffic
                 </span>
                 <h3 className="text-xl font-bold text-[var(--forest-deep)]">
                   Anda Berada Dalam Antrean
@@ -1527,8 +1527,10 @@ export default function CheckoutPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-100 bg-white py-6 text-center text-xs text-[var(--ink-soft)]">
-        © {new Date().getFullYear()} Passify Cloud OS · Platform Reservasi & E-Ticketing Wisata Alam
+        Â© {new Date().getFullYear()} Passify Cloud OS Â· Platform Reservasi & E-Ticketing Wisata Alam
       </footer>
     </div>
   );
 }
+
+

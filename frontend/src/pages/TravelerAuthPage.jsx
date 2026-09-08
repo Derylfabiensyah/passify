@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Compass, Lock, Mail, Phone, ShieldCheck, User, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
@@ -217,8 +217,8 @@ export default function TravelerAuthPage({ mode }) {
       : '/';
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
-      <header className="nav-bar sticky top-0 z-40 bg-white/90 backdrop-blur-md">
+    <div className="min-h-screen bg-transparent text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
+      <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex min-h-[68px] max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5 no-underline">
             <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
@@ -320,7 +320,7 @@ export default function TravelerAuthPage({ mode }) {
                     className="field-control pl-10 pr-10 text-xs font-medium"
                     value={login.password}
                     onChange={(e) => setLogin({ ...login, password: e.target.value })}
-                    placeholder="••••••••"
+                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                     required
                   />
                   <button
@@ -480,3 +480,5 @@ export default function TravelerAuthPage({ mode }) {
     </div>
   );
 }
+
+

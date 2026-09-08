@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, Clock, Compass,
@@ -81,7 +81,7 @@ export default function TravelerPortal() {
       <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-3 no-underline" aria-label="Kembali ke Passify">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--forest-deep)] text-white shadow-[0_8px_18px_rgba(16,45,32,.16)]">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--forest-deep)] text-[var(--forest-deep)] shadow-[0_8px_18px_rgba(16,45,32,.16)]">
               <Compass className="h-4 w-4" />
             </span>
             <span className="min-w-0">
@@ -150,22 +150,22 @@ export default function TravelerPortal() {
           </label>
         </section>
 
-        <section className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest-deep)] shadow-[var(--shadow-lift)]">
-          {destination.cover_image_url && <img src={destination.cover_image_url} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-35 saturate-[.7]" />}
-          <div className="absolute inset-0 -z-10 bg-[linear-gradient(105deg,rgba(16,45,32,.98),rgba(16,45,32,.82)_50%,rgba(16,45,32,.48))]" />
+        <section className="relative isolate overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
+          {destination.cover_image_url && <img src={destination.cover_image_url} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25 mix-blend-overlay saturate-0" />}
+          <div className="absolute inset-0 -z-10 bg-transparent" />
           <div className="grid gap-8 px-6 py-8 sm:px-9 sm:py-10 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-end lg:gap-12 lg:px-12 lg:py-14">
             <div className="max-w-2xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[11px] font-bold text-white/90 backdrop-blur-sm"><MapPin className="h-3.5 w-3.5 text-[var(--leaf)]" />{destination.location || destination.province}</div>
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[var(--forest)]/20 bg-[var(--forest)]/5 px-3 py-1.5 text-[11px] font-bold text-[var(--ink)] backdrop-blur-sm"><MapPin className="h-3.5 w-3.5 text-[var(--leaf)]" />{destination.location || destination.province}</div>
               <p className="eyebrow !text-[var(--leaf)]">Kunjungan yang terjaga</p>
-              <h1 className="mt-3 max-w-[760px] text-4xl font-bold leading-[.98] text-white sm:text-5xl lg:text-6xl">{destination.name}</h1>
-              <p className="mt-5 max-w-xl text-sm leading-6 text-white/80 sm:text-[15px] sm:leading-7">{destination.description}</p>
+              <h1 className="mt-3 max-w-[760px] text-4xl font-bold leading-[.98] text-[var(--forest-deep)] sm:text-5xl lg:text-6xl">{destination.name}</h1>
+              <p className="mt-5 max-w-xl text-sm leading-6 text-[var(--forest-deep)]/80 sm:text-[15px] sm:leading-7">{destination.description}</p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <button id="book-now-hero-btn" type="button" onClick={handleBookNowClick} className="btn-clay px-5 py-3.5 text-sm"><Ticket className="h-4 w-4" />Pesan tiket kunjungan<ArrowRight className="h-4 w-4" /></button>
-                <span className="flex items-center gap-2 text-xs font-medium text-white/75"><ShieldCheck className="h-4 w-4 text-[var(--leaf)]" />Kuota dan QR tiket terlindungi</span>
+                <span className="flex items-center gap-2 text-xs font-medium text-[var(--forest-deep)]/75"><ShieldCheck className="h-4 w-4 text-[var(--leaf)]" />Kuota dan QR tiket terlindungi</span>
               </div>
             </div>
 
-            <aside className="rounded-2xl bg-[rgba(255,254,250,.97)] p-5 text-[var(--ink)] shadow-[0_16px_36px_rgba(0,0,0,.16)] backdrop-blur-md">
+            <aside className="glass-panel p-5 text-[var(--ink)]">
               <div className="flex items-start justify-between gap-3 border-b border-[var(--border)] pb-4">
                 <div><p className="eyebrow">Ketersediaan hari ini</p><p className="mt-1 text-xs font-semibold text-[var(--ink-soft)]">{todayLabel}</p></div>
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Buka</span>
@@ -259,7 +259,7 @@ export default function TravelerPortal() {
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[rgba(255,254,250,.94)] px-4 py-3 backdrop-blur-md lg:hidden">
         <button type="button" onClick={handleBookNowClick} className="btn-clay w-full text-sm"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button>
       </div>
-      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 sm:px-6 lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between"><span><strong className="text-[var(--forest-deep)]">{destination.name}</strong> · Didukung Passify</span><Link to="/" className="font-semibold text-[var(--forest)] hover:text-[var(--bark)]">Kembali ke beranda Passify</Link></div></footer>
+      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 sm:px-6 lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between"><span><strong className="text-[var(--forest-deep)]">{destination.name}</strong> Â· Didukung Passify</span><Link to="/" className="font-semibold text-[var(--forest)] hover:text-[var(--bark)]">Kembali ke beranda Passify</Link></div></footer>
 
       {/* Passify Cashless Wallet Modal */}
       {showWalletModal && (
@@ -271,3 +271,4 @@ export default function TravelerPortal() {
     </div>
   );
 }
+

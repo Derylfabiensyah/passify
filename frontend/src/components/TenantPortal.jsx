@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -92,11 +92,11 @@ export default function TenantPortal() {
     <div className="tenant-portal min-h-screen bg-[var(--canvas)] text-[var(--ink)]" style={portalStyle}>
       {/* Pengelola Top Bar (Only visible for Tenant Admins) */}
       {isManager && (
-        <div className="tenant-primary text-white px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-white/10 shadow-xs">
+        <div className="tenant-primary text-[var(--forest-deep)] px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-white/10 shadow-xs">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="font-bold">Template Website Resmi: {destination.name}</span>
-            <span className="hidden sm:inline text-white/60">({destination.slug}.passify.id)</span>
+            <span className="hidden sm:inline text-[var(--forest-deep)]/60">({destination.slug}.passify.id)</span>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -108,7 +108,7 @@ export default function TenantPortal() {
             <Link
               to="/"
               onClick={() => localStorage.removeItem('passify_current_tenant')}
-              className="text-white/75 hover:text-white text-xs no-underline font-medium"
+              className="text-[var(--forest-deep)]/75 hover:text-[var(--forest-deep)] text-xs no-underline font-medium"
             >
               Beranda Utama Passify
             </Link>
@@ -116,10 +116,10 @@ export default function TenantPortal() {
         </div>
       )}
 
-      <header className="nav-bar sticky top-0 z-40 bg-white/90 backdrop-blur-md">
+      <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link to="/" className="flex min-w-0 items-center gap-3 no-underline">
-            <span className="tenant-primary grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-white">
+            <span className="tenant-primary grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-[var(--forest-deep)]">
               <Compass className="h-4 w-4" />
             </span>
             <span className="min-w-0">
@@ -197,26 +197,26 @@ export default function TenantPortal() {
       </header>
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
-        <section className="tenant-primary relative isolate overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
+        <section className="relative isolate overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
           <img
             src={destination.cover_image_url || destination.cover_image || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80'}
             alt={destination.name || 'Pemandangan Wisata Alam'}
-            className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02]"
+            className="absolute inset-0 -z-20 h-full w-full object-cover object-center mix-blend-overlay opacity-25 saturate-0"
           />
-          <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/90 via-black/70 to-black/85" />
+          
           <div className={`grid gap-8 px-6 py-10 sm:px-9 sm:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12 lg:py-14 ${template.show_availability === false ? 'lg:grid-cols-1' : ''}`}>
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md shadow-xs">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-[var(--forest)]/5 px-3.5 py-1.5 text-xs font-semibold text-[var(--forest-deep)] backdrop-blur-md shadow-xs">
                 <MapPin className="h-3.5 w-3.5 text-emerald-300" />
                 {destination.location || [destination.address, destination.city, destination.province].filter(Boolean).join(', ') || destination.province || destination.city || 'Indonesia'}
               </span>
               <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300 drop-shadow-xs">
                 {portalEyebrow}
               </p>
-              <h1 className="mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-md">
+              <h1 className="mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight text-[var(--forest-deep)] sm:text-5xl lg:text-6xl drop-shadow-md">
                 {portalHeading}
               </h1>
-              <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-white/90 drop-shadow-xs">
+              <p className="mt-4 max-w-xl text-sm sm:text-base leading-relaxed text-[var(--ink)] drop-shadow-xs">
                 {portalCopy}
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
@@ -230,12 +230,12 @@ export default function TenantPortal() {
                 </button>
                 <Link
                   to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-[var(--forest-deep)] bg-[var(--forest)]/5 hover:bg-white/25 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
                 >
                   <History className="h-4 w-4 text-emerald-300" />
                   Riwayat Pesanan
                 </Link>
-                <span className="inline-flex items-center gap-2 text-xs font-medium text-white/90">
+                <span className="inline-flex items-center gap-2 text-xs font-medium text-[var(--ink)]">
                   <ShieldCheck className="h-4 w-4 text-emerald-400" />
                   QR aman untuk gerbang
                 </span>
@@ -243,7 +243,7 @@ export default function TenantPortal() {
             </div>
 
             {template.show_availability !== false && (
-              <div className="glass-card-dark rounded-2xl p-5 sm:p-6 text-white">
+              <div className="glass-panel rounded-2xl p-5 sm:p-6 text-[var(--forest-deep)]">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
                     Ketersediaan Hari Ini
@@ -254,11 +254,11 @@ export default function TenantPortal() {
                   </span>
                 </div>
                 <div className="mt-4 flex items-end justify-between">
-                  <span className="text-xs font-medium text-white/70">Kuota terisi</span>
-                  <strong className="text-3xl font-extrabold tracking-tight text-white">{used}%</strong>
+                  <span className="text-xs font-medium text-[var(--forest-deep)]/70">Kuota terisi</span>
+                  <strong className="text-3xl font-extrabold tracking-tight text-[var(--forest-deep)]">{used}%</strong>
                 </div>
                 <div
-                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/15"
+                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--forest)]/5"
                   role="progressbar"
                   aria-valuenow={used}
                   aria-valuemin={0}
@@ -272,11 +272,11 @@ export default function TenantPortal() {
                 </div>
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   <div className="rounded-xl border border-white/10 bg-white/[0.08] p-3.5 backdrop-blur-sm">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-white/60">Tersisa</span>
-                    <strong className="mt-1 block text-xl font-black text-white">{remaining.toLocaleString('id-ID')}</strong>
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[var(--forest-deep)]/60">Tersisa</span>
+                    <strong className="mt-1 block text-xl font-black text-[var(--forest-deep)]">{remaining.toLocaleString('id-ID')}</strong>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-white/[0.08] p-3.5 backdrop-blur-sm">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-white/60">Mulai dari</span>
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[var(--forest-deep)]/60">Mulai dari</span>
                     <strong className="mt-1 block text-lg font-black text-[#E8C58C]">{rupiah(startingPrice)}</strong>
                   </div>
                 </div>
@@ -413,12 +413,12 @@ export default function TenantPortal() {
             <Ticket className="h-3.5 w-3.5" />
             Riwayat Pesanan & E-Tiket
           </Link>
-          <span>•</span>
+          <span>â€¢</span>
           <Link to={isManager ? "/admin" : "/masuk"} className="hover:underline">
             {isManager ? "Portal Pengelola" : "Masuk Akun"}
           </Link>
         </div>
-        <p>{destination.name} · Didukung oleh Passify</p>
+        <p>{destination.name} Â· Didukung oleh Passify</p>
       </footer>
 
       {/* Passify Cashless Wallet Modal */}
@@ -431,3 +431,5 @@ export default function TenantPortal() {
     </div>
   );
 }
+
+

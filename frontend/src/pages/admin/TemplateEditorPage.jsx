@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import {
   ExternalLink,
   Eye,
@@ -77,7 +77,7 @@ function FacilityTagInput({ value = [], onChange }) {
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap gap-1.5 min-h-[42px] p-2 bg-[var(--canvas)] rounded-xl border border-[var(--border)]">
+      <div className="flex flex-wrap gap-1.5 min-h-[42px] p-2 bg-transparent rounded-xl border border-[var(--border)]">
         {value.map((tag) => (
           <span
             key={tag}
@@ -131,7 +131,7 @@ function FacilityTagInput({ value = [], onChange }) {
 
 function ToggleField({ checked, description, label, onChange }) {
   return (
-    <label className="flex min-h-12 items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--sand)] px-4 py-3 cursor-pointer hover:bg-[var(--canvas)] transition-colors">
+    <label className="flex min-h-12 items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--sand)] px-4 py-3 cursor-pointer hover:bg-transparent transition-colors">
       <span>
         <span className="block text-sm font-bold text-[var(--forest-deep)]">{label}</span>
         <span className="mt-0.5 block text-xs text-[var(--ink-soft)]">{description}</span>
@@ -221,10 +221,10 @@ function PortalLivePreview({ destination, template }) {
         </a>
       </div>
 
-      <div className="p-4 sm:p-5 flex-1 bg-[var(--canvas)] overflow-y-auto flex justify-center">
+      <div className="p-4 sm:p-5 flex-1 bg-transparent overflow-y-auto flex justify-center">
         {viewMode === 'mobile' ? (
           /* Mobile / Android Frame */
-          <div className="w-full max-w-[360px] h-fit overflow-hidden rounded-[2.5rem] border-[6px] border-white shadow-2xl bg-[var(--canvas)] transition-all duration-300">
+          <div className="w-full max-w-[360px] h-fit overflow-hidden rounded-[2.5rem] border-[6px] border-white shadow-2xl bg-transparent transition-all duration-300">
             {/* Mobile Header Bar */}
             <div className="bg-white px-4 py-2.5 flex items-center justify-between border-b border-[var(--border)]">
               <span className="text-xs font-black tracking-tight text-[var(--forest-deep)] font-serif truncate max-w-[180px]">{heading}</span>
@@ -267,7 +267,7 @@ function PortalLivePreview({ destination, template }) {
             </div>
 
             {/* Mobile Content Stack */}
-            <div className="space-y-3.5 p-4 bg-[var(--canvas)]">
+            <div className="space-y-3.5 p-4 bg-transparent">
               {/* Real Availability Card */}
               {template.show_availability !== false && (
                 <div className="rounded-2xl bg-[var(--forest-deep)]/95 border border-white/15 p-3.5 text-white shadow-xs">
@@ -302,7 +302,7 @@ function PortalLivePreview({ destination, template }) {
                   categories.map((cat) => {
                     const catTotal = Number(cat.price || cat.base_price || 0) + Number(cat.insurance || cat.insurance_fee || 0) + Number(cat.retribusi || cat.retribusi_fee || 0);
                     return (
-                      <div key={cat.id} className="p-2.5 rounded-xl bg-[var(--canvas)] border border-[var(--border)] flex items-center justify-between">
+                      <div key={cat.id} className="p-2.5 rounded-xl bg-transparent border border-[var(--border)] flex items-center justify-between">
                         <div>
                           <p className="text-xs font-bold text-[var(--forest-deep)]">{cat.name}</p>
                           <p className="text-[10px] text-[var(--ink-soft)]">Total: Rp {catTotal.toLocaleString('id-ID')}</p>
@@ -322,7 +322,7 @@ function PortalLivePreview({ destination, template }) {
                   <p className="text-xs font-bold text-[var(--forest-deep)] mb-2 font-serif">Fasilitas Kawasan</p>
                   <div className="flex flex-wrap gap-1">
                     {facilities.map((f) => (
-                      <span key={f} className="inline-flex items-center gap-1 text-[10px] font-medium bg-[var(--canvas)] text-[var(--ink-soft)] px-2 py-1 rounded-md">
+                      <span key={f} className="inline-flex items-center gap-1 text-[10px] font-medium bg-transparent text-[var(--ink-soft)] px-2 py-1 rounded-md">
                         <CheckCircle2 className="h-3 w-3 text-[var(--forest)]" />
                         {f}
                       </span>
@@ -345,7 +345,7 @@ function PortalLivePreview({ destination, template }) {
           </div>
         ) : (
           /* Desktop / Web Browser Frame */
-          <div className="w-full max-w-2xl h-fit overflow-hidden rounded-2xl border border-[var(--border)] shadow-xl bg-[var(--canvas)] transition-all duration-300">
+          <div className="w-full max-w-2xl h-fit overflow-hidden rounded-2xl border border-[var(--border)] shadow-xl bg-transparent transition-all duration-300">
             {/* Desktop Browser Topbar */}
             <div className="bg-[var(--fog)] px-4 py-2 border-b border-[var(--border)] flex items-center gap-3">
               <div className="flex items-center gap-1.5">
@@ -438,7 +438,7 @@ function PortalLivePreview({ destination, template }) {
                     categories.map((cat) => {
                       const catTotal = Number(cat.price || cat.base_price || 0) + Number(cat.insurance || cat.insurance_fee || 0) + Number(cat.retribusi || cat.retribusi_fee || 0);
                       return (
-                        <div key={cat.id} className="p-3 rounded-xl bg-[var(--canvas)] border border-[var(--border)] flex items-center justify-between">
+                        <div key={cat.id} className="p-3 rounded-xl bg-transparent border border-[var(--border)] flex items-center justify-between">
                           <div>
                             <p className="text-xs font-bold text-[var(--forest-deep)]">{cat.name}</p>
                             <p className="text-[10px] text-[var(--ink-soft)]">Total: Rp {catTotal.toLocaleString('id-ID')}</p>
@@ -459,7 +459,7 @@ function PortalLivePreview({ destination, template }) {
                       <p className="text-xs font-bold text-[var(--forest-deep)] mb-2.5 font-serif">Fasilitas Kawasan</p>
                       <div className="flex flex-wrap gap-1.5">
                         {facilities.map((f) => (
-                          <span key={f} className="inline-flex items-center gap-1.5 text-xs font-medium bg-[var(--canvas)] text-[var(--ink-soft)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
+                          <span key={f} className="inline-flex items-center gap-1.5 text-xs font-medium bg-transparent text-[var(--ink-soft)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
                             <CheckCircle2 className="h-3.5 w-3.5 text-[var(--forest)]" />
                             {f}
                           </span>
@@ -832,7 +832,7 @@ export default function TemplateEditorPage() {
                 className={`flex flex-col cursor-pointer items-center gap-2 rounded-xl border p-3.5 text-xs font-semibold transition-all ${
                   formData.primary_color === choice.value
                     ? 'border-[var(--forest)] bg-[var(--leaf-pale)] text-[var(--forest-deep)] scale-[1.02] shadow-xs'
-                    : 'border-[var(--border)] bg-[var(--sand)] text-[var(--ink-soft)] hover:bg-[var(--canvas)]'
+                    : 'border-[var(--border)] bg-[var(--sand)] text-[var(--ink-soft)] hover:bg-transparent'
                 }`}
               >
                 <input
@@ -968,3 +968,4 @@ export default function TemplateEditorPage() {
     </div>
   );
 }
+

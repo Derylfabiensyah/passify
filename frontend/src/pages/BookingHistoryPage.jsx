@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
@@ -217,9 +217,9 @@ export default function BookingHistoryPage() {
   const brandName = destination?.name || (effectiveSlug ? effectiveSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'passify');
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
+    <div className="min-h-screen bg-transparent text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-xs border-b border-gray-100">
+      <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to={homeUrl} className="flex items-center gap-2 text-xl font-bold tracking-tight text-[var(--forest-deep)] no-underline">
             {effectiveSlug ? (
@@ -466,7 +466,7 @@ export default function BookingHistoryPage() {
                         <div className="space-y-1">
                           {(ticket.visitors || [{ name: ticket.visitorName || 'Pengunjung' }]).map((v, vIdx) => (
                             <div key={vIdx} className="flex justify-between text-[11px] text-[var(--ink)]">
-                              <span>• {v.name}</span>
+                              <span>â€¢ {v.name}</span>
                               {v.nik && <span className="font-mono text-gray-500 text-[10px]">NIK: {v.nik}</span>}
                             </div>
                           ))}
@@ -543,8 +543,10 @@ export default function BookingHistoryPage() {
 
       {/* Footer */}
       <footer className="border-t border-gray-100 bg-white py-6 text-center text-xs text-[var(--ink-soft)]">
-        © {new Date().getFullYear()} Passify Cloud OS · Platform Reservasi & E-Ticketing Wisata Alam
+        Â© {new Date().getFullYear()} Passify Cloud OS Â· Platform Reservasi & E-Ticketing Wisata Alam
       </footer>
     </div>
   );
 }
+
+

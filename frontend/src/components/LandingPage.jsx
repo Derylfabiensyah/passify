@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -71,7 +71,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="landing-page min-h-screen overflow-x-hidden bg-[var(--canvas)] text-[var(--ink)]">
+    <div className="landing-page min-h-screen overflow-x-hidden bg-transparent text-[var(--ink)]">
       <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline" aria-label="Passify beranda">
@@ -80,14 +80,14 @@ export default function LandingPage() {
 
           <nav className="hidden items-center gap-6 text-xs font-bold text-[var(--ink-soft)] lg:flex" aria-label="Navigasi utama">
             {navLinks.map((link, idx) => (
-              <a key={idx} href={link.href} className="transition-colors hover:text-[var(--forest-deep)]">
+              <a key={idx} href={link.href} className="transition-colors hover:text-[var(--forest)]">
                 {link.label}
               </a>
             ))}
           </nav>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--forest-deep)] sm:inline">
+            <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--forest)] sm:inline">
               Jelajah Wisata
             </Link>
             <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px]">
@@ -98,7 +98,7 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-[var(--forest-deep)] hover:bg-[var(--fog)] border border-[var(--border)] transition-colors"
+              className="lg:hidden p-2 rounded-xl text-[var(--forest-deep)] hover:bg-transparent border border-[var(--border)] transition-colors"
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? 'Tutup navigasi mobile' : 'Buka navigasi mobile'}
             >
@@ -118,9 +118,9 @@ export default function LandingPage() {
             />
 
             {/* Drawer Panel */}
-            <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-[var(--sand)] shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300 border-l border-[var(--border)]">
+            <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-transparent shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300 border-l border-[var(--border)]">
               {/* Drawer Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] bg-[var(--canvas)]">
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] bg-transparent">
                 <Link
                   to="/"
                   onClick={() => setMobileMenuOpen(false)}
@@ -131,7 +131,7 @@ export default function LandingPage() {
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-xl text-[var(--ink-soft)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                  className="p-2 rounded-xl text-[var(--ink-soft)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
                   aria-label="Tutup menu"
                 >
                   <X className="h-5 w-5" />
@@ -148,7 +148,7 @@ export default function LandingPage() {
                     key={idx}
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
                   >
                     <span>{link.label}</span>
                     <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
@@ -162,7 +162,7 @@ export default function LandingPage() {
                   <Link
                     to="/jelajah"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
                       <Compass className="h-4 w-4 text-[var(--forest)]" />
@@ -173,7 +173,7 @@ export default function LandingPage() {
                   <Link
                     to="/daftar-wisata"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest-deep)] hover:bg-[var(--fog)] transition-colors"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
                       <Building2 className="h-4 w-4 text-[var(--forest)]" />
@@ -185,7 +185,7 @@ export default function LandingPage() {
               </div>
 
               {/* Drawer Bottom Actions */}
-              <div className="p-4 border-t border-[var(--border)] bg-[var(--canvas)] space-y-2.5">
+              <div className="p-4 border-t border-[var(--border)] bg-transparent space-y-2.5">
                 <Link
                   to="/daftar-wisata"
                   onClick={() => setMobileMenuOpen(false)}
@@ -210,29 +210,25 @@ export default function LandingPage() {
       </header>
 
       <main>
-        <section className="relative isolate overflow-hidden bg-[var(--forest-deep)] text-white">
-          <img src={heroImage} alt="Lanskap pegunungan saat pagi hari" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-55 saturate-[.64]" />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10"
-            style={{ backgroundImage: 'linear-gradient(105deg, rgba(16,45,32,.98) 4%, rgba(16,45,32,.88) 46%, rgba(16,45,32,.46))' }}
-          />
+        <section className="relative isolate overflow-hidden text-[var(--ink)]">
+          
+          
           <div className="mx-auto grid min-h-[calc(100vh-68px)] max-w-[1240px] gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(0,_1fr)_22rem] lg:items-end lg:gap-14 lg:px-8 lg:py-20">
             <div className="max-w-[780px]">
               <Eyebrow className="!text-[var(--leaf)]">Untuk pengelola kawasan yang ingin menjaga ritme</Eyebrow>
-              <h1 className="mt-5 max-w-[760px] font-sans text-[clamp(2.7rem,6.4vw,5.9rem)] font-bold leading-[.93] tracking-[-.06em] text-white">Alam memberi batas.<br />Operasi memberi kepastian.</h1>
+              <h1 className="mt-5 max-w-[760px] font-sans text-[clamp(2.7rem,6.4vw,5.9rem)] font-bold leading-[.93] tracking-[-.06em] text-[var(--forest-deep)]">Alam memberi batas.<br />Operasi memberi kepastian.</h1>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
                   Daftarkan wisata Anda <ArrowRight className="h-4 w-4" />
                 </Link>
-                <Link to="/jelajah" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/12 text-white hover:bg-white/20">
+                <Link to="/jelajah" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-[var(--forest)]/10 text-[var(--forest-deep)] hover:bg-[var(--forest)]/20">
                   Jelajahi portal wisatawan <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
-              <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/20 pt-5 text-xs font-semibold text-white/75"><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Kuota per sesi</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Gerbang siap offline</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Payout terlacak</span></div>
+              <div className="mt-12 flex flex-wrap gap-x-6 gap-y-3 border-t border-[var(--forest)]/20 pt-5 text-xs font-semibold text-[var(--ink-soft)]"><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Kuota per sesi</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Gerbang siap offline</span><span className="flex items-center gap-2"><Check className="h-4 w-4 text-[var(--leaf)]" />Payout terlacak</span></div>
             </div>
 
-            <aside className="rounded-2xl bg-[rgba(255,254,250,.96)] p-5 text-[var(--ink)] shadow-[0_20px_46px_rgba(0,0,0,.24)] backdrop-blur-md sm:p-6 lg:mb-3">
+            <aside className="glass-panel p-5 text-[var(--ink)] sm:p-6 lg:mb-3">
               <div className="flex items-start justify-between gap-4 pb-4"><div><Eyebrow>Contoh operasional</Eyebrow><p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Taman Nasional Bromo Tengger Semeru</p></div><span className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--leaf-pale)] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]"><span className="status-dot" />Normal</span></div>
               <div className="mt-5">
                 <div className="flex items-end justify-between">
@@ -250,13 +246,13 @@ export default function LandingPage() {
                   <div className="h-full w-[71%] rounded-full bg-[var(--leaf)]" />
                 </div>
               </div>
-              <dl className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kunjungan</dt><dd className="mt-1 text-xl font-extrabold tracking-[-.04em] text-[var(--forest-deep)]">58 orang</dd></div><div className="rounded-xl bg-[var(--canvas)] p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Gate utama</dt><dd className="mt-1 text-sm font-extrabold text-[var(--forest)]">Siap menerima</dd></div></dl>
+              <dl className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-xl bg-transparent p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Sisa kunjungan</dt><dd className="mt-1 text-xl font-extrabold tracking-[-.04em] text-[var(--forest-deep)]">58 orang</dd></div><div className="rounded-xl bg-transparent p-3 shadow-2xs"><dt className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Gate utama</dt><dd className="mt-1 text-sm font-extrabold text-[var(--forest)]">Siap menerima</dd></div></dl>
               <p className="mt-4 text-[11px] leading-5 text-[var(--ink-soft)]">Simulasi status yang membantu tim memutuskan sebelum kawasan menjadi terlalu penuh.</p>
             </aside>
           </div>
         </section>
 
-        <section id="masalah" className="scroll-mt-24 bg-[var(--sand)]">
+        <section id="masalah" className="scroll-mt-24 bg-transparent">
           <div className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
             <SectionHeading eyebrow="Kawasan punya ritmenya sendiri" title="Ketika kunjungan bertambah, keputusan harus semakin jernih.">Bukan sekadar menjual tiket. Pengelola perlu menjaga ruang, menggerakkan petugas, dan tetap memahami uang yang mengalir setiap hari.</SectionHeading>
             <div className="mt-10 grid gap-4 md:grid-cols-3 lg:gap-5">
@@ -264,26 +260,26 @@ export default function LandingPage() {
                 { index: '01', title: 'Ruang yang tidak bisa ditambah', text: 'Daya dukung menentukan berapa banyak orang yang dapat hadir tanpa mengubah pengalaman atau ekosistem kawasan.' },
                 { index: '02', title: 'Hari lapangan tidak selalu tersambung', text: 'Gerbang tetap harus bergerak ketika sinyal hilang, antrean datang, dan petugas membutuhkan jawaban yang cepat.' },
                 { index: '03', title: 'Kepercayaan perlu jejak yang jelas', text: 'Komponen tiket, transaksi, dan pencairan perlu mudah dibaca tanpa menambah pekerjaan administratif.' },
-              ].map(({ index, title, text }) => <article key={index} className="rounded-2xl bg-[var(--canvas)] p-6 shadow-[0_18px_42px_rgba(16,45,32,.10)] sm:p-7"><div><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span></div><h3 className="mt-9 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
+              ].map(({ index, title, text }) => <article key={index} className="card p-6 sm:p-7"><div><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span></div><h3 className="mt-9 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
             </div>
           </div>
         </section>
 
-        <section id="alur" className="scroll-mt-24 bg-[var(--fog)]">
+        <section id="alur" className="scroll-mt-24 bg-transparent">
           <div className="mx-auto grid max-w-[1240px] gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-start lg:gap-20 lg:px-8 lg:py-24">
-            <SectionHeading eyebrow="Satu alur, bukan banyak alat" title="Dari rencana pengunjung sampai rekonsiliasi hari ini.">Passify membantu kawasan merespons dengan satu sumber informasi yang sama—di portal, di gerbang, dan pada laporan pengelola.</SectionHeading>
+            <SectionHeading eyebrow="Satu alur, bukan banyak alat" title="Dari rencana pengunjung sampai rekonsiliasi hari ini.">Passify membantu kawasan merespons dengan satu sumber informasi yang samaâ€”di portal, di gerbang, dan pada laporan pengelola.</SectionHeading>
             <div>
               {[
                 { number: '01', title: 'Pengunjung memilih waktu yang masih masuk akal', text: 'Reservasi mengikuti tanggal, sesi, jalur, atau aktivitas yang Anda atur untuk kawasan.' },
                 { number: '02', title: 'Gerbang memvalidasi tanpa menunggu kondisi ideal', text: 'Tiket dinamis tetap dapat diperiksa di lapangan dan diselaraskan ketika koneksi tersedia kembali.' },
                 { number: '03', title: 'Pendapatan kembali dalam gambaran yang bisa ditindak', text: 'Komponen penjualan dan settlement disusun agar tim memahami apa yang terjadi, bukan sekadar melihat angka.' },
               ].map(({ number, title, text }) => <article key={number} className="grid gap-4 py-7 sm:grid-cols-[46px_1fr] sm:items-start sm:gap-5"><span className="text-2xl font-bold tracking-[-.04em] text-[var(--bark)]">{number}</span><div><h3 className="font-sans text-xl font-bold leading-snug tracking-[-.035em]">{title}</h3><p className="mt-2 max-w-xl text-sm leading-6 text-[var(--ink-soft)]">{text}</p></div></article>)}
-              <div className="mt-7 rounded-2xl bg-[var(--forest-deep)] p-5 text-white sm:p-6"><div className="flex items-center justify-between gap-4 pb-4"><div><Eyebrow className="!text-[var(--leaf)]">Simulasi operasional</Eyebrow><p className="mt-1 text-2xl font-bold tracking-[-.045em] text-white">Gerbang selatan siap menerima</p></div><CloudOff className="h-5 w-5 shrink-0 text-[var(--leaf)]" /></div><div className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-2xl bg-white/10 p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-white/55">Scan terakhir</span><strong className="mt-2 block text-xl">08:42</strong></div><div className="rounded-2xl bg-white/10 p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-white/55">Sesi pagi</span><strong className="mt-2 block text-xl">142 / 200</strong></div></div><p className="mt-4 text-xs leading-5 text-white/65">Contoh tampilan status; data akan diselaraskan saat koneksi tersedia.</p></div>
+              <div className="mt-7 rounded-2xl bg-[var(--forest-deep)] p-5 text-[var(--forest-deep)] sm:p-6"><div className="flex items-center justify-between gap-4 pb-4"><div><Eyebrow className="!text-[var(--leaf)]">Simulasi operasional</Eyebrow><p className="mt-1 text-2xl font-bold tracking-[-.045em] text-[var(--forest-deep)]">Gerbang selatan siap menerima</p></div><CloudOff className="h-5 w-5 shrink-0 text-[var(--leaf)]" /></div><div className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-2xl bg-white/10 p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]/55">Scan terakhir</span><strong className="mt-2 block text-xl">08:42</strong></div><div className="rounded-2xl bg-white/10 p-4"><span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest-deep)]/55">Sesi pagi</span><strong className="mt-2 block text-xl">142 / 200</strong></div></div><p className="mt-4 text-xs leading-5 text-[var(--forest-deep)]/65">Contoh tampilan status; data akan diselaraskan saat koneksi tersedia.</p></div>
             </div>
           </div>
         </section>
 
-        <section id="white-label" className="scroll-mt-24 bg-[var(--canvas)]">
+        <section id="white-label" className="scroll-mt-24 bg-transparent">
           <div className="mx-auto grid max-w-[1240px] gap-10 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-20 lg:px-8 lg:py-24">
             <div>
               <SectionHeading
@@ -304,7 +300,7 @@ export default function LandingPage() {
               {/* Header Card */}
               <div className="flex items-start justify-between gap-4 pb-5">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[var(--bark)] text-white shadow-xs">
+                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[var(--bark)] text-[var(--forest-deep)] shadow-xs">
                     <Trees className="h-5 w-5" />
                   </span>
                   <span>
@@ -348,7 +344,7 @@ export default function LandingPage() {
                 <span className="text-[var(--ink-soft)] font-semibold">Mulai Rp35.000 / orang</span>
                 <Link
                   to="/pesan/curug-bidadari"
-                  className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-white transition-colors hover:bg-[var(--forest-deep)] shadow-xs no-underline font-bold"
+                  className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-[var(--forest-deep)] transition-colors hover:bg-[var(--forest-deep)] shadow-xs no-underline font-bold"
                 >
                   Pilih tanggal
                 </Link>
@@ -358,27 +354,27 @@ export default function LandingPage() {
         </section>
 
         <section id="contact" className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
-          <div className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]"><img src={trailImage} alt="Jalur hutan yang tenang" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-42 saturate-[.55]" /><div aria-hidden="true" className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.97), rgba(16,45,32,.74), rgba(16,45,32,.40))' }} /><div className="grid min-h-[390px] items-end px-7 py-9 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14"><div className="max-w-xl"><Eyebrow className="!text-[var(--leaf)]">Mulai dari kebutuhan kawasan Anda</Eyebrow><h2 className="mt-4 text-4xl font-bold leading-[.96] text-white sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2><p className="mt-5 text-sm leading-6 text-white/75 sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p>                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="relative isolate overflow-hidden rounded-2xl text-[var(--ink)] shadow-[var(--shadow-lift)]"><div className="grid min-h-[390px] items-end px-7 py-9 sm:px-10 sm:py-12 lg:min-h-[440px] lg:px-14 lg:py-14"><div className="max-w-xl"><Eyebrow className="!text-[var(--leaf)]">Mulai dari kebutuhan kawasan Anda</Eyebrow><h2 className="mt-4 text-4xl font-bold leading-[.96] text-[var(--forest-deep)] sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2><p className="mt-5 text-sm leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p>                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
                     Daftarkan wisata <ArrowRight className="h-4 w-4" />
                   </Link>
-                  <a href="mailto:hello@passify.id" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/15 text-white hover:bg-white/25">
+                  <a href="mailto:hello@passify.id" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-[var(--forest)]/10 text-[var(--forest-deep)] hover:bg-[var(--forest)]/20">
                     Bicarakan kebutuhan <ArrowUpRight className="h-4 w-4" />
                   </a>
                 </div></div></div></div>
         </section>
       </main>
 
-      <footer className="bg-[var(--forest-deep)] text-white pt-16 pb-12">
+      <footer className="text-[var(--forest-deep)] pt-16 pb-12">
         <div className="mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-8">
           {/* Main Footer Grid */}
-          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5 pb-12 border-b border-white/10">
+          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5 pb-12 border-b border-[var(--forest)]/10">
             {/* Column 1: Brand & Identity */}
             <div className="lg:col-span-2 space-y-4">
-              <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-white no-underline inline-block">
+              <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline inline-block">
                 passify
               </Link>
-              <p className="text-sm leading-6 text-white/70 max-w-sm">
+              <p className="text-sm leading-6 text-[var(--ink-soft)] max-w-sm">
                 Platform SaaS White-Label E-Ticketing & Manajemen Kuota Wisata Alam. Dirancang tangguh di lapangan dengan teknologi offline-first, dynamic TOTP QR, dan ekosistem pembayaran terpadu.
               </p>
             </div>
@@ -388,12 +384,12 @@ export default function LandingPage() {
               <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
                 Solusi Kawasan
               </h4>
-              <ul className="space-y-2.5 text-sm text-white/75">
-                <li><a href="#masalah" className="hover:text-white transition-colors">Daya Dukung & Kuota</a></li>
-                <li><a href="#alur" className="hover:text-white transition-colors">Validasi Gate Offline</a></li>
-                <li><a href="#white-label" className="hover:text-white transition-colors">Portal White-Label</a></li>
-                <li><Link to="/jelajah" className="hover:text-white transition-colors">E-Ticket QR Dinamis</Link></li>
-                <li><span className="text-white/40">Rekonsiliasi Kas Otomatis</span></li>
+              <ul className="space-y-2.5 text-sm text-[var(--ink-soft)]">
+                <li><a href="#masalah" className="hover:text-[var(--forest)] transition-colors">Daya Dukung & Kuota</a></li>
+                <li><a href="#alur" className="hover:text-[var(--forest)] transition-colors">Validasi Gate Offline</a></li>
+                <li><a href="#white-label" className="hover:text-[var(--forest)] transition-colors">Portal White-Label</a></li>
+                <li><Link to="/jelajah" className="hover:text-[var(--forest)] transition-colors">E-Ticket QR Dinamis</Link></li>
+                <li><span className="text-[var(--ink-muted)]">Rekonsiliasi Kas Otomatis</span></li>
               </ul>
             </div>
 
@@ -402,11 +398,11 @@ export default function LandingPage() {
               <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
                 Akses & Portal
               </h4>
-              <ul className="space-y-2.5 text-sm text-white/75">
-                <li><Link to="/jelajah" className="hover:text-white transition-colors">Portal Wisatawan</Link></li>
-                <li><Link to="/daftar-wisata" className="hover:text-white transition-colors">Daftarkan Wisata Baru</Link></li>
-                <li><Link to="/masuk" className="hover:text-white transition-colors">Masuk Petugas / Admin</Link></li>
-                <li><Link to="/verifikasi-email" className="hover:text-white transition-colors">Aktivasi Akun Pengelola</Link></li>
+              <ul className="space-y-2.5 text-sm text-[var(--ink-soft)]">
+                <li><Link to="/jelajah" className="hover:text-[var(--forest)] transition-colors">Portal Wisatawan</Link></li>
+                <li><Link to="/daftar-wisata" className="hover:text-[var(--forest)] transition-colors">Daftarkan Wisata Baru</Link></li>
+                <li><Link to="/masuk" className="hover:text-[var(--forest)] transition-colors">Masuk Petugas / Admin</Link></li>
+                <li><Link to="/verifikasi-email" className="hover:text-[var(--forest)] transition-colors">Aktivasi Akun Pengelola</Link></li>
               </ul>
             </div>
 
@@ -415,41 +411,41 @@ export default function LandingPage() {
               <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
                 Hubungi Kami
               </h4>
-              <ul className="space-y-3 text-sm text-white/75">
+              <ul className="space-y-3 text-sm text-[var(--ink-soft)]">
                 <li className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-[var(--leaf)] shrink-0" />
-                  <a href="mailto:hello@passify.id" className="hover:text-white transition-colors">hello@passify.id</a>
+                  <a href="mailto:hello@passify.id" className="hover:text-[var(--forest)] transition-colors">hello@passify.id</a>
                 </li>
                 <li className="flex items-center gap-2">
                   <Globe className="h-4 w-4 text-[var(--leaf)] shrink-0" />
-                  <span className="text-white/75">Indonesia (BKSDA & BUMDes)</span>
+                  <span className="text-[var(--ink-soft)]">Indonesia (BKSDA & BUMDes)</span>
                 </li>
               </ul>
             </div>
           </div>
 
           {/* Bottom Bar */}
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
-            <p>© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--forest-deep)]/60">
+            <p>Â© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
             <div className="flex gap-6 font-medium">
               <button
                 type="button"
                 onClick={() => openLegal('privacy')}
-                className="hover:text-white transition-colors cursor-pointer"
+                className="hover:text-[var(--forest)] transition-colors cursor-pointer"
               >
                 Kebijakan Privasi
               </button>
               <button
                 type="button"
                 onClick={() => openLegal('terms')}
-                className="hover:text-white transition-colors cursor-pointer"
+                className="hover:text-[var(--forest)] transition-colors cursor-pointer"
               >
                 Syarat Penggunaan
               </button>
               <button
                 type="button"
                 onClick={() => openLegal('help')}
-                className="hover:text-white transition-colors cursor-pointer"
+                className="hover:text-[var(--forest)] transition-colors cursor-pointer"
               >
                 Pusat Bantuan
               </button>
@@ -466,3 +462,8 @@ export default function LandingPage() {
     </div>
   );
 }
+
+
+
+
+

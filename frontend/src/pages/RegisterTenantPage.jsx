@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Trees, 
@@ -180,9 +180,9 @@ export default function RegisterTenantPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--moss)] selection:text-white">
+    <div className="min-h-screen bg-transparent text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--moss)] selection:text-white">
       {/* Header */}
-      <header className="border-b border-[rgba(23,59,50,0.1)] bg-[var(--canvas)]/80 backdrop-blur-md sticky top-0 z-30">
+      <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 no-underline">
             <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
@@ -543,8 +543,10 @@ export default function RegisterTenantPage() {
 
       {/* Footer */}
       <footer className="border-t border-[rgba(23,59,50,0.1)] px-4 py-6 text-center text-xs text-[var(--ink-soft)]">
-        © 2026 Passify. Platform SaaS Tiket Wisata Alam White-Label.
+        Â© 2026 Passify. Platform SaaS Tiket Wisata Alam White-Label.
       </footer>
     </div>
   );
 }
+
+

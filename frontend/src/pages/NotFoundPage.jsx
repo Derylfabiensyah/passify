@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Compass, Home, Search, ArrowLeft, Ticket, ShieldAlert } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
@@ -8,7 +8,7 @@ export default function NotFoundPage() {
   const { tenant } = useTenant();
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] flex flex-col justify-between font-sans text-[var(--ink)] antialiased selection:bg-[var(--leaf-pale)] selection:text-[var(--forest-deep)]">
+    <div className="min-h-screen bg-transparent flex flex-col justify-between font-sans text-[var(--ink)] antialiased selection:bg-[var(--leaf-pale)] selection:text-[var(--forest-deep)]">
       {/* Top Simple Nav */}
       <header className="border-b border-[var(--border)] bg-[var(--surface)]/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -30,7 +30,7 @@ export default function NotFoundPage() {
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--canvas)] cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] hover:bg-transparent cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Kembali</span>
@@ -51,7 +51,7 @@ export default function NotFoundPage() {
           {/* 404 Code & Heading */}
           <div className="space-y-3">
             <span className="font-mono text-sm font-bold tracking-widest uppercase text-[var(--bark)] bg-[var(--bark-pale)]/50 px-3 py-1 rounded-full">
-              Error 404 • Halaman Tidak Ditemukan
+              Error 404 â€¢ Halaman Tidak Ditemukan
             </span>
             <h1 className="font-heading text-3xl sm:text-4xl font-extrabold text-[var(--forest-deep)] tracking-tight">
               Tersesat di Jalur Wisata?
@@ -73,7 +73,7 @@ export default function NotFoundPage() {
 
             <Link
               to="/jelajah"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--surface)] text-[var(--forest-deep)] border border-[var(--border)] font-semibold text-sm hover:bg-[var(--canvas)] hover:border-[var(--leaf)] transition-all cursor-pointer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--surface)] text-[var(--forest-deep)] border border-[var(--border)] font-semibold text-sm hover:bg-transparent hover:border-[var(--leaf)] transition-all cursor-pointer"
             >
               <Search className="w-4 h-4 text-[var(--forest-soft)]" />
               <span>Jelajah Destinasi</span>
@@ -89,14 +89,14 @@ export default function NotFoundPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               <Link
                 to="/tiket-saya"
-                className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-[var(--canvas)] text-[var(--ink)] font-medium transition-colors border border-transparent hover:border-[var(--border)]"
+                className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-transparent text-[var(--ink)] font-medium transition-colors border border-transparent hover:border-[var(--border)]"
               >
                 <Ticket className="w-4 h-4 text-[var(--forest)]" />
                 <span>Riwayat Tiket &amp; E-Ticket</span>
               </Link>
               <Link
                 to="/daftar-wisata"
-                className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-[var(--canvas)] text-[var(--ink)] font-medium transition-colors border border-transparent hover:border-[var(--border)]"
+                className="flex items-center gap-2 p-2.5 rounded-lg hover:bg-transparent text-[var(--ink)] font-medium transition-colors border border-transparent hover:border-[var(--border)]"
               >
                 <Compass className="w-4 h-4 text-[var(--bark)]" />
                 <span>Daftarkan Destinasi Wisata</span>
@@ -113,3 +113,4 @@ export default function NotFoundPage() {
     </div>
   );
 }
+

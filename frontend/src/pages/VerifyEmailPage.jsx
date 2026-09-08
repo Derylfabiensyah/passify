@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle2, AlertCircle, Loader2, ArrowRight, Trees, ExternalLink } from 'lucide-react';
 
@@ -42,9 +42,9 @@ export default function VerifyEmailPage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--moss)] selection:text-white">
+    <div className="min-h-screen bg-transparent text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--moss)] selection:text-white">
       {/* Header */}
-      <header className="border-b border-[rgba(23,59,50,0.1)] bg-[var(--canvas)]/80 backdrop-blur-md sticky top-0 z-30">
+      <header className="border-b border-[rgba(23,59,50,0.1)] bg-transparent/80 backdrop-blur-md sticky top-0 z-30">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2 no-underline">
             <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
@@ -80,7 +80,7 @@ export default function VerifyEmailPage() {
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
-                Verifikasi Berhasil! 🎉
+                Verifikasi Berhasil! ðŸŽ‰
               </h1>
               <p className="mt-3 text-sm leading-relaxed text-[var(--ink-soft)]">
                 {message}
@@ -135,8 +135,9 @@ export default function VerifyEmailPage() {
 
       {/* Footer */}
       <footer className="border-t border-[rgba(23,59,50,0.1)] px-4 py-6 text-center text-xs text-[var(--ink-soft)]">
-        © 2026 Passify. Platform SaaS Tiket Wisata Alam White-Label.
+        Â© 2026 Passify. Platform SaaS Tiket Wisata Alam White-Label.
       </footer>
     </div>
   );
 }
+

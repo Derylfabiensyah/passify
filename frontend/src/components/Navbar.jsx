@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   Mountain,
   ArrowRight,
@@ -86,7 +86,7 @@ export default function Navbar({
         </Link>
 
         {/* Menu Navigasi B2B SaaS Murni (Tanpa Search/Wallet/E-Ticket B2C) */}
-        <nav className="hidden lg:flex items-center gap-1 bg-gray-100/80 p-1.5 rounded-full border border-gray-200/70">
+        <nav className="hidden lg:flex items-center gap-1 bg-white/20 backdrop-blur-md p-1.5 rounded-full border border-white/30 shadow-xs">
           {[
             { label: 'Fitur', target: 'features-section' },
             { label: 'Teknologi Offline', target: 'offline-infrastructure' },
@@ -200,9 +200,9 @@ export default function Navbar({
           />
 
           {/* Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-white shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
+          <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-white/80 dark:bg-black/80 backdrop-blur-2xl border-l border-white/20 shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white/10 dark:bg-black/10">
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
@@ -288,7 +288,7 @@ export default function Navbar({
             </div>
 
             {/* Drawer Footer Actions */}
-            <div className="p-4 border-t border-gray-100 bg-gray-50/70 space-y-2.5">
+            <div className="p-4 border-t border-gray-100 bg-white/10 dark:bg-black/10 space-y-2.5">
               <button
                 onClick={() => handleScrollTo('tourist-demo-banner')}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs border border-emerald-200 transition-colors shadow-2xs"
@@ -345,3 +345,4 @@ export default function Navbar({
     </header>
   );
 }
+

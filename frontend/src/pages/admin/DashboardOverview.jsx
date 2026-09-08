@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import {
   TrendingUp,
   Ticket,
@@ -103,7 +103,7 @@ export default function DashboardOverview() {
       ? Number(rawQuotaPct.toFixed(1))
       : Math.round(rawQuotaPct);
 
-  // ─── Chart.js Configuration: Hourly Visitors ──────────────────
+  // â”€â”€â”€ Chart.js Configuration: Hourly Visitors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const hourlyChartData = {
     labels: hourlyVisitors.map((h) => h.hour),
     datasets: [
@@ -166,7 +166,7 @@ export default function DashboardOverview() {
     }
   };
 
-  // ─── Chart.js Configuration: Weekly Revenue ───────────────────
+  // â”€â”€â”€ Chart.js Configuration: Weekly Revenue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const revenueChartData = {
     labels: revenueWeekly.map((d) => d.day),
     datasets: [
@@ -216,7 +216,7 @@ export default function DashboardOverview() {
     }
   };
 
-  // ─── TanStack React Table: Recent Transactions Columns ─────────
+  // â”€â”€â”€ TanStack React Table: Recent Transactions Columns â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const transactionColumns = useMemo(
     () => [
       {
@@ -297,7 +297,7 @@ export default function DashboardOverview() {
     []
   );
 
-  // ─── TanStack React Table: Gate Scans Columns ──────────────────
+  // â”€â”€â”€ TanStack React Table: Gate Scans Columns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const gateColumns = useMemo(
     () => [
       {

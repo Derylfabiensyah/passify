@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   MapPin,
@@ -70,7 +70,7 @@ function TicketCategoryRow({ cat, onEdit, onDelete }) {
   const total = Number(cat.price || 0) + Number(cat.insurance || 0) + Number(cat.retribusi || 0);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5 px-4 rounded-xl bg-[var(--canvas)] border border-[var(--border)] hover:border-[var(--forest)]/30 transition-colors">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5 px-4 rounded-xl bg-transparent border border-[var(--border)] hover:border-[var(--forest)]/30 transition-colors">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-[var(--forest-deep)]">{cat.name}</span>
@@ -86,8 +86,8 @@ function TicketCategoryRow({ cat, onEdit, onDelete }) {
           <span>
             Tarif Pokok: <strong className="text-[var(--ink)] font-semibold">Rp {Number(cat.price || 0).toLocaleString('id-ID')}</strong>
           </span>
-          <span>• Asuransi: Rp {Number(cat.insurance || 0).toLocaleString('id-ID')}</span>
-          <span>• Retribusi: Rp {Number(cat.retribusi || 0).toLocaleString('id-ID')}</span>
+          <span>â€¢ Asuransi: Rp {Number(cat.insurance || 0).toLocaleString('id-ID')}</span>
+          <span>â€¢ Retribusi: Rp {Number(cat.retribusi || 0).toLocaleString('id-ID')}</span>
           <span className="text-[var(--bark)] font-extrabold">
             Total: Rp {total.toLocaleString('id-ID')}
           </span>
@@ -241,7 +241,7 @@ function DestinationCard({
 
           <div className="space-y-2.5">
             {(dest.ticket_categories || []).length === 0 ? (
-              <div className="p-8 rounded-2xl border-2 border-dashed border-[var(--border)] bg-[var(--canvas)] text-center flex flex-col items-center justify-center space-y-3">
+              <div className="p-8 rounded-2xl border-2 border-dashed border-[var(--border)] bg-transparent text-center flex flex-col items-center justify-center space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest)] flex items-center justify-center shadow-xs">
                   <Ticket className="w-6 h-6" />
                 </div>
@@ -681,3 +681,4 @@ export default function DestinationsPage() {
     </div>
   );
 }
+

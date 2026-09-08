@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import {
   ScanLine,
   Plus,
@@ -66,7 +66,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
                 {device.device_code}
               </span>
               <span className="text-[10px] font-semibold text-gray-600">
-                {device.gate_type === 'entrance' ? '• Pintu Masuk' : '• Pintu Keluar'}
+                {device.gate_type === 'entrance' ? 'â€¢ Pintu Masuk' : 'â€¢ Pintu Keluar'}
               </span>
             </div>
           </div>
@@ -111,7 +111,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
           </span>
           <div className="flex items-center gap-1">
             <span className="font-mono text-[10px] text-gray-600">
-              {keyVisible ? (device.hmac_key || 'a3f8c2d1e6b9') : '••••••••••••'}
+              {keyVisible ? (device.hmac_key || 'a3f8c2d1e6b9') : 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢'}
             </span>
             <button
               type="button"
@@ -214,7 +214,7 @@ function DevicePairingModal({ device, onClose }) {
             </div>
             <div>
               <h3 className="text-sm font-bold text-gray-900">Pairing Scanner Petugas</h3>
-              <p className="text-xs text-gray-500">{device.device_name} • {device.device_code}</p>
+              <p className="text-xs text-gray-500">{device.device_name} â€¢ {device.device_code}</p>
             </div>
           </div>
           <button
@@ -418,7 +418,7 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
               <span>{result.message || 'Tiket berhasil divalidasi!'}</span>
             </div>
             <div className="text-[11px] text-emerald-700">
-              Kode: <span className="font-mono font-bold">{result.ticket_code}</span> • Pengunjung: {result.visitor_name || 'Wisatawan'}
+              Kode: <span className="font-mono font-bold">{result.ticket_code}</span> â€¢ Pengunjung: {result.visitor_name || 'Wisatawan'}
             </div>
           </div>
         )}
