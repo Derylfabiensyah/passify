@@ -18,7 +18,7 @@ export default function Footer() {
               <Mountain className="w-4 h-4" />
             </div>
             <div>
-              <span className="text-[var(--forest-deep)] font-bold text-base font-heading tracking-tight">Passify</span>
+              <span className="text-xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
               <p className="text-[11px] text-[var(--ink-soft)]">White-Label Cloud E-Ticketing &amp; Reservation Engine</p>
             </div>
           </div>

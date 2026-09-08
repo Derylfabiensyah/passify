@@ -74,7 +74,7 @@ export default function LandingPage() {
     <div className="landing-page min-h-screen overflow-x-hidden bg-[var(--canvas)] text-[var(--ink)]">
       <header className="nav-bar sticky top-0 z-40">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="text-xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline" aria-label="Passify beranda">
+          <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline" aria-label="Passify beranda">
             passify
           </Link>
 
@@ -124,7 +124,7 @@ export default function LandingPage() {
                 <Link
                   to="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline"
+                  className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline"
                 >
                   passify
                 </Link>

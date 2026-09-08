@@ -45,8 +45,8 @@ function Brand({ collapsed = false }) {
       className="flex items-center gap-2.5 no-underline transition-opacity hover:opacity-85 outline-none focus:outline-none focus-visible:outline-none"
       aria-label="Passify Console"
     >
-      <span className="text-xl font-black tracking-tight text-[var(--forest-deep)] font-serif">
-        {collapsed ? 'P' : 'Passify'}
+      <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">
+        {collapsed ? 'p' : 'passify'}
       </span>
     </Link>
   );

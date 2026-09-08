@@ -74,7 +74,7 @@ export default function Navbar({
           </div>
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-lg text-gray-900 font-['Outfit'] tracking-tight">Passify</span>
+              <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 tracking-wider uppercase border border-emerald-200">
                 SaaS B2B
               </span>
@@ -212,7 +212,7 @@ export default function Navbar({
                   <Mountain className="w-4 h-4" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-base text-gray-900 font-['Outfit']">Passify</span>
+                  <span className="text-xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
                   <span className="text-[9px] font-bold text-emerald-700 uppercase tracking-wider">SaaS E-Ticketing</span>
                 </div>
               </Link>

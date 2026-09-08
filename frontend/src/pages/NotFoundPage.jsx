@@ -17,8 +17,8 @@ export default function NotFoundPage() {
               <Compass className="w-5 h-5 text-[var(--leaf)]" />
             </div>
             <div>
-              <span className="font-heading font-bold text-lg text-[var(--forest-deep)] tracking-tight">
-                {tenant?.name || 'Passify'}
+              <span className={tenant?.name ? "font-heading font-bold text-lg text-[var(--forest-deep)] tracking-tight" : "text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]"}>
+                {tenant?.name || 'passify'}
               </span>
               {tenant?.tagline && (
                 <span className="hidden sm:inline text-xs text-[var(--ink-soft)] ml-2 pl-2 border-l border-[var(--border)]">

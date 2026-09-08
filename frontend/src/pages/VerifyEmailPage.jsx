@@ -46,8 +46,8 @@ export default function VerifyEmailPage() {
       {/* Header */}
       <header className="border-b border-[rgba(23,59,50,0.1)] bg-[var(--canvas)]/80 backdrop-blur-md sticky top-0 z-30">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 text-decoration-none">
-            <span className="text-xl font-extrabold tracking-tight text-[var(--forest-deep)]">passify</span>
+          <Link to="/" className="flex items-center gap-2 no-underline">
+            <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
           </Link>
           <Link to="/" className="text-xs font-semibold text-[var(--ink-soft)] hover:text-[var(--ink)]">
             Kembali ke Beranda

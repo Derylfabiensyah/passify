@@ -230,7 +230,7 @@ export default function BookingHistoryPage() {
                 <span>{brandName}</span>
               </>
             ) : (
-              <span className="text-2xl tracking-[-.05em]">passify</span>
+              <span className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">passify</span>
             )}
           </Link>
 
