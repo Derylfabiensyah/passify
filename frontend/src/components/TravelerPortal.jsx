@@ -93,7 +93,7 @@ export default function TravelerPortal() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to="/riwayat-pesanan"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
               title="Lihat riwayat pesanan dan e-tiket saya"
             >
               <Ticket className="h-3.5 w-3.5 text-[var(--forest)]" />
@@ -104,7 +104,7 @@ export default function TravelerPortal() {
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
               title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
             >
               <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />

@@ -135,7 +135,7 @@ export default function TenantPortal() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
               title="Lihat riwayat pesanan dan e-tiket saya"
             >
               <Ticket className="h-3.5 w-3.5 text-[var(--forest)]" />
@@ -146,7 +146,7 @@ export default function TenantPortal() {
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
               title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
             >
               <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />
@@ -230,7 +230,7 @@ export default function TenantPortal() {
                 </button>
                 <Link
                   to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
                 >
                   <History className="h-4 w-4 text-emerald-300" />
                   Riwayat Pesanan

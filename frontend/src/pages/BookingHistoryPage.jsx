@@ -248,7 +248,7 @@ export default function BookingHistoryPage() {
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] border border-gray-200 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
               title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
             >
               <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />
