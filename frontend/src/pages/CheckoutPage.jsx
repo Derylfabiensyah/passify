@@ -251,13 +251,18 @@ export default function CheckoutPage() {
     });
   }, [totalQty]);
 
-  // 15-Minute Realtime Countdown Timer in Step 2 (Non-blocking)
+  // 15-Minute Realtime Quota Lock Countdown Timer in Step 2 (PDF Spec Hal. 1 & 4)
   useEffect(() => {
     if (step !== 2) return;
     const tick = () => {
       const saved = getPaymentDeadline(destination?.slug);
       const remaining = Math.max(0, Math.floor((saved - Date.now()) / 1000));
       setTimeLeftSeconds(remaining);
+      if (remaining <= 0) {
+        clearPaymentDeadline();
+        setStep(1);
+        setFormError('Batas waktu pembayaran (15 menit) telah berakhir. Kuota reservasi tiket Anda dilepas otomatis kembali ke sistem agar dapat dipesan wisatawan lain.');
+      }
     };
     tick();
     const interval = setInterval(tick, 1000);
@@ -285,9 +290,13 @@ export default function CheckoutPage() {
 
   const selectedSlot = (destination?.time_slots || []).find((s) => s.id === selectedSlotId);
 
-  // Quantity Modifier
+  // Quantity Modifier (Fair Quota: Maks 4 Tiket per Transaksi)
   const handleQtyChange = (catId, delta) => {
     setFormError('');
+    if (delta > 0 && totals.quantity >= 4) {
+      setFormError('Batas maksimal pembelian adalah 4 tiket per pemesanan agar kuota terbagi adil bagi wisatawan lain.');
+      return;
+    }
     setQuantities((prev) => {
       const current = prev[catId] || 0;
       const next = Math.max(0, current + delta);
@@ -314,6 +323,10 @@ export default function CheckoutPage() {
       setFormError('Pilih minimal 1 tiket untuk melanjutkan pemesanan.');
       return;
     }
+    if (totals.quantity > 4) {
+      setFormError('Batas maksimal pembelian adalah 4 tiket per transaksi.');
+      return;
+    }
     if (!contact.name.trim() || !contact.email.trim() || !contact.phone.trim()) {
       setFormError('Mohon lengkapi Data Kontak Pemesan (Nama, Email, & WhatsApp).');
       return;
@@ -323,6 +336,39 @@ export default function CheckoutPage() {
       setFormError('Mohon isi nama lengkap untuk setiap tiket pengunjung.');
       return;
     }
+
+    // Anti-Hoarding & Fair Quota Enforcement (PDF Spec Hal. 1 & 4)
+    try {
+      const myTickets = JSON.parse(localStorage.getItem('passify_my_tickets') || '[]');
+      const phoneNorm = contact.phone.replace(/[^0-9]/g, '');
+      const existingBookings = myTickets.filter((t) => {
+        const tPhone = (t.contact?.phone || '').replace(/[^0-9]/g, '');
+        const isSameDestination = t.destinationSlug === destination?.slug || t.destinationId === destination?.id;
+        const isSameDate = t.visitDate === visitDate;
+        const isSameContact =
+          (phoneNorm && tPhone === phoneNorm) ||
+          (t.contact?.email && contact.email && t.contact.email.toLowerCase().trim() === contact.email.toLowerCase().trim());
+        return isSameDestination && isSameDate && isSameContact && t.status !== 'cancelled';
+      });
+
+      const alreadyPurchasedQty = existingBookings.reduce((sum, t) => sum + Number(t.totalQty || 0), 0);
+      const MAX_QUOTA_PER_BUYER = 4;
+
+      if (alreadyPurchasedQty >= MAX_QUOTA_PER_BUYER) {
+        setFormError(
+          `Pembatasan Kuota Adil: Kontak (${contact.name} / ${contact.phone}) telah memiliki ${alreadyPurchasedQty} tiket untuk tanggal ${visitDate}. Anda telah mencapai batas maksimal (${MAX_QUOTA_PER_BUYER} tiket) agar wisatawan lain mendapatkan kuota.`
+        );
+        return;
+      }
+
+      if (alreadyPurchasedQty + totals.quantity > MAX_QUOTA_PER_BUYER) {
+        const sisaBoleh = MAX_QUOTA_PER_BUYER - alreadyPurchasedQty;
+        setFormError(
+          `Pembatasan Kuota Adil: Anda sudah memiliki ${alreadyPurchasedQty} tiket untuk tanggal ${visitDate}. Anda hanya dapat menambah maksimal ${sisaBoleh} tiket lagi (batas maksimal ${MAX_QUOTA_PER_BUYER} tiket per wisatawan agar kuota terbagi merata).`
+        );
+        return;
+      }
+    } catch (_) {}
 
     // Realtime 15-min payment deadline (persists across navigation/back)
     const now = Date.now();
@@ -681,13 +727,18 @@ export default function CheckoutPage() {
                   <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]">
                     <Ticket className="h-5 w-5" />
                   </span>
-                  <div>
-                    <h2 className="text-base font-bold text-[var(--forest-deep)]">
-                      2. Jumlah & Kategori Tiket
-                    </h2>
-                    <p className="text-xs text-[var(--ink-soft)]">
-                      Sudah termasuk tiket masuk, asuransi keselamatan jiwa, dan retribusi konservasi.
-                    </p>
+                  <div className="flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h2 className="text-base font-bold text-[var(--forest-deep)]">
+                        2. Jumlah & Kategori Tiket
+                      </h2>
+                      <p className="text-xs text-[var(--ink-soft)]">
+                        Sudah termasuk tiket masuk, asuransi keselamatan jiwa, dan retribusi konservasi.
+                      </p>
+                    </div>
+                    <span className="self-start sm:self-auto bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
+                      Maks. 4 Tiket / Pemesan (Fair Quota)
+                    </span>
                   </div>
                 </div>
 
@@ -929,23 +980,23 @@ export default function CheckoutPage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 max-w-4xl mx-auto">
             {/* Left 2 Cols: Payment Selection */}
             <div className="lg:col-span-2 space-y-6">
-              {/* 15-Minute Countdown Alert Banner */}
+              {/* 15-Minute Quota Lock & Payment Deadline Banner (PDF Spec Hal. 1 & 4) */}
               <div className="rounded-3xl bg-[var(--forest-deep)] text-white p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
                       Batas Waktu Pembayaran
                     </span>
-                    <span className="bg-emerald-500/20 text-[var(--leaf)] text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">
-                      Bisa Langsung Bayar
+                    <span className="bg-emerald-500/20 text-[var(--leaf)] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                      <Lock className="h-3 w-3" /> Kuota Terkunci 15 Menit
                     </span>
                   </div>
                   <p className="text-xs text-white/90">
-                    <strong>Anda tidak perlu menunggu timer ini.</strong> Langsung klik tombol <strong className="text-[var(--leaf)]">"Bayar Sekarang"</strong> untuk menyelesaikan transaksi.
+                    Kuota tiket Anda telah diamankan selama <strong>15 menit</strong> untuk mencegah double-booking. Segera selesaikan transaksi sebelum batas waktu berakhir agar kuota tidak dilepas otomatis ke wisatawan lain.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-2xl shrink-0 self-start sm:self-auto">
-                  <Clock className="h-5 w-5 text-[var(--leaf)]" />
+                  <Clock className="h-5 w-5 text-[var(--leaf)] animate-pulse" />
                   <div className="text-right">
                     <div className="text-xl font-mono font-extrabold text-[var(--leaf)] leading-none">
                       {formatTimer(timeLeftSeconds)}
@@ -1107,8 +1158,8 @@ export default function CheckoutPage() {
                   <ArrowLeft className="h-3.5 w-3.5" /> Kembali / Ubah Data Pemesanan
                 </button>
 
-                <p className="text-center text-[10px] text-emerald-700 font-bold bg-emerald-50 py-1.5 px-3 rounded-xl">
-                  ⚡ Pembayaran langsung diproses (tidak perlu menunggu timer).
+                <p className="text-center text-[10px] text-emerald-800 font-medium bg-emerald-50/80 py-1.5 px-3 rounded-xl border border-emerald-200/50">
+                  🔒 Kuota tiket dijamin selama 15 menit. Selesaikan transaksi sebelum waktu habis.
                 </p>
 
                 <p className="text-center text-[10px] text-[var(--ink-soft)]">
