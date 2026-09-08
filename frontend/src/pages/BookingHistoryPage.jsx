@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
   ArrowLeft,
@@ -32,11 +32,26 @@ import { formatRupiah } from '../api/client';
 export default function BookingHistoryPage() {
   const { toast } = useToast();
   const { slug, destination } = useTenant();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'active' | 'used' | 'expired'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTicketForQR, setSelectedTicketForQR] = useState(null);
+
+  const currentTenantSlug =
+    searchParams.get('tenant') ||
+    slug ||
+    destination?.slug ||
+    sessionStorage.getItem('passify_last_active_tenant') ||
+    localStorage.getItem('passify_last_active_tenant');
+
+  useEffect(() => {
+    if (currentTenantSlug) {
+      sessionStorage.setItem('passify_last_active_tenant', currentTenantSlug);
+      localStorage.setItem('passify_last_active_tenant', currentTenantSlug);
+    }
+  }, [currentTenantSlug]);
 
   // User auth state
   const [user, setUser] = useState(() => {
@@ -149,6 +164,10 @@ export default function BookingHistoryPage() {
   }, [tickets]);
 
   const handleLogout = () => {
+    if (currentTenantSlug) {
+      sessionStorage.setItem('passify_last_active_tenant', currentTenantSlug);
+      localStorage.setItem('passify_last_active_tenant', currentTenantSlug);
+    }
     localStorage.removeItem('passify_user');
     localStorage.removeItem('passify_token');
     setUser(null);
@@ -177,8 +196,9 @@ export default function BookingHistoryPage() {
   const usedCount = tickets.filter((t) => t.status === 'used').length;
   const expiredCount = tickets.filter((t) => t.status === 'expired').length;
 
-  const homeUrl = slug ? `/?tenant=${slug}` : '/';
-  const brandName = destination?.name || (slug ? slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'passify');
+  const effectiveSlug = currentTenantSlug || slug;
+  const homeUrl = effectiveSlug ? `/?tenant=${effectiveSlug}` : '/';
+  const brandName = destination?.name || (effectiveSlug ? effectiveSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : 'passify');
 
   return (
     <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
@@ -186,7 +206,7 @@ export default function BookingHistoryPage() {
       <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md shadow-xs border-b border-gray-100">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to={homeUrl} className="flex items-center gap-2 text-xl font-bold tracking-tight text-[var(--forest-deep)] no-underline">
-            {slug ? (
+            {effectiveSlug ? (
               <>
                 <div className="h-8 w-8 rounded-xl bg-[var(--forest)] text-white flex items-center justify-center font-bold text-xs shadow-2xs">
                   <Leaf className="h-4 w-4" />
@@ -200,10 +220,10 @@ export default function BookingHistoryPage() {
 
           <nav className="flex items-center gap-4 text-xs font-bold">
             <Link to={homeUrl} className="text-[var(--ink-soft)] hover:text-[var(--forest-deep)] transition-colors">
-              {slug ? 'Beranda Destinasi' : 'Jelajahi Wisata'}
+              {effectiveSlug ? 'Beranda Destinasi' : 'Jelajahi Wisata'}
             </Link>
             <Link
-              to={slug ? `/riwayat-pesanan?tenant=${slug}` : '/riwayat-pesanan'}
+              to={effectiveSlug ? `/riwayat-pesanan?tenant=${effectiveSlug}` : '/riwayat-pesanan'}
               className="text-[var(--forest-deep)] font-extrabold bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl"
             >
               Tiket Saya
@@ -224,7 +244,11 @@ export default function BookingHistoryPage() {
                 </button>
               </div>
             ) : (
-              <Link to="/masuk" className="btn-secondary px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5">
+              <Link
+                to={effectiveSlug ? `/masuk?tenant=${effectiveSlug}` : '/masuk'}
+                state={{ from: homeUrl, tenantSlug: effectiveSlug }}
+                className="btn-secondary px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5"
+              >
                 <LogIn className="h-3.5 w-3.5" /> Masuk
               </Link>
             )}
@@ -309,12 +333,23 @@ export default function BookingHistoryPage() {
                   : 'Anda belum memesan tiket wisata alam. Yuk jelajahi berbagai destinasi alam menarik!'}
               </p>
             </div>
-            <Link
-              to={homeUrl}
-              className="inline-flex items-center justify-center gap-2 btn-primary px-5 py-2.5 rounded-2xl text-xs font-bold no-underline"
-            >
-              {slug ? 'Kembali ke Beranda Destinasi' : 'Jelajahi Destinasi Wisata'} <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
+              {!user && (
+                <Link
+                  to={effectiveSlug ? `/masuk?tenant=${effectiveSlug}` : '/masuk'}
+                  state={{ from: homeUrl, tenantSlug: effectiveSlug }}
+                  className="btn-secondary px-5 py-2.5 rounded-2xl text-xs font-bold no-underline flex items-center gap-1.5"
+                >
+                  <LogIn className="h-3.5 w-3.5" /> Masuk ke Akun
+                </Link>
+              )}
+              <Link
+                to={homeUrl}
+                className="inline-flex items-center justify-center gap-2 btn-primary px-5 py-2.5 rounded-2xl text-xs font-bold no-underline"
+              >
+                {effectiveSlug ? 'Kembali ke Beranda Destinasi' : 'Jelajahi Destinasi Wisata'} <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -52,13 +52,23 @@ export default function TenantPortal() {
   const portalHeading = template.hero_heading || destination.name;
   const portalCopy = template.hero_copy || destination.description;
 
+  React.useEffect(() => {
+    if (destination?.slug) {
+      sessionStorage.setItem('passify_last_active_tenant', destination.slug);
+      localStorage.setItem('passify_last_active_tenant', destination.slug);
+    }
+  }, [destination?.slug]);
+
   const openBooking = () => {
     navigate(`/pesan/${destination.slug || destination.id}`);
   };
   const logout = () => {
+    if (destination?.slug) {
+      sessionStorage.setItem('passify_last_active_tenant', destination.slug);
+      localStorage.setItem('passify_last_active_tenant', destination.slug);
+    }
     localStorage.removeItem('passify_user');
     localStorage.removeItem('passify_token');
-    localStorage.removeItem('passify_current_tenant');
     setUser(null);
   };
 
@@ -108,7 +118,7 @@ export default function TenantPortal() {
           
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
-              to="/riwayat-pesanan"
+              to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
               className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] border border-[var(--forest)]/20 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
               title="Lihat riwayat pesanan dan e-tiket saya"
             >
@@ -144,7 +154,14 @@ export default function TenantPortal() {
                 </button>
               </div>
             ) : (
-              <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-xl">
+              <Link
+                to={destination?.slug ? `/masuk?tenant=${destination.slug}` : '/masuk'}
+                state={{
+                  from: destination?.slug ? `/?tenant=${destination.slug}` : location.pathname,
+                  tenantSlug: destination?.slug
+                }}
+                className="btn-secondary rounded-xl"
+              >
                 <LogIn className="h-3.5 w-3.5" />
                 <span>Masuk</span>
               </Link>
@@ -186,7 +203,7 @@ export default function TenantPortal() {
                   Pesan tiket
                 </button>
                 <Link
-                  to="/riwayat-pesanan"
+                  to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 border border-white/30 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
                 >
                   <History className="h-4 w-4 text-emerald-300" />
@@ -356,7 +373,7 @@ export default function TenantPortal() {
           <span>Pesan tiket</span>
         </button>
         <Link
-          to="/riwayat-pesanan"
+          to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
           className="btn-secondary px-3.5 py-3 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold no-underline whitespace-nowrap"
           title="Riwayat Pesanan"
         >
@@ -366,7 +383,7 @@ export default function TenantPortal() {
       </div>
       <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 text-center text-xs text-[var(--ink-soft)] space-y-2">
         <div className="flex flex-wrap justify-center items-center gap-3 text-xs font-medium">
-          <Link to="/riwayat-pesanan" className="text-[var(--forest-deep)] hover:underline font-bold flex items-center gap-1">
+          <Link to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'} className="text-[var(--forest-deep)] hover:underline font-bold flex items-center gap-1">
             <Ticket className="h-3.5 w-3.5" />
             Riwayat Pesanan & E-Tiket
           </Link>

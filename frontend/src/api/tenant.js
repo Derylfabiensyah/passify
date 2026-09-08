@@ -70,7 +70,13 @@ export async function resolveTenantFromHostname(hostname) {
 
   if (isLocal) {
     const params = new URLSearchParams(window.location.search);
-    return params.get('tenant');
+    const fromParam = params.get('tenant');
+    if (fromParam) {
+      sessionStorage.setItem('passify_last_active_tenant', fromParam);
+      localStorage.setItem('passify_last_active_tenant', fromParam);
+      return fromParam;
+    }
+    return null;
   }
 
   // Case 1: Root domain

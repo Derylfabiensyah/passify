@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Compass, Lock, Mail, Phone, ShieldCheck, User, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const AUTH_API = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8081/api/v1/auth';
@@ -9,6 +9,7 @@ export default function TravelerAuthPage({ mode }) {
   const isLogin = mode === 'login';
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
@@ -16,7 +17,14 @@ export default function TravelerAuthPage({ mode }) {
   const [login, setLogin] = useState({ email: '', password: '' });
   const [registration, setRegistration] = useState({ name: '', email: '', phone: '', password: '' });
 
-  const returnTo = location.state?.from;
+  const queryReturn = searchParams.get('return') || searchParams.get('redirect');
+  const queryTenant = searchParams.get('tenant');
+  const returnTo = location.state?.from || queryReturn;
+  const targetTenant =
+    location.state?.tenantSlug ||
+    queryTenant ||
+    sessionStorage.getItem('passify_last_active_tenant') ||
+    localStorage.getItem('passify_last_active_tenant');
   const nextState = location.state?.openBooking ? { openBooking: true } : undefined;
 
   const handleAuthenticationSuccess = (user, token) => {
@@ -29,13 +37,15 @@ export default function TravelerAuthPage({ mode }) {
     const tenantSlug = user.tenant?.slug || user.tenant?.subdomain || user.tenant_slug;
 
     if (isManager) {
-      if (tenantSlug) {
-        localStorage.setItem('passify_current_tenant', tenantSlug);
+      const activeTenant = tenantSlug || targetTenant;
+      if (activeTenant) {
+        localStorage.setItem('passify_current_tenant', activeTenant);
+        sessionStorage.setItem('passify_last_active_tenant', activeTenant);
         try {
           const raw = localStorage.getItem('passify_admin_destinations');
           if (raw) {
             const list = JSON.parse(raw);
-            if (Array.isArray(list) && list.length > 0 && list[0].slug !== tenantSlug) {
+            if (Array.isArray(list) && list.length > 0 && list[0].slug !== activeTenant) {
               localStorage.removeItem('passify_admin_destinations');
             }
           }
@@ -46,8 +56,15 @@ export default function TravelerAuthPage({ mode }) {
     }
 
     // Traveler (Wisatawan) redirection
+    // 1. If explicit returnTo is provided and not generic
     if (returnTo && returnTo !== '/jelajah' && returnTo !== '/masuk' && returnTo !== '/daftar') {
       navigate(returnTo, { state: nextState });
+      return;
+    }
+
+    // 2. If user logged out from a tenant or targetTenant is specified, redirect directly to that tenant
+    if (targetTenant) {
+      navigate(`/?tenant=${targetTenant}`);
       return;
     }
 
@@ -192,7 +209,12 @@ export default function TravelerAuthPage({ mode }) {
   const setRegistrationValue = (field, value) =>
     setRegistration((previous) => ({ ...previous, [field]: value }));
 
-  const backTarget = returnTo && returnTo !== '/masuk' ? returnTo : '/';
+  const backTarget =
+    returnTo && returnTo !== '/masuk' && returnTo !== '/daftar'
+      ? returnTo
+      : targetTenant
+      ? `/?tenant=${targetTenant}`
+      : '/';
 
   return (
     <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col justify-between selection:bg-[var(--leaf)] selection:text-[var(--forest-deep)]">
@@ -432,14 +454,22 @@ export default function TravelerAuthPage({ mode }) {
             {isLogin ? (
               <>
                 Belum memiliki akun?{' '}
-                <Link to="/daftar" state={location.state} className="font-bold text-[var(--forest)] hover:underline">
+                <Link
+                  to={{ pathname: '/daftar', search: location.search }}
+                  state={location.state}
+                  className="font-bold text-[var(--forest)] hover:underline"
+                >
                   Daftar sekarang
                 </Link>
               </>
             ) : (
               <>
                 Sudah memiliki akun?{' '}
-                <Link to="/masuk" state={location.state} className="font-bold text-[var(--forest)] hover:underline">
+                <Link
+                  to={{ pathname: '/masuk', search: location.search }}
+                  state={location.state}
+                  className="font-bold text-[var(--forest)] hover:underline"
+                >
                   Masuk ke akun
                 </Link>
               </>
