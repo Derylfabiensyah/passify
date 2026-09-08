@@ -123,7 +123,7 @@ export default function TenantPortal() {
               <Compass className="h-4 w-4" />
             </span>
             <span className="min-w-0">
-              <span className="block truncate font-serif text-lg font-bold text-[var(--forest-deep)] sm:text-xl">
+              <span className="block truncate text-lg font-bold text-[var(--forest-deep)] sm:text-xl">
                 {destination.name}
               </span>
               <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-[var(--ink-soft)]">
@@ -364,7 +364,7 @@ export default function TenantPortal() {
             {template.show_facilities !== false && (
               <article className="card p-6 border border-[var(--border)] bg-white/80 backdrop-blur-md shadow-xs">
                 <div>
-                  <h2 className="text-xl font-bold font-serif text-[var(--forest-deep)]">Fasilitas kawasan</h2>
+                  <h2 className="text-xl font-bold text-[var(--forest-deep)]">Fasilitas kawasan</h2>
                 </div>
                 <ul className="mt-5 grid gap-2 sm:grid-cols-2">
                   {(destination.facilities || []).map((facility) => (
@@ -383,7 +383,7 @@ export default function TenantPortal() {
             {template.show_rules !== false && (
               <article className="card p-6 border border-white/60 bg-white/70 backdrop-blur-xl shadow-xs transition-all">
                 <p className="eyebrow !text-[var(--bark)]">Etika berkunjung</p>
-                <h2 className="mt-1.5 text-xl font-bold font-serif text-[var(--forest-deep)]">Jaga kawasan bersama</h2>
+                <h2 className="mt-1.5 text-xl font-bold text-[var(--forest-deep)]">Jaga kawasan bersama</h2>
                 <p className="mt-4 text-sm leading-relaxed text-[var(--ink-soft)] whitespace-pre-line">
                   {destination.rules || 'Dilarang membuang sampah sembarangan dan wajib menjaga kelestarian alam.'}
                 </p>

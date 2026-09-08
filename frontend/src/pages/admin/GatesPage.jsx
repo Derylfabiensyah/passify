@@ -519,7 +519,7 @@ function AddEditGateModal({ device, destinations, onClose, onSave }) {
     <div className="modal-overlay">
       <div className="modal-content card p-6 max-w-lg w-full bg-white border border-gray-200 rounded-2xl shadow-xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-bold text-gray-900 font-['Outfit'] flex items-center gap-2">
+          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-emerald-600" />
             <span>{isNew ? 'Registrasi Perangkat Gate Baru' : 'Ubah Konfigurasi Perangkat'}</span>
           </h3>
@@ -872,7 +872,7 @@ export default function GatesPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">
             Perangkat & Terminal Pemindai (Gate Scanners)
           </h1>
         </div>

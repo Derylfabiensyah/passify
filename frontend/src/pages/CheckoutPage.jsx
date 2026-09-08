@@ -700,7 +700,7 @@ export default function CheckoutPage() {
                   <span className="inline-block rounded-full bg-[var(--leaf-pale)] px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]">
                     {destination.tenant_name || destination.name}
                   </span>
-                  <h1 className="text-xl sm:text-2xl font-bold text-[var(--forest-deep)] font-serif">
+                  <h1 className="text-xl sm:text-2xl font-bold text-[var(--forest-deep)]">
                     {destination.name}
                   </h1>
                   <p className="text-xs text-[var(--ink-soft)]">

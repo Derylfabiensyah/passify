@@ -198,7 +198,7 @@ function EditQuotaModal({ day, onClose, onSave }) {
     <div className="modal-overlay">
       <div className="modal-content card p-6 max-w-sm w-full bg-white border border-gray-200 rounded-2xl shadow-xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-bold text-gray-900 font-['Outfit']">Ubah Kuota {day.dayLabel}</h3>
+          <h3 className="text-base font-bold text-gray-900">Ubah Kuota {day.dayLabel}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
             <X className="w-4 h-4" />
           </button>
@@ -309,7 +309,7 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
     <div className="modal-overlay">
       <div className="modal-content card p-6 max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-xl">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base font-bold text-gray-900 font-['Outfit']">
+          <h3 className="text-base font-bold text-gray-900">
             {isNew ? 'Tambah Sesi Kunjungan Baru' : 'Ubah Sesi Kunjungan'}
           </h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
@@ -632,7 +632,7 @@ export default function QuotasPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 font-['Outfit']">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">
             Manajemen Kuota & Kapasitas Kunjungan
           </h1>
         </div>
@@ -701,7 +701,7 @@ export default function QuotasPage() {
       {/* Quota Calendar Grid */}
       <div className="card p-5 bg-white rounded-2xl shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
+          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <CalendarClock className="w-4 h-4 text-emerald-600" />
             <span>Kalender Kuota Harian (7 Hari Ke Depan)</span>
           </h3>
@@ -723,7 +723,7 @@ export default function QuotasPage() {
       {/* Time Slots Grid */}
       <div className="card p-5 bg-white rounded-2xl shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
+          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <Clock className="w-4 h-4 text-emerald-600" />
             <span>Sesi Waktu Kunjungan ({selectedDest.name})</span>
           </h3>

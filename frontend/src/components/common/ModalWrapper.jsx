@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 
 /**
@@ -154,7 +154,7 @@ export default function ModalWrapper({
           <div className="flex items-center justify-between gap-4 p-5 sm:p-6 pb-3 sm:pb-4 border-b border-gray-100">
             {title ? (
               typeof title === 'string' ? (
-                <h3 id={generatedTitleId} className="text-base sm:text-lg font-bold text-gray-900 font-['Outfit'] tracking-tight">
+                <h3 id={generatedTitleId} className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">
                   {title}
                 </h3>
               ) : (

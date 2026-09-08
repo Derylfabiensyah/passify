@@ -135,7 +135,7 @@ export default function DashboardOverview() {
         align: 'end',
         labels: {
           color: '#526b5a',
-          font: { size: 11, family: 'Outfit' },
+          font: { size: 11, family: 'Plus Jakarta Sans' },
           boxWidth: 10,
           usePointStyle: true
         }
@@ -447,7 +447,7 @@ export default function DashboardOverview() {
         <div className="card p-5 bg-white rounded-2xl shadow-sm flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 font-['Outfit']">
+              <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
                 <Ticket className="w-4 h-4 text-emerald-600" />
                 <span>Penjualan Per Kategori Tiket</span>
               </h3>

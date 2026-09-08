@@ -223,7 +223,7 @@ export default function AdminLayout({ children }) {
               <Menu className="h-4 w-4" />
             </button>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold text-[var(--forest-deep)] sm:text-xl font-['Outfit']">
+              <h1 className="truncate text-lg font-bold text-[var(--forest-deep)] sm:text-xl">
                 {currentItem?.label || 'Ringkasan'}
               </h1>
             </div>

@@ -85,7 +85,7 @@ export default function TravelerPortal() {
               <Compass className="h-4 w-4" />
             </span>
             <span className="min-w-0">
-              <span className="block truncate font-serif text-lg font-bold text-[var(--forest-deep)] sm:text-xl">{destination.name}</span>
+              <span className="block truncate text-lg font-bold text-[var(--forest-deep)] sm:text-xl">{destination.name}</span>
               <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-[var(--ink-soft)]">Portal tiket resmi kawasan</span>
             </span>
           </Link>
