@@ -38,12 +38,50 @@ export default function ETicketModal({ order, onClose }) {
       if (res.ok) {
         const payload = await res.json();
         if (payload?.data?.status === 'used') {
+          const scannedAt = payload.data.used_at || new Date().toISOString();
           setIsUsed(true);
-          setUsedAt(payload.data.used_at || new Date().toISOString());
+          setUsedAt(scannedAt);
+          try {
+            const raw = localStorage.getItem('passify_my_tickets');
+            if (raw) {
+              const list = JSON.parse(raw);
+              const updated = list.map((t) =>
+                (order.ticketCode && t.ticketCode === order.ticketCode) ||
+                (order.orderNumber && t.orderNumber === order.orderNumber)
+                  ? { ...t, status: 'used', usedAt: scannedAt }
+                  : t
+              );
+              localStorage.setItem('passify_my_tickets', JSON.stringify(updated));
+              window.dispatchEvent(new Event('storage'));
+            }
+          } catch (_) {}
         }
       }
     } catch (_) {}
   }, [order?.ticketCode, order?.orderNumber, isUsed]);
+
+  // Sync state if ticket was scanned and updated in another tab or scanner simulator
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const raw = localStorage.getItem('passify_my_tickets');
+        if (raw) {
+          const list = JSON.parse(raw);
+          const found = list.find(
+            (t) =>
+              (order?.ticketCode && t.ticketCode === order.ticketCode) ||
+              (order?.orderNumber && t.orderNumber === order.orderNumber)
+          );
+          if (found && found.status === 'used') {
+            setIsUsed(true);
+            setUsedAt(found.usedAt || new Date().toISOString());
+          }
+        }
+      } catch (_) {}
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [order?.ticketCode, order?.orderNumber]);
 
   const fetchLiveQR = useCallback(async () => {
     if (isUsed) return;

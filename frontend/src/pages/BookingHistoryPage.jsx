@@ -47,32 +47,50 @@ export default function BookingHistoryPage() {
     }
   });
 
-  // Load bookings exclusively from LocalStorage (pure real user orders)
-  useEffect(() => {
+  // Helper to filter tickets for the currently logged in user
+  const filterTicketsForUser = (allTickets, currentUser) => {
+    const userEmail = (currentUser?.email || '').toLowerCase().trim();
+    const userId = currentUser?.id;
+    if (!userEmail && !userId) return [];
+    return allTickets.filter((t) => {
+      const ticketEmail = (t.userEmail || t.contact?.email || '').toLowerCase().trim();
+      return (userEmail && ticketEmail === userEmail) || (userId && t.userId === userId);
+    });
+  };
+
+  const loadUserBookings = () => {
     try {
+      const currentUser = JSON.parse(localStorage.getItem('passify_user') || 'null');
+      setUser(currentUser);
       const stored = localStorage.getItem('passify_my_tickets');
       if (stored) {
         const parsed = JSON.parse(stored);
-          // Filter out any legacy dummy sample tickets or previous test orders with fake destinations
-          const realTickets = parsed.filter(
-            (t) =>
-              t.ticketId !== 'tkt-curug-001' &&
-              t.ticketId !== 'tkt-kawah-002' &&
-              t.orderNumber !== 'TWA-20260828-8921' &&
-              t.orderNumber !== 'TWA-20260815-4102' &&
-              t.destinationName !== 'Curug Bidadari Eco Park' &&
-              t.tenantName !== 'PT Wisata Alam Mandiri' &&
-              t.destinationName !== 'Kawah Putih Ciwidey' &&
-              t.tenantName !== 'Perum Perhutani Unit III'
-          );
-          setTickets(realTickets);
-          localStorage.setItem('passify_my_tickets', JSON.stringify(realTickets));
-          return;
+        const realTickets = parsed.filter(
+          (t) =>
+            t.ticketId !== 'tkt-curug-001' &&
+            t.ticketId !== 'tkt-kawah-002' &&
+            t.orderNumber !== 'TWA-20260828-8921' &&
+            t.orderNumber !== 'TWA-20260815-4102' &&
+            t.destinationName !== 'Curug Bidadari Eco Park' &&
+            t.tenantName !== 'PT Wisata Alam Mandiri' &&
+            t.destinationName !== 'Kawah Putih Ciwidey' &&
+            t.tenantName !== 'Perum Perhutani Unit III'
+        );
+        const userTickets = filterTicketsForUser(realTickets, currentUser);
+        setTickets(userTickets);
+        return;
       }
       setTickets([]);
     } catch (_) {
       setTickets([]);
     }
+  };
+
+  // Load bookings exclusively for the logged-in user and listen for cross-tab / scan storage events
+  useEffect(() => {
+    loadUserBookings();
+    window.addEventListener('storage', loadUserBookings);
+    return () => window.removeEventListener('storage', loadUserBookings);
   }, []);
 
   // Real-time live status sync with Gate Access Control Service
@@ -107,12 +125,26 @@ export default function BookingHistoryPage() {
 
       if (isUpdated) {
         setTickets(updatedList);
-        localStorage.setItem('passify_my_tickets', JSON.stringify(updatedList));
+        try {
+          const stored = localStorage.getItem('passify_my_tickets');
+          if (stored) {
+            const allTickets = JSON.parse(stored);
+            const merged = allTickets.map((t) => {
+              const match = updatedList.find(
+                (u) =>
+                  (u.ticketCode && u.ticketCode === t.ticketCode) ||
+                  (u.orderNumber && u.orderNumber === t.orderNumber)
+              );
+              return match ? { ...t, ...match } : t;
+            });
+            localStorage.setItem('passify_my_tickets', JSON.stringify(merged));
+          }
+        } catch (_) {}
       }
     };
 
     syncLiveStatus();
-    const interval = setInterval(syncLiveStatus, 2500);
+    const interval = setInterval(syncLiveStatus, 2000);
     return () => clearInterval(interval);
   }, [tickets]);
 

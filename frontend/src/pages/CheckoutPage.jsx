@@ -487,6 +487,16 @@ export default function CheckoutPage() {
       }
 
       const orderNumber = `TWA-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const savedUser = (() => {
+        try {
+          return JSON.parse(localStorage.getItem('passify_user') || 'null');
+        } catch {
+          return null;
+        }
+      })();
+      const userEmail = (savedUser?.email || contact.email || '').toLowerCase().trim();
+      const userId = savedUser?.id || null;
+
       const orderData = {
         orderNumber,
         ticketId: `tkt-${Math.random().toString(36).substring(2, 9)}`,
@@ -502,6 +512,8 @@ export default function CheckoutPage() {
         totalQty: totals.quantity,
         grandTotal: totals.grandTotal,
         paymentMethod: paymentMethod === 'midtrans' ? 'MIDTRANS_SNAP' : 'PASSIFY_WALLET',
+        userId,
+        userEmail,
         contact,
         visitors,
         status: 'active',

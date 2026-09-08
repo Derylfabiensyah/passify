@@ -310,11 +310,25 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
 
   const handleScan = async (e) => {
     e.preventDefault();
-    const cleanCode = ticketCode.trim().replace(/^#/, '');
-    if (!cleanCode) {
+    let raw = ticketCode.trim().replace(/^#/, '');
+    if (!raw) {
       setError('Masukkan kode tiket terlebih dahulu.');
       return;
     }
+    let cleanCode = raw;
+    if (cleanCode.startsWith('PASSIFY:')) {
+      const parts = cleanCode.split(':');
+      if (parts.length >= 2) cleanCode = parts[1];
+    } else if (cleanCode.includes(':')) {
+      const parts = cleanCode.split(':');
+      for (const p of parts) {
+        if (p.startsWith('TWA-')) {
+          cleanCode = p;
+          break;
+        }
+      }
+    }
+
     setError('');
     setLoading(true);
     setResult(null);
@@ -325,6 +339,7 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ticket_code: cleanCode,
+          qr_payload: raw,
           device_id: selectedDeviceId,
           destination_id: destinationId,
           scanned_at: new Date().toISOString(),
@@ -335,6 +350,28 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
       if (res.ok && data.success) {
         setResult(data.data);
         if (onScanSuccess) onScanSuccess(data.data);
+
+        // Update local storage so traveler tickets instantly reflect 'used' status
+        try {
+          const stored = localStorage.getItem('passify_my_tickets');
+          if (stored) {
+            const list = JSON.parse(stored);
+            const validatedCode = data.data.ticket_code || cleanCode;
+            const updated = list.map((t) => {
+              if (
+                t.ticketCode === validatedCode ||
+                t.orderNumber === validatedCode ||
+                cleanCode.includes(t.ticketCode) ||
+                (t.ticketCode && cleanCode.includes(t.ticketCode.replace(/^#/, '')))
+              ) {
+                return { ...t, status: 'used', usedAt: new Date().toISOString() };
+              }
+              return t;
+            });
+            localStorage.setItem('passify_my_tickets', JSON.stringify(updated));
+            window.dispatchEvent(new Event('storage'));
+          }
+        } catch (_) {}
       } else {
         setError(data.message || 'Validasi tiket gagal.');
       }

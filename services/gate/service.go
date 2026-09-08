@@ -104,6 +104,26 @@ func parseFlexibleTime(val interface{}) time.Time {
 	return time.Now()
 }
 
+// cleanTicketCode extracts clean ticket code from raw QR or manual input
+func cleanTicketCode(raw string) string {
+	raw = strings.TrimSpace(raw)
+	raw = strings.TrimPrefix(raw, "#")
+	if strings.Contains(raw, ":") {
+		parts := strings.Split(raw, ":")
+		for _, p := range parts {
+			trimmed := strings.TrimSpace(p)
+			if strings.HasPrefix(trimmed, "TWA-") {
+				return trimmed
+			}
+		}
+		if len(parts) >= 2 && strings.EqualFold(parts[0], "PASSIFY") {
+			return strings.TrimSpace(parts[1])
+		}
+	}
+	return raw
+}
+
+
 // SyncLogsRequest payload for batch syncing offline logs
 type SyncLogsRequest struct {
 	DeviceID uuid.UUID          `json:"device_id" binding:"required"`
@@ -264,17 +284,15 @@ func (s *gateService) GenerateManifest(deviceID uuid.UUID, date time.Time) (*Man
 
 // ValidateTicketOnline performs real-time online validation of a scanned ticket
 func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*ValidateResponse, error) {
-	// If a full QR payload is provided, extract ticket code
-	ticketCodeToLookup := strings.TrimSpace(req.TicketCode)
+	// If a full QR payload is provided or ticket_code contains QR formatting, extract clean ticket code
+	rawInput := strings.TrimSpace(req.TicketCode)
 	if req.QRPayload != "" {
-		parts := strings.Split(strings.TrimSpace(req.QRPayload), ":")
-		if len(parts) >= 2 && parts[0] == "PASSIFY" {
-			ticketCodeToLookup = parts[1]
-		}
+		rawInput = strings.TrimSpace(req.QRPayload)
 	}
+	ticketCodeToLookup := cleanTicketCode(rawInput)
 
 	scannedAt := parseFlexibleTime(req.ScannedAt)
-	ticket, err := s.repo.GetTicketForValidation(ticketCodeToLookup, scannedAt)
+	ticket, _ := s.repo.GetTicketForValidation(ticketCodeToLookup, scannedAt)
 
 	var devUUID uuid.UUID
 	if req.DeviceID != "" {
@@ -336,7 +354,56 @@ func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*Validate
 		}
 	}
 
-	if err == nil && ticket != nil {
+	if ticket == nil {
+		if existing, exErr := s.repo.GetTicketByCode(ticketCodeToLookup); exErr == nil && existing != nil {
+			if existing.Status == "used" {
+				now := time.Now()
+				ticketCodeStr := ticketCodeToLookup
+				log := &models.ScanLog{
+					ID:            uuid.New(),
+					TenantID:      device.TenantID,
+					GateDeviceID:  device.ID,
+					TicketID:      &existing.ID,
+					TicketCode:    &ticketCodeStr,
+					ScannedAt:     scannedAt,
+					ScanResult:    "already_used",
+					IsOfflineScan: false,
+					SyncedAt:      &now,
+					CreatedAt:     now,
+				}
+				_ = s.repo.CreateScanLog(log)
+
+				visitorName := ""
+				if existing.VisitorName != nil {
+					visitorName = *existing.VisitorName
+				}
+				categoryName := ""
+				if existing.Category != nil {
+					categoryName = existing.Category.Name
+				}
+
+				return &ValidateResponse{
+					Valid:        false,
+					ScanResult:   "already_used",
+					TicketCode:   existing.TicketCode,
+					VisitorName:  visitorName,
+					CategoryName: categoryName,
+					Message:      "Tiket sudah pernah digunakan",
+				}, nil
+			} else if existing.Status == "cancelled" || existing.Status == "expired" {
+				return &ValidateResponse{
+					Valid:        false,
+					ScanResult:   "expired",
+					TicketCode:   existing.TicketCode,
+					Message:      fmt.Sprintf("Tiket tidak aktif (status: %s)", existing.Status),
+				}, nil
+			} else if existing.Status == "active" {
+				ticket = existing
+			}
+		}
+	}
+
+	if ticket != nil {
 		// Multi-tenant destination verification: if device belongs to different destination, align or verify
 		if ticket.DestinationID != device.DestinationID {
 			if req.DeviceID != "" && devUUID != uuid.Nil {
@@ -720,6 +787,7 @@ func (s *gateService) GetScanStats(destinationID uuid.UUID, date time.Time) (*Sc
 
 // GetTicketStatus returns the live status of a ticket by code
 func (s *gateService) GetTicketStatus(code string) (*TicketStatusResponse, error) {
+	code = cleanTicketCode(code)
 	ticket, err := s.repo.GetTicketByCode(code)
 	if err != nil || ticket == nil {
 		return nil, fmt.Errorf("ticket not found")
