@@ -94,7 +94,7 @@ class ApiService {
         'device_id': deviceId,
         'ticket_code': ticketCode,
         if (qrPayload != null && qrPayload.isNotEmpty) 'qr_payload': qrPayload,
-        'scanned_at': DateTime.now().toIso8601String(),
+        'scanned_at': DateTime.now().toUtc().toIso8601String(),
       },
     );
 

@@ -67,12 +67,14 @@ export const TICKET_CATEGORY_SALES = [];
 
 export const RECENT_TRANSACTIONS = [];
 
-export const GATE_SCAN_STATS = {
-  scans_today: 0,
-  valid_scans: 0,
-  rejected_scans: 0,
-  offline_synced: 0,
-};
+export const GATE_SCAN_STATS = [
+  {
+    gate_name: "Pintu Masuk Utama 01",
+    total_scanned: 0,
+    last_scan: "Hari ini",
+    status: "online"
+  }
+];
 
 export const ADMIN_DESTINATIONS = [];
 

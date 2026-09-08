@@ -59,40 +59,49 @@ export default function DashboardOverview() {
 
   const loadData = async () => {
     try {
-      setIsRefreshing(true);
       const data = await fetchDashboardOverviewTelemetry(slug);
       setTelemetry(data);
     } catch (err) {
       console.warn('Live telemetry load fallback:', err);
-    } finally {
-      setIsRefreshing(false);
     }
   };
 
   useEffect(() => {
-    loadData();
+    setIsRefreshing(true);
+    loadData().finally(() => setIsRefreshing(false));
+    const interval = setInterval(loadData, 3000);
+    return () => clearInterval(interval);
   }, [slug]);
 
   const stats = telemetry?.stats || DASHBOARD_STATS;
-  const hourlyVisitors = telemetry?.hourlyVisitors || HOURLY_VISITORS;
-  const revenueWeekly = telemetry?.revenueWeekly || REVENUE_WEEKLY;
-  const ticketCategorySales = telemetry?.ticketCategorySales || TICKET_CATEGORY_SALES;
-  const recentTransactions = telemetry?.recentTransactions || RECENT_TRANSACTIONS;
-  const gateScanStats = telemetry?.gateScanStats || GATE_SCAN_STATS;
+  const today = stats?.today || DASHBOARD_STATS.today;
+  const yesterday = stats?.yesterday || DASHBOARD_STATS.yesterday;
+  const hourlyVisitors = Array.isArray(telemetry?.hourlyVisitors) ? telemetry.hourlyVisitors : HOURLY_VISITORS;
+  const revenueWeekly = Array.isArray(telemetry?.revenueWeekly) ? telemetry.revenueWeekly : REVENUE_WEEKLY;
+  const ticketCategorySales = Array.isArray(telemetry?.ticketCategorySales) ? telemetry.ticketCategorySales : TICKET_CATEGORY_SALES;
+  const recentTransactions = Array.isArray(telemetry?.recentTransactions) ? telemetry.recentTransactions : RECENT_TRANSACTIONS;
+  const gateScanStats = Array.isArray(telemetry?.gateScanStats)
+    ? telemetry.gateScanStats
+    : Array.isArray(GATE_SCAN_STATS)
+    ? GATE_SCAN_STATS
+    : [];
 
   const revGrowth = Math.round(
-    ((stats.today.revenue - stats.yesterday.revenue) / (stats.yesterday.revenue || 1)) * 100
+    (((today.revenue || 0) - (yesterday.revenue || 0)) / (yesterday.revenue || 1)) * 100
   );
   const ticketGrowth = Math.round(
-    ((stats.today.tickets_sold - stats.yesterday.tickets_sold) /
-      (stats.yesterday.tickets_sold || 1)) *
+    (((today.tickets_sold || 0) - (yesterday.tickets_sold || 0)) /
+      (yesterday.tickets_sold || 1)) *
       100
   );
-  const quotaUsedPct = Math.round(
-    ((stats.today.total_capacity - stats.today.remaining_quota) /
-      (stats.today.total_capacity || 1)) *
-      100
-  );
+  const rawQuotaPct =
+    (((today.total_capacity || 1000) - (today.remaining_quota || 0)) /
+      (today.total_capacity || 1)) *
+    100;
+  const quotaUsedPct =
+    rawQuotaPct > 0 && rawQuotaPct < 1
+      ? Number(rawQuotaPct.toFixed(1))
+      : Math.round(rawQuotaPct);
 
   // ─── Chart.js Configuration: Hourly Visitors ──────────────────
   const hourlyChartData = {
@@ -237,7 +246,7 @@ export default function DashboardOverview() {
         header: 'Nominal',
         cell: (info) => (
           <span className="font-bold text-gray-900">
-            Rp {info.getValue().toLocaleString('id-ID')}
+            Rp {Number(info.getValue() || 0).toLocaleString('id-ID')}
           </span>
         )
       },
@@ -303,7 +312,7 @@ export default function DashboardOverview() {
         header: 'Total Pindai (Scan)',
         cell: (info) => (
           <span className="font-semibold text-gray-900">
-            {info.getValue().toLocaleString('id-ID')} pax
+            {Number(info.getValue() || 0).toLocaleString('id-ID')} pax
           </span>
         )
       },
@@ -352,8 +361,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={DollarSign}
           label="Pendapatan Hari Ini"
-          value={`Rp ${Number(stats.today.revenue || 0).toLocaleString('id-ID')}`}
-          subValue={`Kemarin: Rp ${Number(stats.yesterday.revenue || 0).toLocaleString('id-ID')}`}
+          value={`Rp ${Number(today.revenue || 0).toLocaleString('id-ID')}`}
+          subValue={`Kemarin: Rp ${Number(yesterday.revenue || 0).toLocaleString('id-ID')}`}
           trend={revGrowth}
           badgeText="FINANCE"
           isLoading={isRefreshing}
@@ -361,8 +370,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={Ticket}
           label="Tiket Terjual Hari Ini"
-          value={(stats.today.tickets_sold || 0).toLocaleString('id-ID')}
-          subValue={`Kemarin: ${stats.yesterday.tickets_sold || 0} tiket`}
+          value={Number(today.tickets_sold || 0).toLocaleString('id-ID')}
+          subValue={`Kemarin: ${Number(yesterday.tickets_sold || 0).toLocaleString('id-ID')} tiket`}
           trend={ticketGrowth}
           badgeText="SALES"
           isLoading={isRefreshing}
@@ -370,8 +379,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={Users}
           label="Pengunjung Di Dalam Kawasan"
-          value={(stats.today.visitors_entered || 0).toLocaleString('id-ID')}
-          subValue={`Kapasitas Maks: ${(stats.today.total_capacity || 1000).toLocaleString('id-ID')}`}
+          value={Number(today.visitors_entered || 0).toLocaleString('id-ID')}
+          subValue={`Kapasitas Maks: ${Number(today.total_capacity || 1000).toLocaleString('id-ID')}`}
           progress={quotaUsedPct}
           badgeText="CROWD"
           isLoading={isRefreshing}
@@ -379,8 +388,8 @@ export default function DashboardOverview() {
         <AdminStatCard
           icon={Wallet}
           label="Transaksi Cashless (NFC/QR)"
-          value={`Rp ${Number(stats.today.wallet_topups || 0).toLocaleString('id-ID')}`}
-          subValue={`${stats.today.vendor_transactions || 0} transaksi merchant`}
+          value={`Rp ${Number(today.wallet_topups || 0).toLocaleString('id-ID')}`}
+          subValue={`${Number(today.vendor_transactions || 0).toLocaleString('id-ID')} transaksi merchant`}
           badgeText="TENANT"
           isLoading={isRefreshing}
         />
@@ -451,7 +460,7 @@ export default function DashboardOverview() {
                   <div className="flex items-center justify-between text-xs mb-1.5">
                     <span className="font-semibold text-gray-700">{cat.name}</span>
                     <span className="text-emerald-700 font-bold">
-                      {(cat.sold || 0).toLocaleString('id-ID')} tiket ({cat.percentage || 0}%)
+                      {(Number(cat.sold) || 0).toLocaleString('id-ID')} tiket ({Number(cat.percentage) || 0}%)
                     </span>
                   </div>
                   <div

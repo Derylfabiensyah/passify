@@ -103,6 +103,46 @@ export async function resolveTenantFromHostname(hostname) {
 }
 
 /**
+ * Calculates booked ticket counts from client-side stored bookings
+ */
+export function getLocalBookedCount(destinationId, destinationSlug, destinationName) {
+  try {
+    const raw = localStorage.getItem('passify_my_tickets');
+    if (!raw) return { total: 0, bySlot: {} };
+    const tickets = JSON.parse(raw);
+    if (!Array.isArray(tickets)) return { total: 0, bySlot: {} };
+
+    let total = 0;
+    const bySlot = {};
+
+    tickets.forEach((t) => {
+      if (t.status === 'cancelled') return;
+
+      const norm = (s) => (s || '').toString().toLowerCase().trim();
+      const matchSlug = destinationSlug && t.destinationSlug && norm(t.destinationSlug) === norm(destinationSlug);
+      const matchId = destinationId && t.destinationId && t.destinationId === destinationId;
+      const matchName = destinationName && t.destinationName && norm(t.destinationName) === norm(destinationName);
+
+      // Match destination by slug, id, or name; fallback if no destination fields exist
+      const isMatch = matchSlug || matchId || matchName || (!t.destinationSlug && !t.destinationId && !t.destinationName);
+      if (isMatch) {
+        const qty = Number(t.totalQty || t.quantity || 1);
+        total += qty;
+
+        const slotIdKey = t.timeSlotId || '';
+        const slotLabelKey = t.timeSlotLabel || '';
+        if (slotIdKey) bySlot[slotIdKey] = (bySlot[slotIdKey] || 0) + qty;
+        if (slotLabelKey) bySlot[slotLabelKey] = (bySlot[slotLabelKey] || 0) + qty;
+      }
+    });
+
+    return { total, bySlot };
+  } catch (_) {
+    return { total: 0, bySlot: {} };
+  }
+}
+
+/**
  * Fetches destination data by tenant slug
  */
 export async function fetchDestinationBySlug(slug) {
@@ -142,8 +182,8 @@ export async function fetchDestinationBySlug(slug) {
           }));
         }
 
-        // 2. Fetch live categories from ticket-service if not in response
-        if (categories.length === 0) {
+        // 2. Fetch live authoritative categories from ticket-service if available
+        if (data.id) {
           try {
             const catRes = await fetch(`http://localhost:8083/api/v1/tickets/destinations/${data.id}/categories`);
             if (catRes.ok) {
@@ -167,9 +207,21 @@ export async function fetchDestinationBySlug(slug) {
           categories = localDest.ticket_categories;
         }
 
-        // 4. Fetch live time slots from ticket-service
+        // 4. Time slots from destination response or ticket-service
         let slots = [];
-        if (data.id) {
+        if (data.time_slots && Array.isArray(data.time_slots) && data.time_slots.length > 0) {
+          slots = data.time_slots.map((s) => ({
+            id: s.id,
+            label: s.slot_label || s.label || `${s.start_time?.slice(0, 5)} - ${s.end_time?.slice(0, 5)}`,
+            slot_label: s.slot_label || s.label,
+            time_range: s.time_range || `${s.start_time?.slice(0, 5)} - ${s.end_time?.slice(0, 5)}`,
+            max_capacity: Number(s.max_capacity || 500),
+            booked: Number(s.booked || 0),
+            is_active: s.is_active !== false,
+          }));
+        }
+
+        if (slots.length === 0 && data.id) {
           try {
             const slotRes = await fetch(`http://localhost:8083/api/v1/tickets/destinations/${data.id}/time-slots`);
             if (slotRes.ok) {
@@ -193,8 +245,24 @@ export async function fetchDestinationBySlug(slug) {
           slots = localDest.time_slots;
         }
 
+        const { total: bookedTotal, bySlot } = getLocalBookedCount(data.id, slug, data.name);
+        if (slots.length > 0) {
+          slots = slots.map((s, idx) => {
+            const slotCount = (bySlot[s.id] || bySlot[s.label] || bySlot[s.slot_label] || 0);
+            const baseBooked = Number(s.booked || 0);
+            const totalSlotBooked = slotCount > 0 ? (baseBooked + slotCount) : (idx === 0 && bookedTotal > 0 ? (baseBooked + bookedTotal) : baseBooked);
+            return {
+              ...s,
+              booked: totalSlotBooked,
+            };
+          });
+        }
+
+        const finalBookedToday = Math.max(Number(data.booked_today || 0), bookedTotal);
+
         return {
           ...data,
+          booked_today: finalBookedToday,
           portal_template: loadPortalTemplate(slug) || data.portal_template || null,
           ticket_categories: categories,
           time_slots: slots,
@@ -203,8 +271,19 @@ export async function fetchDestinationBySlug(slug) {
     } else if (response.status === 404) {
       // If backend explicitly returned 404 Not Found, only return localDest if it matches exact slug
       if (localDest && localDest.slug === slug) {
+        const { total: bookedTotal, bySlot } = getLocalBookedCount(localDest.id, slug, localDest.name);
+        const slots = (localDest.time_slots || []).map((s, idx) => {
+          const slotCount = (bySlot[s.id] || bySlot[s.label] || bySlot[s.slot_label] || 0);
+          const baseBooked = Number(s.booked || 0);
+          return {
+            ...s,
+            booked: slotCount > 0 ? (baseBooked + slotCount) : (idx === 0 && bookedTotal > 0 ? (baseBooked + bookedTotal) : baseBooked),
+          };
+        });
         return {
           ...localDest,
+          booked_today: Math.max(Number(localDest.booked_today || 0), bookedTotal),
+          time_slots: slots,
           portal_template: loadPortalTemplate(slug) || localDest.portal_template || null,
         };
       }
@@ -217,8 +296,19 @@ export async function fetchDestinationBySlug(slug) {
 
   // If backend was unreachable (e.g. offline dev), only fallback if localDest matches exact slug
   if (localDest && localDest.slug === slug) {
+    const { total: bookedTotal, bySlot } = getLocalBookedCount(localDest.id, slug, localDest.name);
+    const slots = (localDest.time_slots || []).map((s, idx) => {
+      const slotCount = (bySlot[s.id] || bySlot[s.label] || bySlot[s.slot_label] || 0);
+      const baseBooked = Number(s.booked || 0);
+      return {
+        ...s,
+        booked: slotCount > 0 ? (baseBooked + slotCount) : (idx === 0 && bookedTotal > 0 ? (baseBooked + bookedTotal) : baseBooked),
+      };
+    });
     return {
       ...localDest,
+      booked_today: Math.max(Number(localDest.booked_today || 0), bookedTotal),
+      time_slots: slots,
       portal_template: loadPortalTemplate(slug) || localDest.portal_template || null,
     };
   }

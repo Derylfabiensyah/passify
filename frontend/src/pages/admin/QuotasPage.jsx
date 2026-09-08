@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useTenant } from '../../contexts/TenantContext';
 import { fetchAdminDestinations, fetchAdminQuotas } from '../../api/admin';
+import { getLocalBookedCount } from '../../api/tenant';
 import { apiRequest } from '../../api/client';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import { ADMIN_DESTINATIONS, QUOTA_CALENDAR } from '../../data/adminData';
@@ -96,13 +97,13 @@ function QuotaDayCard({ day, onEditQuota, onToggleClose }) {
             <span>
               Terisi:{' '}
               <strong className="text-gray-900 font-semibold">
-                {day.booked.toLocaleString('id-ID')}
+                {Number(day.booked || 0).toLocaleString('id-ID')}
               </strong>
             </span>
             <span>
               Sisa:{' '}
               <strong className="text-emerald-700 font-semibold">
-                {remaining.toLocaleString('id-ID')}
+                {Number(remaining || 0).toLocaleString('id-ID')}
               </strong>
             </span>
           </div>
@@ -226,7 +227,7 @@ function EditQuotaModal({ day, onClose, onSave }) {
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
             />
             <span className="text-[11px] text-gray-500 mt-1 block">
-              Saat ini terpesan: {day.booked.toLocaleString('id-ID')} pax
+              Saat ini terpesan: {Number(day.booked || 0).toLocaleString('id-ID')} pax
             </span>
           </div>
           <button
@@ -398,7 +399,7 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
   );
 }
 
-const generateInitialCalendar = (capacity = 1000) => {
+const generateInitialCalendar = (capacity = 1000, todayBooked = 0) => {
   const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   const today = new Date();
   return Array.from({ length: 7 }, (_, i) => {
@@ -410,7 +411,7 @@ const generateInitialCalendar = (capacity = 1000) => {
       date: dateStr,
       dayLabel,
       max_capacity: capacity,
-      booked: 0,
+      booked: i === 0 ? todayBooked : 0,
       is_closed: false,
     };
   });
@@ -435,21 +436,36 @@ export default function QuotasPage() {
           setSelectedDestId(dests[0].id);
 
           const destCapacity = Number(dests[0].max_daily_capacity) || 1000;
-          setQuotaCalendar(generateInitialCalendar(destCapacity));
+          const localCount = getLocalBookedCount(dests[0].id, dests[0].slug, dests[0].name).total;
+          const destBooked = Math.max(Number(dests[0].booked_today || 0), localCount);
+          setQuotaCalendar(generateInitialCalendar(destCapacity, destBooked));
 
           // Fetch quota calendar and time slots
           const { quotas, timeSlots } = await fetchAdminQuotas(dests[0].id);
           const finalSlots = (timeSlots && timeSlots.length > 0) ? timeSlots : (dests[0].time_slots || []);
           if (finalSlots.length > 0) {
             setDestinations((prev) =>
-              prev.map((d, idx) => (idx === 0 ? { ...d, time_slots: finalSlots } : d))
+              prev.map((d, idx) => (idx === 0 ? { ...d, time_slots: finalSlots, booked_today: destBooked } : d))
             );
+            try {
+              const raw = localStorage.getItem('passify_admin_destinations');
+              const list = raw ? JSON.parse(raw) : [];
+              if (Array.isArray(list) && list.length > 0) {
+                list[0].time_slots = finalSlots;
+                localStorage.setItem('passify_admin_destinations', JSON.stringify(list));
+              }
+            } catch (_) {}
           }
           if (quotas && quotas.length > 0) {
             setQuotaCalendar((prev) =>
-              prev.map((day) => {
+              prev.map((day, idx) => {
                 const match = quotas.find((q) => q.date === day.date);
-                return match ? { ...day, max_capacity: match.max_capacity, booked: match.booked || 0, is_closed: match.is_closed } : day;
+                return match ? {
+                  ...day,
+                  max_capacity: match.max_capacity,
+                  booked: match.booked || (idx === 0 ? destBooked : 0),
+                  is_closed: match.is_closed
+                } : day;
               })
             );
           }
@@ -459,6 +475,12 @@ export default function QuotasPage() {
       }
     }
     loadData();
+    const interval = setInterval(loadData, 3000);
+    window.addEventListener('storage', loadData);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', loadData);
+    };
   }, [slug]);
 
   const selectedDest = destinations.find((d) => d.id === selectedDestId) || destinations[0] || {};
@@ -550,6 +572,7 @@ export default function QuotasPage() {
           localStorage.setItem('passify_admin_destinations', JSON.stringify(list));
         }
       }
+      window.dispatchEvent(new Event('storage'));
     } catch (err) {
       console.warn('Sync time slot warning:', err);
     }
@@ -567,6 +590,19 @@ export default function QuotasPage() {
     );
     showToast('Sesi kunjungan berhasil dihapus.');
 
+    try {
+      const raw = localStorage.getItem('passify_admin_destinations');
+      if (raw) {
+        const list = JSON.parse(raw);
+        const idx = list.findIndex((d) => d.id === selectedDest.id || d.slug === selectedDest.slug);
+        if (idx >= 0) {
+          list[idx].time_slots = (list[idx].time_slots || []).filter((s) => s.id !== slotId);
+          localStorage.setItem('passify_admin_destinations', JSON.stringify(list));
+        }
+      }
+      window.dispatchEvent(new Event('storage'));
+    } catch (_) {}
+
     if (slotId && !String(slotId).startsWith('ts-')) {
       try {
         await apiRequest(`/api/v1/tickets/time-slots/${slotId}`, {
@@ -580,7 +616,8 @@ export default function QuotasPage() {
 
   const totalWeeklyCapacity = quotaCalendar.reduce((sum, d) => sum + d.max_capacity, 0);
   const totalWeeklyBooked = quotaCalendar.reduce((sum, d) => sum + d.booked, 0);
-  const weeklyOccupancyPct = totalWeeklyCapacity > 0 ? Math.round((totalWeeklyBooked / totalWeeklyCapacity) * 100) : 0;
+  const rawWeeklyPct = totalWeeklyCapacity > 0 ? (totalWeeklyBooked / totalWeeklyCapacity) * 100 : 0;
+  const weeklyOccupancyPct = rawWeeklyPct > 0 && rawWeeklyPct < 1 ? Number(rawWeeklyPct.toFixed(1)) : Math.round(rawWeeklyPct);
 
   return (
     <div className="flex flex-col gap-6">

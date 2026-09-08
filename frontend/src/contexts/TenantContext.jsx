@@ -35,6 +35,8 @@ export function TenantProvider({ children }) {
 
   useEffect(() => {
     refetch();
+    window.addEventListener('storage', refetch);
+    return () => window.removeEventListener('storage', refetch);
   }, []);
 
   const updatePortalTemplate = (template) => {

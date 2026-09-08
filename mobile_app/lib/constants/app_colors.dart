@@ -20,6 +20,7 @@ class AppColors {
   static const Color ink = Color(0xFF1C201A);
   static const Color inkSoft = Color(0xFF52594B);
   static const Color textMuted = Color(0xFF707768);
+  static const Color muted = textMuted;
 
   static const Color darkCanvas = Color(0xFF191E16);
   static const Color darkSurface = Color(0xFF22291E);

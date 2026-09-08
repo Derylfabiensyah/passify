@@ -28,9 +28,13 @@ export default function ETicketModal({ order, onClose }) {
   const [usedAt, setUsedAt] = useState(order?.usedAt || null);
 
   const checkLiveStatus = useCallback(async () => {
-    if (!order?.ticketCode || isUsed) return;
+    const codeToPoll = order?.ticketCode || order?.orderNumber;
+    if (!codeToPoll || isUsed) return;
     try {
-      const res = await fetch(`http://localhost:8086/api/v1/gate/status/${order.ticketCode}`);
+      let res = await fetch(`http://localhost:8086/api/v1/gate/status/${codeToPoll}`);
+      if (!res.ok && order?.orderNumber && order.orderNumber !== codeToPoll) {
+        res = await fetch(`http://localhost:8086/api/v1/gate/status/${order.orderNumber}`);
+      }
       if (res.ok) {
         const payload = await res.json();
         if (payload?.data?.status === 'used') {
@@ -39,7 +43,7 @@ export default function ETicketModal({ order, onClose }) {
         }
       }
     } catch (_) {}
-  }, [order?.ticketCode, isUsed]);
+  }, [order?.ticketCode, order?.orderNumber, isUsed]);
 
   const fetchLiveQR = useCallback(async () => {
     if (isUsed) return;

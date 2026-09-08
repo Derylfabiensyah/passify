@@ -85,9 +85,14 @@ export default function BookingHistoryPage() {
       let isUpdated = false;
       const updatedList = await Promise.all(
         tickets.map(async (ticket) => {
-          if (ticket.status === 'used' || !ticket.ticketCode) return ticket;
+          if (ticket.status === 'used') return ticket;
+          const codeToPoll = ticket.ticketCode || ticket.orderNumber;
+          if (!codeToPoll) return ticket;
           try {
-            const res = await fetch(`http://localhost:8086/api/v1/gate/status/${ticket.ticketCode}`);
+            let res = await fetch(`http://localhost:8086/api/v1/gate/status/${codeToPoll}`);
+            if (!res.ok && ticket.orderNumber && ticket.orderNumber !== codeToPoll) {
+              res = await fetch(`http://localhost:8086/api/v1/gate/status/${ticket.orderNumber}`);
+            }
             if (res.ok) {
               const resData = await res.json();
               if (resData?.data?.status === 'used') {
@@ -326,7 +331,7 @@ export default function BookingHistoryPage() {
 
                       {/* Order Code */}
                       <div className="absolute top-3.5 right-3.5 font-mono text-[11px] font-bold text-white bg-black/40 px-2.5 py-1 rounded-xl backdrop-blur-xs">
-                        #{ticket.orderNumber}
+                        #{ticket.ticketCode || ticket.orderNumber}
                       </div>
 
                       {/* Destination Title */}

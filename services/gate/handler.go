@@ -92,10 +92,6 @@ func (h *GateHandler) HandleValidateTicket(c *gin.Context) {
 		return
 	}
 
-	if req.ScannedAt.IsZero() {
-		req.ScannedAt = time.Now()
-	}
-
 	res, err := h.service.ValidateTicketOnline(req)
 	if err != nil {
 		response.InternalServerError(c, err.Error())

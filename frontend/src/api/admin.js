@@ -1,5 +1,5 @@
 import { apiRequest } from './client';
-import { fetchDestinationBySlug } from './tenant';
+import { fetchDestinationBySlug, getLocalBookedCount } from './tenant';
 import {
   HOURLY_VISITORS,
   REVENUE_WEEKLY,
@@ -96,12 +96,42 @@ export function getActiveAdminTenant() {
 export async function fetchAdminDestinations(slug) {
   const user = getAdminUser();
   const currentSlug = slug || user.tenant_slug || getActiveAdminTenant()?.slug || 'curug-citambur';
+  const effectiveTenantId = user.tenant_id;
 
   // 1. Fetch authoritative destination data directly (shared with public portal)
   try {
-    const dest = await fetchDestinationBySlug(currentSlug);
+    const [dest, financeData] = await Promise.all([
+      fetchDestinationBySlug(currentSlug),
+      effectiveTenantId ? fetchAdminFinanceData(effectiveTenantId) : Promise.resolve({ transactions: [] }),
+    ]);
+
     if (dest) {
-      const unifiedList = [dest];
+      let trxBookedCount = 0;
+      if (Array.isArray(financeData?.transactions)) {
+        trxBookedCount = financeData.transactions
+          .filter((t) => {
+            const st = (t.payment_status || t.status || '').toLowerCase();
+            return st === 'paid' || st === 'settlement' || st === 'success';
+          })
+          .reduce((sum, t) => sum + Number(t.visitor_count || 1), 0);
+      }
+
+      const totalBooked = Math.max(Number(dest.booked_today || 0), trxBookedCount);
+      let slots = dest.time_slots || [];
+      if (slots.length > 0 && totalBooked > 0) {
+        const hasSlotBooked = slots.some((s) => Number(s.booked || 0) > 0);
+        if (!hasSlotBooked) {
+          slots = slots.map((s, idx) => (idx === 0 ? { ...s, booked: totalBooked } : s));
+        }
+      }
+
+      const updatedDest = {
+        ...dest,
+        booked_today: totalBooked,
+        time_slots: slots,
+      };
+
+      const unifiedList = [updatedDest];
       try {
         localStorage.setItem('passify_admin_destinations', JSON.stringify(unifiedList));
         localStorage.setItem('passify_current_tenant', dest.slug);
@@ -251,22 +281,39 @@ export async function fetchDashboardOverviewTelemetry(slug) {
 
   // Compute live today metrics
   const totalCapacity = Number(primaryDest.max_daily_capacity) || 1000;
-  const bookedToday = Number(primaryDest.booked_today) || 0;
-  const remainingQuota = Math.max(0, totalCapacity - bookedToday);
+  const localBooked = getLocalBookedCount(primaryDest.id, primaryDest.slug, primaryDest.name).total;
+  const bookedToday = Math.max(Number(primaryDest.booked_today || 0), localBooked);
 
   // Compute revenue from transactions if available
   let calculatedRevenue = 0;
+  let trxVisitors = 0;
   if (Array.isArray(financeData.transactions) && financeData.transactions.length > 0) {
-    calculatedRevenue = financeData.transactions
-      .filter((t) => t.status === 'paid' || t.status === 'PAID' || t.status === 'settlement')
-      .reduce((sum, t) => sum + (Number(t.amount) || Number(t.total_amount) || 0), 0);
+    const paidTxs = financeData.transactions.filter((t) => {
+      const st = (t.payment_status || t.status || '').toLowerCase();
+      return st === 'paid' || st === 'settlement' || st === 'success';
+    });
+    calculatedRevenue = paidTxs.reduce(
+      (sum, t) => sum + (Number(t.grand_total ?? t.amount ?? t.total_amount ?? 0)),
+      0
+    );
+    trxVisitors = paidTxs.reduce((sum, t) => sum + Number(t.visitor_count || 1), 0);
   }
+
+  // Compute live scan and ticket metrics
+  const totalScans = Number(gateData.stats?.total_scans ?? gateData.stats?.scans_today ?? 0);
+  const ticketsSold = Math.max(
+    bookedToday,
+    trxVisitors,
+    Array.isArray(financeData.transactions) ? financeData.transactions.length : 0,
+    totalScans
+  );
+  const remainingQuota = Math.max(0, totalCapacity - ticketsSold);
 
   const liveStats = {
     today: {
       revenue: calculatedRevenue,
-      tickets_sold: bookedToday,
-      visitors_entered: gateData.stats?.scans_today || 0,
+      tickets_sold: ticketsSold,
+      visitors_entered: totalScans,
       remaining_quota: remainingQuota,
       total_capacity: totalCapacity,
       wallet_topups: 0,
@@ -279,8 +326,8 @@ export async function fetchDashboardOverviewTelemetry(slug) {
     },
     this_month: {
       revenue: calculatedRevenue,
-      tickets_sold: bookedToday,
-      visitors_entered: gateData.stats?.scans_today || 0,
+      tickets_sold: ticketsSold,
+      visitors_entered: totalScans,
     },
   };
 
@@ -314,7 +361,29 @@ export async function fetchDashboardOverviewTelemetry(slug) {
           percentage: 0,
         }))
       : [],
-    recentTransactions: financeData.transactions || [],
-    gateScanStats: gateData.stats || { scans_today: 0, valid_scans: 0, rejected_scans: 0, offline_synced: 0 },
+    recentTransactions: Array.isArray(financeData.transactions) ? financeData.transactions : [],
+    gateScanStats: Array.isArray(gateData.devices) && gateData.devices.length > 0
+      ? gateData.devices.map((d) => {
+          const gateStatsMap = {};
+          if (gateData.stats?.by_gate) {
+            gateData.stats.by_gate.forEach((g) => {
+              gateStatsMap[g.device_id] = g.total_scans;
+            });
+          }
+          return {
+            gate_name: d.device_name || d.device_code || 'Gerbang Masuk',
+            total_scanned: gateStatsMap[d.id] ?? (gateData.stats?.total_scans ?? gateData.stats?.scans_today ?? 0),
+            last_scan: d.last_log_sync_at ? new Date(d.last_log_sync_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : 'Hari ini',
+            status: d.is_active ? 'online' : 'offline',
+          };
+        })
+      : [
+          {
+            gate_name: 'Pintu Masuk Utama 01',
+            total_scanned: gateData.stats?.total_scans ?? gateData.stats?.scans_today ?? 0,
+            last_scan: 'Hari ini',
+            status: 'online',
+          }
+        ],
   };
 }

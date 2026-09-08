@@ -27,13 +27,22 @@ const adminThemeStyles = `
   .admin-shell .btn-primary:hover { background: var(--forest-deep); }
   .admin-shell .btn-secondary { color: var(--forest); }
   .admin-shell table th { font-size: .6875rem; letter-spacing: .08em; }
+  .admin-shell aside a,
+  .admin-shell aside a:focus,
+  .admin-shell aside a:focus-visible,
+  .admin-shell aside button,
+  .admin-shell aside button:focus,
+  .admin-shell aside button:focus-visible {
+    outline: none !important;
+    outline-offset: 0 !important;
+  }
 `;
 
 function Brand({ collapsed = false }) {
   return (
     <Link
       to="/admin"
-      className="flex items-center gap-2.5 no-underline transition-opacity hover:opacity-85"
+      className="flex items-center gap-2.5 no-underline transition-opacity hover:opacity-85 outline-none focus:outline-none focus-visible:outline-none"
       aria-label="Passify Console"
     >
       <span className="text-xl font-black tracking-tight text-[var(--forest-deep)] font-serif">
@@ -68,7 +77,7 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
               to={item.path}
               onClick={onNavigate}
               title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold no-underline transition-colors ${
+              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold no-underline transition-colors outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
                 isActive
                   ? 'bg-[var(--forest-deep)] text-white shadow-[0_7px_16px_rgba(16,45,32,.13)]'
                   : 'text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)]'

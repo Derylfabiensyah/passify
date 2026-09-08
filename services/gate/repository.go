@@ -147,7 +147,7 @@ func (r *gateRepository) GetTicketForValidation(ticketCode string, visitDate tim
 	err := r.db.Preload("Category").
 		Preload("Destination").
 		Preload("TimeSlot").
-		Where("ticket_code = ? AND visit_date = ? AND status = ?", ticketCode, dateStr, "active").
+		Where("(ticket_code = ? OR transaction_id IN (SELECT id FROM transactions WHERE order_number = ?)) AND visit_date = ? AND status = ?", ticketCode, ticketCode, dateStr, "active").
 		First(&ticket).Error
 	if err != nil {
 		return nil, err
@@ -170,7 +170,7 @@ func (r *gateRepository) GetTicketByCode(ticketCode string) (*models.Ticket, err
 	err := r.db.Preload("Category").
 		Preload("Destination").
 		Preload("TimeSlot").
-		Where("ticket_code = ?", ticketCode).
+		Where("ticket_code = ? OR transaction_id IN (SELECT id FROM transactions WHERE order_number = ?)", ticketCode, ticketCode).
 		First(&ticket).Error
 	if err != nil {
 		return nil, err

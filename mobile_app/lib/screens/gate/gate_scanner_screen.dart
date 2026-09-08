@@ -11,6 +11,7 @@ import '../../widgets/scan_result_sheet.dart';
 import '../../widgets/scanner_overlay.dart';
 import 'gate_stats_screen.dart';
 import 'offline_manifest_screen.dart';
+import 'pairing_scanner_screen.dart';
 
 class GateScannerScreen extends StatefulWidget {
   const GateScannerScreen({super.key});
@@ -60,6 +61,84 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
         setState(() => _isModalShowing = false);
       }
     });
+  }
+
+  void _showManualInputDialog() {
+    final textController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Row(
+          children: [
+            Icon(Icons.edit_note_rounded, color: AppColors.forest),
+            SizedBox(width: 8),
+            Text(
+              'Input Kode Tiket',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Masukkan kode tiket pengunjung secara manual:',
+              style: TextStyle(fontSize: 12, color: AppColors.inkSoft),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: textController,
+              autofocus: true,
+              textCapitalization: TextCapitalization.characters,
+              decoration: InputDecoration(
+                hintText: 'Contoh: TWA-QR-21712',
+                hintStyle: const TextStyle(fontSize: 13, color: AppColors.textMuted),
+                filled: true,
+                fillColor: AppColors.canvas,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Batal', style: TextStyle(color: AppColors.inkSoft)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.forest,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
+            onPressed: () async {
+              final code = textController.text.trim();
+              if (code.isEmpty) return;
+              Navigator.of(ctx).pop();
+
+              final scannerProvider = Provider.of<GateScannerProvider>(context, listen: false);
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+              final result = await scannerProvider.processScannedCode(
+                rawPayload: code,
+                deviceId: authProvider.selectedDeviceId,
+              );
+
+              if (!mounted) return;
+              _showDetailModal(result);
+            },
+            child: const Text('Validasi Tiket'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _onDetect(BarcodeCapture capture) async {
@@ -280,6 +359,40 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           onPressed: () {
                             HapticFeedback.selectionClick();
                             _scannerController.switchCamera();
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.qr_code_scanner_rounded, color: AppColors.leafPale, size: 20),
+                          tooltip: 'Pairing Gerbang',
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 20),
+                          tooltip: 'Input Kode Manual',
+                          onPressed: () {
+                            HapticFeedback.selectionClick();
+                            _showManualInputDialog();
                           },
                         ),
                       ),

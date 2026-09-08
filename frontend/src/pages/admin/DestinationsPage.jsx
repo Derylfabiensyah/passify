@@ -23,6 +23,7 @@ import ModalWrapper from '../../components/common/ModalWrapper';
 import { useToast } from '../../contexts/ToastContext';
 import { useTenant } from '../../contexts/TenantContext';
 import { fetchAdminDestinations, getAdminUser } from '../../api/admin';
+import { getLocalBookedCount } from '../../api/tenant';
 import { apiRequest } from '../../api/client';
 
 function DeleteCategoryConfirmationModal({ isOpen, onClose, onConfirm, categoryName }) {
@@ -127,7 +128,11 @@ function DestinationCard({
   onEditCategory,
   onDeleteCategory
 }) {
-  const quotaPct = Math.round(((dest.booked_today || 0) / (dest.max_daily_capacity || 1000)) * 100);
+  const capacity = Number(dest.max_daily_capacity || 1000);
+  const localCount = getLocalBookedCount(dest.id, dest.slug, dest.name).total;
+  const booked = Math.max(Number(dest.booked_today || 0), localCount);
+  const rawPct = capacity ? (booked / capacity) * 100 : 0;
+  const quotaPct = rawPct > 0 && rawPct < 1 ? Number(rawPct.toFixed(1)) : Math.round(rawPct);
 
   return (
     <div className="card bg-white rounded-2xl overflow-hidden shadow-xs border border-[var(--border)]">
@@ -186,7 +191,7 @@ function DestinationCard({
             <div>
               <span className="text-[10px] uppercase font-bold text-[var(--ink-muted)] block">Terisi Hari Ini</span>
               <strong className="text-sm font-bold text-emerald-700">
-                {Number(dest.booked_today || 0).toLocaleString('id-ID')} ({quotaPct}%)
+                {Number(booked || 0).toLocaleString('id-ID')} pax ({quotaPct}%)
               </strong>
             </div>
             <div>
@@ -462,6 +467,12 @@ export default function DestinationsPage() {
       }
     }
     loadRealDestinations();
+    const interval = setInterval(loadRealDestinations, 3000);
+    window.addEventListener('storage', loadRealDestinations);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', loadRealDestinations);
+    };
   }, [activeSlug]);
 
   const saveDestinationsList = (updated) => {
@@ -470,6 +481,7 @@ export default function DestinationsPage() {
     if (updated.length > 0 && updated[0].slug) {
       localStorage.setItem('passify_current_tenant', updated[0].slug);
     }
+    window.dispatchEvent(new Event('storage'));
     refetch?.();
   };
 
@@ -589,9 +601,11 @@ export default function DestinationsPage() {
     }
   };
 
-  const capacity = Number(dest.max_daily_capacity || 500);
-  const booked = Number(dest.booked_today || 0);
-  const quotaPct = capacity ? Math.round((booked / capacity) * 100) : 0;
+  const capacity = Number(dest.max_daily_capacity || 1000);
+  const localCount = getLocalBookedCount(dest.id, dest.slug, dest.name).total;
+  const booked = Math.max(Number(dest.booked_today || 0), localCount);
+  const rawPct = capacity ? (booked / capacity) * 100 : 0;
+  const quotaPct = rawPct > 0 && rawPct < 1 ? Number(rawPct.toFixed(1)) : Math.round(rawPct);
   const ticketCategories = dest.ticket_categories || [];
 
   return (
@@ -625,8 +639,8 @@ export default function DestinationsPage() {
         <AdminStatCard
           icon={Users}
           label="Total Daya Dukung Alam"
-          value={`${capacity.toLocaleString('id-ID')} pax`}
-          subValue={`Terisi: ${booked.toLocaleString('id-ID')} pax hari ini`}
+          value={`${Number(capacity || 0).toLocaleString('id-ID')} pax`}
+          subValue={`Terisi: ${Number(booked || 0).toLocaleString('id-ID')} pax hari ini`}
           progress={quotaPct}
           badgeText="KUOTA"
         />

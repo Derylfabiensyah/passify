@@ -57,7 +57,7 @@ class OfflineScanModel {
       'id': id,
       'device_id': deviceId,
       'ticket_code': ticketCode,
-      'scanned_at': scannedAt.toIso8601String(),
+      'scanned_at': scannedAt.toUtc().toIso8601String(),
       'scan_result': scanResult,
       'raw_qr_payload': rawQrPayload,
       'synced': synced ? 1 : 0,
@@ -79,7 +79,7 @@ class OfflineScanModel {
   Map<String, dynamic> toApiJson() {
     return {
       'ticket_code': ticketCode,
-      'scanned_at': scannedAt.toIso8601String(),
+      'scanned_at': scannedAt.toUtc().toIso8601String(),
       'scan_result': scanResult,
       'raw_qr_payload': rawQrPayload,
     };

@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import '../models/scan_log_model.dart';
 import '../services/api_service.dart';
 import '../services/database_helper.dart';
+import '../services/sync_service.dart';
 
 class GateScannerProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
   final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+  final SyncService _syncService = SyncService();
 
   bool _isProcessing = false;
   bool _isTorchOn = false;
@@ -93,6 +95,7 @@ class GateScannerProvider with ChangeNotifier {
         rawQrPayload: rawPayload,
         deviceId: deviceId,
       );
+      _syncService.pushOfflineScans(deviceId).catchError((_) => <String, dynamic>{});
     } else {
       // Try online first, fallback to offline on timeout or connection error
       try {
@@ -108,6 +111,7 @@ class GateScannerProvider with ChangeNotifier {
           rawQrPayload: rawPayload,
           deviceId: deviceId,
         );
+        _syncService.pushOfflineScans(deviceId).catchError((_) => <String, dynamic>{});
       }
     }
 

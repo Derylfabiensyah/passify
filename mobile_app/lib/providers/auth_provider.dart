@@ -15,6 +15,8 @@ class AuthProvider with ChangeNotifier {
   // Selected Gate Device ID (for gate scanners)
   String _selectedDeviceId = 'c8b9d319-36e1-4288-b9cf-fe79eaff0001';
   String _selectedDestinationId = '11111111-1111-1111-1111-111111111111';
+  String _selectedDeviceName = 'Gate Masuk Utama 1';
+  String _selectedDeviceCode = 'GATE-BIDADARI-01';
 
   UserModel? get currentUser => _currentUser;
   String? get token => _token;
@@ -24,11 +26,28 @@ class AuthProvider with ChangeNotifier {
 
   String get selectedDeviceId => _selectedDeviceId;
   String get selectedDestinationId => _selectedDestinationId;
+  String get selectedDeviceName => _selectedDeviceName;
+  String get selectedDeviceCode => _selectedDeviceCode;
 
-  void setSelectedDevice(String deviceId, {String? destinationId}) {
+  Future<void> setSelectedDevice(
+    String deviceId, {
+    String? destinationId,
+    String? deviceName,
+    String? deviceCode,
+  }) async {
     _selectedDeviceId = deviceId;
     if (destinationId != null) _selectedDestinationId = destinationId;
+    if (deviceName != null) _selectedDeviceName = deviceName;
+    if (deviceCode != null) _selectedDeviceCode = deviceCode;
     notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('passify_gate_device_id', _selectedDeviceId);
+      await prefs.setString('passify_gate_destination_id', _selectedDestinationId);
+      await prefs.setString('passify_gate_device_name', _selectedDeviceName);
+      await prefs.setString('passify_gate_device_code', _selectedDeviceCode);
+    } catch (_) {}
   }
 
   Future<void> checkExistingSession() async {
@@ -38,6 +57,24 @@ class AuthProvider with ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       _token = prefs.getString('passify_jwt_token');
+
+      // Load saved gate device config
+      final savedDevId = prefs.getString('passify_gate_device_id');
+      if (savedDevId != null && savedDevId.isNotEmpty) {
+        _selectedDeviceId = savedDevId;
+      }
+      final savedDestId = prefs.getString('passify_gate_destination_id');
+      if (savedDestId != null && savedDestId.isNotEmpty) {
+        _selectedDestinationId = savedDestId;
+      }
+      final savedDevName = prefs.getString('passify_gate_device_name');
+      if (savedDevName != null && savedDevName.isNotEmpty) {
+        _selectedDeviceName = savedDevName;
+      }
+      final savedDevCode = prefs.getString('passify_gate_device_code');
+      if (savedDevCode != null && savedDevCode.isNotEmpty) {
+        _selectedDeviceCode = savedDevCode;
+      }
 
       if (_token != null && _token!.isNotEmpty) {
         final profile = await _apiService.getProfile();

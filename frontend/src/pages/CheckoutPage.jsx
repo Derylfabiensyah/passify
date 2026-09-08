@@ -23,8 +23,27 @@ import {
   Leaf
 } from 'lucide-react';
 import { fetchDestinationBySlug } from '../api/tenant';
+import { fetchAdminQuotas } from '../api/admin';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
+
+const getPaymentDeadline = (slug) => {
+  try {
+    const raw = localStorage.getItem('passify_payment_session');
+    if (!raw) return 0;
+    const session = JSON.parse(raw);
+    if (!slug || session.slug === slug) return Number(session.deadline || 0);
+  } catch (_) {}
+  return 0;
+};
+
+const setPaymentDeadline = (slug, deadline) => {
+  localStorage.setItem('passify_payment_session', JSON.stringify({ slug, deadline }));
+};
+
+const clearPaymentDeadline = () => {
+  localStorage.removeItem('passify_payment_session');
+};
 
 export default function CheckoutPage() {
   const { tenantSlug, destinationId } = useParams();
@@ -51,10 +70,23 @@ export default function CheckoutPage() {
   // Step 2 Payment States
   const [paymentMethod, setPaymentMethod] = useState('midtrans'); // 'midtrans' | 'wallet'
   const [walletBalance, setWalletBalance] = useState(150000);
-  const [timeLeftSeconds, setTimeLeftSeconds] = useState(900); // 15 minutes timer
+  const [timeLeftSeconds, setTimeLeftSeconds] = useState(() => {
+    const saved = getPaymentDeadline();
+    const diff = Math.floor((saved - Date.now()) / 1000);
+    return diff > 0 ? diff : 900;
+  });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showSnapModal, setShowSnapModal] = useState(false);
   const [snapData, setSnapData] = useState(null);
+
+  // Handle browser back button between steps
+  useEffect(() => {
+    const onPopState = () => {
+      setStep((prev) => (prev === 2 ? 1 : prev));
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
 
   // Success Result State
   const [completedOrder, setCompletedOrder] = useState(null);
@@ -71,11 +103,30 @@ export default function CheckoutPage() {
         contextSlug ||
         'curug-cibereum';
 
-      let dest = null;
-      if (contextDest && (contextDest.slug === targetSlug || !tenantSlug)) {
-        dest = contextDest;
-      } else {
-        dest = await fetchDestinationBySlug(targetSlug);
+      // 1. Check local admin destination cache (only if exact slug match)
+      let adminDest = null;
+      try {
+        const raw = localStorage.getItem('passify_admin_destinations');
+        if (raw) {
+          const list = JSON.parse(raw);
+          if (Array.isArray(list) && list.length > 0) {
+            adminDest =
+              list.find((d) => d.slug === targetSlug || d.id === targetSlug) ||
+              list.find((d) => d.name && d.name.toLowerCase().includes(targetSlug.replace(/-/g, ' '))) ||
+              null;
+          }
+        }
+      } catch (_) {}
+
+      // 2. Fetch authoritative destination data directly from backend
+      let dest = await fetchDestinationBySlug(targetSlug);
+
+      if (!dest && contextDest && contextDest.slug === targetSlug) {
+        dest = { ...contextDest };
+      }
+
+      if (!dest && adminDest) {
+        dest = { ...adminDest };
       }
 
       if (!dest) {
@@ -87,15 +138,66 @@ export default function CheckoutPage() {
           tenant_name: title,
           location: 'Kawasan Konservasi Alam, Indonesia',
           cover_image_url: 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1200&q=80',
-          ticket_categories: [
-            { id: `cat-reguler-${targetSlug}`, name: 'Tiket Masuk Reguler', price: 35000, insurance: 3000, retribusi: 2000 }
-          ],
-          time_slots: [
-            { id: 'slot-1', label: 'Sesi Pagi (07:00 - 11:30)', max_capacity: 500, booked: 0 },
-            { id: 'slot-2', label: 'Sesi Siang (11:30 - 15:30)', max_capacity: 500, booked: 0 },
-            { id: 'slot-3', label: 'Sesi Sore (15:30 - 18:00)', max_capacity: 500, booked: 0 }
-          ]
+          ticket_categories: [],
+          time_slots: []
         };
+      }
+
+      // 3. Sync time slots and live ticket categories from ticket-service
+      const destId = dest.id || adminDest?.id;
+      let liveSlots = [];
+      let liveCategories = [];
+
+      if (destId) {
+        try {
+          const { timeSlots } = await fetchAdminQuotas(destId);
+          if (Array.isArray(timeSlots) && timeSlots.length > 0) {
+            liveSlots = timeSlots;
+          }
+        } catch (_) {}
+
+        try {
+          const catRes = await fetch(`http://localhost:8083/api/v1/tickets/destinations/${destId}/categories`);
+          if (catRes.ok) {
+            const catJson = await catRes.json();
+            if (Array.isArray(catJson?.data) && catJson.data.length > 0) {
+              liveCategories = catJson.data.map((c) => ({
+                id: c.id,
+                name: c.name,
+                price: Number(c.base_price ?? c.price ?? 0),
+                insurance: Number(c.insurance_fee ?? c.insurance ?? 0),
+                retribusi: Number(c.retribusi_fee ?? c.retribusi ?? 0),
+                is_active: c.is_active !== false,
+              }));
+            }
+          }
+        } catch (_) {}
+      }
+
+      // Combine / prioritize time slots:
+      if (dest.time_slots && dest.time_slots.length > 0) {
+        // Authoritative backend time slots
+      } else if (liveSlots.length > 0) {
+        dest.time_slots = liveSlots;
+      } else if (adminDest?.time_slots && adminDest.time_slots.length > 0) {
+        dest.time_slots = adminDest.time_slots;
+      } else {
+        dest.time_slots = [
+          { id: 'slot-1', label: 'Sesi Kunjungan (08:00 - 16:00 WIB)', max_capacity: 500, booked: 0 }
+        ];
+      }
+
+      // Combine / prioritize ticket categories:
+      if (liveCategories.length > 0) {
+        dest.ticket_categories = liveCategories;
+      } else if (dest.ticket_categories && dest.ticket_categories.length > 0) {
+        // Authoritative backend categories
+      } else if (adminDest?.ticket_categories && adminDest.ticket_categories.length > 0) {
+        dest.ticket_categories = adminDest.ticket_categories;
+      } else {
+        dest.ticket_categories = [
+          { id: `cat-reguler-${targetSlug}`, name: 'Tiket Masuk Reguler', price: 35000, insurance: 3000, retribusi: 2000 }
+        ];
       }
 
       setDestination(dest);
@@ -104,7 +206,10 @@ export default function CheckoutPage() {
       if (dest.ticket_categories && dest.ticket_categories[0]) {
         initialQty[dest.ticket_categories[0].id] = 1;
       }
-      setQuantities(initialQty);
+      setQuantities((prev) => {
+        const hasExisting = Object.keys(prev).some((k) => (dest.ticket_categories || []).some((c) => c.id === k));
+        return hasExisting ? prev : initialQty;
+      });
 
       // Auto-fill user contact if logged in
       try {
@@ -123,6 +228,8 @@ export default function CheckoutPage() {
     }
 
     loadDest();
+    window.addEventListener('storage', loadDest);
+    return () => window.removeEventListener('storage', loadDest);
   }, [tenantSlug, destinationId, searchParams, contextSlug, contextDest]);
 
   // Adjust visitors array length when total quantity changes
@@ -144,22 +251,23 @@ export default function CheckoutPage() {
     });
   }, [totalQty]);
 
-  // 15-Minute Countdown Timer in Step 2
+  // 15-Minute Realtime Countdown Timer in Step 2
   useEffect(() => {
     if (step !== 2) return;
-    const interval = setInterval(() => {
-      setTimeLeftSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setStep(1);
-          setFormError('Sesi pembayaran telah berakhir (15 menit). Silakan ulangi pemesanan tiket Anda.');
-          return 900;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const tick = () => {
+      const saved = getPaymentDeadline(destination?.slug);
+      const remaining = Math.max(0, Math.floor((saved - Date.now()) / 1000));
+      setTimeLeftSeconds(remaining);
+      if (remaining <= 0) {
+        clearPaymentDeadline();
+        setStep(1);
+        setFormError('Sesi pembayaran telah berakhir (15 menit). Silakan ulangi pemesanan tiket Anda.');
+      }
+    };
+    tick();
+    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [step]);
+  }, [step, destination?.slug]);
 
   // Totals Calculation
   const totals = useMemo(() => {
@@ -221,16 +329,69 @@ export default function CheckoutPage() {
       return;
     }
 
-    setTimeLeftSeconds(900); // Reset 15 mins timer
+    // Realtime 15-min payment deadline (persists across navigation/back)
+    const now = Date.now();
+    const saved = getPaymentDeadline(destination?.slug);
+    const deadline = saved > now ? saved : now + 15 * 60 * 1000;
+    setPaymentDeadline(destination?.slug, deadline);
+    setTimeLeftSeconds(Math.max(0, Math.floor((deadline - now) / 1000)));
+
     setStep(2);
+    try {
+      window.history.pushState({ step: 2 }, '');
+    } catch (_) {}
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Complete Booking Helper
   const finalizeBookingSuccess = (orderData) => {
+    clearPaymentDeadline();
     try {
       const existingBookings = JSON.parse(localStorage.getItem('passify_my_tickets') || '[]');
       localStorage.setItem('passify_my_tickets', JSON.stringify([orderData, ...existingBookings]));
+    } catch (_) {}
+
+    // Deduct quota immediately in destination state
+    setDestination((prev) => {
+      if (!prev) return prev;
+      const qty = Number(orderData.totalQty || 1);
+      const targetSlotId = orderData.timeSlotId || selectedSlotId;
+      const updatedSlots = (prev.time_slots || []).map((s) =>
+        s.id === targetSlotId || s.label === orderData.timeSlotLabel
+          ? { ...s, booked: (Number(s.booked) || 0) + qty }
+          : s
+      );
+      return {
+        ...prev,
+        booked_today: (Number(prev.booked_today) || 0) + qty,
+        time_slots: updatedSlots,
+      };
+    });
+
+    // Update local admin destinations cache and trigger storage event
+    try {
+      const raw = localStorage.getItem('passify_admin_destinations');
+      if (raw) {
+        const list = JSON.parse(raw);
+        const qty = Number(orderData.totalQty || 1);
+        const updated = list.map((d) => {
+          if (d.slug === destination.slug || d.id === destination.id) {
+            const updatedSlots = (d.time_slots || []).map((s) =>
+              s.id === orderData.timeSlotId || s.id === selectedSlotId || s.label === orderData.timeSlotLabel
+                ? { ...s, booked: (Number(s.booked) || 0) + qty }
+                : s
+            );
+            return {
+              ...d,
+              booked_today: (Number(d.booked_today) || 0) + qty,
+              time_slots: updatedSlots,
+            };
+          }
+          return d;
+        });
+        localStorage.setItem('passify_admin_destinations', JSON.stringify(updated));
+      }
+      window.dispatchEvent(new Event('storage'));
     } catch (_) {}
 
     setCompletedOrder(orderData);
@@ -254,16 +415,20 @@ export default function CheckoutPage() {
         orderNumber,
         ticketId: `tkt-${Math.random().toString(36).substring(2, 9)}`,
         ticketCode: `TWA-QR-${Math.floor(10000 + Math.random() * 90000)}`,
+        destinationId: destination.id,
+        destinationSlug: destination.slug,
         destinationName: destination.name,
         tenantName: destination.tenant_name,
         location: destination.location,
         visitDate,
-        timeSlotLabel: selectedSlot?.label || 'Sesi Kunjungan Pagi',
+        timeSlotId: selectedSlot?.id,
+        timeSlotLabel: selectedSlot?.label || selectedSlot?.slot_label || 'Sesi Kunjungan Pagi',
         totalQty: totals.quantity,
         grandTotal: totals.grandTotal,
         paymentMethod: paymentMethod === 'midtrans' ? 'MIDTRANS_SNAP' : 'PASSIFY_WALLET',
         contact,
         visitors,
+        status: 'active',
         createdAt: new Date().toISOString(),
       };
 
@@ -348,12 +513,17 @@ export default function CheckoutPage() {
           {/* 2-Step Stepper Header */}
           {step < 3 && (
             <div className="flex items-center gap-2 sm:gap-4">
-              <div className={`flex items-center gap-2 ${step === 1 ? 'text-[var(--forest-deep)] font-extrabold' : 'text-[var(--ink-soft)] font-medium'}`}>
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className={`flex items-center gap-2 bg-transparent border-none p-0 cursor-pointer ${step === 1 ? 'text-[var(--forest-deep)] font-extrabold' : 'text-[var(--ink-soft)] font-medium hover:text-[var(--forest-deep)]'}`}
+                title="Kembali ke Isi Data"
+              >
                 <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${step === 1 ? 'bg-[var(--forest)] text-white' : 'bg-[var(--leaf-pale)] text-[var(--forest)]'}`}>
                   {step > 1 ? <Check className="h-4 w-4" /> : '1'}
                 </span>
                 <span className="hidden sm:inline text-xs uppercase tracking-wider">1. Isi Data</span>
-              </div>
+              </button>
 
               <div className="h-0.5 w-6 sm:w-10 bg-[var(--border)]" />
 
@@ -471,23 +641,19 @@ export default function CheckoutPage() {
                             onClick={() => setSelectedSlotId(slot.id)}
                             className={`cursor-pointer rounded-2xl p-4 transition-all flex items-center justify-between border ${
                               isSelected
-                                ? 'bg-gradient-to-r from-emerald-50 to-teal-50/60 border-emerald-600 shadow-sm ring-1 ring-emerald-600'
-                                : 'bg-white hover:bg-gray-50 border-gray-200 hover:border-emerald-300 text-gray-800'
+                                ? 'bg-white border-gray-900 shadow-xs'
+                                : 'bg-white hover:bg-gray-50/80 border-gray-200 hover:border-gray-300 text-gray-800'
                             }`}
                           >
                             <div className="space-y-1">
                               <div className="flex items-center gap-2">
-                                <Clock className={`w-4 h-4 ${isSelected ? 'text-emerald-600' : 'text-gray-400'}`} />
-                                <p className={`text-sm font-bold ${isSelected ? 'text-emerald-950 font-serif' : 'text-gray-900'}`}>
+                                <Clock className={`w-4 h-4 ${isSelected ? 'text-gray-900' : 'text-gray-400'}`} />
+                                <p className="text-sm font-bold text-gray-900">
                                   {label}
                                 </p>
                               </div>
                               <div className="flex items-center gap-2 pl-6">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold ${
-                                  isSelected
-                                    ? 'bg-emerald-600 text-white shadow-xs'
-                                    : 'bg-emerald-50 text-emerald-800 border border-emerald-200/70'
-                                }`}>
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-medium bg-gray-100 text-gray-600">
                                   Sisa Kuota: {remaining.toLocaleString('id-ID')} orang
                                 </span>
                                 {timeRange && !label.includes(timeRange) && (
@@ -499,9 +665,9 @@ export default function CheckoutPage() {
                             </div>
 
                             {/* Radio indicator */}
-                            <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${
+                            <div className={`h-5 w-5 rounded-full border flex items-center justify-center transition-colors shrink-0 ${
                               isSelected
-                                ? 'border-emerald-600 bg-emerald-600'
+                                ? 'border-gray-900 bg-gray-900'
                                 : 'border-gray-300 bg-white'
                             }`}>
                               {isSelected && <div className="h-2 w-2 rounded-full bg-white" />}
@@ -925,6 +1091,15 @@ export default function CheckoutPage() {
                       <span>Bayar Sekarang ({formatRupiah(totals.grandTotal)})</span>
                     </>
                   )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  disabled={isProcessingPayment}
+                  className="w-full btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold cursor-pointer disabled:opacity-50"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" /> Kembali / Ubah Data Pemesanan
                 </button>
 
                 <p className="text-center text-[10px] text-[var(--ink-soft)]">

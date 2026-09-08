@@ -18,8 +18,10 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
-  Copy
+  Copy,
+  QrCode
 } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useTenant } from '../../contexts/TenantContext';
 import { fetchAdminDestinations, fetchAdminGateTelemetry } from '../../api/admin';
 import { apiRequest } from '../../api/client';
@@ -27,7 +29,7 @@ import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
 import { GATE_DEVICES, ADMIN_DESTINATIONS } from '../../data/adminData';
 
-function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onDelete }) {
+function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDelete }) {
   const [keyVisible, setKeyVisible] = useState(false);
   const [copied, setCopied] = useState(false);
   const isOnline = device.is_active;
@@ -131,33 +133,308 @@ function DeviceCard({ device, onEdit, onToggle, onDownloadManifest, onDelete }) 
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-3 border-t border-gray-100 gap-2">
+      <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
         <button
           type="button"
-          onClick={() => onDownloadManifest(device)}
-          className="btn-secondary btn-sm flex-1 justify-center shadow-2xs text-xs"
+          onClick={() => onPair(device)}
+          className="btn-primary btn-sm w-full justify-center shadow-2xs text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold gap-1.5 py-2 rounded-xl transition-transform active:scale-98"
+          title="Tampilkan QR Code untuk disambungkan ke Scanner HP Petugas"
         >
-          <Download className="w-3.5 h-3.5" />
-          <span>Unduh Manifest Offline</span>
+          <QrCode className="w-4 h-4" />
+          <span>Pairing HP Scanner</span>
         </button>
-        <button
-          type="button"
-          onClick={() => onEdit(device)}
-          className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:text-gray-900 border border-gray-200 transition-colors shadow-xs"
-          title="Ubah Konfigurasi"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-        </button>
-        {onDelete && (
+        <div className="flex items-center justify-between gap-2">
           <button
             type="button"
-            onClick={() => onDelete(device.id)}
-            className="p-2 rounded-lg bg-gray-50 text-gray-600 hover:text-red-600 border border-gray-200 transition-colors shadow-xs"
-            title="Hapus Perangkat"
+            onClick={() => onDownloadManifest(device)}
+            className="btn-secondary btn-sm flex-1 justify-center shadow-2xs text-xs py-1.5"
+            title="Unduh file manifest offline untuk cadangan manual"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5" />
+            <span>Unduh Manifest</span>
           </button>
+          <button
+            type="button"
+            onClick={() => onEdit(device)}
+            className="p-1.5 rounded-lg bg-gray-50 text-gray-600 hover:text-gray-900 border border-gray-200 transition-colors shadow-xs"
+            title="Ubah Konfigurasi"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={() => onDelete(device.id)}
+              className="p-1.5 rounded-lg bg-gray-50 text-gray-600 hover:text-red-600 border border-gray-200 transition-colors shadow-xs"
+              title="Hapus Perangkat"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DevicePairingModal({ device, onClose }) {
+  const defaultHost =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? '192.168.18.87'
+      : window.location.hostname;
+  const [serverHost, setServerHost] = useState(defaultHost);
+  const [copied, setCopied] = useState(false);
+
+  const pairingPayload = useMemo(() => {
+    return JSON.stringify({
+      type: 'passify_gate_pairing',
+      host: serverHost.trim(),
+      device_id: device.id || 'c8b9d319-36e1-4288-b9cf-fe79eaff0001',
+      device_code: device.device_code,
+      device_name: device.device_name,
+      destination_id: device.destination_id || '11111111-1111-1111-1111-111111111111',
+      hmac_key: device.hmac_key || 'passify_secret_key_123'
+    });
+  }, [serverHost, device]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(pairingPayload);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col items-center">
+        {/* Header */}
+        <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
+              <QrCode className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-gray-900">Pairing Scanner Petugas</h3>
+              <p className="text-xs text-gray-500">{device.device_name} • {device.device_code}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* QR Display Container */}
+        <div className="p-4 bg-white rounded-2xl border-2 border-dashed border-emerald-300 shadow-inner my-1 flex flex-col items-center">
+          <QRCodeSVG
+            value={pairingPayload}
+            size={200}
+            level="M"
+            includeMargin={true}
+          />
+          <div className="flex items-center gap-2 mt-3">
+            <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+              {device.device_code}
+            </span>
+            <span className="text-[11px] font-semibold text-gray-500">
+              {device.gate_type === 'entrance' ? 'Pintu Masuk' : 'Pintu Keluar'}
+            </span>
+          </div>
+        </div>
+
+        {/* Server IP Config */}
+        <div className="w-full mt-3">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] font-bold text-gray-700">
+              IP Host Server (Jaringan Wi-Fi):
+            </label>
+            <span className="text-[10px] text-gray-400 font-mono">Port :8081 - :8086</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={serverHost}
+              onChange={(e) => setServerHost(e.target.value)}
+              className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-xs font-mono text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
+              placeholder="192.168.18.87"
+            />
+            <button
+              type="button"
+              onClick={handleCopy}
+              className="btn-secondary btn-sm text-xs py-2 px-3 shrink-0 flex items-center gap-1.5"
+              title="Salin JSON Konfigurasi"
+            >
+              {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Tersalin' : 'Salin JSON'}</span>
+            </button>
+          </div>
+          <p className="text-[10px] text-gray-500 mt-1">
+            *Pastikan HP Scanner dan Laptop Admin berada di jaringan Wi-Fi yang sama ({serverHost}).
+          </p>
+        </div>
+
+        {/* Instructions */}
+        <div className="w-full bg-emerald-50/70 border border-emerald-100 rounded-2xl p-3.5 mt-3.5 text-xs text-emerald-950 space-y-1.5">
+          <p className="font-bold flex items-center gap-1.5 text-emerald-900">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            Langkah Cepat di HP Petugas:
+          </p>
+          <ol className="list-decimal list-inside text-[11px] text-emerald-900/90 space-y-1 ml-1">
+            <li>Buka aplikasi Passify di HP petugas.</li>
+            <li>Tap tombol <strong>"Pairing Gerbang"</strong> di beranda.</li>
+            <li>Arahkan kamera HP ke QR Code di atas.</li>
+            <li>HP otomatis terhubung & men-download tiket manifest hari ini!</li>
+          </ol>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          className="w-full mt-4 btn-secondary py-2.5 justify-center text-xs font-semibold rounded-xl"
+        >
+          Selesai / Tutup
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
+  const [ticketCode, setTicketCode] = useState('');
+  const [selectedDeviceId, setSelectedDeviceId] = useState(devices[0]?.id || '');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState('');
+
+  const handleScan = async (e) => {
+    e.preventDefault();
+    const cleanCode = ticketCode.trim().replace(/^#/, '');
+    if (!cleanCode) {
+      setError('Masukkan kode tiket terlebih dahulu.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const res = await fetch('http://localhost:8086/api/v1/gate/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticket_code: cleanCode,
+          device_id: selectedDeviceId,
+          destination_id: destinationId,
+          scanned_at: new Date().toISOString(),
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setResult(data.data);
+        if (onScanSuccess) onScanSuccess(data.data);
+      } else {
+        setError(data.message || 'Validasi tiket gagal.');
+      }
+    } catch (err) {
+      setError(`Gagal terhubung ke Gate Service: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col">
+        <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
+              <ScanLine className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-gray-900">Simulasi Pemindaian Gerbang</h3>
+              <p className="text-xs text-gray-500">Uji coba validasi scan tiket langsung</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
         )}
+
+        {result && (
+          <div className="mb-4 p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 space-y-1.5 animate-in fade-in">
+            <div className="flex items-center gap-1.5 font-bold text-emerald-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span>{result.message || 'Tiket berhasil divalidasi!'}</span>
+            </div>
+            <div className="text-[11px] text-emerald-700">
+              Kode: <span className="font-mono font-bold">{result.ticket_code}</span> • Pengunjung: {result.visitor_name || 'Wisatawan'}
+            </div>
+          </div>
+        )}
+
+        <form onSubmit={handleScan} className="space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">Pilih Perangkat Gerbang</label>
+            <select
+              value={selectedDeviceId}
+              onChange={(e) => setSelectedDeviceId(e.target.value)}
+              className="w-full text-xs rounded-xl border border-gray-200 p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+            >
+              {devices.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.device_name} ({d.device_code})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1">Kode Tiket Pengunjung</label>
+            <input
+              type="text"
+              value={ticketCode}
+              onChange={(e) => setTicketCode(e.target.value.toUpperCase())}
+              placeholder="Contoh: TWA-QR-21712"
+              className="w-full text-xs font-mono font-bold uppercase rounded-xl border border-gray-200 p-2.5 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+              autoFocus
+            />
+            <p className="text-[11px] text-gray-400 mt-1">
+              Masukkan kode tiket yang tertera pada e-ticket wisatawan.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary text-xs flex-1 justify-center py-2.5 rounded-xl"
+            >
+              Tutup
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-primary text-xs flex-1 justify-center py-2.5 rounded-xl gap-1.5 shadow-xs"
+            >
+              {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ScanLine className="w-4 h-4" />}
+              <span>{loading ? 'Memvalidasi...' : 'Scan / Validasi'}</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
@@ -344,6 +621,8 @@ export default function GatesPage() {
   const [filterDest, setFilterDest] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
+  const [pairingDevice, setPairingDevice] = useState(null);
+  const [showSimulateScanModal, setShowSimulateScanModal] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
   // Load real gate telemetry from backend
@@ -353,9 +632,20 @@ export default function GatesPage() {
         const dests = await fetchAdminDestinations(slug);
         if (dests && dests.length > 0) {
           setDestinations(dests);
-          const { devices: realDevices } = await fetchAdminGateTelemetry(dests[0].id);
+          const { devices: realDevices, stats } = await fetchAdminGateTelemetry(dests[0].id);
           if (realDevices && realDevices.length > 0) {
-            setDevices(realDevices);
+            const gateStatsMap = {};
+            if (stats?.by_gate) {
+              stats.by_gate.forEach((g) => {
+                gateStatsMap[g.device_id] = g.total_scans;
+              });
+            }
+            const mergedDevices = realDevices.map((d) => ({
+              ...d,
+              destination: dests[0].name,
+              total_scans_today: gateStatsMap[d.id] ?? (stats?.total_scans ?? stats?.scans_today ?? 0),
+            }));
+            setDevices(mergedDevices);
           } else {
             // Default initial gate device for new tenant
             setDevices([
@@ -367,7 +657,7 @@ export default function GatesPage() {
                 gate_type: 'entrance',
                 is_active: true,
                 last_sync_at: new Date().toISOString(),
-                total_scans_today: 0,
+                total_scans_today: stats?.total_scans ?? stats?.scans_today ?? 0,
                 hmac_key: `PASSIFY-SEC-${(dests[0].slug || 'DEV').toUpperCase()}`,
               }
             ]);
@@ -378,6 +668,8 @@ export default function GatesPage() {
       }
     }
     loadData();
+    const interval = setInterval(loadData, 3000);
+    return () => clearInterval(interval);
   }, [slug]);
 
   const showToast = (msg) => {
@@ -528,7 +820,7 @@ export default function GatesPage() {
     []
   );
 
-  const totalScans = devices.reduce((sum, d) => sum + d.total_scans_today, 0);
+  const totalScans = devices.reduce((sum, d) => sum + (Number(d.total_scans_today) || 0), 0);
 
   return (
     <div className="flex flex-col gap-6">
@@ -548,15 +840,26 @@ export default function GatesPage() {
           </h1>
         </div>
 
-        <button
-          id="add-gate-device-btn"
-          type="button"
-          onClick={() => setShowAddModal(true)}
-          className="btn-primary btn-sm shadow-2xs"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Registrasi Device Tenant</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowSimulateScanModal(true)}
+            className="btn-secondary btn-sm shadow-2xs gap-1.5"
+            title="Uji coba validasi scan tiket langsung"
+          >
+            <ScanLine className="w-4 h-4 text-emerald-600" />
+            <span>Simulasi Scan Tiket</span>
+          </button>
+          <button
+            id="add-gate-device-btn"
+            type="button"
+            onClick={() => setShowAddModal(true)}
+            className="btn-primary btn-sm shadow-2xs"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Registrasi Device Tenant</span>
+          </button>
+        </div>
       </div>
 
       {/* KPI Cards (Minimalist style) */}
@@ -626,6 +929,7 @@ export default function GatesPage() {
           <DeviceCard
             key={device.id}
             device={device}
+            onPair={setPairingDevice}
             onEdit={setEditingDevice}
             onToggle={handleToggleDevice}
             onDownloadManifest={handleDownloadManifest}
@@ -645,6 +949,12 @@ export default function GatesPage() {
       />
 
       {/* Modals */}
+      {pairingDevice && (
+        <DevicePairingModal
+          device={pairingDevice}
+          onClose={() => setPairingDevice(null)}
+        />
+      )}
       {showAddModal && (
         <AddEditGateModal
           destinations={uniqueDestinations}
@@ -658,6 +968,16 @@ export default function GatesPage() {
           destinations={uniqueDestinations}
           onClose={() => setEditingDevice(null)}
           onSave={handleSaveDevice}
+        />
+      )}
+      {showSimulateScanModal && (
+        <SimulateScanModal
+          devices={devices}
+          destinationId={destinations[0]?.id}
+          onClose={() => setShowSimulateScanModal(false)}
+          onScanSuccess={() => {
+            showToast('Tiket berhasil tervalidasi via simulasi scan!');
+          }}
         />
       )}
     </div>

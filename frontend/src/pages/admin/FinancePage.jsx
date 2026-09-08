@@ -210,7 +210,7 @@ export default function FinancePage() {
         header: 'Pendapatan Kotor',
         cell: (info) => (
           <span className="text-[var(--ink)]">
-            Rp {info.getValue().toLocaleString('id-ID')}
+            Rp {Number(info.getValue() || 0).toLocaleString('id-ID')}
           </span>
         )
       },
@@ -219,7 +219,7 @@ export default function FinancePage() {
         header: 'Biaya Layanan (5%)',
         cell: (info) => (
           <span className="text-red-600 font-mono">
-            -Rp {info.getValue().toLocaleString('id-ID')}
+            -Rp {Number(info.getValue() || 0).toLocaleString('id-ID')}
           </span>
         )
       },
@@ -228,7 +228,7 @@ export default function FinancePage() {
         header: 'Pencairan Bersih (Net)',
         cell: (info) => (
           <span className="font-bold text-[var(--forest)] font-heading text-sm">
-            Rp {info.getValue().toLocaleString('id-ID')}
+            Rp {Number(info.getValue() || 0).toLocaleString('id-ID')}
           </span>
         )
       },
