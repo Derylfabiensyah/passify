@@ -314,11 +314,11 @@ export default function CheckoutPage() {
 
   const selectedSlot = (destination?.time_slots || []).find((s) => s.id === selectedSlotId);
 
-  // Quantity Modifier (Fair Quota: Maks 4 Tiket per Transaksi)
+  // Quantity Modifier (Fair Quota: Maks 5 Tiket per Transaksi)
   const handleQtyChange = (catId, delta) => {
     setFormError('');
-    if (delta > 0 && totals.quantity >= 4) {
-      setFormError('Batas maksimal pembelian adalah 4 tiket per pemesanan agar kuota terbagi adil bagi wisatawan lain.');
+    if (delta > 0 && totals.quantity >= 5) {
+      setFormError('Batas maksimal pembelian adalah 5 tiket per pemesanan agar kuota terbagi adil bagi wisatawan lain.');
       return;
     }
     setQuantities((prev) => {
@@ -347,8 +347,8 @@ export default function CheckoutPage() {
       setFormError('Pilih minimal 1 tiket untuk melanjutkan pemesanan.');
       return;
     }
-    if (totals.quantity > 4) {
-      setFormError('Batas maksimal pembelian adalah 4 tiket per transaksi.');
+    if (totals.quantity > 5) {
+      setFormError('Batas maksimal pembelian adalah 5 tiket per transaksi.');
       return;
     }
     if (!contact.name.trim() || !contact.email.trim() || !contact.phone.trim()) {
@@ -376,7 +376,7 @@ export default function CheckoutPage() {
       });
 
       const alreadyPurchasedQty = existingBookings.reduce((sum, t) => sum + Number(t.totalQty || 0), 0);
-      const MAX_QUOTA_PER_BUYER = 4;
+      const MAX_QUOTA_PER_BUYER = 5;
 
       if (alreadyPurchasedQty >= MAX_QUOTA_PER_BUYER) {
         setFormError(
@@ -772,7 +772,7 @@ export default function CheckoutPage() {
                       </p>
                     </div>
                     <span className="self-start sm:self-auto bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-bold px-2.5 py-1 rounded-full shrink-0">
-                      Maks. 4 Tiket / Pemesan (Fair Quota)
+                      Maks. 5 Tiket / Pemesan (Fair Quota)
                     </span>
                   </div>
                 </div>
