@@ -231,7 +231,7 @@ export default function TravelerAuthPage({ mode }) {
 
       <main className="mx-auto grid min-h-[calc(100vh-68px)] max-w-5xl items-center gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[.78fr_1.22fr] lg:py-14 flex-1">
         {/* Left Side Banner */}
-        <section className="order-2 rounded-3xl bg-[var(--forest-deep)] p-7 text-white shadow-md lg:order-1 lg:p-9 space-y-5">
+        <section className="order-2 rounded-2xl bg-[var(--forest-deep)] p-7 text-white shadow-md lg:order-1 lg:p-9 space-y-5">
           <span className="inline-block text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
             Akses Terpadu Passify
           </span>
@@ -264,7 +264,7 @@ export default function TravelerAuthPage({ mode }) {
         </section>
 
         {/* Right Side Form Card */}
-        <section className="order-1 bg-white p-6 shadow-[0_16px_40px_rgba(16,45,32,.08)] rounded-3xl sm:p-8 lg:order-2 space-y-5">
+        <section className="order-1 bg-white p-6 shadow-[0_16px_40px_rgba(16,45,32,.08)] rounded-2xl sm:p-8 lg:order-2 space-y-5">
           <div>
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--bark)]">
               {isLogin ? 'Autentikasi Akun' : 'Registrasi Wisatawan'}

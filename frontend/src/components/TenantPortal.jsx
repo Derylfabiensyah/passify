@@ -197,7 +197,7 @@ export default function TenantPortal() {
       </header>
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
-        <section className="tenant-primary relative isolate overflow-hidden rounded-[2rem] shadow-[var(--shadow-lift)]">
+        <section className="tenant-primary relative isolate overflow-hidden rounded-2xl shadow-[var(--shadow-lift)]">
           <img
             src={destination.cover_image_url || destination.cover_image || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80'}
             alt={destination.name || 'Pemandangan Wisata Alam'}

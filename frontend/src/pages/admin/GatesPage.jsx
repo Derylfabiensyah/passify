@@ -205,7 +205,7 @@ function DevicePairingModal({ device, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col items-center">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col items-center">
         {/* Header */}
         <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
           <div className="flex items-center gap-2.5">
@@ -384,7 +384,7 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col">
         <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">

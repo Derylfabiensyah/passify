@@ -42,7 +42,7 @@ export default function NotFoundPage() {
       <main className="flex-1 flex items-center justify-center px-6 py-16">
         <div className="max-w-xl w-full text-center">
           {/* Animated Themed Badge */}
-          <div className="inline-flex items-center justify-center p-4 bg-[var(--leaf-pale)] rounded-3xl mb-6 shadow-sm border border-[var(--leaf)]/20 animate-bounce duration-1000">
+          <div className="inline-flex items-center justify-center p-4 bg-[var(--leaf-pale)] rounded-2xl mb-6 shadow-sm border border-[var(--leaf)]/20 animate-bounce duration-1000">
             <div className="w-16 h-16 rounded-2xl bg-[var(--forest-deep)] text-[var(--leaf)] flex items-center justify-center shadow-md">
               <Compass className="w-8 h-8 animate-spin duration-3000" />
             </div>

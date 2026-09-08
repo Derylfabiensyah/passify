@@ -681,7 +681,7 @@ export default function CheckoutPage() {
             {/* Left 2 Cols: Form Sections */}
             <div className="lg:col-span-2 space-y-6">
               {/* Destination Card Banner */}
-              <div className="rounded-3xl bg-white p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-start sm:items-center border border-[var(--border)]">
+              <div className="rounded-2xl bg-white p-6 shadow-sm flex flex-col sm:flex-row gap-5 items-start sm:items-center border border-[var(--border)]">
                 <img
                   src={
                     destination.cover_image_url ||
@@ -710,7 +710,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Section 1: Jadwal & Sesi Kunjungan */}
-              <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
                   <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]">
                     <Calendar className="h-5 w-5" />
@@ -799,7 +799,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Section 2: Pilihan Kategori Tiket */}
-              <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
                   <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]">
                     <Ticket className="h-5 w-5" />
@@ -864,7 +864,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Section 3: Data Kontak Pemesan */}
-              <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
                   <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]">
                     <User className="h-5 w-5" />
@@ -923,7 +923,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Section 4: Data Pengunjung per Tiket (Asuransi Jasa Raharja) */}
-              <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
                   <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]">
                     <ShieldCheck className="h-5 w-5 text-[var(--bark)]" />
@@ -982,7 +982,7 @@ export default function CheckoutPage() {
 
             {/* Right Col: Sticky Price Breakdown & Action */}
             <div className="space-y-6">
-              <div className="sticky top-24 rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="sticky top-24 rounded-2xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <h3 className="text-base font-bold text-[var(--forest-deep)] pb-3 border-b border-gray-100">
                   Ringkasan Pemesanan
                 </h3>
@@ -1071,7 +1071,7 @@ export default function CheckoutPage() {
             {/* Left 2 Cols: Payment Selection */}
             <div className="lg:col-span-2 space-y-6">
               {/* 1. Redis Distributed Lock: 5-Minute Checkout Lock (PDF Spec Hal. 4 Poin 7.A) */}
-              <div className="rounded-3xl bg-[var(--forest-deep)] text-white p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="rounded-2xl bg-[var(--forest-deep)] text-white p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-[var(--leaf)]">
@@ -1097,7 +1097,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Payment Methods Card */}
-              <div className="rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <div className="flex items-center justify-between pb-4 border-b border-gray-100">
                   <h2 className="text-base font-bold text-[var(--forest-deep)]">Pilih Metode Pembayaran</h2>
                   <span className="text-xs text-[var(--ink-soft)]">Midtrans Payment Gateway</span>
@@ -1202,7 +1202,7 @@ export default function CheckoutPage() {
 
             {/* Right Col: Pay Summary & Action Button */}
             <div className="space-y-6">
-              <div className="sticky top-24 rounded-3xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
+              <div className="sticky top-24 rounded-2xl bg-white p-6 sm:p-7 shadow-sm space-y-5">
                 <h3 className="text-base font-bold text-[var(--forest-deep)] pb-3 border-b border-gray-100">
                   Rincian Tagihan Akhir
                 </h3>
@@ -1277,7 +1277,7 @@ export default function CheckoutPage() {
         {/* ========================================================================= */}
         {step === 3 && completedOrder && (
           <div className="max-w-xl mx-auto py-8">
-            <div className="rounded-3xl bg-white p-8 sm:p-10 shadow-sm text-center space-y-6">
+            <div className="rounded-2xl bg-white p-8 sm:p-10 shadow-sm text-center space-y-6">
               {/* Success Badge Icon */}
               <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-50 text-emerald-600 shadow-sm animate-bounce-short">
                 <CheckCircle2 className="h-10 w-10" />
@@ -1353,7 +1353,7 @@ export default function CheckoutPage() {
         {/* Midtrans Snap Interactive Simulator Modal (Fallback / Sandbox) */}
         {showSnapModal && snapData && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
-            <div className="w-full max-w-md rounded-3xl bg-white p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,.25)] space-y-6 animate-scale-in text-[var(--ink)]">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,.25)] space-y-6 animate-scale-in text-[var(--ink)]">
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-4 border-b border-gray-100">
                 <div className="flex items-center gap-2.5">
@@ -1445,7 +1445,7 @@ export default function CheckoutPage() {
         {/* ========================================================================= */}
         {inWaitingRoom && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
-            <div className="w-full max-w-md rounded-3xl bg-white p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,.25)] space-y-6 animate-scale-in text-[var(--ink)] text-center">
+            <div className="w-full max-w-md rounded-2xl bg-white p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,.25)] space-y-6 animate-scale-in text-[var(--ink)] text-center">
               <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-amber-50 text-amber-600 animate-pulse">
                 <Users className="h-8 w-8" />
               </div>

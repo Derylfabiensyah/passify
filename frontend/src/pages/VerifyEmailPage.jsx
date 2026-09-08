@@ -57,7 +57,7 @@ export default function VerifyEmailPage() {
 
       {/* Main Content */}
       <main className="mx-auto w-full max-w-lg px-4 py-12 flex-1 flex items-center justify-center">
-        <div className="w-full rounded-3xl bg-white p-8 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)] text-center">
+        <div className="w-full rounded-2xl bg-white p-8 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)] text-center">
           {/* Loading State */}
           {status === 'loading' && (
             <div>

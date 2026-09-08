@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 export function StatCardSkeleton() {
   return (
@@ -50,7 +50,7 @@ export function PortalPageSkeleton() {
 
       {/* Hero banner skeleton */}
       <div className="max-w-[1240px] mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div className="h-80 rounded-[2rem] bg-[var(--forest-deep)]/90 p-8 flex flex-col justify-end gap-4">
+        <div className="h-80 rounded-2xl bg-[var(--forest-deep)]/90 p-8 flex flex-col justify-end gap-4">
           <div className="w-28 h-6 rounded-full bg-white/20" />
           <div className="w-2/3 h-10 rounded-xl bg-white/20" />
           <div className="w-1/2 h-4 rounded-md bg-white/10" />

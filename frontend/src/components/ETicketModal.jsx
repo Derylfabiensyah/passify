@@ -157,7 +157,7 @@ export default function ETicketModal({ order, onClose }) {
       onClose={onClose}
       size="md"
       showCloseButton={false}
-      className="p-0 overflow-hidden bg-white shadow-2xl rounded-3xl"
+      className="p-0 overflow-hidden bg-white shadow-2xl rounded-2xl"
       ariaLabel={`E-Ticket ${order.destinationName}`}
     >
       <div>
@@ -188,7 +188,7 @@ export default function ETicketModal({ order, onClose }) {
         <div className="p-6 sm:p-7 space-y-5">
           {/* Dynamic QR or Used Display Box */}
           {isUsed ? (
-            <div className="rounded-3xl bg-emerald-50/80 border border-emerald-200/60 p-6 text-center space-y-3">
+            <div className="rounded-2xl bg-emerald-50/80 border border-emerald-200/60 p-6 text-center space-y-3">
               <div className="mx-auto w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
@@ -203,7 +203,7 @@ export default function ETicketModal({ order, onClose }) {
               </div>
             </div>
           ) : (
-            <div className="rounded-3xl bg-[var(--fog)] p-5 text-center space-y-4">
+            <div className="rounded-2xl bg-[var(--fog)] p-5 text-center space-y-4">
               <div
                 className="relative mx-auto grid h-52 w-52 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm select-none"
                 onContextMenu={(e) => e.preventDefault()}

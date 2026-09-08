@@ -145,7 +145,7 @@ export default function ModalWrapper({
         aria-labelledby={generatedTitleId}
         aria-label={!generatedTitleId ? (ariaLabel || (typeof title === 'string' ? title : 'Dialog Modal')) : undefined}
         tabIndex={-1}
-        className={`modal-content relative w-full ${resolvedMaxWidth} max-h-[90vh] overflow-y-auto bg-white rounded-3xl sm:rounded-2xl shadow-2xl border border-gray-200/80 outline-none animate-in zoom-in-95 duration-200 ${className}`}
+        className={`modal-content relative w-full ${resolvedMaxWidth} max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-gray-200/80 outline-none animate-in zoom-in-95 duration-200 ${className}`}
       >
         {/* Custom Header or Default Header if title/close button provided */}
         {customHeader ? (

@@ -368,7 +368,7 @@ function PortalLivePreview({ destination, template }) {
 
             {/* Desktop Hero Section */}
             <div className="p-6">
-              <div className="relative isolate overflow-hidden rounded-3xl p-6 text-white" style={{ backgroundColor: primaryBg }}>
+              <div className="relative isolate overflow-hidden rounded-2xl p-6 text-white" style={{ backgroundColor: primaryBg }}>
                 <img
                   src={coverImage}
                   alt=""

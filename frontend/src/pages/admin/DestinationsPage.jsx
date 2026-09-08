@@ -324,7 +324,7 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
 
   return (
     <div className="modal-overlay z-50 flex items-center justify-center p-4">
-      <div className="modal-content bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="modal-content bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         <div className="bg-[var(--forest-deep)] text-white p-5 flex items-center justify-between">
           <h3 className="text-base font-bold font-serif">
             {cat?.id ? 'Edit Kategori Tiket' : 'Tambah Kategori Tiket Baru'}

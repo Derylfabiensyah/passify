@@ -229,7 +229,7 @@ export default function RegisterTenantPage() {
 
         {/* Step 1: Data Akun */}
         {step === 1 && (
-          <div className="rounded-3xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)]">
+          <div className="rounded-2xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)]">
             <div className="mb-6">
               <h1 className="text-3xl font-bold tracking-tight text-[var(--ink)]">
                 Daftarkan Wisata Alam Anda
@@ -366,7 +366,7 @@ export default function RegisterTenantPage() {
 
         {/* Step 2: Data Wisata */}
         {step === 2 && (
-          <div className="rounded-3xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)]">
+          <div className="rounded-2xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)]">
             <div className="mb-6">
               <h1 className="text-3xl font-bold tracking-tight text-[var(--ink)]">
                 Identitas Destinasi & Domain
@@ -499,7 +499,7 @@ export default function RegisterTenantPage() {
 
         {/* Step 3: Success Confirmation */}
         {step === 3 && (
-          <div className="rounded-3xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)] text-center">
+          <div className="rounded-2xl bg-white p-6 sm:p-10 shadow-[0_16px_40px_rgba(16,45,32,.08)] text-center">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-xs">
               <Mail className="h-8 w-8" />
             </div>

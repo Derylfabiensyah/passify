@@ -150,7 +150,7 @@ export default function TravelerPortal() {
           </label>
         </section>
 
-        <section className="relative isolate overflow-hidden rounded-[2rem] bg-[var(--forest-deep)] shadow-[var(--shadow-lift)]">
+        <section className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest-deep)] shadow-[var(--shadow-lift)]">
           {destination.cover_image_url && <img src={destination.cover_image_url} alt="" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-35 saturate-[.7]" />}
           <div className="absolute inset-0 -z-10 bg-[linear-gradient(105deg,rgba(16,45,32,.98),rgba(16,45,32,.82)_50%,rgba(16,45,32,.48))]" />
           <div className="grid gap-8 px-6 py-8 sm:px-9 sm:py-10 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-end lg:gap-12 lg:px-12 lg:py-14">
