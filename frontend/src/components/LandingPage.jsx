@@ -24,15 +24,15 @@ const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?
 const trailImage = 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=85';
 
 function Eyebrow({ children, className = '' }) {
-  return <p className={`eyebrow ${className}`}>{children}</p>;
+  return <p className={`eyebrow !text-emerald-800 ${className}`}>{children}</p>;
 }
 
 function SectionHeading({ eyebrow, title, children, className = '' }) {
   return (
     <div className={className}>
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 className="mt-3 max-w-3xl font-sans text-4xl font-bold leading-[1.02] tracking-[-.045em] sm:text-5xl">{title}</h2>
-      {children && <p className="mt-5 max-w-2xl text-sm leading-6 text-[var(--ink-soft)] sm:text-[15px] sm:leading-7">{children}</p>}
+      <h2 className="mt-3 max-w-3xl font-sans text-4xl font-black leading-[1.02] tracking-[-.045em] text-[#14281a] sm:text-5xl">{title}</h2>
+      {children && <p className="mt-5 max-w-2xl text-sm font-medium leading-6 text-[#2d3728] sm:text-[15px] sm:leading-7">{children}</p>}
     </div>
   );
 }
@@ -72,25 +72,25 @@ export default function LandingPage() {
 
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-transparent text-[var(--ink)]">
-      <header className="nav-bar sticky top-0 z-40">
+      <header className="sticky top-0 z-40 border-b border-white/80 bg-white/85 backdrop-blur-2xl shadow-xs transition-all">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline" aria-label="Passify beranda">
+          <Link to="/" className="text-2xl font-black tracking-[-.05em] text-[#14281a] no-underline" aria-label="Passify beranda">
             passify
           </Link>
 
-          <nav className="hidden items-center gap-6 text-xs font-bold text-[var(--ink-soft)] lg:flex" aria-label="Navigasi utama">
+          <nav className="hidden items-center gap-6 text-xs font-bold text-[#14281a] lg:flex" aria-label="Navigasi utama">
             {navLinks.map((link, idx) => (
-              <a key={idx} href={link.href} className="transition-colors hover:text-[var(--forest)]">
+              <a key={idx} href={link.href} className="transition-colors hover:text-emerald-700">
                 {link.label}
               </a>
             ))}
           </nav>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <Link to="/jelajah" className="hidden text-xs font-bold text-[var(--ink-soft)] transition-colors hover:text-[var(--forest)] sm:inline">
+            <Link to="/jelajah" className="hidden text-xs font-bold text-[#14281a] transition-colors hover:text-emerald-700 sm:inline">
               Jelajah Wisata
             </Link>
-            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px]">
+            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px] font-bold shadow-xs">
               Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
 
@@ -98,7 +98,7 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-[var(--forest-deep)] hover:bg-transparent border border-[var(--border)] transition-colors"
+              className="lg:hidden p-2 rounded-xl text-[#14281a] hover:bg-white/60 border border-gray-200/90 transition-colors"
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? 'Tutup navigasi mobile' : 'Buka navigasi mobile'}
             >
@@ -296,39 +296,57 @@ export default function LandingPage() {
                 { index: '01', title: 'Ruang yang tidak bisa ditambah', text: 'Daya dukung menentukan berapa banyak orang yang dapat hadir tanpa mengubah pengalaman atau ekosistem kawasan.' },
                 { index: '02', title: 'Hari lapangan tidak selalu tersambung', text: 'Gerbang tetap harus bergerak ketika sinyal hilang, antrean datang, dan petugas membutuhkan jawaban yang cepat.' },
                 { index: '03', title: 'Kepercayaan perlu jejak yang jelas', text: 'Komponen tiket, transaksi, dan pencairan perlu mudah dibaca tanpa menambah pekerjaan administratif.' },
-              ].map(({ index, title, text }) => <article key={index} className="card p-6 sm:p-7"><div><span className="text-[11px] font-extrabold tracking-[.12em] text-[var(--bark)]">{index}</span></div><h3 className="mt-9 text-2xl font-bold leading-tight">{title}</h3><p className="mt-3 text-sm leading-6 text-[var(--ink-soft)]">{text}</p></article>)}
+              ].map(({ index, title, text }) => (
+                <article key={index} className="glass-panel p-6 sm:p-7 hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
+                  <div>
+                    <span className="inline-block rounded-lg bg-emerald-100/90 px-2.5 py-1 text-xs font-black tracking-[.14em] text-emerald-800 border border-emerald-200/60">
+                      {index}
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-2xl font-black leading-tight text-[#14281a]">{title}</h3>
+                  <p className="mt-3 text-sm font-medium leading-6 text-[#2d3728]">{text}</p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
 
         <section id="alur" className="scroll-mt-24 bg-transparent">
           <div className="mx-auto grid max-w-[1240px] gap-12 px-4 py-16 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-start lg:gap-20 lg:px-8 lg:py-24">
-            <SectionHeading eyebrow="Satu alur, bukan banyak alat" title="Dari rencana pengunjung sampai rekonsiliasi hari ini.">Passify membantu kawasan merespons dengan satu sumber informasi yang samaâ€”di portal, di gerbang, dan pada laporan pengelola.</SectionHeading>
-            <div>
+            <SectionHeading eyebrow="Satu alur, bukan banyak alat" title="Dari rencana pengunjung sampai rekonsiliasi hari ini.">Passify membantu kawasan merespons dengan satu sumber informasi yang sama — di portal, di gerbang, dan pada laporan pengelola.</SectionHeading>
+            <div className="space-y-4">
               {[
                 { number: '01', title: 'Pengunjung memilih waktu yang masih masuk akal', text: 'Reservasi mengikuti tanggal, sesi, jalur, atau aktivitas yang Anda atur untuk kawasan.' },
                 { number: '02', title: 'Gerbang memvalidasi tanpa menunggu kondisi ideal', text: 'Tiket dinamis tetap dapat diperiksa di lapangan dan diselaraskan ketika koneksi tersedia kembali.' },
                 { number: '03', title: 'Pendapatan kembali dalam gambaran yang bisa ditindak', text: 'Komponen penjualan dan settlement disusun agar tim memahami apa yang terjadi, bukan sekadar melihat angka.' },
-              ].map(({ number, title, text }) => <article key={number} className="grid gap-4 py-7 sm:grid-cols-[46px_1fr] sm:items-start sm:gap-5"><span className="text-2xl font-bold tracking-[-.04em] text-[var(--bark)]">{number}</span><div><h3 className="font-sans text-xl font-bold leading-snug tracking-[-.035em]">{title}</h3><p className="mt-2 max-w-xl text-sm leading-6 text-[var(--ink-soft)]">{text}</p></div></article>)}
-              <div className="mt-7 rounded-2xl glass-card-dark p-5 text-white sm:p-6">
-                <div className="flex items-center justify-between gap-4 pb-4">
+              ].map(({ number, title, text }) => (
+                <article key={number} className="glass-panel p-5 sm:p-6 rounded-2xl grid gap-4 sm:grid-cols-[46px_1fr] sm:items-start sm:gap-5 shadow-xs hover:shadow-md transition-all">
+                  <span className="text-2xl font-black tracking-[-.04em] text-emerald-800">{number}</span>
+                  <div>
+                    <h3 className="font-sans text-xl font-black leading-snug tracking-[-.035em] text-[#14281a]">{title}</h3>
+                    <p className="mt-2 max-w-xl text-sm font-medium leading-6 text-[#2d3728]">{text}</p>
+                  </div>
+                </article>
+              ))}
+              <div className="mt-7 rounded-2xl glass-card-dark p-5 text-white sm:p-6 shadow-2xl">
+                <div className="flex items-center justify-between gap-4 pb-4 border-b border-white/15">
                   <div>
                     <Eyebrow className="!text-emerald-300">Simulasi operasional</Eyebrow>
-                    <p className="mt-1 text-2xl font-bold tracking-[-.045em] text-white">Gerbang selatan siap menerima</p>
+                    <p className="mt-1 text-2xl font-black tracking-[-.045em] text-white">Gerbang selatan siap menerima</p>
                   </div>
                   <CloudOff className="h-5 w-5 shrink-0 text-emerald-300" />
                 </div>
                 <div className="mt-5 grid grid-cols-2 gap-3">
                   <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
                     <span className="text-[10px] font-extrabold uppercase tracking-wide text-white/70">Scan terakhir</span>
-                    <strong className="mt-2 block text-xl text-white">08:42</strong>
+                    <strong className="mt-2 block text-xl font-black text-white">08:42</strong>
                   </div>
                   <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-4">
                     <span className="text-[10px] font-extrabold uppercase tracking-wide text-white/70">Sesi pagi</span>
-                    <strong className="mt-2 block text-xl text-white">142 / 200</strong>
+                    <strong className="mt-2 block text-xl font-black text-white">142 / 200</strong>
                   </div>
                 </div>
-                <p className="mt-4 text-xs leading-5 text-white/75">
+                <p className="mt-4 text-xs font-medium leading-5 text-white/80">
                   Contoh tampilan status; data akan diselaraskan saat koneksi tersedia.
                 </p>
               </div>
@@ -347,25 +365,25 @@ export default function LandingPage() {
               </SectionHeading>
               <Link
                 to="/jelajah"
-                className="mt-7 inline-flex items-center gap-2 pb-1 text-sm font-extrabold text-[var(--forest)] transition-colors hover:text-[var(--bark)]"
+                className="mt-7 inline-flex items-center gap-2 pb-1 text-sm font-extrabold text-emerald-800 transition-colors hover:text-emerald-950"
               >
                 Buka contoh portal wisatawan <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
 
-            <div className="overflow-hidden rounded-2xl glass-panel p-6 sm:p-8">
+            <div className="overflow-hidden rounded-3xl glass-panel p-6 sm:p-8 shadow-xl border border-white/80">
               {/* Header Card */}
-              <div className="flex items-start justify-between gap-4 pb-5">
+              <div className="flex items-start justify-between gap-4 pb-5 border-b border-black/[0.08] dark:border-white/10">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[var(--bark)] text-[var(--forest-deep)] shadow-xs">
-                    <Trees className="h-5 w-5" />
+                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-emerald-800 text-white shadow-sm">
+                    <Trees className="h-5 w-5 text-emerald-200" />
                   </span>
                   <span>
-                    <span className="block text-sm font-extrabold text-[var(--forest-deep)]">Rimba Senja</span>
-                    <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[.13em] text-[var(--ink-soft)]">Taman wisata alam</span>
+                    <span className="block text-sm font-black text-[#14281a]">Rimba Senja</span>
+                    <span className="mt-0.5 block text-[10px] font-extrabold uppercase tracking-[.13em] text-emerald-800/80">Taman wisata alam</span>
                   </span>
                 </div>
-                <span className="inline-flex items-center rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)]">
+                <span className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-emerald-800 border border-emerald-200/60">
                   Portal contoh
                 </span>
               </div>
@@ -374,34 +392,34 @@ export default function LandingPage() {
               <div className="grid gap-6 py-8 sm:grid-cols-2 sm:items-end">
                 <div>
                   <Eyebrow>Rencana kunjungan</Eyebrow>
-                  <p className="mt-3 text-3xl font-bold leading-[1.05] tracking-[-.045em] text-[var(--forest-deep)] sm:text-4xl">
+                  <p className="mt-3 text-3xl font-black leading-[1.05] tracking-[-.045em] text-[#14281a] sm:text-4xl">
                     Hari yang baik dimulai dari kuota yang jelas.
                   </p>
-                  <p className="mt-4 text-xs leading-5 text-[var(--ink-soft)]">
+                  <p className="mt-4 text-xs font-medium leading-5 text-[#2d3728]">
                     Pilih tanggal dan sesi yang sesuai dengan rencana perjalanan Anda.
                   </p>
                 </div>
                 
                 {/* Sesi Box */}
-                <div className="rounded-2xl bg-[var(--bark-pale)] p-5">
-                  <span className="text-[10px] font-extrabold uppercase tracking-wide text-[var(--bark)]">
+                <div className="rounded-2xl bg-white/70 backdrop-blur-md p-5 border border-white/80 shadow-2xs">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#3b4836]">
                     Contoh sesi tersisa
                   </span>
-                  <strong className="mt-2 block text-4xl font-bold tracking-[-.05em] text-[var(--forest-deep)]">
+                  <strong className="mt-2 block text-4xl font-black tracking-[-.05em] text-[#14281a]">
                     58
                   </strong>
-                  <span className="text-xs font-semibold text-[var(--ink-soft)]">
+                  <span className="text-xs font-bold text-[#3b4836]">
                     pengunjung
                   </span>
                 </div>
               </div>
 
               {/* Footer Card */}
-              <div className="flex items-center justify-between pt-5 text-xs font-bold">
-                <span className="text-[var(--ink-soft)] font-semibold">Mulai Rp35.000 / orang</span>
+              <div className="flex items-center justify-between pt-5 border-t border-black/[0.08] dark:border-white/10 text-xs font-bold">
+                <span className="text-[#14281a] font-bold text-sm">Mulai Rp35.000 / orang</span>
                 <Link
                   to="/pesan/curug-bidadari"
-                  className="inline-flex items-center rounded-xl bg-[var(--forest)] px-4 py-2.5 text-white transition-colors hover:bg-[var(--forest-deep)] shadow-xs no-underline font-bold"
+                  className="btn-primary rounded-xl px-4 py-2.5 text-white transition-colors shadow-xs no-underline font-bold"
                 >
                   Pilih tanggal
                 </Link>
@@ -433,94 +451,96 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="text-[var(--forest-deep)] pt-16 pb-12">
+      <footer className="pb-14 pt-4 sm:pb-16 sm:pt-6">
         <div className="mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-8">
-          {/* Main Footer Grid */}
-          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-5 pb-12 border-b border-[var(--forest)]/10">
-            {/* Column 1: Brand & Identity */}
-            <div className="lg:col-span-2 space-y-4">
-              <Link to="/" className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline inline-block">
-                passify
-              </Link>
-              <p className="text-sm leading-6 text-[var(--ink-soft)] max-w-sm">
-                Platform SaaS White-Label E-Ticketing & Manajemen Kuota Wisata Alam. Dirancang tangguh di lapangan dengan teknologi offline-first, dynamic TOTP QR, dan ekosistem pembayaran terpadu.
-              </p>
+          <div className="glass-panel rounded-3xl p-8 sm:p-12 shadow-xl border border-white/80">
+            {/* Main Footer Grid */}
+            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 pb-10 border-b border-black/[0.08] dark:border-white/10">
+              {/* Column 1: Brand & Identity */}
+              <div className="lg:col-span-2 space-y-4">
+                <Link to="/" className="text-2xl font-black tracking-[-.05em] text-[#14281a] no-underline inline-block hover:opacity-90">
+                  passify
+                </Link>
+                <p className="text-sm font-medium leading-relaxed text-[#2d3728] max-w-sm">
+                  Platform SaaS White-Label E-Ticketing & Manajemen Kuota Wisata Alam. Dirancang tangguh di lapangan dengan teknologi offline-first, dynamic TOTP QR, dan ekosistem pembayaran terpadu.
+                </p>
+              </div>
+
+              {/* Column 2: Solusi Kawasan */}
+              <div>
+                <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
+                  Solusi Kawasan
+                </h4>
+                <ul className="space-y-2.5 text-sm font-semibold text-[#3b4836]">
+                  <li><a href="#masalah" className="hover:text-emerald-800 transition-colors">Daya Dukung & Kuota</a></li>
+                  <li><a href="#alur" className="hover:text-emerald-800 transition-colors">Validasi Gate Offline</a></li>
+                  <li><a href="#white-label" className="hover:text-emerald-800 transition-colors">Portal White-Label</a></li>
+                  <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">E-Ticket QR Dinamis</Link></li>
+                  <li><span className="text-[#6e7a63]">Rekonsiliasi Kas Otomatis</span></li>
+                </ul>
+              </div>
+
+              {/* Column 3: Akses Cepat */}
+              <div>
+                <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
+                  Akses & Portal
+                </h4>
+                <ul className="space-y-2.5 text-sm font-semibold text-[#3b4836]">
+                  <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">Portal Wisatawan</Link></li>
+                  <li><Link to="/daftar-wisata" className="hover:text-emerald-800 transition-colors">Daftarkan Wisata Baru</Link></li>
+                  <li><Link to="/masuk" className="hover:text-emerald-800 transition-colors">Masuk Petugas / Admin</Link></li>
+                  <li><Link to="/verifikasi-email" className="hover:text-emerald-800 transition-colors">Aktivasi Akun Pengelola</Link></li>
+                </ul>
+              </div>
+
+              {/* Column 4: Kontak & Dukungan */}
+              <div>
+                <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
+                  Hubungi Kami
+                </h4>
+                <ul className="space-y-3.5 text-sm font-semibold text-[#3b4836]">
+                  <li className="flex items-center gap-2.5">
+                    <Mail className="h-4 w-4 text-emerald-700 shrink-0" />
+                    <a href="mailto:hello@passify.id" className="hover:text-emerald-800 transition-colors">hello@passify.id</a>
+                  </li>
+                  <li className="flex items-center gap-2.5">
+                    <Globe className="h-4 w-4 text-emerald-700 shrink-0" />
+                    <span className="text-[#2d3728]">Indonesia (BKSDA & BUMDes)</span>
+                  </li>
+                </ul>
+              </div>
             </div>
 
-            {/* Column 2: Solusi Kawasan */}
-            <div>
-              <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
-                Solusi Kawasan
-              </h4>
-              <ul className="space-y-2.5 text-sm text-[var(--ink-soft)]">
-                <li><a href="#masalah" className="hover:text-[var(--forest)] transition-colors">Daya Dukung & Kuota</a></li>
-                <li><a href="#alur" className="hover:text-[var(--forest)] transition-colors">Validasi Gate Offline</a></li>
-                <li><a href="#white-label" className="hover:text-[var(--forest)] transition-colors">Portal White-Label</a></li>
-                <li><Link to="/jelajah" className="hover:text-[var(--forest)] transition-colors">E-Ticket QR Dinamis</Link></li>
-                <li><span className="text-[var(--ink-muted)]">Rekonsiliasi Kas Otomatis</span></li>
-              </ul>
-            </div>
-
-            {/* Column 3: Akses Cepat */}
-            <div>
-              <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
-                Akses & Portal
-              </h4>
-              <ul className="space-y-2.5 text-sm text-[var(--ink-soft)]">
-                <li><Link to="/jelajah" className="hover:text-[var(--forest)] transition-colors">Portal Wisatawan</Link></li>
-                <li><Link to="/daftar-wisata" className="hover:text-[var(--forest)] transition-colors">Daftarkan Wisata Baru</Link></li>
-                <li><Link to="/masuk" className="hover:text-[var(--forest)] transition-colors">Masuk Petugas / Admin</Link></li>
-                <li><Link to="/verifikasi-email" className="hover:text-[var(--forest)] transition-colors">Aktivasi Akun Pengelola</Link></li>
-              </ul>
-            </div>
-
-            {/* Column 4: Kontak & Dukungan */}
-            <div>
-              <h4 className="text-xs font-extrabold uppercase tracking-[.14em] text-[var(--leaf)] mb-4">
-                Hubungi Kami
-              </h4>
-              <ul className="space-y-3 text-sm text-[var(--ink-soft)]">
-                <li className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-[var(--leaf)] shrink-0" />
-                  <a href="mailto:hello@passify.id" className="hover:text-[var(--forest)] transition-colors">hello@passify.id</a>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-[var(--leaf)] shrink-0" />
-                  <span className="text-[var(--ink-soft)]">Indonesia (BKSDA & BUMDes)</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--forest-deep)]/60">
-            <p>Â© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
-            <div className="flex gap-6 font-medium">
-              <button
-                type="button"
-                onClick={() => openLegal('privacy')}
-                className="hover:text-[var(--forest)] transition-colors cursor-pointer"
-              >
-                Kebijakan Privasi
-              </button>
-              <button
-                type="button"
-                onClick={() => openLegal('terms')}
-                className="hover:text-[var(--forest)] transition-colors cursor-pointer"
-              >
-                Syarat Penggunaan
-              </button>
-              <button
-                type="button"
-                onClick={() => openLegal('help')}
-                className="hover:text-[var(--forest)] transition-colors cursor-pointer"
-              >
+            {/* Bottom Bar */}
+            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#3b4836]">
+              <p>© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
+              <div className="flex gap-6 font-bold text-[#14281a]">
+                <button
+                  type="button"
+                  onClick={() => openLegal('privacy')}
+                  className="hover:text-emerald-800 transition-colors cursor-pointer"
+                >
+                  Kebijakan Privasi
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openLegal('terms')}
+                  className="hover:text-emerald-800 transition-colors cursor-pointer"
+                >
+                  Syarat Penggunaan
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openLegal('help')}
+                  className="hover:text-emerald-800 transition-colors cursor-pointer"
+                >
                 Pusat Bantuan
               </button>
             </div>
           </div>
         </div>
-      </footer>
+      </div>
+    </footer>
 
       <LegalModal
         isOpen={legalModal.open}
