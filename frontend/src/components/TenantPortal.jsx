@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -89,26 +89,26 @@ export default function TenantPortal() {
   };
 
   return (
-    <div className="tenant-portal min-h-screen bg-[var(--canvas)] text-[var(--ink)]" style={portalStyle}>
+    <div className="tenant-portal min-h-screen bg-transparent text-[var(--ink)]" style={portalStyle}>
       {/* Pengelola Top Bar (Only visible for Tenant Admins) */}
       {isManager && (
-        <div className="tenant-primary text-[var(--forest-deep)] px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-white/10 shadow-xs">
+        <div className="bg-[#14281a] text-white px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 border-b border-white/10 shadow-xs">
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="font-bold">Template Website Resmi: {destination.name}</span>
-            <span className="hidden sm:inline text-[var(--forest-deep)]/60">({destination.slug}.passify.id)</span>
+            <span className="hidden sm:inline text-white/70">({destination.slug}.passify.id)</span>
           </div>
           <div className="flex items-center gap-3">
             <Link
               to="/admin"
-              className="btn-primary text-[11px] py-1 px-3.5 rounded-xl flex items-center gap-1.5 no-underline font-bold shadow-xs"
+              className="bg-white/15 hover:bg-white/25 text-white border border-white/20 text-[11px] py-1 px-3.5 rounded-xl flex items-center gap-1.5 no-underline font-bold shadow-xs transition-all"
             >
-              <LayoutDashboard className="h-3.5 w-3.5" /> Buka Dashboard Admin
+              <LayoutDashboard className="h-3.5 w-3.5 text-emerald-300" /> Buka Dashboard Admin
             </Link>
             <Link
               to="/"
               onClick={() => localStorage.removeItem('passify_current_tenant')}
-              className="text-[var(--forest-deep)]/75 hover:text-[var(--forest-deep)] text-xs no-underline font-medium"
+              className="text-white/80 hover:text-white text-xs no-underline font-medium transition-colors"
             >
               Beranda Utama Passify
             </Link>
@@ -116,17 +116,17 @@ export default function TenantPortal() {
         </div>
       )}
 
-      <header className="nav-bar sticky top-0 z-40">
+      <header className="sticky top-0 z-40 border-b border-white/80 bg-white/85 backdrop-blur-2xl shadow-xs transition-all">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-3 no-underline">
-            <span className="tenant-primary grid h-10 w-10 shrink-0 place-items-center rounded-2xl text-[var(--forest-deep)]">
+          <Link to="/" className="flex min-w-0 items-center gap-3 no-underline group">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-emerald-800 text-white shadow-sm group-hover:scale-105 transition-transform">
               <Compass className="h-4 w-4" />
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-lg font-bold text-[var(--forest-deep)] sm:text-xl">
+              <span className="block truncate text-lg font-black text-[#14281a] sm:text-xl">
                 {destination.name}
               </span>
-              <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-[var(--ink-soft)]">
+              <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-emerald-800/80">
                 {portalEyebrow}
               </span>
             </span>
@@ -135,10 +135,10 @@ export default function TenantPortal() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
               title="Lihat riwayat pesanan dan e-tiket saya"
             >
-              <Ticket className="h-3.5 w-3.5 text-[var(--forest)]" />
+              <Ticket className="h-3.5 w-3.5 text-emerald-700" />
               <span className="hidden sm:inline">Riwayat Pesanan</span>
               <span className="sm:hidden">Pesanan</span>
             </Link>
@@ -146,17 +146,17 @@ export default function TenantPortal() {
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
               title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
             >
-              <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />
-              <span className="hidden sm:inline">Dompet:</span> <span>{rupiah(walletBalance)}</span>
+              <Wallet className="h-3.5 w-3.5 text-emerald-700" />
+              <span className="hidden sm:inline">Dompet:</span> <span className="font-extrabold text-emerald-800">{rupiah(walletBalance)}</span>
             </button>
 
             {isManager && (
               <Link
                 to="/admin"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl no-underline hover:bg-[var(--sand)]"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 px-3 py-1.5 rounded-xl no-underline hover:border-gray-300 transition-all shadow-2xs"
               >
                 <LayoutDashboard className="h-3.5 w-3.5 text-[var(--forest)]" /> Dashboard Admin
               </Link>
@@ -243,22 +243,22 @@ export default function TenantPortal() {
             </div>
 
             {template.show_availability !== false && (
-              <div className="glass-panel rounded-2xl p-5 sm:p-6 text-[var(--forest-deep)]">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300">
+              <aside className="glass-card-dark rounded-2xl p-5 sm:p-6 text-white shadow-2xl">
+                <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-3.5">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300">
                     Ketersediaan Hari Ini
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-300">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Sistem Aktif
                   </span>
                 </div>
                 <div className="mt-4 flex items-end justify-between">
-                  <span className="text-xs font-medium text-white/90/70">Kuota terisi</span>
-                  <strong className="text-3xl font-extrabold tracking-tight text-[var(--forest-deep)]">{used}%</strong>
+                  <span className="text-xs font-semibold text-white/80">Kuota terisi</span>
+                  <strong className="text-3xl font-black tracking-tight text-white">{used}%</strong>
                 </div>
                 <div
-                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-[var(--forest)]/5"
+                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/15 backdrop-blur-xs"
                   role="progressbar"
                   aria-valuenow={used}
                   aria-valuemin={0}
@@ -271,35 +271,35 @@ export default function TenantPortal() {
                   />
                 </div>
                 <div className="mt-5 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-white/10 bg-white/[0.08] p-3.5 backdrop-blur-sm">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[var(--forest-deep)]/60">Tersisa</span>
-                    <strong className="mt-1 block text-xl font-black text-[var(--forest-deep)]">{remaining.toLocaleString('id-ID')}</strong>
+                  <div className="rounded-xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-md">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-white/70">Tersisa</span>
+                    <strong className="mt-1 block text-xl font-black text-white">{remaining.toLocaleString('id-ID')}</strong>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-white/[0.08] p-3.5 backdrop-blur-sm">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-[var(--forest-deep)]/60">Mulai dari</span>
-                    <strong className="mt-1 block text-lg font-black text-[#E8C58C]">{rupiah(startingPrice)}</strong>
+                  <div className="rounded-xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-md">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-300/90">Mulai dari</span>
+                    <strong className="mt-1 block text-lg font-black text-emerald-300">{rupiah(startingPrice)}</strong>
                   </div>
                 </div>
-              </div>
+              </aside>
             )}
           </div>
         </section>
 
         <section className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div>
-            <p className="eyebrow">Pilih tiket</p>
-            <h2 className="mt-2 text-3xl font-bold">Satu perjalanan, satu tiket resmi</h2>
-            <p className="mt-2 text-sm text-[var(--ink-soft)]">
+            <p className="eyebrow !text-emerald-800">Pilih tiket</p>
+            <h2 className="mt-2 text-3xl font-black text-[#14281a]">Satu perjalanan, satu tiket resmi</h2>
+            <p className="mt-2 text-sm font-medium text-[#3b4836]">
               Pilih tiket yang sesuai, kemudian lengkapi jadwal dan data pengunjung dalam tiga langkah singkat.
             </p>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {(destination.ticket_categories || []).length === 0 ? (
-                <div className="col-span-full rounded-2xl border border-dashed border-[var(--border)] bg-white/60 p-8 text-center backdrop-blur-sm">
-                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest-deep)]">
+                <div className="col-span-full glass-panel p-8 text-center">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800">
                     <Ticket className="h-6 w-6" />
                   </div>
-                  <h3 className="mt-3 text-base font-bold text-[var(--forest-deep)]">Pemesanan Tiket Belum Dibuka</h3>
-                  <p className="mt-1 text-xs text-[var(--ink-soft)] max-w-md mx-auto">
+                  <h3 className="mt-3 text-base font-bold text-[#14281a]">Pemesanan Tiket Belum Dibuka</h3>
+                  <p className="mt-1 text-xs text-[#3b4836] max-w-md mx-auto">
                     Pengelola kawasan {destination.name} saat ini sedang mempersiapkan kategori kuota tiket online.
                   </p>
                 </div>
@@ -309,27 +309,27 @@ export default function TenantPortal() {
                   return (
                     <article
                       key={category.id}
-                      className="card flex min-h-[200px] flex-col justify-between p-5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)] transition-all"
+                      className="glass-panel flex min-h-[200px] flex-col justify-between p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-200 group"
                     >
                       <div>
-                        <h3 className="text-xl font-bold">{category.name}</h3>
-                        <p className="mt-2 text-xs text-[var(--ink-soft)]">
+                        <h3 className="text-xl font-bold text-[#14281a] group-hover:text-emerald-800 transition-colors">{category.name}</h3>
+                        <p className="mt-2 text-xs font-medium text-[#4a5845]">
                           Termasuk komponen asuransi dan retribusi resmi.
                         </p>
                       </div>
-                      <div className="mt-5 flex items-end justify-between border-t border-[var(--border)] pt-4">
+                      <div className="mt-5 flex items-end justify-between border-t border-black/[0.08] dark:border-white/10 pt-4">
                         <div>
-                          <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">
+                          <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[#556350]">
                             Total per orang
                           </span>
-                          <strong className="mt-1 block text-xl font-extrabold text-[var(--bark)]">
+                          <strong className="mt-1 block text-2xl font-black text-[#14281a]">
                             {rupiah(total)}
                           </strong>
                         </div>
                         <button
                           type="button"
                           onClick={openBooking}
-                          className="btn-primary btn-sm rounded-xl cursor-pointer"
+                          className="btn-primary btn-sm rounded-xl font-bold shadow-xs hover:shadow-md cursor-pointer"
                         >
                           Pilih <ArrowRight className="h-3.5 w-3.5" />
                         </button>
@@ -340,20 +340,20 @@ export default function TenantPortal() {
               )}
             </div>
           </div>
-          <aside className="surface-muted h-fit p-5 lg:sticky lg:top-24">
-            <h2 className="text-xl font-bold">Kunjungan tertata</h2>
-            <ul className="mt-4 space-y-3 text-xs leading-5 text-[var(--ink-soft)]">
-              <li className="flex gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
-                Pilih tanggal dan sesi yang sesuai.
+          <aside className="glass-panel h-fit p-6 lg:sticky lg:top-24 shadow-xs">
+            <h2 className="text-xl font-bold text-[#14281a]">Kunjungan tertata</h2>
+            <ul className="mt-4 space-y-3 text-xs font-medium leading-5 text-[#2f382a]">
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700 mt-0.5" />
+                <span>Pilih tanggal dan sesi yang sesuai.</span>
               </li>
-              <li className="flex gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
-                Isi data setiap pemegang tiket.
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700 mt-0.5" />
+                <span>Isi data setiap pemegang tiket.</span>
               </li>
-              <li className="flex gap-2">
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
-                Tunjukkan QR aktif di gerbang.
+              <li className="flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700 mt-0.5" />
+                <span>Tunjukkan QR aktif di gerbang.</span>
               </li>
             </ul>
           </aside>
@@ -362,17 +362,17 @@ export default function TenantPortal() {
         {(template.show_facilities !== false || template.show_rules !== false) && (
           <section className="mt-10 grid gap-6 md:grid-cols-2">
             {template.show_facilities !== false && (
-              <article className="card p-6 border border-[var(--border)] bg-white/80 backdrop-blur-md shadow-xs">
+              <article className="glass-panel p-6 shadow-xs">
                 <div>
-                  <h2 className="text-xl font-bold text-[var(--forest-deep)]">Fasilitas kawasan</h2>
+                  <h2 className="text-xl font-bold text-[#14281a]">Fasilitas kawasan</h2>
                 </div>
                 <ul className="mt-5 grid gap-2 sm:grid-cols-2">
                   {(destination.facilities || []).map((facility) => (
                     <li
                       key={facility}
-                      className="flex items-center gap-2 rounded-xl bg-[var(--canvas)]/80 px-3 py-2.5 text-xs font-semibold text-[var(--ink-soft)] border border-[var(--border)] shadow-2xs"
+                      className="flex items-center gap-2 rounded-xl bg-white/70 backdrop-blur-xs px-3.5 py-2.5 text-xs font-bold text-[#14281a] border border-white/80 shadow-2xs"
                     >
-                      <CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />
+                      <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" />
                       {facility}
                     </li>
                   ))}
@@ -381,10 +381,10 @@ export default function TenantPortal() {
             )}
 
             {template.show_rules !== false && (
-              <article className="card p-6 border border-white/60 bg-white/70 backdrop-blur-xl shadow-xs transition-all">
-                <p className="eyebrow !text-[var(--bark)]">Etika berkunjung</p>
-                <h2 className="mt-1.5 text-xl font-bold text-[var(--forest-deep)]">Jaga kawasan bersama</h2>
-                <p className="mt-4 text-sm leading-relaxed text-[var(--ink-soft)] whitespace-pre-line">
+              <article className="glass-panel p-6 shadow-xs">
+                <p className="eyebrow !text-emerald-800">Etika berkunjung</p>
+                <h2 className="mt-1.5 text-xl font-bold text-[#14281a]">Jaga kawasan bersama</h2>
+                <p className="mt-4 text-sm font-medium leading-relaxed text-[#2f382a] whitespace-pre-line">
                   {destination.rules || 'Dilarang membuang sampah sembarangan dan wajib menjaga kelestarian alam.'}
                 </p>
               </article>
@@ -393,7 +393,7 @@ export default function TenantPortal() {
         )}
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[rgba(255,254,250,.94)] px-4 py-3 backdrop-blur-md lg:hidden flex items-center gap-2">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/80 bg-white/85 px-4 py-3 backdrop-blur-xl lg:hidden flex items-center gap-2 shadow-lg">
         <button type="button" onClick={openBooking} className="btn-clay flex-1 justify-center py-3">
           <Ticket className="h-4 w-4" />
           <span>Pesan tiket</span>
@@ -403,22 +403,22 @@ export default function TenantPortal() {
           className="btn-secondary px-3.5 py-3 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold no-underline whitespace-nowrap"
           title="Riwayat Pesanan"
         >
-          <History className="h-4 w-4 text-[var(--forest)]" />
+          <History className="h-4 w-4 text-emerald-700" />
           <span>Pesanan</span>
         </Link>
       </div>
-      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 text-center text-xs text-[var(--ink-soft)] space-y-2">
+      <footer className="border-t border-white/60 bg-white/50 backdrop-blur-md px-4 py-7 text-center text-xs text-[#3b4836] space-y-2">
         <div className="flex flex-wrap justify-center items-center gap-3 text-xs font-medium">
-          <Link to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'} className="text-[var(--forest-deep)] hover:underline font-bold flex items-center gap-1">
-            <Ticket className="h-3.5 w-3.5" />
+          <Link to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'} className="text-emerald-800 hover:underline font-bold flex items-center gap-1">
+            <Ticket className="h-3.5 w-3.5 text-emerald-700" />
             Riwayat Pesanan & E-Tiket
           </Link>
-          <span>â€¢</span>
-          <Link to={isManager ? "/admin" : "/masuk"} className="hover:underline">
+          <span>•</span>
+          <Link to={isManager ? "/admin" : "/masuk"} className="hover:underline font-semibold text-[#14281a]">
             {isManager ? "Portal Pengelola" : "Masuk Akun"}
           </Link>
         </div>
-        <p>{destination.name} Â· Didukung oleh Passify</p>
+        <p className="text-[#4a5845] font-medium">{destination.name} · Didukung oleh Passify</p>
       </footer>
 
       {/* Passify Cashless Wallet Modal */}

@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, Clock, Compass,
@@ -77,26 +77,26 @@ export default function TravelerPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
-      <header className="nav-bar sticky top-0 z-40">
+    <div className="min-h-screen bg-transparent text-[var(--ink)]">
+      <header className="sticky top-0 z-40 border-b border-white/80 bg-white/85 backdrop-blur-2xl shadow-xs transition-all">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <Link to="/" className="flex min-w-0 items-center gap-3 no-underline" aria-label="Kembali ke Passify">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[var(--forest-deep)] text-[var(--forest-deep)] shadow-[0_8px_18px_rgba(16,45,32,.16)]">
+          <Link to="/" className="flex min-w-0 items-center gap-3 no-underline group" aria-label="Kembali ke Passify">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-emerald-800 text-white shadow-sm group-hover:scale-105 transition-transform">
               <Compass className="h-4 w-4" />
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-lg font-bold text-[var(--forest-deep)] sm:text-xl">{destination.name}</span>
-              <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-[var(--ink-soft)]">Portal tiket resmi kawasan</span>
+              <span className="block truncate text-lg font-black text-[#14281a] sm:text-xl">{destination.name}</span>
+              <span className="block truncate text-[10px] font-extrabold uppercase tracking-[.13em] text-emerald-800/80">Portal tiket resmi kawasan</span>
             </span>
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               to="/riwayat-pesanan"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-[var(--leaf-pale)] hover:bg-[var(--sand)] px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
               title="Lihat riwayat pesanan dan e-tiket saya"
             >
-              <Ticket className="h-3.5 w-3.5 text-[var(--forest)]" />
+              <Ticket className="h-3.5 w-3.5 text-emerald-700" />
               <span className="hidden sm:inline">Riwayat Pesanan</span>
               <span className="sm:hidden">Pesanan</span>
             </Link>
@@ -104,11 +104,11 @@ export default function TravelerPortal() {
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--forest-deep)] bg-white hover:bg-[var(--leaf-pale)] px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
               title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
             >
-              <Wallet className="h-3.5 w-3.5 text-[var(--forest)]" />
-              <span className="hidden sm:inline">Dompet:</span> <span>{formatRupiah(walletBalance)}</span>
+              <Wallet className="h-3.5 w-3.5 text-emerald-700" />
+              <span className="hidden sm:inline">Dompet:</span> <span className="font-extrabold text-emerald-800">{formatRupiah(walletBalance)}</span>
             </button>
 
             {user ? (
@@ -127,7 +127,7 @@ export default function TravelerPortal() {
       </header>
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
-        <section className="mb-6 flex flex-col gap-3 rounded-2xl bg-[var(--leaf-pale)]/80 px-5 py-3.5 text-xs text-[var(--ink-soft)] shadow-2xs sm:flex-row sm:items-center sm:justify-between">
+        <section className="mb-6 flex flex-col gap-3 rounded-2xl glass-panel px-5 py-3.5 text-xs text-[#2f382a] shadow-xs sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span>
               <strong className="font-bold text-[var(--forest-deep)]">Mode demo.</strong> Lihat contoh portal untuk beberapa pengelola wisata.
@@ -232,70 +232,102 @@ export default function TravelerPortal() {
 
         <section className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div>
-            <div className="flex flex-col gap-3 border-b border-[var(--border)] pb-5 sm:flex-row sm:items-end sm:justify-between">
-              <div><p className="eyebrow">Pilih sesuai rencana</p><h2 className="mt-2 text-3xl font-bold">Tiket resmi untuk kunjungan Anda</h2><p className="mt-2 max-w-xl text-sm text-[var(--ink-soft)]">Harga ditampilkan transparan, termasuk asuransi dan retribusi kawasan bila berlaku.</p></div>
-              <span className="inline-flex items-center gap-2 text-xs font-semibold text-[var(--forest)]"><CalendarDays className="h-4 w-4" />Pilih tanggal di langkah berikutnya</span>
+            <div className="flex flex-col gap-3 border-b border-black/[0.08] dark:border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="eyebrow !text-emerald-800">Pilih sesuai rencana</p>
+                <h2 className="mt-2 text-3xl font-black text-[#14281a]">Tiket resmi untuk kunjungan Anda</h2>
+                <p className="mt-2 max-w-xl text-sm font-medium text-[#3b4836]">Harga ditampilkan transparan, termasuk asuransi dan retribusi kawasan bila berlaku.</p>
+              </div>
+              <span className="inline-flex items-center gap-2 text-xs font-bold text-emerald-800"><CalendarDays className="h-4 w-4" />Pilih tanggal di langkah berikutnya</span>
             </div>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
               {(destination.ticket_categories || []).map((cat) => {
                 const total = Number(cat.price || 0) + Number(cat.insurance || 0) + Number(cat.retribusi || 0);
-                return <article key={cat.id} className="card group flex min-h-[220px] flex-col justify-between p-5 hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]">
-                  <div>
-                    <h3 className="text-xl font-bold leading-snug">{cat.name}</h3>
-                    <dl className="mt-4 space-y-1.5 text-xs text-[var(--ink-soft)]">
-                      <div className="flex justify-between gap-3">
-                        <dt>Tarif masuk</dt>
-                        <dd className="font-semibold text-[var(--ink)]">{formatRupiah(cat.price)}</dd>
-                      </div>
-                      {Number(cat.insurance) > 0 && (
-                        <div className="flex justify-between gap-3">
-                          <dt>Asuransi</dt>
-                          <dd>{formatRupiah(cat.insurance)}</dd>
-                        </div>
-                      )}
-                      {Number(cat.retribusi) > 0 && (
-                        <div className="flex justify-between gap-3">
-                          <dt>Retribusi kawasan</dt>
-                          <dd>{formatRupiah(cat.retribusi)}</dd>
-                        </div>
-                      )}
-                    </dl>
-                  </div>
-                  <div className="mt-5 flex items-end justify-between gap-3 border-t border-[var(--border)] pt-4">
+                return (
+                  <article key={cat.id} className="glass-panel group flex min-h-[220px] flex-col justify-between p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
                     <div>
-                      <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[var(--ink-muted)]">Total per orang</span>
-                      <strong className="mt-1 block text-xl font-extrabold text-[var(--bark)]">{formatRupiah(total)}</strong>
+                      <h3 className="text-xl font-bold leading-snug text-[#14281a] group-hover:text-emerald-800 transition-colors">{cat.name}</h3>
+                      <dl className="mt-4 space-y-1.5 text-xs text-[#3b4836]">
+                        <div className="flex justify-between gap-3">
+                          <dt>Tarif masuk</dt>
+                          <dd className="font-bold text-[#14281a]">{formatRupiah(cat.price)}</dd>
+                        </div>
+                        {Number(cat.insurance) > 0 && (
+                          <div className="flex justify-between gap-3">
+                            <dt>Asuransi</dt>
+                            <dd className="font-semibold">{formatRupiah(cat.insurance)}</dd>
+                          </div>
+                        )}
+                        {Number(cat.retribusi) > 0 && (
+                          <div className="flex justify-between gap-3">
+                            <dt>Retribusi kawasan</dt>
+                            <dd className="font-semibold">{formatRupiah(cat.retribusi)}</dd>
+                          </div>
+                        )}
+                      </dl>
                     </div>
-                    <button type="button" onClick={handleBookNowClick} className="btn-primary btn-sm rounded-xl">
-                      Pilih <ChevronRight className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </article>;
+                    <div className="mt-5 flex items-end justify-between gap-3 border-t border-black/[0.08] dark:border-white/10 pt-4">
+                      <div>
+                        <span className="block text-[10px] font-extrabold uppercase tracking-wide text-[#556350]">Total per orang</span>
+                        <strong className="mt-1 block text-2xl font-black text-[#14281a]">{formatRupiah(total)}</strong>
+                      </div>
+                      <button type="button" onClick={handleBookNowClick} className="btn-primary btn-sm rounded-xl font-bold shadow-xs hover:shadow-md cursor-pointer">
+                        Pilih <ChevronRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </article>
+                );
               })}
             </div>
           </div>
 
-          <aside className="surface-muted h-fit p-5 lg:sticky lg:top-24">
-            <h2 className="text-xl font-bold">Sebelum berkunjung</h2>
-            <p className="mt-2 text-xs leading-5 text-[var(--ink-soft)]">Tiket dikaitkan dengan waktu kunjungan agar kawasan tetap nyaman bagi semua orang.</p>
-            <ul className="mt-5 space-y-3 text-xs text-[var(--ink-soft)]">
-              <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />Pilih sesi yang masih tersedia.</li>
-              <li className="flex gap-2"><Users className="h-4 w-4 shrink-0 text-[var(--forest)]" />Isi data untuk setiap pengunjung.</li>
-              <li className="flex gap-2"><ShieldCheck className="h-4 w-4 shrink-0 text-[var(--forest)]" />Simpan QR tiket untuk dipindai di gerbang.</li>
+          <aside className="glass-panel h-fit p-6 lg:sticky lg:top-24 shadow-xs">
+            <h2 className="text-xl font-bold text-[#14281a]">Sebelum berkunjung</h2>
+            <p className="mt-2 text-xs font-medium leading-5 text-[#3b4836]">Tiket dikaitkan dengan waktu kunjungan agar kawasan tetap nyaman bagi semua orang.</p>
+            <ul className="mt-5 space-y-3.5 text-xs font-medium text-[#2f382a]">
+              <li className="flex items-start gap-2.5"><CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700 mt-0.5" /><span>Pilih sesi yang masih tersedia.</span></li>
+              <li className="flex items-start gap-2.5"><Users className="h-4 w-4 shrink-0 text-emerald-700 mt-0.5" /><span>Isi data untuk setiap pengunjung.</span></li>
+              <li className="flex items-start gap-2.5"><ShieldCheck className="h-4 w-4 shrink-0 text-emerald-700 mt-0.5" /><span>Simpan QR tiket untuk dipindai di gerbang.</span></li>
             </ul>
           </aside>
         </section>
 
         <section className="mt-10 grid gap-5 md:grid-cols-2">
-          <article className="card p-6"><div><p className="eyebrow">Di kawasan</p><h2 className="mt-1 text-xl font-bold">Fasilitas untuk perjalanan nyaman</h2></div><ul className="mt-5 grid gap-2 sm:grid-cols-2">{(destination.facilities || []).map((facility) => <li key={facility} className="flex items-center gap-2 rounded-xl bg-[var(--canvas)] px-3 py-2.5 text-xs font-semibold text-[var(--ink-soft)] shadow-2xs"><CheckCircle2 className="h-4 w-4 shrink-0 text-[var(--forest)]" />{facility}</li>)}</ul></article>
-          <article className="rounded-2xl bg-[var(--bark-pale)]/55 p-6 shadow-2xs"><div><p className="eyebrow !text-[var(--bark)]">Etika berkunjung</p><h2 className="mt-1 text-xl font-bold">Aturan konservasi</h2></div><p className="mt-5 text-sm leading-6 text-[var(--ink-soft)]">{destination.rules}</p><p className="mt-5 flex items-center gap-2 text-xs font-bold text-[var(--bark)]"><Clock className="h-4 w-4" />Tunjukkan QR aktif saat memasuki kawasan.</p></article>
+          <article className="glass-panel p-6 shadow-xs">
+            <div>
+              <p className="eyebrow !text-emerald-800">Di kawasan</p>
+              <h2 className="mt-1 text-xl font-bold text-[#14281a]">Fasilitas untuk perjalanan nyaman</h2>
+            </div>
+            <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+              {(destination.facilities || []).map((facility) => (
+                <li key={facility} className="flex items-center gap-2 rounded-xl bg-white/70 backdrop-blur-xs px-3.5 py-2.5 text-xs font-bold text-[#14281a] border border-white/80 shadow-2xs">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-700" />{facility}
+                </li>
+              ))}
+            </ul>
+          </article>
+          <article className="glass-panel p-6 shadow-xs">
+            <div>
+              <p className="eyebrow !text-emerald-800">Etika berkunjung</p>
+              <h2 className="mt-1 text-xl font-bold text-[#14281a]">Aturan konservasi</h2>
+            </div>
+            <p className="mt-4 text-sm font-medium leading-6 text-[#2f382a]">{destination.rules}</p>
+            <p className="mt-5 flex items-center gap-2 text-xs font-bold text-emerald-800">
+              <Clock className="h-4 w-4 text-emerald-700" />Tunjukkan QR aktif saat memasuki kawasan.
+            </p>
+          </article>
         </section>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-[var(--border)] bg-[rgba(255,254,250,.94)] px-4 py-3 backdrop-blur-md lg:hidden">
-        <button type="button" onClick={handleBookNowClick} className="btn-clay w-full text-sm"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/80 bg-white/85 px-4 py-3 backdrop-blur-xl lg:hidden shadow-lg">
+        <button type="button" onClick={handleBookNowClick} className="btn-clay w-full text-sm font-bold"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button>
       </div>
-      <footer className="border-t border-[var(--border)] bg-[var(--sand)] px-4 py-7 sm:px-6 lg:px-8"><div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[var(--ink-soft)] sm:flex-row sm:items-center sm:justify-between"><span><strong className="text-[var(--forest-deep)]">{destination.name}</strong> Â· Didukung Passify</span><Link to="/" className="font-semibold text-[var(--forest)] hover:text-[var(--bark)]">Kembali ke beranda Passify</Link></div></footer>
+      <footer className="border-t border-white/60 bg-white/50 backdrop-blur-md px-4 py-7 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[#3b4836] sm:flex-row sm:items-center sm:justify-between">
+          <span><strong className="text-[#14281a] font-bold">{destination.name}</strong> · Didukung Passify</span>
+          <Link to="/" className="font-bold text-emerald-800 hover:text-emerald-950">Kembali ke beranda Passify</Link>
+        </div>
+      </footer>
 
       {/* Passify Cashless Wallet Modal */}
       {showWalletModal && (
