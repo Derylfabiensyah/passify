@@ -451,96 +451,94 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="mt-8 sm:mt-12">
+      <footer className="mt-12 sm:mt-16 w-full glass-panel rounded-t-[2.5rem] sm:rounded-t-[3.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-2xl pt-12 pb-8 sm:pt-16 sm:pb-12">
         <div className="mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-8">
-          <div className="glass-panel rounded-t-3xl sm:rounded-t-[2.5rem] rounded-b-none p-8 sm:p-12 pb-8 sm:pb-10 shadow-2xl border-t border-x border-b-0 border-white/80">
-            {/* Main Footer Grid */}
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 pb-10 border-b border-black/[0.08] dark:border-white/10">
-              {/* Column 1: Brand & Identity */}
-              <div className="lg:col-span-2 space-y-4">
-                <Link to="/" className="text-2xl font-black tracking-[-.05em] text-[#14281a] no-underline inline-block hover:opacity-90">
-                  passify
-                </Link>
-                <p className="text-sm font-medium leading-relaxed text-[#2d3728] max-w-sm">
-                  Platform SaaS White-Label E-Ticketing & Manajemen Kuota Wisata Alam. Dirancang tangguh di lapangan dengan teknologi offline-first, dynamic TOTP QR, dan ekosistem pembayaran terpadu.
-                </p>
-              </div>
-
-              {/* Column 2: Solusi Kawasan */}
-              <div>
-                <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
-                  Solusi Kawasan
-                </h4>
-                <ul className="space-y-2.5 text-sm font-semibold text-[#3b4836]">
-                  <li><a href="#masalah" className="hover:text-emerald-800 transition-colors">Daya Dukung & Kuota</a></li>
-                  <li><a href="#alur" className="hover:text-emerald-800 transition-colors">Validasi Gate Offline</a></li>
-                  <li><a href="#white-label" className="hover:text-emerald-800 transition-colors">Portal White-Label</a></li>
-                  <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">E-Ticket QR Dinamis</Link></li>
-                  <li><span className="text-[#6e7a63]">Rekonsiliasi Kas Otomatis</span></li>
-                </ul>
-              </div>
-
-              {/* Column 3: Akses Cepat */}
-              <div>
-                <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
-                  Akses & Portal
-                </h4>
-                <ul className="space-y-2.5 text-sm font-semibold text-[#3b4836]">
-                  <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">Portal Wisatawan</Link></li>
-                  <li><Link to="/daftar-wisata" className="hover:text-emerald-800 transition-colors">Daftarkan Wisata Baru</Link></li>
-                  <li><Link to="/masuk" className="hover:text-emerald-800 transition-colors">Masuk Petugas / Admin</Link></li>
-                  <li><Link to="/verifikasi-email" className="hover:text-emerald-800 transition-colors">Aktivasi Akun Pengelola</Link></li>
-                </ul>
-              </div>
-
-              {/* Column 4: Kontak & Dukungan */}
-              <div>
-                <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
-                  Hubungi Kami
-                </h4>
-                <ul className="space-y-3.5 text-sm font-semibold text-[#3b4836]">
-                  <li className="flex items-center gap-2.5">
-                    <Mail className="h-4 w-4 text-emerald-700 shrink-0" />
-                    <a href="mailto:hello@passify.id" className="hover:text-emerald-800 transition-colors">hello@passify.id</a>
-                  </li>
-                  <li className="flex items-center gap-2.5">
-                    <Globe className="h-4 w-4 text-emerald-700 shrink-0" />
-                    <span className="text-[#2d3728]">Indonesia (BKSDA & BUMDes)</span>
-                  </li>
-                </ul>
-              </div>
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 pb-10 border-b border-black/[0.08] dark:border-white/10">
+            {/* Column 1: Brand & Identity */}
+            <div className="lg:col-span-2 space-y-4">
+              <Link to="/" className="text-2xl font-black tracking-[-.05em] text-[#14281a] no-underline inline-block hover:opacity-90">
+                passify
+              </Link>
+              <p className="text-sm font-medium leading-relaxed text-[#2d3728] max-w-sm">
+                Platform SaaS White-Label E-Ticketing & Manajemen Kuota Wisata Alam. Dirancang tangguh di lapangan dengan teknologi offline-first, dynamic TOTP QR, dan ekosistem pembayaran terpadu.
+              </p>
             </div>
 
-            {/* Bottom Bar */}
-            <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#3b4836]">
-              <p>© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
-              <div className="flex gap-6 font-bold text-[#14281a]">
-                <button
-                  type="button"
-                  onClick={() => openLegal('privacy')}
-                  className="hover:text-emerald-800 transition-colors cursor-pointer"
-                >
-                  Kebijakan Privasi
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openLegal('terms')}
-                  className="hover:text-emerald-800 transition-colors cursor-pointer"
-                >
-                  Syarat Penggunaan
-                </button>
-                <button
-                  type="button"
-                  onClick={() => openLegal('help')}
-                  className="hover:text-emerald-800 transition-colors cursor-pointer"
-                >
+            {/* Column 2: Solusi Kawasan */}
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
+                Solusi Kawasan
+              </h4>
+              <ul className="space-y-2.5 text-sm font-semibold text-[#3b4836]">
+                <li><a href="#masalah" className="hover:text-emerald-800 transition-colors">Daya Dukung & Kuota</a></li>
+                <li><a href="#alur" className="hover:text-emerald-800 transition-colors">Validasi Gate Offline</a></li>
+                <li><a href="#white-label" className="hover:text-emerald-800 transition-colors">Portal White-Label</a></li>
+                <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">E-Ticket QR Dinamis</Link></li>
+                <li><span className="text-[#6e7a63]">Rekonsiliasi Kas Otomatis</span></li>
+              </ul>
+            </div>
+
+            {/* Column 3: Akses Cepat */}
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
+                Akses & Portal
+              </h4>
+              <ul className="space-y-2.5 text-sm font-semibold text-[#3b4836]">
+                <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">Portal Wisatawan</Link></li>
+                <li><Link to="/daftar-wisata" className="hover:text-emerald-800 transition-colors">Daftarkan Wisata Baru</Link></li>
+                <li><Link to="/masuk" className="hover:text-emerald-800 transition-colors">Masuk Petugas / Admin</Link></li>
+                <li><Link to="/verifikasi-email" className="hover:text-emerald-800 transition-colors">Aktivasi Akun Pengelola</Link></li>
+              </ul>
+            </div>
+
+            {/* Column 4: Kontak & Dukungan */}
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-[.15em] text-[#14281a] mb-4">
+                Hubungi Kami
+              </h4>
+              <ul className="space-y-3.5 text-sm font-semibold text-[#3b4836]">
+                <li className="flex items-center gap-2.5">
+                  <Mail className="h-4 w-4 text-emerald-700 shrink-0" />
+                  <a href="mailto:hello@passify.id" className="hover:text-emerald-800 transition-colors">hello@passify.id</a>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <Globe className="h-4 w-4 text-emerald-700 shrink-0" />
+                  <span className="text-[#2d3728]">Indonesia (BKSDA & BUMDes)</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-medium text-[#3b4836]">
+            <p>© {new Date().getFullYear()} Passify. Ticketing untuk kawasan yang dijaga. Hak cipta dilindungi.</p>
+            <div className="flex gap-6 font-bold text-[#14281a]">
+              <button
+                type="button"
+                onClick={() => openLegal('privacy')}
+                className="hover:text-emerald-800 transition-colors cursor-pointer"
+              >
+                Kebijakan Privasi
+              </button>
+              <button
+                type="button"
+                onClick={() => openLegal('terms')}
+                className="hover:text-emerald-800 transition-colors cursor-pointer"
+              >
+                Syarat Penggunaan
+              </button>
+              <button
+                type="button"
+                onClick={() => openLegal('help')}
+                className="hover:text-emerald-800 transition-colors cursor-pointer"
+              >
                 Pusat Bantuan
               </button>
             </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
 
       <LegalModal
         isOpen={legalModal.open}
