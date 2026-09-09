@@ -489,6 +489,48 @@ export async function fetchDashboardOverviewTelemetry(slug) {
         }
       ];
 
+  const formattedTransactions = Array.isArray(financeData.transactions)
+    ? financeData.transactions.map((t) => {
+        const nominal = Number(t.grand_total ?? t.amount ?? t.total_amount ?? t.subtotal ?? 0);
+        const visitorName =
+          t.user?.full_name ||
+          t.user?.name ||
+          t.visitor_name ||
+          t.visitor ||
+          t.tickets?.[0]?.visitor_name ||
+          t.customer_name ||
+          'Wisatawan Terverifikasi';
+        const categoryName =
+          t.tickets?.[0]?.category?.name ||
+          t.category ||
+          'Tiket Masuk Reguler';
+        const qty = Number(t.visitor_count ?? t.qty ?? t.quantity ?? (t.tickets?.length ? t.tickets.length : 1));
+        const st = (t.payment_status || t.status || 'paid').toLowerCase();
+        let txTime = t.time || 'Hari ini';
+        if (t.created_at) {
+          const d = new Date(t.created_at);
+          txTime = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+        }
+
+        return {
+          ...t,
+          id: t.order_number || t.id,
+          raw_id: t.id,
+          order_number: t.order_number,
+          visitor: visitorName,
+          visitor_name: visitorName,
+          category: categoryName,
+          qty: qty,
+          amount: nominal,
+          grand_total: nominal,
+          time: txTime,
+          created_at: t.created_at,
+          status: st,
+          payment_status: st,
+        };
+      })
+    : [];
+
   return {
     destinations,
     stats: liveStats,
@@ -497,7 +539,7 @@ export async function fetchDashboardOverviewTelemetry(slug) {
       ? financeData.weeklyRevenue
       : defaultWeekly,
     ticketCategorySales,
-    recentTransactions: Array.isArray(financeData.transactions) ? financeData.transactions : [],
+    recentTransactions: formattedTransactions,
     gateScanStats,
   };
 }

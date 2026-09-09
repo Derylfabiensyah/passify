@@ -225,7 +225,8 @@ export default function DashboardOverview() {
   const transactionColumns = useMemo(
     () => [
       {
-        accessorKey: 'id',
+        id: 'id',
+        accessorFn: (row) => row.order_number || row.id,
         header: 'ID Transaksi',
         cell: (info) => (
           <span className="font-mono font-bold text-emerald-700">
@@ -235,19 +236,39 @@ export default function DashboardOverview() {
       },
       {
         id: 'visitor',
-        accessorFn: (row) => row.visitor || row.visitor_name,
+        accessorFn: (row) =>
+          row.visitor ||
+          row.visitor_name ||
+          row.user?.full_name ||
+          row.user?.name ||
+          row.customer_name ||
+          row.tickets?.[0]?.visitor_name ||
+          'Wisatawan Terverifikasi',
         header: 'Wisatawan / Pemesan',
-        cell: (info) => (
-          <div>
-            <div className="font-semibold text-gray-900">{info.getValue()}</div>
-            <div className="text-[10px] text-gray-500">
-              {info.row.original.category} {info.row.original.qty ? `(${info.row.original.qty} pax)` : ''}
+        cell: (info) => {
+          const row = info.row.original;
+          const categoryName =
+            row.category ||
+            row.tickets?.[0]?.category?.name ||
+            'Tiket Masuk Reguler';
+          const qty =
+            row.qty ||
+            row.visitor_count ||
+            row.quantity ||
+            (row.tickets?.length ? row.tickets.length : 1);
+          return (
+            <div>
+              <div className="font-semibold text-gray-900">{info.getValue()}</div>
+              <div className="text-[10px] text-gray-500">
+                {categoryName} ({qty} pax)
+              </div>
             </div>
-          </div>
-        )
+          );
+        }
       },
       {
-        accessorKey: 'amount',
+        id: 'amount',
+        accessorFn: (row) => Number(row.grand_total ?? row.amount ?? row.total_amount ?? row.subtotal ?? 0),
         header: 'Nominal',
         cell: (info) => (
           <span className="font-bold text-gray-900">
@@ -256,19 +277,38 @@ export default function DashboardOverview() {
         )
       },
       {
-        accessorKey: 'time',
+        id: 'time',
+        accessorFn: (row) => {
+          if (row.time) return row.time;
+          const ts = row.created_at || row.updated_at;
+          if (ts) {
+            const d = new Date(ts);
+            return (
+              d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) +
+              ' ' +
+              d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) +
+              ' WIB'
+            );
+          }
+          return 'Hari ini';
+        },
         header: 'Waktu Transaksi',
         cell: (info) => (
           <span className="text-gray-500 text-xs">{info.getValue()}</span>
         )
       },
       {
-        accessorKey: 'status',
+        id: 'status',
+        accessorFn: (row) => (row.payment_status || row.status || 'paid').toLowerCase(),
         header: 'Status',
         cell: (info) => {
           const rawStatus = (info.getValue() || '').toLowerCase();
           const cfg =
-            rawStatus === 'paid' || rawStatus === 'success' || rawStatus === 'settled' || rawStatus === 'completed'
+            rawStatus === 'paid' ||
+            rawStatus === 'success' ||
+            rawStatus === 'settled' ||
+            rawStatus === 'completed' ||
+            rawStatus === 'settlement'
               ? {
                   label: 'Berhasil',
                   cls: 'bg-emerald-50 text-emerald-800 border-emerald-200'
