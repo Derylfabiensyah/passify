@@ -70,7 +70,12 @@ export default function DashboardOverview() {
     setIsRefreshing(true);
     loadData().finally(() => setIsRefreshing(false));
     const interval = setInterval(loadData, 3000);
-    return () => clearInterval(interval);
+    const handleStorage = () => loadData();
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorage);
+    };
   }, [slug]);
 
   const stats = telemetry?.stats || DASHBOARD_STATS;

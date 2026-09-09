@@ -27,6 +27,9 @@ type GateRepository interface {
 	GetTicketByCode(ticketCode string) (*models.Ticket, error)
 	UpdateTicketStatus(ticketID uuid.UUID, status string, usedAt *time.Time, gateDeviceID *uuid.UUID) error
 	GetScanLogsForDestinationDate(destinationID uuid.UUID, date time.Time) ([]models.ScanLog, error)
+	GetAllScanLogsForDestination(destinationID uuid.UUID) ([]models.ScanLog, error)
+	GetUsedTicketsCountForDestination(destinationID uuid.UUID) (int64, error)
+	GetDeviceTotalScans(deviceID uuid.UUID) (int64, error)
 }
 
 type gateRepository struct {
@@ -199,6 +202,33 @@ func (r *gateRepository) GetScanLogsForDestinationDate(destinationID uuid.UUID, 
 
 	err := r.db.Joins("JOIN gate_devices ON scan_logs.gate_device_id = gate_devices.id").
 		Where("gate_devices.destination_id = ? AND scan_logs.scanned_at >= ? AND scan_logs.scanned_at < ?", destinationID, startOfDay, endOfDay).
+		Order("scan_logs.scanned_at DESC").
 		Find(&logs).Error
 	return logs, err
 }
+
+func (r *gateRepository) GetAllScanLogsForDestination(destinationID uuid.UUID) ([]models.ScanLog, error) {
+	var logs []models.ScanLog
+	err := r.db.Joins("JOIN gate_devices ON scan_logs.gate_device_id = gate_devices.id").
+		Where("gate_devices.destination_id = ?", destinationID).
+		Order("scan_logs.scanned_at DESC").
+		Find(&logs).Error
+	return logs, err
+}
+
+func (r *gateRepository) GetUsedTicketsCountForDestination(destinationID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Ticket{}).
+		Where("destination_id = ? AND (status = 'used' OR used_at IS NOT NULL)", destinationID).
+		Count(&count).Error
+	return count, err
+}
+
+func (r *gateRepository) GetDeviceTotalScans(deviceID uuid.UUID) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.ScanLog{}).
+		Where("gate_device_id = ? AND scan_result = 'valid'", deviceID).
+		Count(&count).Error
+	return count, err
+}
+

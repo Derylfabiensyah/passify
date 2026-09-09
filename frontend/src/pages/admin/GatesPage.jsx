@@ -369,8 +369,23 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
               return t;
             });
             localStorage.setItem('passify_my_tickets', JSON.stringify(updated));
-            window.dispatchEvent(new Event('storage'));
           }
+
+          // Record scan in local telemetry cache
+          const rawScans = localStorage.getItem('passify_recent_scans');
+          const scanList = rawScans ? JSON.parse(rawScans) : [];
+          scanList.unshift({
+            ticketCode: data.data.ticket_code || cleanCode,
+            visitorName: data.data.visitor_name || 'Wisatawan',
+            category: data.data.category_name || 'Tiket Masuk Reguler',
+            destinationId: destinationId,
+            deviceId: selectedDeviceId,
+            scannedAt: new Date().toISOString(),
+            valid: true,
+          });
+          localStorage.setItem('passify_recent_scans', JSON.stringify(scanList.slice(0, 50)));
+
+          window.dispatchEvent(new Event('storage'));
         } catch (_) {}
       } else {
         setError(data.message || 'Validasi tiket gagal.');
