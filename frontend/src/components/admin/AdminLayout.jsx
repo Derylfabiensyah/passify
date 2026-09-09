@@ -234,9 +234,9 @@ export default function AdminLayout({ children }) {
               to={`/?tenant=${activeTenantSlug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center gap-1.5 rounded-full border border-emerald-300/80 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-[#1e4b35] no-underline transition-all hover:bg-white hover:shadow-xs shadow-2xs sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-full border border-gray-200/90 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-[#2a3426] hover:text-[#14281a] hover:bg-white no-underline transition-all hover:shadow-xs shadow-2xs sm:inline-flex"
             >
-              <ExternalLink className="h-3.5 w-3.5 text-emerald-600" />
+              <ExternalLink className="h-3.5 w-3.5 text-gray-500" />
               <span>Portal Publik</span>
             </Link>
 
