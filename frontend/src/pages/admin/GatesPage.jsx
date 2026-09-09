@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ScanLine,
   Plus,
@@ -53,7 +53,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
   };
 
   return (
-    <div className={`card p-5 bg-white rounded-2xl shadow-sm ${!isOnline ? 'opacity-75 bg-gray-50/60' : ''}`}>
+    <div className={`glass-panel p-5 rounded-2xl shadow-sm ${!isOnline ? 'opacity-75' : ''}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-2xs ${isOnline ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>
@@ -62,11 +62,11 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
           <div>
             <h4 className="text-sm font-bold text-gray-900">{device.device_name}</h4>
             <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[10px] text-gray-500 font-mono font-bold bg-gray-100 px-1.5 py-0.5 rounded-lg shadow-2xs">
+              <span className="text-[10px] text-gray-600 font-mono font-bold bg-white/60 border border-white/80 px-1.5 py-0.5 rounded-lg shadow-2xs">
                 {device.device_code}
               </span>
               <span className="text-[10px] font-semibold text-gray-600">
-                {device.gate_type === 'entrance' ? 'â€¢ Pintu Masuk' : 'â€¢ Pintu Keluar'}
+                {device.gate_type === 'entrance' ? '• Pintu Masuk' : '• Pintu Keluar'}
               </span>
             </div>
           </div>
@@ -133,7 +133,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 pt-3 border-t border-gray-100">
+      <div className="flex flex-col gap-2 pt-3 border-t border-white/60">
         <button
           type="button"
           onClick={() => onPair(device)}
@@ -156,7 +156,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
           <button
             type="button"
             onClick={() => onEdit(device)}
-            className="p-1.5 rounded-lg bg-gray-50 text-gray-600 hover:text-gray-900 border border-gray-200 transition-colors shadow-xs"
+            className="p-1.5 rounded-lg bg-white/60 text-gray-600 hover:text-gray-900 border border-white/80 transition-colors shadow-xs"
             title="Ubah Konfigurasi"
           >
             <Pencil className="w-3.5 h-3.5" />
@@ -165,7 +165,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
             <button
               type="button"
               onClick={() => onDelete(device.id)}
-              className="p-1.5 rounded-lg bg-gray-50 text-gray-600 hover:text-red-600 border border-gray-200 transition-colors shadow-xs"
+              className="p-1.5 rounded-lg bg-white/60 text-gray-600 hover:text-red-600 border border-white/80 transition-colors shadow-xs"
               title="Hapus Perangkat"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -205,16 +205,16 @@ function DevicePairingModal({ device, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col items-center">
+      <div className="glass-panel rounded-2xl max-w-md w-full p-6 shadow-2xl border border-white/80 flex flex-col items-center">
         {/* Header */}
-        <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+        <div className="w-full flex items-center justify-between pb-3 border-b border-white/60 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
               <QrCode className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-gray-900">Pairing Scanner Petugas</h3>
-              <p className="text-xs text-gray-500">{device.device_name} â€¢ {device.device_code}</p>
+              <p className="text-xs text-gray-500">{device.device_name} • {device.device_code}</p>
             </div>
           </div>
           <button
@@ -384,8 +384,8 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 flex flex-col">
-        <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+      <div className="glass-panel rounded-2xl max-w-md w-full p-6 shadow-2xl border border-white/80 flex flex-col">
+        <div className="w-full flex items-center justify-between pb-3 border-b border-white/60 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
               <ScanLine className="w-5 h-5" />
@@ -517,7 +517,7 @@ function AddEditGateModal({ device, destinations, onClose, onSave }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content card p-6 max-w-lg w-full bg-white border border-gray-200 rounded-2xl shadow-xl">
+      <div className="modal-content glass-panel p-6 max-w-lg w-full rounded-2xl shadow-2xl border border-white/80">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
             <Smartphone className="w-4 h-4 text-emerald-600" />
@@ -870,7 +870,7 @@ export default function GatesPage() {
       )}
 
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/60">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">
             Perangkat & Terminal Pemindai (Gate Scanners)
@@ -939,7 +939,7 @@ export default function GatesPage() {
           className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
             filterDest === 'all'
               ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-              : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
           }`}
         >
           Semua Kawasan
@@ -952,7 +952,7 @@ export default function GatesPage() {
             className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
               filterDest === dest
                 ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                : 'bg-white border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
             }`}
           >
             {dest}

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { X } from 'lucide-react';
 
 /**
@@ -145,13 +145,13 @@ export default function ModalWrapper({
         aria-labelledby={generatedTitleId}
         aria-label={!generatedTitleId ? (ariaLabel || (typeof title === 'string' ? title : 'Dialog Modal')) : undefined}
         tabIndex={-1}
-        className={`modal-content relative w-full ${resolvedMaxWidth} max-h-[90vh] overflow-y-auto bg-white rounded-2xl shadow-2xl border border-gray-200/80 outline-none animate-in zoom-in-95 duration-200 ${className}`}
+        className={`modal-content relative w-full ${resolvedMaxWidth} max-h-[90vh] overflow-y-auto bg-white/95 dark:bg-black/85 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/80 dark:border-white/10 outline-none animate-in zoom-in-95 duration-200 ${className}`}
       >
         {/* Custom Header or Default Header if title/close button provided */}
         {customHeader ? (
           customHeader
         ) : (title || showCloseButton) ? (
-          <div className="flex items-center justify-between gap-4 p-5 sm:p-6 pb-3 sm:pb-4 border-b border-gray-100">
+          <div className="flex items-center justify-between gap-4 p-5 sm:p-6 pb-3 sm:pb-4 border-b border-white/60 dark:border-white/10">
             {title ? (
               typeof title === 'string' ? (
                 <h3 id={generatedTitleId} className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ExternalLink,
   Eye,
@@ -131,7 +131,7 @@ function FacilityTagInput({ value = [], onChange }) {
 
 function ToggleField({ checked, description, label, onChange }) {
   return (
-    <label className="flex min-h-12 items-center justify-between gap-4 rounded-xl border border-[var(--border)] bg-[var(--sand)] px-4 py-3 cursor-pointer hover:bg-transparent transition-colors">
+    <label className="flex min-h-12 items-center justify-between gap-4 rounded-xl border border-white/70 bg-white/50 backdrop-blur-xs px-4 py-3 cursor-pointer hover:bg-white/80 transition-colors shadow-2xs">
       <span>
         <span className="block text-sm font-bold text-[var(--forest-deep)]">{label}</span>
         <span className="mt-0.5 block text-xs text-[var(--ink-soft)]">{description}</span>
@@ -673,8 +673,8 @@ export default function TemplateEditorPage() {
       {/* Left Pane: Visual Form Editor */}
       <form onSubmit={handleSave} className="space-y-6 overflow-y-auto pr-1 pb-16">
         {/* Header Bar */}
-        <section className="card p-5 sm:p-7">
-          <div className="flex flex-col gap-4 border-b border-[var(--border)] pb-5 sm:flex-row sm:items-start sm:justify-between">
+        <section className="glass-panel p-5 sm:p-7 rounded-2xl shadow-sm">
+          <div className="flex flex-col gap-4 border-b border-white/60 pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex gap-3">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[var(--leaf-pale)] text-[var(--forest)]">
                 <LayoutTemplate className="h-5 w-5" aria-hidden="true" />
@@ -812,7 +812,7 @@ export default function TemplateEditorPage() {
         </section>
 
         {/* Section 2: Color Palette */}
-        <section className="card p-5 sm:p-7">
+        <section className="glass-panel p-5 sm:p-7 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--bark-pale)] text-[var(--bark)]">
               <Palette className="h-5 w-5" aria-hidden="true" />
@@ -832,7 +832,7 @@ export default function TemplateEditorPage() {
                 className={`flex flex-col cursor-pointer items-center gap-2 rounded-xl border p-3.5 text-xs font-semibold transition-all ${
                   formData.primary_color === choice.value
                     ? 'border-[var(--forest)] bg-[var(--leaf-pale)] text-[var(--forest-deep)] scale-[1.02] shadow-xs'
-                    : 'border-[var(--border)] bg-[var(--sand)] text-[var(--ink-soft)] hover:bg-transparent'
+                    : 'border-white/70 bg-white/60 text-[var(--ink-soft)] hover:bg-white/85 shadow-2xs'
                 }`}
               >
                 <input
@@ -858,7 +858,7 @@ export default function TemplateEditorPage() {
         </section>
 
         {/* Section 3: Facilities & Rules */}
-        <section className="card p-5 sm:p-7 space-y-5">
+        <section className="glass-panel p-5 sm:p-7 rounded-2xl shadow-sm space-y-5">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
               Fasilitas Kawasan Wisata
@@ -885,7 +885,7 @@ export default function TemplateEditorPage() {
         </section>
 
         {/* Section 4: Display Toggles */}
-        <section className="card p-5 sm:p-7">
+        <section className="glass-panel p-5 sm:p-7 rounded-2xl shadow-sm">
           <div className="flex items-center gap-3">
             <span className="grid h-10 w-10 place-items-center rounded-xl bg-[var(--fog)] text-[var(--forest)]">
               <SlidersHorizontal className="h-5 w-5" aria-hidden="true" />

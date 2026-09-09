@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bell, CalendarClock, ChevronDown, ChevronLeft, ChevronRight,
@@ -20,9 +20,8 @@ const menuItems = [
 ];
 
 const adminThemeStyles = `
-  .admin-shell { background: var(--canvas); color: var(--ink); font-family: var(--font-body); }
+  .admin-shell { background: transparent; color: var(--ink); font-family: var(--font-body); min-height: 100vh; }
   .admin-shell h1, .admin-shell h2, .admin-shell h3, .admin-shell h4 { font-family: var(--font-body); letter-spacing: -.03em; }
-  .admin-shell .card { border-radius: var(--radius); box-shadow: var(--shadow-soft); }
   .admin-shell .btn-primary { background: var(--forest); border-color: var(--forest); }
   .admin-shell .btn-primary:hover { background: var(--forest-deep); }
   .admin-shell .btn-secondary { color: var(--forest); }
@@ -91,7 +90,7 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
       </nav>
       <div className="border-t border-[var(--border)] p-3">
         {!collapsed && (
-          <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--fog)] p-2.5">
+          <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-white/70 bg-white/50 dark:bg-black/30 p-2.5 backdrop-blur-md shadow-2xs">
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white shadow-2xs">
                 {userInitial}
@@ -163,7 +162,7 @@ export default function AdminLayout({ children }) {
 
       {/* Desktop Sidebar */}
       <aside
-        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md transition-[width] duration-200 md:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/60 bg-white/65 dark:bg-black/40 backdrop-blur-xl transition-[width] duration-200 md:flex shadow-[4px_0_24px_rgba(24,45,28,0.03)]"
         style={{ width: collapsed ? 76 : 264 }}
       >
         <SidebarContent
@@ -180,11 +179,11 @@ export default function AdminLayout({ children }) {
           type="button"
           aria-label="Tutup menu"
           onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 z-40 bg-[rgba(16,45,32,.48)] md:hidden"
+          className="fixed inset-0 z-40 bg-[rgba(16,45,32,.48)] backdrop-blur-xs md:hidden"
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md shadow-[var(--shadow-lift)] transition-transform duration-200 md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-white/60 bg-white/75 dark:bg-black/60 backdrop-blur-2xl shadow-[var(--shadow-lift)] transition-transform duration-200 md:hidden ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -212,7 +211,7 @@ export default function AdminLayout({ children }) {
       {/* Main Content Area */}
       <div className="min-h-screen transition-[margin] duration-200" style={{ marginLeft: collapsed ? 76 : 264 }}>
         {/* Sticky Header */}
-        <header className="sticky top-0 z-30 flex min-h-[68px] items-center justify-between gap-3 border-b border-[var(--border)] bg-white/10 dark:bg-black/20 px-4 py-3 backdrop-blur-md sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-30 flex min-h-[68px] items-center justify-between gap-3 border-b border-white/60 bg-white/65 dark:bg-black/40 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 shadow-xs">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"

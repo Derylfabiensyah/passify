@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useId } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -61,9 +61,9 @@ export default function DataTable({
   const totalPages = table.getPageCount() || 1;
 
   return (
-    <div className="card bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-sm overflow-hidden">
+    <div className="glass-panel rounded-2xl shadow-sm overflow-hidden">
       {/* Top Header & Global Search */}
-      <div className="p-4 sm:p-5 border-b border-[var(--border)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 border-b border-white/60 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           {title && <h3 id={`table-title-${tableId}`} className="text-base font-bold text-[var(--forest-deep)] font-heading">{title}</h3>}
           {subtitle && <p className="text-xs text-[var(--ink-soft)] mt-0.5">{subtitle}</p>}
@@ -79,7 +79,7 @@ export default function DataTable({
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
             placeholder={searchPlaceholder}
-            className="w-full bg-[var(--canvas)] rounded-xl pl-9 pr-3 py-2 text-xs text-[var(--ink)] placeholder-[var(--ink-soft)] border border-[var(--border)] focus:outline-none focus:ring-1 focus:ring-[var(--forest)] focus:bg-[var(--surface)] transition-colors shadow-2xs"
+            className="w-full bg-white/60 dark:bg-black/20 rounded-xl pl-9 pr-3 py-2 text-xs text-[var(--ink)] placeholder-[var(--ink-soft)] border border-white/80 dark:border-white/10 focus:outline-none focus:ring-1 focus:ring-[var(--forest)] focus:bg-white dark:focus:bg-black/40 transition-colors shadow-2xs backdrop-blur-xs"
           />
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function DataTable({
         >
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="bg-[var(--canvas)]/80 border-b border-[var(--border)]">
+              <tr key={headerGroup.id} className="bg-white/40 dark:bg-black/20 backdrop-blur-md border-b border-white/60 dark:border-white/10">
                 {headerGroup.headers.map((header) => {
                   const canSort = header.column.getCanSort();
                   const sorted = header.column.getIsSorted();
@@ -171,7 +171,7 @@ export default function DataTable({
       </div>
 
       {/* Pagination & Descriptive Row Count Footer */}
-      <div className="p-3 sm:px-5 border-t border-[var(--border)] bg-[var(--surface)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--ink-soft)]">
+      <div className="p-3 sm:px-5 border-t border-white/60 dark:border-white/10 bg-white/30 dark:bg-black/20 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[var(--ink-soft)]">
         <div className="flex items-center gap-2">
           <span>Tampilkan</span>
           <select
@@ -180,7 +180,7 @@ export default function DataTable({
             onChange={(e) => {
               table.setPageSize(Number(e.target.value));
             }}
-            className="bg-[var(--canvas)] border border-[var(--border)] rounded-lg px-2.5 py-1 text-xs text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--forest)] shadow-2xs"
+            className="bg-white/60 dark:bg-black/20 border border-white/80 dark:border-white/10 rounded-lg px-2.5 py-1 text-xs text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--forest)] shadow-2xs"
           >
             {[5, 10, 20, 50].map((size) => (
               <option key={size} value={size}>
@@ -204,7 +204,7 @@ export default function DataTable({
               aria-label="Halaman sebelumnya"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="p-1.5 rounded-lg bg-[var(--canvas)] border border-[var(--border)] text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
+              className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-white/80 dark:border-white/10 text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -213,7 +213,7 @@ export default function DataTable({
               aria-label="Halaman berikutnya"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="p-1.5 rounded-lg bg-[var(--canvas)] border border-[var(--border)] text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
+              className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-white/80 dark:border-white/10 text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

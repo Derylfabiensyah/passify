@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   MapPin,
@@ -70,7 +70,7 @@ function TicketCategoryRow({ cat, onEdit, onDelete }) {
   const total = Number(cat.price || 0) + Number(cat.insurance || 0) + Number(cat.retribusi || 0);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5 px-4 rounded-xl bg-transparent border border-[var(--border)] hover:border-[var(--forest)]/30 transition-colors">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5 px-4 rounded-xl bg-white/60 dark:bg-black/20 backdrop-blur-md border border-white/80 dark:border-white/10 hover:border-emerald-500/40 transition-colors shadow-2xs">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-[var(--forest-deep)]">{cat.name}</span>
@@ -135,7 +135,7 @@ function DestinationCard({
   const quotaPct = rawPct > 0 && rawPct < 1 ? Number(rawPct.toFixed(1)) : Math.round(rawPct);
 
   return (
-    <div className="card bg-white rounded-2xl overflow-hidden shadow-xs border border-[var(--border)]">
+    <div className="glass-panel rounded-2xl overflow-hidden shadow-sm">
       <div className="flex flex-col sm:flex-row gap-5 p-5 sm:p-6">
         <div className="relative w-full sm:w-36 h-32 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
           <img
@@ -204,7 +204,7 @@ function DestinationCard({
         </div>
       </div>
 
-      <div className="px-6 py-3 bg-[var(--sand)] border-t border-[var(--border)] flex items-center justify-between text-xs">
+      <div className="px-6 py-3.5 bg-white/40 dark:bg-black/20 backdrop-blur-md border-t border-white/60 dark:border-white/10 flex items-center justify-between text-xs">
         <button
           type="button"
           onClick={() => onToggleExpand(dest.id)}
@@ -220,7 +220,7 @@ function DestinationCard({
       </div>
 
       {isExpanded && (
-        <div className="p-6 border-t border-[var(--border)] bg-[var(--sand)]/50 space-y-4">
+        <div className="p-6 border-t border-white/60 dark:border-white/10 bg-white/30 dark:bg-black/10 backdrop-blur-md space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h4 className="text-xs font-extrabold uppercase tracking-wider text-[var(--forest-deep)]">
@@ -324,7 +324,7 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
 
   return (
     <div className="modal-overlay z-50 flex items-center justify-center p-4">
-      <div className="modal-content bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="modal-content glass-panel w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-white/80">
         <div className="bg-[var(--forest-deep)] text-white p-5 flex items-center justify-between">
           <h3 className="text-base font-bold font-serif">
             {cat?.id ? 'Edit Kategori Tiket' : 'Tambah Kategori Tiket Baru'}
@@ -399,14 +399,14 @@ function EditCategoryModal({ cat, isOpen, onClose, onSave }) {
           </div>
 
           {/* Grand Total Preview */}
-          <div className="p-4 rounded-2xl bg-[var(--fog)] flex items-baseline justify-between border border-[var(--border)]">
+          <div className="p-4 rounded-2xl bg-white/60 backdrop-blur-xs flex items-baseline justify-between border border-white/70 shadow-2xs">
             <span className="font-bold text-[var(--forest-deep)]">Total per Pengunjung:</span>
             <span className="text-base font-extrabold text-[var(--bark)]">
               Rp {total.toLocaleString('id-ID')}
             </span>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[var(--border)]">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/60">
             <button
               type="button"
               onClick={onClose}
@@ -611,7 +611,7 @@ export default function DestinationsPage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Top Header */}
-      <div className="pb-4 border-b border-[var(--border)]">
+      <div className="pb-4 border-b border-white/60">
         <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--forest-deep)] font-serif">
           Destinasi &amp; Manajemen Tiket
         </h1>

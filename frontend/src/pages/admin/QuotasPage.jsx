@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CalendarClock,
   AlertTriangle,
@@ -32,10 +32,10 @@ function QuotaDayCard({ day, onEditQuota, onToggleClose }) {
 
   return (
     <div
-      className={`p-3.5 rounded-2xl transition-all shadow-2xs ${
+      className={`p-3.5 rounded-2xl transition-all shadow-2xs border ${
         day.is_closed
-          ? 'bg-red-50'
-          : 'bg-white hover:shadow-xs'
+          ? 'bg-red-50/80 border-red-200/80 backdrop-blur-xs'
+          : 'bg-white/70 hover:bg-white/95 border-white/80 backdrop-blur-xs hover:shadow-xs'
       }`}
     >
       <div className="flex items-center justify-between mb-2">
@@ -116,7 +116,7 @@ function QuotaDayCard({ day, onEditQuota, onToggleClose }) {
 function TimeSlotCard({ slot, onEdit, onDelete }) {
   const usedPct = slot.max_capacity > 0 ? Math.round((slot.booked / slot.max_capacity) * 100) : 0;
   return (
-    <div className={`card p-4 bg-white rounded-2xl shadow-sm ${!slot.is_active ? 'opacity-70 bg-gray-50' : ''}`}>
+    <div className={`p-4 rounded-2xl border transition-all shadow-2xs ${!slot.is_active ? 'opacity-70 bg-white/40 border-white/60' : 'bg-white/70 hover:bg-white/95 border-white/80 backdrop-blur-xs'}`}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-gray-50 flex items-center justify-center shadow-2xs">
@@ -196,7 +196,7 @@ function EditQuotaModal({ day, onClose, onSave }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content card p-6 max-w-sm w-full bg-white border border-gray-200 rounded-2xl shadow-xl">
+      <div className="modal-content glass-panel p-6 max-w-sm w-full rounded-2xl shadow-2xl border border-white/80">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-bold text-gray-900">Ubah Kuota {day.dayLabel}</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-700">
@@ -307,7 +307,7 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content card p-6 max-w-md w-full bg-white border border-gray-200 rounded-2xl shadow-xl">
+      <div className="modal-content glass-panel p-6 max-w-md w-full rounded-2xl shadow-2xl border border-white/80">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-base font-bold text-gray-900">
             {isNew ? 'Tambah Sesi Kunjungan Baru' : 'Ubah Sesi Kunjungan'}
@@ -630,7 +630,7 @@ export default function QuotasPage() {
       )}
 
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/60">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900">
             Manajemen Kuota & Kapasitas Kunjungan
@@ -682,7 +682,7 @@ export default function QuotasPage() {
               className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
                 selectedDest.id === dest.id
                   ? 'bg-emerald-600 text-white shadow-2xs'
-                  : 'bg-white text-gray-600 hover:text-gray-900 hover:bg-gray-50 shadow-2xs'
+                  : 'bg-white/60 border border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
               }`}
             >
               {dest.name}
@@ -699,7 +699,7 @@ export default function QuotasPage() {
       ) : null}
 
       {/* Quota Calendar Grid */}
-      <div className="card p-5 bg-white rounded-2xl shadow-sm">
+      <div className="glass-panel p-5 rounded-2xl shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <CalendarClock className="w-4 h-4 text-emerald-600" />
@@ -721,7 +721,7 @@ export default function QuotasPage() {
       </div>
 
       {/* Time Slots Grid */}
-      <div className="card p-5 bg-white rounded-2xl shadow-sm">
+      <div className="glass-panel p-5 rounded-2xl shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
             <Clock className="w-4 h-4 text-emerald-600" />

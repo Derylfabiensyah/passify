@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react';
 import { StatCardSkeleton } from '../common/Skeleton';
 
@@ -31,14 +31,14 @@ export default function AdminStatCard({
   };
 
   return (
-    <div className="p-5 bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
+    <div className="p-5 glass-panel rounded-2xl hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200">
       <div className="flex items-start justify-between mb-3.5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--canvas)] text-[var(--forest-deep)]">
+          <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-[var(--forest-deep)]/10 text-[var(--forest-deep)] backdrop-blur-xs">
             {Icon && <Icon className="w-4 h-4" />}
           </div>
           {badgeText && (
-            <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--ink-soft)] bg-[var(--canvas)] px-2.5 py-0.5 rounded-full border border-[var(--border)]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--forest-deep)] bg-white/70 dark:bg-black/30 px-2.5 py-0.5 rounded-full border border-white/80 shadow-2xs">
               {badgeText}
             </span>
           )}
@@ -81,7 +81,7 @@ export default function AdminStatCard({
             <span className="font-semibold text-[var(--forest-deep)]">{progress}%</span>
           </div>
           <div
-            className="w-full h-1.5 rounded-full bg-[var(--canvas)] overflow-hidden"
+            className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden"
             role="progressbar"
             aria-valuenow={Math.min(100, Math.max(0, progress))}
             aria-valuemin={0}

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Landmark,
   TrendingUp,
@@ -297,7 +297,7 @@ export default function FinancePage() {
   return (
     <div className="flex flex-col gap-6">
       {/* Header & Date Range Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[var(--border)]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/60">
         <div>
           <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--forest-deep)] font-heading">
             Keuangan & Pencairan Dana (Settlement)
@@ -309,7 +309,7 @@ export default function FinancePage() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Period Selector Tabs */}
-          <div className="flex items-center bg-transparent p-1 rounded-xl border border-[var(--border)] text-xs" role="radiogroup" aria-label="Filter Rentang Waktu">
+          <div className="flex items-center bg-white/50 backdrop-blur-md p-1 rounded-xl border border-white/70 text-xs" role="radiogroup" aria-label="Filter Rentang Waktu">
             {[
               { id: '7d', label: '7 Hari' },
               { id: '30d', label: '30 Hari' },
@@ -324,7 +324,7 @@ export default function FinancePage() {
                 onClick={() => setPeriod(t.id)}
                 className={`px-3 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${
                   period === t.id
-                    ? 'bg-[var(--surface)] text-[var(--forest-deep)] shadow-2xs'
+                    ? 'bg-white text-[var(--forest-deep)] shadow-2xs'
                     : 'text-[var(--ink-soft)] hover:text-[var(--forest-deep)]'
                 }`}
               >
@@ -378,7 +378,7 @@ export default function FinancePage() {
       </div>
 
       {/* Chart Section: Gross vs Net Payout */}
-      <div className="card p-5 sm:p-6 bg-[var(--surface)] border border-[var(--border)] rounded-2xl shadow-sm">
+      <div className="glass-panel p-5 sm:p-6 rounded-2xl shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
             <h3 className="text-base font-bold text-[var(--forest-deep)] font-heading flex items-center gap-2">
@@ -408,7 +408,7 @@ export default function FinancePage() {
       />
 
       {/* Payout Schedule Policy Banner */}
-      <div className="card p-4 bg-[var(--surface)] border border-[var(--border)] rounded-2xl flex items-start gap-3 shadow-sm">
+      <div className="glass-panel p-4 rounded-2xl flex items-start gap-3 shadow-sm">
         <div className="w-9 h-9 rounded-xl bg-[var(--leaf-pale)] shadow-2xs flex items-center justify-center flex-shrink-0">
           <FileText className="w-4.5 h-4.5 text-[var(--forest)]" />
         </div>
