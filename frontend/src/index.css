@@ -73,7 +73,7 @@
   --shadow-lift: 0 20px 48px rgba(45, 52, 38, 0.14);
 
   /* Glassmorphism settings */
-  --glass-blur: blur(28px) saturate(200%);
+  --glass-blur: blur(40px) saturate(200%);
   --glass-border: 1px solid rgba(255, 255, 255, 0.85);
   --glass-border-strong: 1px solid rgba(255, 255, 255, 0.95);
 
@@ -194,15 +194,15 @@
   .card {
     border: 1px solid rgba(255, 255, 255, 0.85);
     border-radius: var(--radius-card, 1.25rem);
-    background: rgba(255, 255, 255, 0.68);
-    backdrop-filter: blur(28px) saturate(200%);
-    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
     box-shadow: 0 14px 36px -4px rgba(24, 45, 28, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.5);
     transition: box-shadow .2s ease, transform .2s ease, background .2s ease, border-color .2s ease;
   }
   .card:hover {
     box-shadow: 0 20px 48px -4px rgba(24, 45, 28, 0.14), inset 0 1px 0 #ffffff;
-    background: rgba(255, 255, 255, 0.80);
+    background: rgba(255, 255, 255, 0.84);
     border-color: rgba(255, 255, 255, 1);
   }
   .dark .card {
@@ -338,15 +338,15 @@
   .glass-panel { 
     border: 1px solid rgba(255, 255, 255, 0.85); 
     border-radius: var(--radius-card, 1.25rem);
-    background: rgba(255, 255, 255, 0.68); 
+    background: rgba(255, 255, 255, 0.72); 
     box-shadow: 0 14px 36px -4px rgba(24, 45, 28, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.5); 
-    backdrop-filter: blur(28px) saturate(200%); 
-    -webkit-backdrop-filter: blur(28px) saturate(200%);
+    backdrop-filter: blur(40px) saturate(200%); 
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
     transition: box-shadow .2s ease, transform .2s ease, background .2s ease, border-color .2s ease;
   }
   .glass-panel:hover {
     box-shadow: 0 20px 48px -4px rgba(24, 45, 28, 0.14), inset 0 1px 0 #ffffff;
-    background: rgba(255, 255, 255, 0.80);
+    background: rgba(255, 255, 255, 0.84);
     border-color: rgba(255, 255, 255, 1);
   }
   .dark .glass-panel {
@@ -363,15 +363,15 @@
   .glass-card-dark {
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: var(--radius-card, 1.25rem);
-    background: rgba(12, 28, 20, 0.65);
-    backdrop-filter: blur(24px) saturate(190%);
-    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    background: rgba(12, 28, 20, 0.68);
+    backdrop-filter: blur(36px) saturate(200%);
+    -webkit-backdrop-filter: blur(36px) saturate(200%);
     box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
     color: #ffffff;
   }
   .glass-card-dark:hover {
     border-color: rgba(255, 255, 255, 0.35);
-    background: rgba(16, 36, 26, 0.75);
+    background: rgba(16, 36, 26, 0.78);
   }
 
   .tenant-primary { background-color: var(--tenant-primary, var(--forest-deep)); }

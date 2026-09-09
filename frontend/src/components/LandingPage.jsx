@@ -451,7 +451,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="mt-12 sm:mt-16 w-full glass-panel rounded-t-[2.5rem] sm:rounded-t-[3.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-2xl pt-12 pb-8 sm:pt-16 sm:pb-12">
+      <footer className="mt-12 sm:mt-16 w-full bg-white/85 backdrop-blur-2xl rounded-t-[2.5rem] sm:rounded-t-[3.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-2xl pt-12 pb-8 sm:pt-16 sm:pb-12">
         <div className="mx-auto max-w-[1240px] px-4 sm:px-6 lg:px-8">
           {/* Main Footer Grid */}
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 pb-10 border-b border-black/[0.08] dark:border-white/10">

@@ -407,7 +407,7 @@ export default function TenantPortal() {
           <span>Pesanan</span>
         </Link>
       </div>
-      <footer className="border-t border-white/60 bg-white/50 backdrop-blur-md px-4 py-7 text-center text-xs text-[#3b4836] space-y-2">
+      <footer className="border-t border-white/80 bg-white/85 backdrop-blur-2xl px-4 py-7 text-center text-xs text-[#3b4836] space-y-2">
         <div className="flex flex-wrap justify-center items-center gap-3 text-xs font-medium">
           <Link to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'} className="text-emerald-800 hover:underline font-bold flex items-center gap-1">
             <Ticket className="h-3.5 w-3.5 text-emerald-700" />

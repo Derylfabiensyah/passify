@@ -322,7 +322,7 @@ export default function TravelerPortal() {
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/80 bg-white/85 px-4 py-3 backdrop-blur-xl lg:hidden shadow-lg">
         <button type="button" onClick={handleBookNowClick} className="btn-clay w-full text-sm font-bold"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button>
       </div>
-      <footer className="border-t border-white/60 bg-white/50 backdrop-blur-md px-4 py-7 sm:px-6 lg:px-8">
+      <footer className="border-t border-white/80 bg-white/85 backdrop-blur-2xl px-4 py-7 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[#3b4836] sm:flex-row sm:items-center sm:justify-between">
           <span><strong className="text-[#14281a] font-bold">{destination.name}</strong> · Didukung Passify</span>
           <Link to="/" className="font-bold text-emerald-800 hover:text-emerald-950">Kembali ke beranda Passify</Link>
