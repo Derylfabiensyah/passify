@@ -38,7 +38,7 @@ export default function AdminStatCard({
             {Icon && <Icon className="w-4 h-4" />}
           </div>
           {badgeText && (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--forest-deep)] bg-white/70 dark:bg-black/30 px-2.5 py-0.5 rounded-full border border-white/80 shadow-2xs">
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#14281a] bg-white/80 px-2.5 py-0.5 rounded-full border border-white/90 shadow-2xs">
               {badgeText}
             </span>
           )}
@@ -46,12 +46,12 @@ export default function AdminStatCard({
 
         {(trend !== undefined || trendDirection !== undefined) && (
           <div
-            className={`inline-flex items-center gap-0.5 text-xs font-medium px-2 py-0.5 rounded-full ${
+            className={`inline-flex items-center gap-0.5 text-xs font-bold px-2 py-0.5 rounded-full ${
               isUp
-                ? 'text-emerald-700 bg-emerald-50/70 border border-emerald-200/60'
+                ? 'text-emerald-800 bg-emerald-100/80 border border-emerald-300/80'
                 : isDown
-                ? 'text-red-600 bg-red-50/70 border border-red-200/60'
-                : 'text-gray-600 bg-gray-50 border border-gray-200'
+                ? 'text-red-700 bg-red-100/80 border border-red-300/80'
+                : 'text-gray-700 bg-white/80 border border-white/90'
             }`}
           >
             {isUp && <ArrowUpRight className="w-3.5 h-3.5" />}
@@ -62,23 +62,23 @@ export default function AdminStatCard({
         )}
       </div>
 
-      <div className="text-2xl font-bold text-[var(--forest-deep)] font-heading tracking-tight mb-1">
+      <div className="text-2xl font-extrabold text-[#14281a] font-heading tracking-tight mb-1">
         {value}
       </div>
 
-      <div className="text-xs text-[var(--ink-soft)] font-normal">{label}</div>
+      <div className="text-xs text-[#2a3426] font-semibold">{label}</div>
 
       {subValue && (
-        <div className="text-[11px] text-[var(--ink-soft)]/80 mt-2">
+        <div className="text-[11px] text-[#4d5c48] font-medium mt-1.5">
           <span>{subValue}</span>
         </div>
       )}
 
       {progress !== undefined && (
-        <div className="mt-3.5 pt-3 border-t border-[var(--border)]">
-          <div className="flex items-center justify-between text-[11px] text-[var(--ink-soft)] mb-1.5">
-            <span>{progressLabel}</span>
-            <span className="font-semibold text-[var(--forest-deep)]">{progress}%</span>
+        <div className="mt-3.5 pt-3 border-t border-white/70">
+          <div className="flex items-center justify-between text-[11px] text-[#3d4d38] mb-1.5">
+            <span className="font-semibold">{progressLabel}</span>
+            <span className="font-extrabold text-[#14281a]">{progress}%</span>
           </div>
           <div
             className="w-full h-1.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden"

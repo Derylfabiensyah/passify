@@ -70,25 +70,25 @@ function TicketCategoryRow({ cat, onEdit, onDelete }) {
   const total = Number(cat.price || 0) + Number(cat.insurance || 0) + Number(cat.retribusi || 0);
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5 px-4 rounded-xl bg-white/60 dark:bg-black/20 backdrop-blur-md border border-white/80 dark:border-white/10 hover:border-emerald-500/40 transition-colors shadow-2xs">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3.5 px-4 rounded-xl bg-white/80 hover:bg-white/95 backdrop-blur-md border border-white/90 shadow-2xs hover:shadow-xs transition-all">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[var(--forest-deep)]">{cat.name}</span>
+          <span className="text-xs font-extrabold text-[#14281a]">{cat.name}</span>
           <span
             className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full ${
-              cat.is_active !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-600'
+              cat.is_active !== false ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'
             }`}
           >
             {cat.is_active !== false ? 'Aktif' : 'Nonaktif'}
           </span>
         </div>
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[11px] text-[var(--ink-soft)]">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-[11px] text-[#3d4d38]">
           <span>
-            Tarif Pokok: <strong className="text-[var(--ink)] font-semibold">Rp {Number(cat.price || 0).toLocaleString('id-ID')}</strong>
+            Tarif Pokok: <strong className="text-[#14281a] font-bold">Rp {Number(cat.price || 0).toLocaleString('id-ID')}</strong>
           </span>
-          <span>â€¢ Asuransi: Rp {Number(cat.insurance || 0).toLocaleString('id-ID')}</span>
-          <span>â€¢ Retribusi: Rp {Number(cat.retribusi || 0).toLocaleString('id-ID')}</span>
-          <span className="text-[var(--bark)] font-extrabold">
+          <span>• Asuransi: Rp {Number(cat.insurance || 0).toLocaleString('id-ID')}</span>
+          <span>• Retribusi: Rp {Number(cat.retribusi || 0).toLocaleString('id-ID')}</span>
+          <span className="text-[#14281a] font-black">
             Total: Rp {total.toLocaleString('id-ID')}
           </span>
         </div>
@@ -204,29 +204,29 @@ function DestinationCard({
         </div>
       </div>
 
-      <div className="px-6 py-3.5 bg-white/40 dark:bg-black/20 backdrop-blur-md border-t border-white/60 dark:border-white/10 flex items-center justify-between text-xs">
+      <div className="px-6 py-3.5 bg-white/70 backdrop-blur-md border-t border-white/80 flex items-center justify-between text-xs">
         <button
           type="button"
           onClick={() => onToggleExpand(dest.id)}
-          className="flex items-center gap-1.5 text-[var(--forest-deep)] hover:text-[var(--forest)] font-bold transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 text-[#14281a] hover:text-emerald-800 font-bold transition-colors cursor-pointer"
         >
-          {isExpanded ? <ChevronUp className="w-4 h-4 text-[var(--forest)]" /> : <ChevronDown className="w-4 h-4 text-[var(--forest)]" />}
+          {isExpanded ? <ChevronUp className="w-4 h-4 text-emerald-700" /> : <ChevronDown className="w-4 h-4 text-emerald-700" />}
           <span>{isExpanded ? 'Tutup Pengaturan Tiket & Tarif' : 'Kelola Kategori & Struktur Tarif Tiket'}</span>
         </button>
 
-        <span className="text-[11px] text-[var(--ink-soft)]">
+        <span className="text-[11px] font-semibold text-[#4d5c48]">
           {(dest.facilities || []).length} Fasilitas Aktif
         </span>
       </div>
 
       {isExpanded && (
-        <div className="p-6 border-t border-white/60 dark:border-white/10 bg-white/30 dark:bg-black/10 backdrop-blur-md space-y-4">
+        <div className="p-6 border-t border-white/80 bg-white/50 backdrop-blur-md space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="text-xs font-extrabold uppercase tracking-wider text-[var(--forest-deep)]">
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#14281a]">
                 Daftar Kategori Tiket Masuk Resmi
               </h4>
-              <p className="text-[11px] text-[var(--ink-soft)] mt-0.5">
+              <p className="text-[11px] font-medium text-[#4d5c48] mt-0.5">
                 Atur tarif tiket masuk, asuransi pengunjung, dan retribusi PEMDA yang dapat dipilih wisatawan.
               </p>
             </div>

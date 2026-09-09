@@ -59,11 +59,11 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
 
   return (
     <>
-      <div className="border-b border-[var(--border)] px-4 py-5">
+      <div className="border-b border-white/70 px-5 py-5 flex items-center justify-between">
         <Brand collapsed={collapsed} />
       </div>
-      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-5" aria-label="Navigasi pengelola">
-        <p className={`mb-2 px-3 text-[10px] font-extrabold uppercase tracking-[.14em] text-[var(--ink-muted)] ${collapsed ? 'sr-only' : ''}`}>
+      <nav className="flex-1 space-y-1.5 overflow-y-auto px-3.5 py-5" aria-label="Navigasi pengelola">
+        <p className={`mb-2.5 px-3 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#4d5c48] ${collapsed ? 'sr-only' : ''}`}>
           Operasional
         </p>
         {menuItems.map((item) => {
@@ -76,35 +76,35 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
               to={item.path}
               onClick={onNavigate}
               title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-bold no-underline transition-colors outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
+              className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs font-bold no-underline transition-all outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
                 isActive
-                  ? 'bg-[var(--forest-deep)] text-white shadow-[0_7px_16px_rgba(16,45,32,.13)]'
-                  : 'text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)]'
+                  ? 'bg-[#284430] text-white shadow-[0_6px_20px_rgba(30,55,38,0.22)]'
+                  : 'text-[#2a3426] hover:text-[#14281a] hover:bg-emerald-800/10'
               } ${collapsed ? 'justify-center' : ''}`}
             >
-              <Icon className="h-4 w-4 shrink-0" />
+              <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-white' : 'text-[#3d4d38]'}`} />
               <span className={collapsed ? 'sr-only' : 'truncate'}>{item.label}</span>
             </Link>
           );
         })}
       </nav>
-      <div className="border-t border-[var(--border)] p-3">
+      <div className="border-t border-white/70 p-3.5">
         {!collapsed && (
-          <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-white/70 bg-white/50 dark:bg-black/30 p-2.5 backdrop-blur-md shadow-2xs">
+          <div className="mb-2.5 flex items-center justify-between gap-2 rounded-xl border border-white/85 bg-white/75 p-2.5 backdrop-blur-md shadow-xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[var(--forest)] text-xs font-bold text-white shadow-2xs">
+              <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#284430] text-xs font-bold text-white shadow-2xs">
                 {userInitial}
               </span>
               <div className="min-w-0">
-                <span className="block truncate text-xs font-bold text-[var(--forest-deep)]">{adminUser.name}</span>
-                <span className="block truncate text-[10px] text-[var(--ink-soft)]">{tenantDisplayName}</span>
+                <span className="block truncate text-xs font-bold text-[#14281a]">{adminUser.name}</span>
+                <span className="block truncate text-[10px] font-semibold text-[#4d5c48]">{tenantDisplayName}</span>
               </div>
             </div>
             <button
               type="button"
               onClick={onLogout}
               title="Keluar (Logout)"
-              className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
+              className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors cursor-pointer shrink-0"
               aria-label="Logout"
             >
               <LogOut className="h-4 w-4" />
@@ -116,7 +116,7 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
             id="toggle-sidebar-btn"
             type="button"
             onClick={onToggle}
-            className="hidden w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] md:flex cursor-pointer"
+            className="hidden w-full items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold text-[#2a3426] hover:bg-emerald-800/10 hover:text-[#14281a] md:flex cursor-pointer transition-colors"
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <><ChevronLeft className="h-4 w-4" /><span>Tutup menu</span></>}
           </button>
@@ -162,7 +162,7 @@ export default function AdminLayout({ children }) {
 
       {/* Desktop Sidebar */}
       <aside
-        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/60 bg-white/65 dark:bg-black/40 backdrop-blur-xl transition-[width] duration-200 md:flex shadow-[4px_0_24px_rgba(24,45,28,0.03)]"
+        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-white/80 bg-white/85 backdrop-blur-2xl transition-[width] duration-200 md:flex shadow-[4px_0_30px_rgba(24,45,28,0.04)]"
         style={{ width: collapsed ? 76 : 264 }}
       >
         <SidebarContent
@@ -183,7 +183,7 @@ export default function AdminLayout({ children }) {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-white/60 bg-white/75 dark:bg-black/60 backdrop-blur-2xl shadow-[var(--shadow-lift)] transition-transform duration-200 md:hidden ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-[284px] flex-col border-r border-white/80 bg-white/95 backdrop-blur-2xl shadow-2xl transition-transform duration-200 md:hidden ${
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -191,7 +191,7 @@ export default function AdminLayout({ children }) {
           <button
             type="button"
             onClick={() => setMobileOpen(false)}
-            className="grid h-9 w-9 place-items-center rounded-full text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] cursor-pointer"
+            className="grid h-9 w-9 place-items-center rounded-full text-[#2a3426] hover:bg-emerald-800/10 cursor-pointer"
             aria-label="Tutup menu"
           >
             <X className="h-4 w-4" />
@@ -211,18 +211,18 @@ export default function AdminLayout({ children }) {
       {/* Main Content Area */}
       <div className="min-h-screen transition-[margin] duration-200" style={{ marginLeft: collapsed ? 76 : 264 }}>
         {/* Sticky Header */}
-        <header className="sticky top-0 z-30 flex min-h-[68px] items-center justify-between gap-3 border-b border-white/60 bg-white/65 dark:bg-black/40 px-4 py-3 backdrop-blur-xl sm:px-6 lg:px-8 shadow-xs">
+        <header className="sticky top-0 z-30 flex min-h-[68px] items-center justify-between gap-3 border-b border-white/80 bg-white/85 px-4 py-3 backdrop-blur-2xl sm:px-6 lg:px-8 shadow-[0_2px_16px_rgba(24,45,28,0.03)]">
           <div className="flex min-w-0 items-center gap-3">
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-[var(--border)] text-[var(--forest)] hover:bg-[var(--leaf-pale)] md:hidden cursor-pointer"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/80 bg-white/90 text-[#14281a] hover:bg-white md:hidden cursor-pointer shadow-2xs"
               aria-label="Buka menu"
             >
               <Menu className="h-4 w-4" />
             </button>
             <div className="min-w-0">
-              <h1 className="truncate text-lg font-bold text-[var(--forest-deep)] sm:text-xl">
+              <h1 className="truncate text-lg font-extrabold text-[#14281a] sm:text-xl font-heading">
                 {currentItem?.label || 'Ringkasan'}
               </h1>
             </div>
@@ -234,9 +234,9 @@ export default function AdminLayout({ children }) {
               to={`/?tenant=${activeTenantSlug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center gap-1.5 rounded-full border border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md px-3.5 py-2 text-xs font-bold text-[var(--forest)] no-underline transition-colors hover:bg-[var(--leaf-pale)] sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-full border border-emerald-300/80 bg-white/90 px-3.5 py-1.5 text-xs font-bold text-[#1e4b35] no-underline transition-all hover:bg-white hover:shadow-xs shadow-2xs sm:inline-flex"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-3.5 w-3.5 text-emerald-600" />
               <span>Portal Publik</span>
             </Link>
 
@@ -244,7 +244,7 @@ export default function AdminLayout({ children }) {
             <button
               type="button"
               onClick={() => toast.info('Tidak ada notifikasi baru saat ini.')}
-              className="grid h-9 w-9 place-items-center rounded-full border border-[var(--border)] bg-white/10 dark:bg-black/20 backdrop-blur-md text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] transition-colors cursor-pointer"
+              className="grid h-9 w-9 place-items-center rounded-full border border-gray-200/90 bg-white/90 text-[#2a3426] hover:bg-white hover:text-[#14281a] transition-all shadow-2xs hover:shadow-xs cursor-pointer"
               aria-label="Notifikasi"
             >
               <Bell className="h-4 w-4" />
