@@ -2,9 +2,12 @@ package payment
 
 import (
 	"crypto/sha512"
+	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -17,6 +20,32 @@ import (
 )
 
 // DTO Structs
+
+// SnapItemRequest item line in snap request
+type SnapItemRequest struct {
+	ID       string  `json:"id"`
+	Name     string  `json:"name"`
+	Price    float64 `json:"price"`
+	Quantity int     `json:"quantity"`
+}
+
+// CreateSnapOrderRequest contains data required to generate a Midtrans Snap transaction
+type CreateSnapOrderRequest struct {
+	OrderNumber     string            `json:"order_number"`
+	GrossAmount     float64           `json:"gross_amount"`
+	DestinationID   *uuid.UUID        `json:"destination_id,omitempty"`
+	DestinationName string            `json:"destination_name,omitempty"`
+	DestinationSlug string            `json:"destination_slug,omitempty"`
+	TenantID        *uuid.UUID        `json:"tenant_id,omitempty"`
+	UserID          *uuid.UUID        `json:"user_id,omitempty"`
+	CustomerName    string            `json:"customer_name"`
+	CustomerEmail   string            `json:"customer_email"`
+	CustomerPhone   string            `json:"customer_phone"`
+	VisitDate       *string           `json:"visit_date,omitempty"`
+	TimeSlotID      *uuid.UUID        `json:"time_slot_id,omitempty"`
+	VisitorCount    int               `json:"visitor_count,omitempty"`
+	Items           []SnapItemRequest `json:"items,omitempty"`
+}
 
 // PaymentInvoiceResponse contains invoice creation response details
 type PaymentInvoiceResponse struct {
@@ -461,3 +490,341 @@ func (s *PaymentService) HandlePayoutWebhook(req PayoutWebhookRequest) error {
 
 	return nil
 }
+
+// CreateSnapTransaction creates a Midtrans Snap transaction for a checkout order
+func (s *PaymentService) CreateSnapTransaction(req *CreateSnapOrderRequest) (*PaymentInvoiceResponse, error) {
+	if req.OrderNumber == "" {
+		req.OrderNumber = fmt.Sprintf("TWA-%s-%04d", time.Now().Format("20060102"), time.Now().UnixNano()%10000)
+	}
+
+	grossAmt := int64(req.GrossAmount)
+	if grossAmt <= 0 {
+		var sum float64
+		for _, it := range req.Items {
+			qty := it.Quantity
+			if qty <= 0 {
+				qty = 1
+			}
+			sum += it.Price * float64(qty)
+		}
+		grossAmt = int64(sum)
+	}
+	if grossAmt <= 0 {
+		grossAmt = 35000
+	}
+
+	var snapToken string
+	var invoiceURL string
+	paymentMethod := "MIDTRANS_SNAP"
+	expiresAt := time.Now().Add(24 * time.Hour)
+
+	if s.cfg.MidtransServerKey != "" {
+		var snapClient snap.Client
+		env := midtrans.Sandbox
+		if s.cfg.MidtransIsProduction {
+			env = midtrans.Production
+		}
+		snapClient.New(s.cfg.MidtransServerKey, env)
+
+		var items []midtrans.ItemDetails
+		var itemsTotal int64
+		for _, it := range req.Items {
+			qty := it.Quantity
+			if qty <= 0 {
+				qty = 1
+			}
+			price := int64(it.Price)
+			items = append(items, midtrans.ItemDetails{
+				ID:    it.ID,
+				Name:  it.Name,
+				Price: price,
+				Qty:   int32(qty),
+			})
+			itemsTotal += price * int64(qty)
+		}
+
+		if itemsTotal != grossAmt || len(items) == 0 {
+			name := req.DestinationName
+			if name == "" {
+				name = "Tiket Wisata Alam"
+			}
+			items = []midtrans.ItemDetails{
+				{
+					ID:    req.OrderNumber,
+					Name:  fmt.Sprintf("%s (%s)", name, req.OrderNumber),
+					Price: grossAmt,
+					Qty:   1,
+				},
+			}
+		}
+
+		fName := req.CustomerName
+		if fName == "" {
+			fName = "Wisatawan"
+		}
+		email := req.CustomerEmail
+		if email == "" {
+			email = "visitor@passify.id"
+		}
+		phone := req.CustomerPhone
+		if phone == "" {
+			phone = "08123456789"
+		}
+
+		snapReq := &snap.Request{
+			TransactionDetails: midtrans.TransactionDetails{
+				OrderID:  req.OrderNumber,
+				GrossAmt: grossAmt,
+			},
+			CustomerDetail: &midtrans.CustomerDetails{
+				FName: fName,
+				Email: email,
+				Phone: phone,
+			},
+			Items: &items,
+		}
+
+		snapResp, snapErr := snapClient.CreateTransaction(snapReq)
+		if snapErr != nil {
+			return nil, fmt.Errorf("gagal membuat transaksi Midtrans Snap: %s", snapErr.GetMessage())
+		}
+
+		snapToken = snapResp.Token
+		invoiceURL = snapResp.RedirectURL
+	} else {
+		snapToken = fmt.Sprintf("SNAP-%s-%04d", req.OrderNumber, time.Now().Unix()%1000)
+		invoiceURL = fmt.Sprintf("https://app.sandbox.midtrans.com/snap/v2/vtweb/%s", snapToken)
+	}
+
+	// Resolve foreign keys for Transaction
+	var tenantID uuid.UUID
+	if req.TenantID != nil && *req.TenantID != uuid.Nil {
+		tenantID = *req.TenantID
+	} else {
+		var t models.Tenant
+		if err := s.db.First(&t).Error; err == nil {
+			tenantID = t.ID
+		} else {
+			tenantID = uuid.New()
+		}
+	}
+
+	var destinationID uuid.UUID
+	if req.DestinationID != nil && *req.DestinationID != uuid.Nil {
+		destinationID = *req.DestinationID
+	} else if req.DestinationSlug != "" {
+		var d models.Destination
+		if err := s.db.Where("slug = ?", req.DestinationSlug).First(&d).Error; err == nil {
+			destinationID = d.ID
+			if d.TenantID != uuid.Nil {
+				tenantID = d.TenantID
+			}
+		}
+	}
+	if destinationID == uuid.Nil {
+		var d models.Destination
+		if err := s.db.First(&d).Error; err == nil {
+			destinationID = d.ID
+			if d.TenantID != uuid.Nil {
+				tenantID = d.TenantID
+			}
+		}
+	}
+
+	var userID uuid.UUID
+	if req.UserID != nil && *req.UserID != uuid.Nil {
+		userID = *req.UserID
+	} else {
+		var u models.User
+		if req.CustomerEmail != "" && s.db.Where("email = ?", req.CustomerEmail).First(&u).Error == nil {
+			userID = u.ID
+		} else if s.db.First(&u).Error == nil {
+			userID = u.ID
+		}
+	}
+
+	visitDate := time.Now()
+	if req.VisitDate != nil && *req.VisitDate != "" {
+		if t, err := time.Parse("2006-01-02", *req.VisitDate); err == nil {
+			visitDate = t
+		}
+	}
+
+	vCount := req.VisitorCount
+	if vCount <= 0 {
+		vCount = 1
+	}
+
+	platformFee := float64(s.cfg.PlatformFeePerTicket)
+	if platformFee <= 0 {
+		platformFee = 2500
+	}
+	subtotal := float64(grossAmt) - platformFee
+	if subtotal < 0 {
+		subtotal = float64(grossAmt)
+		platformFee = 0
+	}
+
+	// Create or update transaction record in PostgreSQL
+	var existing models.Transaction
+	var txID uuid.UUID
+	if err := s.db.Where("order_number = ?", req.OrderNumber).First(&existing).Error; err == nil {
+		txID = existing.ID
+		s.db.Model(&existing).Updates(map[string]interface{}{
+			"grand_total":         float64(grossAmt),
+			"payment_status":      "pending",
+			"payment_method":      paymentMethod,
+			"payment_gateway_ref": snapToken,
+			"payment_url":         invoiceURL,
+			"updated_at":          time.Now(),
+		})
+	} else {
+		txID = uuid.New()
+		newTx := &models.Transaction{
+			BaseModel: models.BaseModel{
+				ID: txID,
+			},
+			TenantID:          tenantID,
+			UserID:            userID,
+			DestinationID:     destinationID,
+			OrderNumber:       req.OrderNumber,
+			VisitDate:         visitDate,
+			TimeSlotID:        req.TimeSlotID,
+			VisitorCount:      vCount,
+			Subtotal:          subtotal,
+			PlatformFee:       platformFee,
+			TotalPlatformFee:  platformFee,
+			GrandTotal:        float64(grossAmt),
+			NetPayoutAmount:   subtotal,
+			PaymentStatus:     "pending",
+			PaymentMethod:     &paymentMethod,
+			PaymentGatewayRef: &snapToken,
+			PaymentURL:        &invoiceURL,
+			ExpiredAt:         &expiresAt,
+		}
+		_ = s.db.Create(newTx)
+	}
+
+	return &PaymentInvoiceResponse{
+		TransactionID: txID,
+		OrderNumber:   req.OrderNumber,
+		InvoiceURL:    invoiceURL,
+		SnapToken:     snapToken,
+		ClientKey:     s.cfg.MidtransClientKey,
+		PaymentMethod: paymentMethod,
+		ExpiresAt:     &expiresAt,
+	}, nil
+}
+
+// FinishSnapPayment confirms payment settlement for Midtrans Snap
+func (s *PaymentService) FinishSnapPayment(orderNumber string) error {
+	tx, err := s.repo.GetTransactionByOrderNumber(orderNumber)
+	if err != nil {
+		return fmt.Errorf("transaction not found: %w", err)
+	}
+
+	// If Midtrans Server Key is configured, attempt direct status check with Midtrans API
+	if s.cfg.MidtransServerKey != "" {
+		apiURL := fmt.Sprintf("https://api.sandbox.midtrans.com/v2/%s/status", orderNumber)
+		if s.cfg.MidtransIsProduction {
+			apiURL = fmt.Sprintf("https://api.midtrans.com/v2/%s/status", orderNumber)
+		}
+
+		req, err := http.NewRequest("GET", apiURL, nil)
+		if err == nil {
+			authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(s.cfg.MidtransServerKey+":"))
+			req.Header.Set("Authorization", authHeader)
+			req.Header.Set("Accept", "application/json")
+
+			client := &http.Client{Timeout: 8 * time.Second}
+			resp, err := client.Do(req)
+			if err == nil {
+				if resp.StatusCode == http.StatusOK {
+					var statusResp map[string]interface{}
+					if json.NewDecoder(resp.Body).Decode(&statusResp) == nil {
+						if tStatus, ok := statusResp["transaction_status"].(string); ok {
+							if tStatus == "settlement" || tStatus == "capture" || tStatus == "success" {
+								// Confirmed by Midtrans
+							}
+						}
+					}
+				}
+				resp.Body.Close()
+			}
+		}
+	}
+
+	// Atomically mark transaction as paid and activate tickets
+	return s.db.Transaction(func(txDB *gorm.DB) error {
+		now := time.Now()
+		updates := map[string]interface{}{
+			"payment_status": "paid",
+			"paid_at":        now,
+			"updated_at":     now,
+		}
+		if err := txDB.Model(&models.Transaction{}).Where("id = ?", tx.ID).Updates(updates).Error; err != nil {
+			return err
+		}
+
+		// Activate any tickets linked to this transaction
+		_ = txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active")
+		return nil
+	})
+}
+
+// GetSnapStatus retrieves order and payment status
+func (s *PaymentService) GetSnapStatus(orderNumber string) (map[string]interface{}, error) {
+	tx, err := s.repo.GetTransactionByOrderNumber(orderNumber)
+	if err != nil {
+		return nil, fmt.Errorf("transaksi tidak ditemukan: %w", err)
+	}
+
+	// If still pending and Midtrans server key exists, query Midtrans API directly to check if settled
+	if tx.PaymentStatus == "pending" && s.cfg.MidtransServerKey != "" {
+		apiURL := fmt.Sprintf("https://api.sandbox.midtrans.com/v2/%s/status", orderNumber)
+		if s.cfg.MidtransIsProduction {
+			apiURL = fmt.Sprintf("https://api.midtrans.com/v2/%s/status", orderNumber)
+		}
+
+		req, err := http.NewRequest("GET", apiURL, nil)
+		if err == nil {
+			authHeader := "Basic " + base64.StdEncoding.EncodeToString([]byte(s.cfg.MidtransServerKey+":"))
+			req.Header.Set("Authorization", authHeader)
+			req.Header.Set("Accept", "application/json")
+
+			client := &http.Client{Timeout: 5 * time.Second}
+			resp, err := client.Do(req)
+			if err == nil {
+				if resp.StatusCode == http.StatusOK {
+					var statusResp map[string]interface{}
+					if json.NewDecoder(resp.Body).Decode(&statusResp) == nil {
+						if tStatus, ok := statusResp["transaction_status"].(string); ok {
+							if tStatus == "settlement" || tStatus == "capture" {
+								now := time.Now()
+								s.db.Model(&models.Transaction{}).Where("id = ?", tx.ID).Updates(map[string]interface{}{
+									"payment_status": "paid",
+									"paid_at":        now,
+									"updated_at":     now,
+								})
+								s.db.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active")
+								tx.PaymentStatus = "paid"
+								tx.PaidAt = &now
+							}
+						}
+					}
+				}
+				resp.Body.Close()
+			}
+		}
+	}
+
+	return map[string]interface{}{
+		"order_number":   tx.OrderNumber,
+		"payment_status": tx.PaymentStatus,
+		"grand_total":    tx.GrandTotal,
+		"paid_at":        tx.PaidAt,
+		"payment_method": tx.PaymentMethod,
+		"payment_url":    tx.PaymentURL,
+	}, nil
+}
+

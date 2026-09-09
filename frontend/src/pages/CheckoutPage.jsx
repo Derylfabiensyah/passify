@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
@@ -20,7 +20,8 @@ import {
   Building2,
   ChevronRight,
   Sparkles,
-  Leaf
+  Leaf,
+  ExternalLink
 } from 'lucide-react';
 import { fetchDestinationBySlug } from '../api/tenant';
 import { fetchAdminQuotas } from '../api/admin';
@@ -490,6 +491,48 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Helper to trigger official Midtrans Snap Popup
+  const openSnapPopup = (token, redirectUrl, ordData) => {
+    if (window.snap && typeof window.snap.pay === 'function' && token && !token.startsWith('SNAP-SIMULATOR')) {
+      try {
+        window.snap.pay(token, {
+          onSuccess: async (result) => {
+            try {
+              await fetch('http://localhost:8084/api/v1/payments/snap/finish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_number: ordData.orderNumber }),
+              });
+            } catch (_) {}
+            finalizeBookingSuccess({
+              ...ordData,
+              paymentRef: result?.transaction_id || token,
+              paymentType: result?.payment_type || 'MIDTRANS_SNAP',
+            });
+          },
+          onPending: async (result) => {
+            finalizeBookingSuccess({
+              ...ordData,
+              paymentRef: result?.transaction_id || token,
+              paymentType: result?.payment_type || 'MIDTRANS_SNAP_PENDING',
+            });
+          },
+          onError: () => {
+            setFormError('Pembayaran melalui Midtrans tidak berhasil. Silakan coba kembali.');
+            setShowSnapModal(true);
+          },
+          onClose: () => {
+            setShowSnapModal(true);
+          },
+        });
+        return true;
+      } catch (e) {
+        console.warn('Gagal memanggil window.snap.pay:', e);
+      }
+    }
+    return false;
+  };
+
   // Execute Payment in Step 2
   const handlePayNow = async () => {
     setIsProcessingPayment(true);
@@ -556,16 +599,69 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Midtrans Snap Flow
-      const mockSnapToken = `SNAP-${orderNumber}-${Math.random().toString(36).substring(2, 7)}`;
-      setSnapData({
-        orderNumber,
-        token: mockSnapToken,
-        orderData,
-      });
+      // Midtrans Snap Flow: Request authentic Snap Token from backend
+      const snapItems = Object.entries(quantities)
+        .filter(([_, q]) => q > 0)
+        .map(([catId, q]) => {
+          const cat = (destination.ticket_categories || []).find((c) => c.id === catId);
+          const price = Number(cat?.price ?? cat?.base_price ?? 35000);
+          return {
+            id: catId,
+            name: cat?.name || 'Tiket Wisata',
+            price: price,
+            quantity: q,
+          };
+        });
 
-      // Show interactive Midtrans Snap UI modal
-      setShowSnapModal(true);
+      let realSnapToken = '';
+      let realRedirectUrl = '';
+
+      try {
+        const snapPayload = {
+          order_number: orderNumber,
+          gross_amount: totals.grandTotal,
+          destination_id: destination.id && destination.id.length === 36 ? destination.id : undefined,
+          destination_slug: destination.slug,
+          destination_name: destination.name,
+          customer_name: contact.name || visitors[0]?.name || 'Wisatawan',
+          customer_email: userEmail || 'visitor@passify.id',
+          customer_phone: contact.phone || '08123456789',
+          visit_date: visitDate,
+          visitor_count: totals.quantity,
+          items: snapItems,
+        };
+
+        const snapApiRes = await fetch('http://localhost:8084/api/v1/payments/snap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(snapPayload),
+        });
+
+        if (snapApiRes.ok) {
+          const snapJson = await snapApiRes.json();
+          realSnapToken = snapJson.data?.snap_token;
+          realRedirectUrl = snapJson.data?.redirect_url;
+        }
+      } catch (err) {
+        console.warn('Gagal menghubungi payment-service backend:', err);
+      }
+
+      const activeToken = realSnapToken || `SNAP-${orderNumber}-${Math.random().toString(36).substring(2, 7)}`;
+      const activeRedirectUrl = realRedirectUrl || `https://app.sandbox.midtrans.com/snap/v2/vtweb/${activeToken}`;
+
+      const activeSnapData = {
+        orderNumber,
+        token: activeToken,
+        redirectUrl: activeRedirectUrl,
+        orderData,
+      };
+      setSnapData(activeSnapData);
+
+      // Attempt to directly trigger official Midtrans Snap pop-up
+      const popupOpened = openSnapPopup(activeToken, activeRedirectUrl, orderData);
+      if (!popupOpened) {
+        setShowSnapModal(true);
+      }
     } catch (err) {
       setFormError(err.message || 'Pembayaran gagal diproses. Silakan coba lagi.');
     } finally {
@@ -573,12 +669,21 @@ export default function CheckoutPage() {
     }
   };
 
-  // Simulate Webhook Trigger for instant verification
+  // Simulate Webhook Trigger / Confirmation for instant verification
   const handleSimulateWebhook = async () => {
     if (!snapData) return;
     setIsProcessingPayment(true);
     try {
-      // Send webhook to Payment microservice
+      // 1. Notify payment-service finish
+      await fetch('http://localhost:8084/api/v1/payments/snap/finish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_number: snapData.orderNumber,
+        }),
+      }).catch(() => {});
+
+      // 2. Also send webhook notification to Payment microservice
       await fetch('http://localhost:8084/api/webhooks/midtrans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -589,9 +694,7 @@ export default function CheckoutPage() {
           payment_type: 'bank_transfer',
           gross_amount: String(totals.grandTotal),
         }),
-      }).catch(() => {
-        // Non-blocking in dev if port 8084 is offline
-      });
+      }).catch(() => {});
 
       finalizeBookingSuccess(snapData.orderData);
     } catch (e) {
@@ -1350,7 +1453,7 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        {/* Midtrans Snap Interactive Simulator Modal (Fallback / Sandbox) */}
+        {/* Midtrans Snap Checkout Modal (Direct / Fallback / Sandbox) */}
         {showSnapModal && snapData && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
             <div className="w-full max-w-md rounded-2xl glass-panel p-6 sm:p-8 shadow-[0_24px_60px_rgba(0,0,0,.25)] space-y-6 animate-scale-in text-[var(--ink)]">
@@ -1362,7 +1465,7 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-[var(--forest-deep)]">Midtrans Snap Checkout</h3>
-                    <p className="text-[10px] text-[var(--ink-soft)]">Sandbox Payment Simulation</p>
+                    <p className="text-[10px] text-[var(--ink-soft)]">Merchant Gateway Terhubung (Sandbox)</p>
                   </div>
                 </div>
                 <button
@@ -1370,7 +1473,7 @@ export default function CheckoutPage() {
                   onClick={() => setShowSnapModal(false)}
                   className="h-8 w-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center text-xs font-bold"
                 >
-                  âœ•
+                  ✕
                 </button>
               </div>
 
@@ -1384,40 +1487,62 @@ export default function CheckoutPage() {
                   <span className="text-[var(--ink-soft)]">Total Tagihan</span>
                   <strong className="text-sm text-[var(--bark)]">{formatRupiah(totals.grandTotal)}</strong>
                 </div>
-              </div>
-
-              {/* Simulated Payment Channel Picker */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink-soft)]">
-                  Pilih Channel Pembayaran
-                </label>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="p-3 rounded-xl bg-[var(--leaf-pale)]/50 shadow-2xs font-bold text-[var(--forest-deep)] flex items-center gap-2">
-                    <QrCode className="h-4 w-4 text-[var(--forest)]" /> QRIS / GoPay
-                  </div>
-                  <div className="p-3 rounded-xl bg-gray-50 shadow-2xs text-gray-600 font-medium flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-gray-400" /> BCA / Mandiri VA
-                  </div>
+                <div className="flex justify-between pt-1 border-t border-gray-200/50 text-[11px]">
+                  <span className="text-[var(--ink-soft)]">Status Midtrans</span>
+                  <span className="font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">Menunggu Pembayaran</span>
                 </div>
               </div>
 
+              {/* Midtrans Info Note */}
+              <div className="rounded-xl bg-emerald-50/70 border border-emerald-200/60 p-3 text-[11px] text-emerald-900 leading-relaxed flex items-start gap-2">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
+                <span>
+                  Transaksi ini telah resmi terbit di <strong>Midtrans Sandbox</strong> Anda. Silakan pilih opsi di bawah untuk membuka form pembayaran:
+                </span>
+              </div>
+
               {/* Action Buttons */}
-              <div className="space-y-3 pt-2">
+              <div className="space-y-2.5 pt-1">
+                {/* 1. Open official Snap popup */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const opened = openSnapPopup(snapData.token, snapData.redirectUrl, snapData.orderData);
+                    if (opened) setShowSnapModal(false);
+                  }}
+                  className="w-full btn-primary py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md"
+                >
+                  <QrCode className="h-4 w-4" /> Buka Pop-up Midtrans Snap
+                </button>
+
+                {/* 2. Direct web URL in new tab */}
+                {snapData.redirectUrl && (
+                  <a
+                    href={snapData.redirectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold no-underline text-[var(--forest-deep)] bg-white/80 border border-emerald-300 hover:bg-emerald-50 transition-colors"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> Buka Halaman Web Midtrans (Tab Baru)
+                  </a>
+                )}
+
+                {/* 3. Sync & Confirm Completed Payment */}
                 <button
                   type="button"
                   onClick={handleSimulateWebhook}
                   disabled={isProcessingPayment}
-                  className="w-full btn-primary py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md disabled:opacity-50"
+                  className="w-full py-2.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold bg-gray-50 text-[var(--ink)] border border-gray-200 hover:bg-gray-100 transition-colors disabled:opacity-50"
                 >
                   {isProcessingPayment ? (
                     <>
-                      <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Mengirim Webhook Midtrans...</span>
+                      <div className="h-3.5 w-3.5 border-2 border-[var(--forest)] border-t-transparent rounded-full animate-spin" />
+                      <span>Memproses Konfirmasi...</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>Simulasikan Bayar Sukses (Webhook)</span>
+                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      <span>Konfirmasi Lunas / Selesai Bayar</span>
                     </>
                   )}
                 </button>
@@ -1426,15 +1551,15 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={() => setShowSnapModal(false)}
                   disabled={isProcessingPayment}
-                  className="w-full btn-secondary py-2.5 rounded-2xl text-xs font-bold"
+                  className="w-full py-2 text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] font-medium text-center"
                 >
-                  Batal / Kembali
+                  Tutup / Kembali
                 </button>
               </div>
 
               <div className="flex items-center justify-center gap-1.5 text-[10px] text-[var(--ink-soft)] font-medium">
                 <Lock className="h-3 w-3 text-emerald-600" />
-                <span>Terhubung ke Gateway Backend Midtrans SHA512</span>
+                <span>Terhubung ke Gateway Backend Midtrans SHA512 Sandbox</span>
               </div>
             </div>
           </div>

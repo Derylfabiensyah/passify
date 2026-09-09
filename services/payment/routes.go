@@ -17,6 +17,11 @@ func RegisterRoutes(router *gin.RouterGroup, handler *PaymentHandler, jwtSecret 
 		webhooks.POST("/payout", handler.HandlePayoutWebhook)
 	}
 
+	// Public Snap endpoints (direct checkout without mandatory JWT)
+	router.POST("/snap", handler.HandleCreateSnapTransaction)
+	router.POST("/snap/finish", handler.HandleFinishSnapPayment)
+	router.GET("/snap/status/:order_number", handler.HandleGetSnapStatus)
+
 	// Auth required routes
 	authGroup := router.Group("")
 	authGroup.Use(middleware.AuthMiddleware(jwtSecret))

@@ -308,3 +308,56 @@ func authorizeTransactionAccess(c *gin.Context, tx *models.Transaction) error {
 
 	return errors.New("Anda tidak memiliki akses ke transaksi ini")
 }
+
+// HandleCreateSnapTransaction handles POST /snap
+func (h *PaymentHandler) HandleCreateSnapTransaction(c *gin.Context) {
+	var req CreateSnapOrderRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Format data transaksi Snap tidak valid", err.Error())
+		return
+	}
+
+	res, err := h.service.CreateSnapTransaction(&req)
+	if err != nil {
+		response.BadRequest(c, err.Error(), nil)
+		return
+	}
+
+	response.OK(c, "Token transaksi Midtrans Snap berhasil dibuat", res)
+}
+
+// HandleFinishSnapPayment handles POST /snap/finish
+func (h *PaymentHandler) HandleFinishSnapPayment(c *gin.Context) {
+	var req struct {
+		OrderNumber string `json:"order_number" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Order number diperlukan", err.Error())
+		return
+	}
+
+	if err := h.service.FinishSnapPayment(req.OrderNumber); err != nil {
+		response.InternalServerError(c, err.Error())
+		return
+	}
+
+	response.OK(c, "Status transaksi berhasil diperbarui menjadi lunas", nil)
+}
+
+// HandleGetSnapStatus handles GET /snap/status/:order_number
+func (h *PaymentHandler) HandleGetSnapStatus(c *gin.Context) {
+	orderNumber := c.Param("order_number")
+	if orderNumber == "" {
+		response.BadRequest(c, "Order number diperlukan", nil)
+		return
+	}
+
+	res, err := h.service.GetSnapStatus(orderNumber)
+	if err != nil {
+		response.NotFound(c, err.Error())
+		return
+	}
+
+	response.OK(c, "Status transaksi berhasil diambil", res)
+}
+
