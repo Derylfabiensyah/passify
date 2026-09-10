@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   ExternalLink,
   Eye,
@@ -16,11 +16,16 @@ import {
   Sparkles,
   Ticket,
   Smartphone,
-  Monitor
+  Monitor,
+  UploadCloud,
+  Trash2,
+  Link2,
+  Check,
+  RefreshCw
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { fetchAdminDestinations, getActiveAdminTenant } from '../../api/admin';
-import { savePortalTemplate } from '../../api/tenant';
+import { savePortalTemplate, loadPortalCoverImage } from '../../api/tenant';
 import { apiRequest } from '../../api/client';
 import { useTenant } from '../../contexts/TenantContext';
 import { useToast } from '../../contexts/ToastContext';
@@ -146,6 +151,265 @@ function ToggleField({ checked, description, label, onChange }) {
   );
 }
 
+function CoverImageUploader({ value, onChange, presets = [] }) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [mode, setMode] = useState('upload'); // 'upload' | 'url'
+  const fileInputRef = useRef(null);
+  const { toast } = useToast();
+
+  const processImageFile = (file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Format file tidak didukung. Harap pilih gambar JPG, PNG, atau WebP.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Ukuran file terlalu besar. Maksimal 10 MB sebelum kompresi.');
+      return;
+    }
+
+    setIsProcessing(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const maxWidth = 1920;
+          const maxHeight = 1080;
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+
+          // Scale down proportionally if larger than 1920x1080
+          if (targetWidth > maxWidth || targetHeight > maxHeight) {
+            const ratio = Math.min(maxWidth / targetWidth, maxHeight / targetHeight);
+            targetWidth = Math.round(targetWidth * ratio);
+            targetHeight = Math.round(targetHeight * ratio);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          onChange(compressedDataUrl);
+          toast.success(`Foto sampul berhasil diunggah (${targetWidth} × ${targetHeight} px)`);
+        } catch (err) {
+          toast.error('Gagal memproses gambar. Silakan coba file lain.');
+        } finally {
+          setIsProcessing(false);
+          if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+      };
+      img.onerror = () => {
+        setIsProcessing(false);
+        toast.error('Gagal membaca data gambar.');
+      };
+      img.src = event.target.result;
+    };
+    reader.onerror = () => {
+      setIsProcessing(false);
+      toast.error('Gagal membaca file foto.');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      processImageFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      processImageFile(e.target.files[0]);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      {/* Header with Mode Toggle */}
+      <div className="flex items-center justify-between">
+        <label className="block text-xs font-bold uppercase tracking-wider text-[var(--forest-deep)]">
+          Foto Sampul Pemandangan
+        </label>
+        <button
+          type="button"
+          onClick={() => setMode(mode === 'upload' ? 'url' : 'upload')}
+          className="text-[11px] font-bold text-[var(--forest)] hover:underline flex items-center gap-1 cursor-pointer"
+        >
+          {mode === 'upload' ? (
+            <>
+              <Link2 className="w-3 h-3" />
+              <span>Gunakan Link URL</span>
+            </>
+          ) : (
+            <>
+              <UploadCloud className="w-3 h-3" />
+              <span>Upload File Langsung</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Guide Card: Ideal Dimensions (16:9) */}
+      <div className="rounded-xl border border-emerald-800/15 bg-emerald-50/70 p-3 text-xs text-[var(--forest-deep)] flex items-start gap-2.5">
+        <Sparkles className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-bold">Ukuran Ideal Sampul:</span>
+            <span className="inline-flex items-center bg-emerald-700 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full">
+              Rasio 16:9
+            </span>
+            <span className="font-semibold text-emerald-950">1920 × 1080 px</span>
+            <span className="text-[11px] text-[var(--ink-soft)]">(atau min. 1200 × 675 px)</span>
+          </div>
+          <p className="text-[11px] text-[var(--ink-soft)] leading-relaxed">
+            Format JPG, PNG, atau WebP (maks. 5 MB). Rasio 16:9 widescreen menjamin tampilan sampul penuh tanpa terpotong baik di layar HP maupun laptop.
+          </p>
+        </div>
+      </div>
+
+      {/* Mode: Direct Upload */}
+      {mode === 'upload' ? (
+        <div className="space-y-3">
+          {value ? (
+            /* Preview with actions */
+            <div className="relative aspect-video w-full rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--sand)] shadow-xs group">
+              <img
+                src={value}
+                alt="Sampul Kawasan Wisata"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-between p-3">
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/20">
+                    <Check className="w-3 h-3 text-emerald-400" />
+                    <span>Rasio 16:9 Terpasang</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isProcessing}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-white/95 hover:bg-white text-[var(--forest-deep)] font-bold text-xs rounded-lg backdrop-blur-md transition-all shadow-sm cursor-pointer"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isProcessing ? 'animate-spin' : ''}`} />
+                    <span>{isProcessing ? 'Mengunggah...' : 'Ganti Foto'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onChange('')}
+                    className="inline-flex items-center justify-center p-2 bg-red-600/90 hover:bg-red-600 text-white font-bold text-xs rounded-lg backdrop-blur-md transition-all shadow-sm cursor-pointer"
+                    title="Hapus foto sampul"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Drag & Drop Zone */
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex flex-col items-center justify-center gap-2.5 p-6 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center ${
+                isDragging
+                  ? 'border-[var(--forest)] bg-[var(--leaf-pale)]'
+                  : 'border-[var(--border)] hover:border-[var(--forest)] bg-white/50 hover:bg-white/80'
+              }`}
+            >
+              <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest)]">
+                <UploadCloud className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[var(--forest-deep)]">
+                  Klik untuk memilih foto atau tarik &amp; lepas ke sini
+                </p>
+                <p className="text-[11px] text-[var(--ink-soft)] mt-0.5">
+                  Rasio 16:9 • Resolusi disarankan 1920 × 1080 px • Maksimal 5 MB
+                </p>
+              </div>
+            </div>
+          )}
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+        </div>
+      ) : (
+        /* Mode: URL input */
+        <div className="space-y-2">
+          <input
+            type="url"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="field-control font-mono text-xs w-full"
+            placeholder="https://images.unsplash.com/photo-..."
+          />
+          <p className="text-[11px] text-[var(--ink-soft)]">
+            Masukkan tautan URL foto gambar dengan resolusi lanskap (16:9).
+          </p>
+        </div>
+      )}
+
+      {/* Presets */}
+      {presets.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-soft)] mr-1">
+            Pilihan Cepat:
+          </span>
+          {presets.map((preset) => (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => onChange(preset.url)}
+              className="text-[11px] font-medium bg-[var(--sand)] hover:bg-[var(--leaf-pale)] text-[var(--forest-deep)] border border-[var(--border)] rounded-md px-2 py-0.5 transition-colors cursor-pointer"
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function hexToRgba(hex, alpha = 1) {
+  if (!hex || typeof hex !== 'string') return `rgba(57, 64, 50, ${alpha})`;
+  const cleanHex = hex.replace('#', '');
+  const r = parseInt(cleanHex.substring(0, 2), 16) || 57;
+  const g = parseInt(cleanHex.substring(2, 4), 16) || 64;
+  const b = parseInt(cleanHex.substring(4, 6), 16) || 50;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 function PortalLivePreview({ destination, template }) {
   const [viewMode, setViewMode] = useState('mobile'); // 'mobile' | 'desktop'
   const heading = template.hero_heading || destination?.name || 'Kawasan Wisata Alam';
@@ -238,7 +502,12 @@ function PortalLivePreview({ destination, template }) {
                 alt=""
                 className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-75 scale-105 transition-all duration-300"
               />
-              <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/75 via-black/55 to-black/85" />
+              <div
+                className="absolute inset-0 -z-10"
+                style={{
+                  backgroundImage: `linear-gradient(to bottom, ${hexToRgba(primaryBg, 0.7)}, ${hexToRgba(primaryBg, 0.92)})`
+                }}
+              />
 
               <div className="pt-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
@@ -270,7 +539,10 @@ function PortalLivePreview({ destination, template }) {
             <div className="space-y-3.5 p-4 bg-transparent">
               {/* Real Availability Card */}
               {template.show_availability !== false && (
-                <div className="rounded-2xl bg-[var(--forest-deep)]/95 border border-white/15 p-3.5 text-white shadow-xs">
+                <div
+                  className="rounded-2xl border border-white/15 p-3.5 text-white shadow-xs transition-colors duration-300"
+                  style={{ backgroundColor: hexToRgba(primaryBg, 0.92) }}
+                >
                   <div className="flex items-center justify-between">
                     <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">Ketersediaan Hari Ini</span>
                     <span className="text-[8px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full">Sistem Aktif</span>
@@ -368,13 +640,18 @@ function PortalLivePreview({ destination, template }) {
 
             {/* Desktop Hero Section */}
             <div className="p-6">
-              <div className="relative isolate overflow-hidden rounded-2xl p-6 text-white" style={{ backgroundColor: primaryBg }}>
+              <div className="relative isolate overflow-hidden rounded-2xl p-6 text-white transition-colors duration-300" style={{ backgroundColor: primaryBg }}>
                 <img
                   src={coverImage}
                   alt=""
                   className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-75 scale-105"
                 />
-                <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/60 to-black/40" />
+                <div
+                  className="absolute inset-0 -z-10 transition-colors duration-300"
+                  style={{
+                    backgroundImage: `linear-gradient(90deg, ${hexToRgba(primaryBg, 0.94)}, ${hexToRgba(primaryBg, 0.78)}, ${hexToRgba(primaryBg, 0.45)})`
+                  }}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-6 items-center">
                   <div className="space-y-2">
@@ -402,7 +679,10 @@ function PortalLivePreview({ destination, template }) {
 
                   {/* Desktop Real Availability Card */}
                   {template.show_availability !== false && (
-                    <div className="rounded-2xl bg-[var(--forest-deep)]/95 border border-white/15 p-4 text-white shadow-md">
+                    <div
+                      className="rounded-2xl border border-white/15 p-4 text-white shadow-md transition-colors duration-300"
+                      style={{ backgroundColor: hexToRgba(primaryBg, 0.92) }}
+                    >
                       <div className="flex items-center justify-between">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Ketersediaan Hari Ini</span>
                         <span className="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full">Sistem Aktif</span>
@@ -554,12 +834,14 @@ export default function TemplateEditorPage() {
       : '#394032';
     const chosenAccent = colorChoices.find((c) => c.value === chosenPrimary)?.accent || '#454f2d';
 
+    const savedCover = loadPortalCoverImage(dest.slug || slug) || dest.cover_image_url;
+
     setFormData({
       name: dest.name || 'Kawasan Wisata',
       eyebrow: template.eyebrow || 'Tiket resmi kawasan',
       hero_heading: template.hero_heading || dest.name || '',
       hero_copy: template.hero_copy || dest.description || '',
-      cover_image_url: dest.cover_image_url || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
+      cover_image_url: savedCover || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
       location: dest.location || [dest.address, dest.city].filter(Boolean).join(', ') || 'Cianjur, Jawa Barat',
       province: dest.province || 'Jawa Barat',
       primary_color: chosenPrimary,
@@ -609,11 +891,12 @@ export default function TemplateEditorPage() {
     };
 
     try {
-      // 1. Save portal template
+      // 1. Save portal template & cover image
       await savePortalTemplate({
         tenantId: effectiveTenantId,
         slug: effectiveSlug,
         template: portalTemplatePayload,
+        coverImageUrl: formData.cover_image_url,
       });
 
       // 2. Update local destinations cache with full details
@@ -743,40 +1026,12 @@ export default function TemplateEditorPage() {
               <p className="mt-1 text-[11px] text-[var(--ink-soft)] text-right">{formData.hero_copy.length}/280 karakter</p>
             </div>
 
-            {/* Cover Image & Presets */}
-            <div>
-              <label htmlFor="portal-cover-url" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-[var(--forest-deep)]">
-                Foto Sampul Pemandangan (URL Gambar)
-              </label>
-              <div className="flex gap-2">
-                <input
-                  id="portal-cover-url"
-                  type="url"
-                  value={formData.cover_image_url}
-                  onChange={(e) => setFormData({ ...formData, cover_image_url: e.target.value })}
-                  className="field-control font-mono text-xs flex-1"
-                  placeholder="https://images.unsplash.com/photo-..."
-                  required
-                />
-              </div>
-
-              {/* Quick Presets */}
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-soft)] mr-1">
-                  Pilihan Cepat:
-                </span>
-                {photoPresets.map((preset) => (
-                  <button
-                    key={preset.label}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, cover_image_url: preset.url })}
-                    className="text-[11px] font-medium bg-[var(--sand)] hover:bg-[var(--leaf-pale)] text-[var(--forest-deep)] border border-[var(--border)] rounded-md px-2 py-0.5 transition-colors cursor-pointer"
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Cover Image Uploader with 16:9 guide, direct upload, and presets */}
+            <CoverImageUploader
+              value={formData.cover_image_url}
+              onChange={(url) => setFormData({ ...formData, cover_image_url: url })}
+              presets={photoPresets}
+            />
 
             {/* Location & Province */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

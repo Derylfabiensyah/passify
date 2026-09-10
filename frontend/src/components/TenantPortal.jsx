@@ -17,7 +17,18 @@ import { useTenant } from '../contexts/TenantContext';
 import { PortalPageSkeleton } from './common/Skeleton';
 
 const rupiah = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
-const isPortalColor = (value, allowed, fallback) => allowed.includes(value) ? value : fallback;
+
+function hexToRgba(hex, alpha = 1) {
+  if (!hex || typeof hex !== 'string') return `rgba(16, 45, 32, ${alpha})`;
+  let c = hex.replace('#', '');
+  if (c.length === 3) c = c.split('').map((x) => x + x).join('');
+  const num = parseInt(c, 16);
+  if (isNaN(num)) return `rgba(16, 45, 32, ${alpha})`;
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 export default function TenantPortal() {
   const { destination, isLoading } = useTenant();
@@ -46,8 +57,8 @@ export default function TenantPortal() {
       )
     : 0;
   const template = destination.portal_template || {};
-  const primaryColor = isPortalColor(template.primary_color, ['#394032', '#454F2D'], '#394032');
-  const accentColor = template.accent_color === '#797F3E' ? '#50572E' : '#765A31';
+  const primaryColor = template.primary_color || '#394032';
+  const accentColor = template.accent_color || '#454f2d';
   const portalStyle = { '--tenant-primary': primaryColor, '--tenant-accent': accentColor };
   const portalEyebrow = template.eyebrow || 'Tiket resmi kawasan';
   const portalHeading = template.hero_heading || destination.name;
@@ -161,12 +172,21 @@ export default function TenantPortal() {
       </header>
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
-        <section className="tenant-primary relative isolate overflow-hidden rounded-2xl text-white shadow-[var(--shadow-lift)]">
+        <section
+          className="relative isolate overflow-hidden rounded-2xl text-white shadow-[var(--shadow-lift)] transition-colors duration-300"
+          style={{ backgroundColor: primaryColor }}
+        >
           <img
             src={destination.cover_image_url || destination.cover_image || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80'}
             alt={destination.name || 'Pemandangan Wisata Alam'}
-            className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02] opacity-65 saturate-[.95]" />
-          <div className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.92), rgba(16,45,32,.75), rgba(16,45,32,.40))' }} />
+            className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02] opacity-65 saturate-[.95]"
+          />
+          <div
+            className="absolute inset-0 -z-10 transition-colors duration-300"
+            style={{
+              backgroundImage: `linear-gradient(90deg, ${hexToRgba(primaryColor, 0.94)}, ${hexToRgba(primaryColor, 0.78)}, ${hexToRgba(primaryColor, 0.45)})`
+            }}
+          />
           
           <div className={`grid gap-8 px-6 py-10 sm:px-9 sm:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12 lg:py-14 ${template.show_availability === false ? 'lg:grid-cols-1' : ''}`}>
             <div className="max-w-2xl">
@@ -187,7 +207,8 @@ export default function TenantPortal() {
                 <button
                   type="button"
                   onClick={openBooking}
-                  className="tenant-accent inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-extrabold shadow-lg shadow-black/30 transition-all hover:brightness-110 active:scale-[0.98]"
+                  style={{ backgroundColor: accentColor }}
+                  className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-black/30 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
                 >
                   <Ticket className="h-4 w-4" />
                   Pesan tiket
@@ -207,12 +228,25 @@ export default function TenantPortal() {
             </div>
 
             {template.show_availability !== false && (
-              <aside className="glass-card-dark rounded-2xl p-5 sm:p-6 text-white shadow-2xl">
+              <aside
+                className="rounded-2xl p-5 sm:p-6 text-white shadow-2xl backdrop-blur-xl border transition-colors duration-300"
+                style={{
+                  backgroundColor: hexToRgba(primaryColor, 0.72),
+                  borderColor: hexToRgba(accentColor, 0.35)
+                }}
+              >
                 <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-3.5">
                   <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300">
                     Ketersediaan Hari Ini
                   </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/40 bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-bold text-emerald-300">
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold"
+                    style={{
+                      backgroundColor: hexToRgba(accentColor, 0.25),
+                      border: `1px solid ${hexToRgba(accentColor, 0.45)}`,
+                      color: '#fff'
+                    }}
+                  >
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Sistem Aktif
                   </span>
@@ -230,8 +264,8 @@ export default function TenantPortal() {
                   aria-label="Persentase kuota terisi hari ini"
                 >
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 shadow-[0_0_12px_rgba(52,211,153,0.5)] transition-all duration-500"
-                    style={{ width: `${used}%` }}
+                    className="h-full rounded-full shadow-[0_0_12px_rgba(52,211,153,0.4)] transition-all duration-500"
+                    style={{ width: `${used}%`, backgroundColor: accentColor }}
                   />
                 </div>
                 <div className="mt-5 grid grid-cols-2 gap-3">

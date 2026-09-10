@@ -11,10 +11,22 @@ export function loadPortalTemplate(slug) {
   }
 }
 
-export async function savePortalTemplate({ tenantId, slug, template }) {
-  const targetSlug = slug || 'curug-citambur';
+export function loadPortalCoverImage(slug) {
+  if (!slug) return null;
+  try {
+    return localStorage.getItem(`passify_cover_image_${slug}`) || null;
+  } catch {
+    return null;
+  }
+}
+
+export async function savePortalTemplate({ tenantId, slug, template, coverImageUrl }) {
+  const targetSlug = slug || 'curug-cikanteh';
   localStorage.setItem(`${TEMPLATE_STORAGE_PREFIX}${targetSlug}`, JSON.stringify(template));
   localStorage.setItem('passify_portal_template_last', JSON.stringify(template));
+  if (coverImageUrl) {
+    localStorage.setItem(`passify_cover_image_${targetSlug}`, coverImageUrl);
+  }
 
   // Update in local admin destinations cache if present
   try {
@@ -23,16 +35,25 @@ export async function savePortalTemplate({ tenantId, slug, template }) {
       const list = JSON.parse(raw);
       const updated = list.map((d) =>
         d.slug === targetSlug || d.id === tenantId
-          ? { ...d, portal_template: template }
+          ? {
+              ...d,
+              portal_template: template,
+              ...(coverImageUrl ? { cover_image_url: coverImageUrl } : {}),
+            }
           : d
       );
       localStorage.setItem('passify_admin_destinations', JSON.stringify(updated));
     }
   } catch (_) {}
 
+  // Dispatch storage event so open portal tabs refresh instantaneously
+  try {
+    window.dispatchEvent(new Event('storage'));
+  } catch (_) {}
+
   const effectiveTenantId = tenantId && !String(tenantId).startsWith('dest-')
     ? tenantId
-    : 'b416a526-0994-453d-a83d-bf18487f3049';
+    : '413baace-9c74-4abb-8aa4-a8310ffc4c0b';
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/tenants/${effectiveTenantId}/settings`, {
@@ -266,8 +287,13 @@ export async function fetchDestinationBySlug(slug) {
 
         const finalBookedToday = Math.max(Number(data.booked_today || 0), bookedTotal);
 
+        const savedCover = loadPortalCoverImage(slug);
+        const finalCover = savedCover || (localDest && localDest.slug === slug && localDest.cover_image_url ? localDest.cover_image_url : null) || data.cover_image_url || data.cover_image;
+
         return {
           ...data,
+          cover_image_url: finalCover,
+          cover_image: finalCover,
           booked_today: finalBookedToday,
           portal_template: loadPortalTemplate(slug) || data.portal_template || null,
           ticket_categories: categories,
@@ -286,8 +312,11 @@ export async function fetchDestinationBySlug(slug) {
             booked: slotCount > 0 ? (baseBooked + slotCount) : (idx === 0 && bookedTotal > 0 ? (baseBooked + bookedTotal) : baseBooked),
           };
         });
+        const savedCover = loadPortalCoverImage(slug) || localDest.cover_image_url;
         return {
           ...localDest,
+          cover_image_url: savedCover,
+          cover_image: savedCover,
           booked_today: Math.max(Number(localDest.booked_today || 0), bookedTotal),
           time_slots: slots,
           portal_template: loadPortalTemplate(slug) || localDest.portal_template || null,
@@ -311,8 +340,11 @@ export async function fetchDestinationBySlug(slug) {
         booked: slotCount > 0 ? (baseBooked + slotCount) : (idx === 0 && bookedTotal > 0 ? (baseBooked + bookedTotal) : baseBooked),
       };
     });
+    const savedCover = loadPortalCoverImage(slug) || localDest.cover_image_url;
     return {
       ...localDest,
+      cover_image_url: savedCover,
+      cover_image: savedCover,
       booked_today: Math.max(Number(localDest.booked_today || 0), bookedTotal),
       time_slots: slots,
       portal_template: loadPortalTemplate(slug) || localDest.portal_template || null,
