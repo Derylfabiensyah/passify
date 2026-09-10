@@ -493,7 +493,8 @@ export default function CheckoutPage() {
 
   // Helper to trigger official Midtrans Snap Popup
   const openSnapPopup = (token, redirectUrl, ordData) => {
-    if (window.snap && typeof window.snap.pay === 'function' && token && !token.startsWith('SNAP-SIMULATOR')) {
+    // Real Midtrans Snap tokens are UUID/hex strings. Tokens starting with "SNAP-" are local simulation fallbacks.
+    if (window.snap && typeof window.snap.pay === 'function' && token && !token.startsWith('SNAP-')) {
       try {
         window.snap.pay(token, {
           onSuccess: async (result) => {
@@ -641,6 +642,9 @@ export default function CheckoutPage() {
           const snapJson = await snapApiRes.json();
           realSnapToken = snapJson.data?.snap_token;
           realRedirectUrl = snapJson.data?.redirect_url;
+        } else {
+          const errJson = await snapApiRes.json().catch(() => null);
+          console.warn('Gagal mendapatkan token Snap dari backend:', errJson?.message || snapApiRes.statusText);
         }
       } catch (err) {
         console.warn('Gagal menghubungi payment-service backend:', err);
