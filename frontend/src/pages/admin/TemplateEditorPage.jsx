@@ -410,13 +410,28 @@ function hexToRgba(hex, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function formatCleanLocation(dest) {
+  if (!dest) return 'Indonesia';
+  const raw = typeof dest === 'string' ? dest : (dest.location || [dest.address, dest.city, dest.province].filter(Boolean).join(', '));
+  if (!raw) return dest.province || dest.city || 'Indonesia';
+
+  const parts = raw.split(',').map((p) => p.trim()).filter(Boolean);
+  const uniqueParts = [];
+  for (const part of parts) {
+    if (!uniqueParts.some((p) => p.toLowerCase() === part.toLowerCase())) {
+      uniqueParts.push(part);
+    }
+  }
+  return uniqueParts.join(', ') || 'Indonesia';
+}
+
 function PortalLivePreview({ destination, template }) {
   const [viewMode, setViewMode] = useState('mobile'); // 'mobile' | 'desktop'
   const heading = template.hero_heading || destination?.name || 'Kawasan Wisata Alam';
   const eyebrow = template.eyebrow || 'Tiket Resmi Kawasan';
   const copy = template.hero_copy || destination?.description || 'Nikmati keindahan panorama dan konservasi alam yang teratur.';
   const coverImage = destination?.cover_image_url || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80';
-  const locationText = destination?.location || [destination?.address, destination?.city, destination?.province].filter(Boolean).join(', ') || destination?.province || 'Indonesia';
+  const locationText = formatCleanLocation(destination);
   const primaryBg = template.primary_color || '#394032';
   const actionColor = template.accent_color || '#454f2d';
   const facilities = destination?.facilities && destination.facilities.length > 0
@@ -496,21 +511,21 @@ function PortalLivePreview({ destination, template }) {
             </div>
 
             {/* Mobile Hero */}
-            <div className="relative isolate overflow-hidden p-5 text-white" style={{ backgroundColor: primaryBg }}>
+            <div className="relative isolate overflow-hidden p-5 text-white" style={{ backgroundColor: '#111811' }}>
               <img
                 src={coverImage}
                 alt=""
-                className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-75 scale-105 transition-all duration-300"
+                className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-95 saturate-[1.1] scale-105 transition-all duration-300"
               />
               <div
                 className="absolute inset-0 -z-10"
                 style={{
-                  backgroundImage: `linear-gradient(to bottom, ${hexToRgba(primaryBg, 0.7)}, ${hexToRgba(primaryBg, 0.92)})`
+                  backgroundImage: `linear-gradient(to bottom, ${hexToRgba(primaryBg, 0.88)} 0%, ${hexToRgba(primaryBg, 0.55)} 60%, ${hexToRgba(primaryBg, 0.22)} 100%)`
                 }}
               />
 
               <div className="pt-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-xl shadow-sm">
                   <MapPin className="h-3 w-3 text-emerald-300" />
                   <span className="truncate max-w-[200px]">{locationText}</span>
                 </span>
@@ -540,28 +555,31 @@ function PortalLivePreview({ destination, template }) {
               {/* Real Availability Card */}
               {template.show_availability !== false && (
                 <div
-                  className="rounded-2xl border border-white/15 p-3.5 text-white shadow-xs transition-colors duration-300"
-                  style={{ backgroundColor: hexToRgba(primaryBg, 0.92) }}
+                  className="relative isolate overflow-hidden rounded-2xl border p-3.5 text-white shadow-lg backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300"
+                  style={{
+                    background: `linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%), ${hexToRgba(primaryBg, 0.32)}`,
+                    borderColor: 'rgba(255, 255, 255, 0.35)',
+                  }}
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between border-b border-white/20 pb-2.5">
                     <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">Ketersediaan Hari Ini</span>
-                    <span className="text-[8px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full">Sistem Aktif</span>
+                    <span className="text-[8px] font-bold text-white bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/25">Sistem Aktif</span>
                   </div>
                   <div className="mt-2 flex items-end justify-between">
-                    <span className="text-[10px] text-white/70">Kuota terisi</span>
+                    <span className="text-[10px] text-white/80">Kuota terisi</span>
                     <strong className="text-base font-extrabold text-white">{quotaPct}%</strong>
                   </div>
-                  <div className="mt-1 h-1.5 w-full bg-white/15 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full" style={{ width: `${Math.min(100, Math.max(0, quotaPct))}%` }} />
+                  <div className="mt-1 h-2 w-full bg-black/35 rounded-full overflow-hidden p-0.5 border border-white/15">
+                    <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.6)]" style={{ width: `${Math.min(100, Math.max(0, quotaPct))}%` }} />
                   </div>
                   <div className="mt-2.5 grid grid-cols-2 gap-2 text-center">
-                    <div className="rounded-lg bg-white/10 p-1.5 border border-white/10">
-                      <span className="block text-[8px] uppercase tracking-wider text-white/60">Tersisa</span>
+                    <div className="rounded-lg bg-black/25 p-1.5 border border-white/20 backdrop-blur-md">
+                      <span className="block text-[8px] uppercase tracking-wider text-white/70">Tersisa</span>
                       <span className="font-extrabold text-xs text-white">{remaining.toLocaleString('id-ID')} pax</span>
                     </div>
-                    <div className="rounded-lg bg-white/10 p-1.5 border border-white/10">
-                      <span className="block text-[8px] uppercase tracking-wider text-white/60">Mulai dari</span>
-                      <span className="font-extrabold text-xs text-[#E8C58C]">Rp {minPrice.toLocaleString('id-ID')}</span>
+                    <div className="rounded-lg bg-black/25 p-1.5 border border-white/20 backdrop-blur-md">
+                      <span className="block text-[8px] uppercase tracking-wider text-emerald-300">Mulai dari</span>
+                      <span className="font-extrabold text-xs text-emerald-300">Rp {minPrice.toLocaleString('id-ID')}</span>
                     </div>
                   </div>
                 </div>
@@ -640,22 +658,22 @@ function PortalLivePreview({ destination, template }) {
 
             {/* Desktop Hero Section */}
             <div className="p-6">
-              <div className="relative isolate overflow-hidden rounded-2xl p-6 text-white transition-colors duration-300" style={{ backgroundColor: primaryBg }}>
+              <div className="relative isolate overflow-hidden rounded-3xl p-6 text-white transition-colors duration-300 shadow-xl border border-white/10" style={{ backgroundColor: '#111811' }}>
                 <img
                   src={coverImage}
                   alt=""
-                  className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-75 scale-105"
+                  className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-95 saturate-[1.1] scale-105"
                 />
                 <div
                   className="absolute inset-0 -z-10 transition-colors duration-300"
                   style={{
-                    backgroundImage: `linear-gradient(90deg, ${hexToRgba(primaryBg, 0.94)}, ${hexToRgba(primaryBg, 0.78)}, ${hexToRgba(primaryBg, 0.45)})`
+                    backgroundImage: `linear-gradient(90deg, ${hexToRgba(primaryBg, 0.90)} 0%, ${hexToRgba(primaryBg, 0.65)} 48%, ${hexToRgba(primaryBg, 0.18)} 100%)`
                   }}
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-6 items-center">
                   <div className="space-y-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-1 text-[10px] font-semibold text-white backdrop-blur-xl shadow-sm">
                       <MapPin className="h-3 w-3 text-emerald-300" />
                       <span className="truncate">{locationText}</span>
                     </span>
@@ -680,28 +698,31 @@ function PortalLivePreview({ destination, template }) {
                   {/* Desktop Real Availability Card */}
                   {template.show_availability !== false && (
                     <div
-                      className="rounded-2xl border border-white/15 p-4 text-white shadow-md transition-colors duration-300"
-                      style={{ backgroundColor: hexToRgba(primaryBg, 0.92) }}
+                      className="relative isolate overflow-hidden rounded-3xl border p-5 text-white shadow-xl backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300"
+                      style={{
+                        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%), ${hexToRgba(primaryBg, 0.32)}`,
+                        borderColor: 'rgba(255, 255, 255, 0.35)',
+                      }}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between border-b border-white/20 pb-3">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Ketersediaan Hari Ini</span>
-                        <span className="text-[9px] font-bold text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-full">Sistem Aktif</span>
+                        <span className="text-[9px] font-bold text-white bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/25">Sistem Aktif</span>
                       </div>
                       <div className="mt-3 flex items-end justify-between">
-                        <span className="text-xs text-white/70">Kuota Terisi</span>
+                        <span className="text-xs text-white/80">Kuota Terisi</span>
                         <strong className="text-xl font-extrabold text-white">{quotaPct}%</strong>
                       </div>
-                      <div className="mt-1.5 h-2 w-full bg-white/15 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full" style={{ width: `${Math.min(100, Math.max(0, quotaPct))}%` }} />
+                      <div className="mt-2 h-2.5 w-full bg-black/35 rounded-full overflow-hidden p-0.5 border border-white/15">
+                        <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.6)]" style={{ width: `${Math.min(100, Math.max(0, quotaPct))}%` }} />
                       </div>
-                      <div className="mt-3 grid grid-cols-2 gap-2 text-center">
-                        <div className="rounded-xl bg-white/10 p-2 border border-white/10">
-                          <span className="block text-[9px] uppercase tracking-wider text-white/60">Tersisa</span>
+                      <div className="mt-4 grid grid-cols-2 gap-2 text-center">
+                        <div className="rounded-xl bg-black/25 p-2.5 border border-white/20 backdrop-blur-md">
+                          <span className="block text-[9px] uppercase tracking-wider text-white/70">Tersisa</span>
                           <span className="font-extrabold text-sm text-white">{remaining.toLocaleString('id-ID')} pax</span>
                         </div>
-                        <div className="rounded-xl bg-white/10 p-2 border border-white/10">
-                          <span className="block text-[9px] uppercase tracking-wider text-white/60">Mulai dari</span>
-                          <span className="font-extrabold text-sm text-[#E8C58C]">Rp {minPrice.toLocaleString('id-ID')}</span>
+                        <div className="rounded-xl bg-black/25 p-2.5 border border-white/20 backdrop-blur-md">
+                          <span className="block text-[9px] uppercase tracking-wider text-emerald-300">Mulai dari</span>
+                          <span className="font-extrabold text-sm text-emerald-300">Rp {minPrice.toLocaleString('id-ID')}</span>
                         </div>
                       </div>
                     </div>
@@ -842,7 +863,7 @@ export default function TemplateEditorPage() {
       hero_heading: template.hero_heading || dest.name || '',
       hero_copy: template.hero_copy || dest.description || '',
       cover_image_url: savedCover || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80',
-      location: dest.location || [dest.address, dest.city].filter(Boolean).join(', ') || 'Cianjur, Jawa Barat',
+      location: formatCleanLocation(dest),
       province: dest.province || 'Jawa Barat',
       primary_color: chosenPrimary,
       accent_color: chosenAccent,

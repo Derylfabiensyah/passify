@@ -30,6 +30,21 @@ function hexToRgba(hex, alpha = 1) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+export function formatCleanLocation(dest) {
+  if (!dest) return 'Indonesia';
+  const raw = dest.location || [dest.address, dest.city, dest.province].filter(Boolean).join(', ');
+  if (!raw) return dest.province || dest.city || 'Indonesia';
+
+  const parts = raw.split(',').map((p) => p.trim()).filter(Boolean);
+  const uniqueParts = [];
+  for (const part of parts) {
+    if (!uniqueParts.some((p) => p.toLowerCase() === part.toLowerCase())) {
+      uniqueParts.push(part);
+    }
+  }
+  return uniqueParts.join(', ') || 'Indonesia';
+}
+
 export default function TenantPortal() {
   const { destination, isLoading } = useTenant();
   const location = useLocation();
@@ -173,26 +188,26 @@ export default function TenantPortal() {
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
         <section
-          className="relative isolate overflow-hidden rounded-2xl text-white shadow-[var(--shadow-lift)] transition-colors duration-300"
-          style={{ backgroundColor: primaryColor }}
+          className="relative isolate overflow-hidden rounded-3xl text-white shadow-2xl border border-white/10 transition-colors duration-300"
+          style={{ backgroundColor: '#111811' }}
         >
           <img
             src={destination.cover_image_url || destination.cover_image || 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1600&q=80'}
             alt={destination.name || 'Pemandangan Wisata Alam'}
-            className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02] opacity-65 saturate-[.95]"
+            className="absolute inset-0 -z-20 h-full w-full object-cover object-center scale-[1.02] brightness-95 saturate-[1.1] transition-all duration-500"
           />
           <div
             className="absolute inset-0 -z-10 transition-colors duration-300"
             style={{
-              backgroundImage: `linear-gradient(90deg, ${hexToRgba(primaryColor, 0.94)}, ${hexToRgba(primaryColor, 0.78)}, ${hexToRgba(primaryColor, 0.45)})`
+              backgroundImage: `linear-gradient(90deg, ${hexToRgba(primaryColor, 0.90)} 0%, ${hexToRgba(primaryColor, 0.65)} 48%, ${hexToRgba(primaryColor, 0.18)} 100%)`
             }}
           />
           
-          <div className={`grid gap-8 px-6 py-10 sm:px-9 sm:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:px-12 lg:py-14 ${template.show_availability === false ? 'lg:grid-cols-1' : ''}`}>
+          <div className={`grid gap-8 px-6 py-10 sm:px-9 sm:py-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end lg:px-12 lg:py-14 ${template.show_availability === false ? 'lg:grid-cols-1' : ''}`}>
             <div className="max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-md shadow-xs">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-3.5 py-1.5 text-xs font-semibold text-white backdrop-blur-xl shadow-md">
                 <MapPin className="h-3.5 w-3.5 text-emerald-300" />
-                {destination.location || [destination.address, destination.city, destination.province].filter(Boolean).join(', ') || destination.province || destination.city || 'Indonesia'}
+                {formatCleanLocation(destination)}
               </span>
               <p className="mt-5 text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300 drop-shadow-xs">
                 {portalEyebrow}
@@ -208,19 +223,19 @@ export default function TenantPortal() {
                   type="button"
                   onClick={openBooking}
                   style={{ backgroundColor: accentColor }}
-                  className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-black/30 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
+                  className="inline-flex min-h-12 items-center justify-center gap-2.5 rounded-xl px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-black/40 transition-all hover:brightness-110 active:scale-[0.98] cursor-pointer"
                 >
                   <Ticket className="h-4 w-4" />
                   Pesan tiket
                 </button>
                 <Link
                   to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md transition-all shadow-md active:scale-[0.98] no-underline"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-xs sm:text-sm font-bold text-white bg-white/20 hover:bg-white/30 backdrop-blur-xl border border-white/30 transition-all shadow-md active:scale-[0.98] no-underline"
                 >
                   <History className="h-4 w-4 text-emerald-300" />
                   Riwayat Pesanan
                 </Link>
-                <span className="inline-flex items-center gap-2 text-xs font-medium text-white/85">
+                <span className="inline-flex items-center gap-2 text-xs font-medium text-white/90 drop-shadow-xs">
                   <ShieldCheck className="h-4 w-4 text-emerald-400" />
                   QR aman untuk gerbang
                 </span>
@@ -229,34 +244,29 @@ export default function TenantPortal() {
 
             {template.show_availability !== false && (
               <aside
-                className="rounded-2xl p-5 sm:p-6 text-white shadow-2xl backdrop-blur-xl border transition-colors duration-300"
+                className="relative isolate overflow-hidden rounded-3xl p-6 sm:p-7 text-white backdrop-blur-2xl backdrop-saturate-150 border transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.45)]"
                 style={{
-                  backgroundColor: hexToRgba(primaryColor, 0.72),
-                  borderColor: hexToRgba(accentColor, 0.35)
+                  background: `linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%), ${hexToRgba(primaryColor, 0.32)}`,
+                  borderColor: 'rgba(255, 255, 255, 0.35)',
                 }}
               >
-                <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-3.5">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300">
+                <div className="flex items-center justify-between gap-2 border-b border-white/20 pb-3.5">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-300 drop-shadow-xs">
                     Ketersediaan Hari Ini
                   </span>
                   <span
-                    className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold"
-                    style={{
-                      backgroundColor: hexToRgba(accentColor, 0.25),
-                      border: `1px solid ${hexToRgba(accentColor, 0.45)}`,
-                      color: '#fff'
-                    }}
+                    className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold shadow-xs backdrop-blur-md border border-white/30 bg-white/20 text-white"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     Sistem Aktif
                   </span>
                 </div>
                 <div className="mt-4 flex items-end justify-between">
-                  <span className="text-xs font-semibold text-white/80">Kuota terisi</span>
-                  <strong className="text-3xl font-black tracking-tight text-white">{used}%</strong>
+                  <span className="text-xs font-semibold text-white/85">Kuota terisi</span>
+                  <strong className="text-3xl font-black tracking-tight text-white drop-shadow-sm">{used}%</strong>
                 </div>
                 <div
-                  className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/15 backdrop-blur-xs"
+                  className="mt-2.5 h-3 overflow-hidden rounded-full bg-black/35 backdrop-blur-sm p-0.5 border border-white/20"
                   role="progressbar"
                   aria-valuenow={used}
                   aria-valuemin={0}
@@ -264,18 +274,18 @@ export default function TenantPortal() {
                   aria-label="Persentase kuota terisi hari ini"
                 >
                   <div
-                    className="h-full rounded-full shadow-[0_0_12px_rgba(52,211,153,0.4)] transition-all duration-500"
-                    style={{ width: `${used}%`, backgroundColor: accentColor }}
+                    className="h-full rounded-full shadow-[0_0_14px_rgba(52,211,153,0.7)] transition-all duration-500"
+                    style={{ width: `${used}%`, backgroundColor: accentColor || '#10b981' }}
                   />
                 </div>
                 <div className="mt-5 grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-md">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-white/70">Tersisa</span>
-                    <strong className="mt-1 block text-xl font-black text-white">{remaining.toLocaleString('id-ID')}</strong>
+                  <div className="rounded-2xl border border-white/20 bg-black/25 p-3.5 backdrop-blur-md shadow-inner transition-transform hover:scale-[1.02]">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-white/75">Tersisa</span>
+                    <strong className="mt-1 block text-2xl font-black text-white drop-shadow-xs">{remaining.toLocaleString('id-ID')} pax</strong>
                   </div>
-                  <div className="rounded-xl border border-white/15 bg-white/10 p-3.5 backdrop-blur-md">
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-300/90">Mulai dari</span>
-                    <strong className="mt-1 block text-lg font-black text-emerald-300">{rupiah(startingPrice)}</strong>
+                  <div className="rounded-2xl border border-white/20 bg-black/25 p-3.5 backdrop-blur-md shadow-inner transition-transform hover:scale-[1.02]">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-emerald-300">Mulai dari</span>
+                    <strong className="mt-1 block text-xl font-black text-emerald-300 drop-shadow-xs">{rupiah(startingPrice)}</strong>
                   </div>
                 </div>
               </aside>
