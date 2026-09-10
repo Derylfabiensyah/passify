@@ -15,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
 import { PortalPageSkeleton } from './common/Skeleton';
-import WalletModal from './WalletModal';
 
 const rupiah = (value) => `Rp ${Number(value || 0).toLocaleString('id-ID')}`;
 const isPortalColor = (value, allowed, fallback) => allowed.includes(value) ? value : fallback;
@@ -27,20 +26,6 @@ export default function TenantPortal() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('passify_user') || 'null'); } catch { return null; }
   });
-  const [showWalletModal, setShowWalletModal] = useState(false);
-  const [walletBalance, setWalletBalance] = useState(() => {
-    const saved = localStorage.getItem('passify_wallet_balance');
-    return saved !== null ? Number(saved) : 150000;
-  });
-
-  React.useEffect(() => {
-    const syncWallet = () => {
-      const saved = localStorage.getItem('passify_wallet_balance');
-      if (saved !== null) setWalletBalance(Number(saved));
-    };
-    window.addEventListener('storage', syncWallet);
-    return () => window.removeEventListener('storage', syncWallet);
-  }, []);
 
   if (isLoading) {
     return <PortalPageSkeleton />;
@@ -133,26 +118,6 @@ export default function TenantPortal() {
           </Link>
           
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
-              title="Lihat riwayat pesanan dan e-tiket saya"
-            >
-              <Ticket className="h-3.5 w-3.5 text-emerald-700" />
-              <span className="hidden sm:inline">Riwayat Pesanan</span>
-              <span className="sm:hidden">Pesanan</span>
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setShowWalletModal(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
-              title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
-            >
-              <Wallet className="h-3.5 w-3.5 text-emerald-700" />
-              <span className="hidden sm:inline">Dompet:</span> <span className="font-extrabold text-emerald-800">{rupiah(walletBalance)}</span>
-            </button>
-
             {isManager && (
               <Link
                 to="/admin"
@@ -163,22 +128,21 @@ export default function TenantPortal() {
             )}
 
             {user ? (
-              <div className="flex items-center gap-2">
-                <span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">
-                  Halo, {user.name?.split(' ')[0] || (isManager ? 'Pengelola' : 'Wisatawan')}
+              <Link
+                to={destination?.slug ? `/profil?tenant=${destination.slug}` : '/profil'}
+                className="inline-flex items-center gap-2.5 rounded-2xl bg-white/90 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 transition-all shadow-2xs group no-underline"
+                title="Buka Halaman Profil & Dompet"
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-800 text-white text-xs font-black shadow-2xs group-hover:scale-105 transition-transform">
+                  {user.avatar || user.name?.charAt(0)?.toUpperCase() || (isManager ? 'P' : 'W')}
                 </span>
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-[var(--leaf-pale)] text-xs font-bold text-[var(--forest-deep)]">
-                  {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'P'}
-                </span>
-                <button
-                  type="button"
-                  onClick={logout}
-                  title="Keluar"
-                  className="grid h-9 w-9 place-items-center rounded-xl text-[var(--ink-soft)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)] transition-colors"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </div>
+                <div className="text-left hidden sm:block">
+                  <span className="block text-xs font-bold text-[#14281a] leading-none group-hover:text-emerald-800 transition-colors">
+                    {user.name?.split(' ')[0] || (isManager ? 'Pengelola' : 'Wisatawan')}
+                  </span>
+                  <span className="block text-[10px] text-gray-500 font-medium mt-0.5">Profil & Dompet</span>
+                </div>
+              </Link>
             ) : (
               <Link
                 to={destination?.slug ? `/masuk?tenant=${destination.slug}` : '/masuk'}
@@ -186,7 +150,7 @@ export default function TenantPortal() {
                   from: destination?.slug ? `/?tenant=${destination.slug}` : location.pathname,
                   tenantSlug: destination?.slug
                 }}
-                className="btn-secondary rounded-xl"
+                className="btn-secondary rounded-xl px-3.5 sm:px-4"
               >
                 <LogIn className="h-3.5 w-3.5" />
                 <span>Masuk</span>
@@ -399,35 +363,32 @@ export default function TenantPortal() {
           <span>Pesan tiket</span>
         </button>
         <Link
-          to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'}
+          to={destination?.slug ? `/profil?tenant=${destination.slug}` : '/profil'}
           className="btn-secondary px-3.5 py-3 rounded-xl flex items-center justify-center gap-1.5 text-xs font-bold no-underline whitespace-nowrap"
-          title="Riwayat Pesanan"
+          title="Halaman Profil & Dompet"
         >
-          <History className="h-4 w-4 text-emerald-700" />
-          <span>Pesanan</span>
+          <span className="grid h-4 w-4 place-items-center rounded-full bg-emerald-800 text-[9px] text-white font-bold">
+            {user?.avatar || user?.name?.charAt(0)?.toUpperCase() || 'P'}
+          </span>
+          <span>Profil</span>
         </Link>
       </div>
-      <footer className="border-t border-white/80 bg-white/85 backdrop-blur-2xl px-4 py-7 text-center text-xs text-[#3b4836] space-y-2">
+      <footer className="w-full bg-white/85 backdrop-blur-2xl rounded-t-[2rem] sm:rounded-t-[2.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-lg px-4 py-7 text-center text-xs text-[#3b4836] space-y-2">
         <div className="flex flex-wrap justify-center items-center gap-3 text-xs font-medium">
-          <Link to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'} className="text-emerald-800 hover:underline font-bold flex items-center gap-1">
-            <Ticket className="h-3.5 w-3.5 text-emerald-700" />
-            Riwayat Pesanan & E-Tiket
+          <Link to={destination?.slug ? `/profil?tenant=${destination.slug}` : '/profil'} className="text-emerald-800 hover:underline font-bold flex items-center gap-1">
+            Profil & Dompet
           </Link>
           <span>•</span>
-          <Link to={isManager ? "/admin" : "/masuk"} className="hover:underline font-semibold text-[#14281a]">
-            {isManager ? "Portal Pengelola" : "Masuk Akun"}
+          <Link to={destination?.slug ? `/riwayat-pesanan?tenant=${destination.slug}` : '/riwayat-pesanan'} className="hover:underline font-medium text-[#3b4836]">
+            Riwayat Pesanan
+          </Link>
+          <span>•</span>
+          <Link to={isManager ? "/admin" : (user ? (destination?.slug ? `/profil?tenant=${destination.slug}` : '/profil') : "/masuk")} className="hover:underline font-semibold text-[#14281a]">
+            {isManager ? "Portal Pengelola" : (user ? "Akun Saya" : "Masuk Akun")}
           </Link>
         </div>
         <p className="text-[#4a5845] font-medium">{destination.name} · Didukung oleh Passify</p>
       </footer>
-
-      {/* Passify Cashless Wallet Modal */}
-      {showWalletModal && (
-        <WalletModal
-          walletBalance={walletBalance}
-          onClose={() => setShowWalletModal(false)}
-        />
-      )}
     </div>
   );
 }

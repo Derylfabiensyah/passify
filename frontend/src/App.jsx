@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { TenantProvider, useTenant } from './contexts/TenantContext';
 import { ToastProvider } from './contexts/ToastContext';
@@ -20,6 +20,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import TravelerAuthPage from './pages/TravelerAuthPage';
 import CheckoutPage from './pages/CheckoutPage';
 import BookingHistoryPage from './pages/BookingHistoryPage';
+import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 
 function AppRoutes() {
@@ -48,6 +49,8 @@ function AppRoutes() {
         <Route path="/riwayat-pesanan" element={<BookingHistoryPage />} />
         <Route path="/tiket-saya" element={<BookingHistoryPage />} />
         <Route path="/riwayat" element={<BookingHistoryPage />} />
+        <Route path="/profil" element={<ProfilePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/pesan" element={<CheckoutPage />} />
         <Route path="/pesan/:tenantSlug" element={<CheckoutPage />} />
         <Route
@@ -79,6 +82,8 @@ function AppRoutes() {
       <Route path="/riwayat-pesanan" element={<BookingHistoryPage />} />
       <Route path="/tiket-saya" element={<BookingHistoryPage />} />
       <Route path="/riwayat" element={<BookingHistoryPage />} />
+      <Route path="/profil" element={<ProfilePage />} />
+      <Route path="/profile" element={<ProfilePage />} />
       <Route path="/pesan" element={<CheckoutPage />} />
       <Route path="/pesan/:tenantSlug" element={<CheckoutPage />} />
       <Route path="/pesan/:tenantSlug/:destinationId" element={<CheckoutPage />} />

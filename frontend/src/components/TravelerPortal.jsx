@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import { formatRupiah } from '../api/client';
 import { DESTINATIONS } from '../data/destinations';
-import WalletModal from './WalletModal';
 
 const fallbackDestination = {
   id: 'dest-demo',
@@ -35,20 +34,6 @@ export default function TravelerPortal() {
       return null;
     }
   });
-  const [showWalletModal, setShowWalletModal] = useState(false);
-  const [walletBalance, setWalletBalance] = useState(() => {
-    const saved = localStorage.getItem('passify_wallet_balance');
-    return saved !== null ? Number(saved) : 150000;
-  });
-
-  React.useEffect(() => {
-    const syncWallet = () => {
-      const saved = localStorage.getItem('passify_wallet_balance');
-      if (saved !== null) setWalletBalance(Number(saved));
-    };
-    window.addEventListener('storage', syncWallet);
-    return () => window.removeEventListener('storage', syncWallet);
-  }, []);
 
   const destinations = Array.isArray(DESTINATIONS) && DESTINATIONS.length ? DESTINATIONS : [fallbackDestination];
   const destination = destinations[demoIndex] || destinations[0] || fallbackDestination;
@@ -91,36 +76,28 @@ export default function TravelerPortal() {
           </Link>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              to="/riwayat-pesanan"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl no-underline transition-all shadow-2xs"
-              title="Lihat riwayat pesanan dan e-tiket saya"
-            >
-              <Ticket className="h-3.5 w-3.5 text-emerald-700" />
-              <span className="hidden sm:inline">Riwayat Pesanan</span>
-              <span className="sm:hidden">Pesanan</span>
-            </Link>
-
-            <button
-              type="button"
-              onClick={() => setShowWalletModal(true)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#14281a] bg-white/80 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 rounded-xl transition-all shadow-2xs cursor-pointer"
-              title="Buka Dompet Digital Cashless & Simulasi Gelang NFC"
-            >
-              <Wallet className="h-3.5 w-3.5 text-emerald-700" />
-              <span className="hidden sm:inline">Dompet:</span> <span className="font-extrabold text-emerald-800">{formatRupiah(walletBalance)}</span>
-            </button>
-
             {user ? (
-              <div className="flex items-center gap-2">
-                <span className="hidden text-xs font-semibold text-[var(--ink-soft)] sm:inline">Halo, {user.name?.split(' ')[0] || 'Wisatawan'}</span>
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--leaf-pale)] text-xs font-bold text-[var(--forest-deep)]">{user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}</span>
-                <button type="button" onClick={handleLogout} title="Keluar" className="grid h-9 w-9 place-items-center rounded-full border border-transparent text-[var(--ink-soft)] transition-colors hover:border-[var(--border)] hover:bg-[var(--bark-pale)] hover:text-[var(--bark)]">
-                  <LogOut className="h-4 w-4" /><span className="sr-only">Keluar</span>
-                </button>
-              </div>
+              <Link
+                to="/profil"
+                className="inline-flex items-center gap-2.5 rounded-2xl bg-white/90 hover:bg-white border border-gray-200/90 hover:border-gray-300 px-3 py-1.5 transition-all shadow-2xs group no-underline"
+                title="Buka Halaman Profil & Dompet"
+              >
+                <span className="grid h-8 w-8 place-items-center rounded-xl bg-emerald-800 text-white text-xs font-black shadow-2xs group-hover:scale-105 transition-transform">
+                  {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'W'}
+                </span>
+                <div className="text-left hidden sm:block">
+                  <span className="block text-xs font-bold text-[#14281a] leading-none group-hover:text-emerald-800 transition-colors">
+                    {user.name?.split(' ')[0] || 'Wisatawan'}
+                  </span>
+                  <span className="block text-[10px] text-gray-500 font-medium mt-0.5">Profil & Dompet</span>
+                </div>
+              </Link>
             ) : (
-              <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-xl px-3.5 sm:px-4"><LogIn className="h-3.5 w-3.5" /><span className="hidden sm:inline">Masuk / Daftar</span><span className="sm:hidden">Masuk</span></Link>
+              <Link to="/masuk" state={{ from: location.pathname }} className="btn-secondary rounded-xl px-3.5 sm:px-4">
+                <LogIn className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Masuk / Daftar</span>
+                <span className="sm:hidden">Masuk</span>
+              </Link>
             )}
           </div>
         </div>
@@ -322,20 +299,12 @@ export default function TravelerPortal() {
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/80 bg-white/85 px-4 py-3 backdrop-blur-xl lg:hidden shadow-lg">
         <button type="button" onClick={handleBookNowClick} className="btn-clay w-full text-sm font-bold"><Ticket className="h-4 w-4" />Pesan tiket kunjungan</button>
       </div>
-      <footer className="border-t border-white/80 bg-white/85 backdrop-blur-2xl px-4 py-7 sm:px-6 lg:px-8">
+      <footer className="w-full bg-white/85 backdrop-blur-2xl rounded-t-[2rem] sm:rounded-t-[2.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-lg px-4 py-7 sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-[1240px] flex-col gap-2 text-xs text-[#3b4836] sm:flex-row sm:items-center sm:justify-between">
           <span><strong className="text-[#14281a] font-bold">{destination.name}</strong> · Didukung Passify</span>
           <Link to="/" className="font-bold text-emerald-800 hover:text-emerald-950">Kembali ke beranda Passify</Link>
         </div>
       </footer>
-
-      {/* Passify Cashless Wallet Modal */}
-      {showWalletModal && (
-        <WalletModal
-          walletBalance={walletBalance}
-          onClose={() => setShowWalletModal(false)}
-        />
-      )}
     </div>
   );
 }
