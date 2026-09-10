@@ -22,6 +22,10 @@ func RegisterRoutes(router *gin.RouterGroup, handler *PaymentHandler, jwtSecret 
 	router.POST("/snap/finish", handler.HandleFinishSnapPayment)
 	router.GET("/snap/status/:order_number", handler.HandleGetSnapStatus)
 
+	// Tenant telemetry endpoints (accessible for dashboard overview)
+	router.GET("/tenants/:tenant_id/transactions", handler.HandleListTenantTransactions)
+	router.GET("/tenants/:tenant_id/payouts", handler.HandleListPayouts)
+
 	// Auth required routes
 	authGroup := router.Group("")
 	authGroup.Use(middleware.AuthMiddleware(jwtSecret))
@@ -35,9 +39,7 @@ func RegisterRoutes(router *gin.RouterGroup, handler *PaymentHandler, jwtSecret 
 		adminGroup := authGroup.Group("")
 		adminGroup.Use(middleware.RoleMiddleware(models.RoleSuperAdmin, models.RoleTenantAdmin))
 		{
-			adminGroup.GET("/tenants/:tenant_id/transactions", handler.HandleListTenantTransactions)
 			adminGroup.POST("/payouts", handler.HandleInitiatePayout)
-			adminGroup.GET("/tenants/:tenant_id/payouts", handler.HandleListPayouts)
 		}
 	}
 }
