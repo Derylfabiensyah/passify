@@ -16,7 +16,6 @@ import {
   LogOut,
   MapPin,
   QrCode,
-  Search,
   ShieldCheck,
   Sparkles,
   Ticket,
@@ -38,7 +37,6 @@ export default function BookingHistoryPage() {
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'active' | 'used' | 'expired'
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedTicketForQR, setSelectedTicketForQR] = useState(null);
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [walletBalance, setWalletBalance] = useState(() => {
@@ -196,15 +194,6 @@ export default function BookingHistoryPage() {
     if (filterTab === 'active' && status !== 'active') return false;
     if (filterTab === 'used' && status !== 'used') return false;
     if (filterTab === 'expired' && status !== 'expired') return false;
-
-    // Search query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchName = t.destinationName?.toLowerCase().includes(q);
-      const matchOrder = t.orderNumber?.toLowerCase().includes(q);
-      const matchVisitor = t.visitorName?.toLowerCase().includes(q);
-      return matchName || matchOrder || matchVisitor;
-    }
     return true;
   });
 
@@ -298,18 +287,6 @@ export default function BookingHistoryPage() {
               Buka E-Ticket Dynamic QR 10 Menit saat tiba di gerbang, atau cetak bukti invoice reservasi resmi Anda.
             </p>
           </div>
-
-          {/* Search Bar */}
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-soft)]" />
-            <input
-              type="text"
-              placeholder="Cari nama wisata atau nomor order..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="field-control pl-9 text-xs font-medium"
-            />
-          </div>
         </div>
 
         {/* Filter Tabs */}
@@ -354,8 +331,8 @@ export default function BookingHistoryPage() {
             <div className="space-y-1">
               <h3 className="text-base font-bold text-[var(--forest-deep)]">Belum Ada Tiket yang Cocok</h3>
               <p className="text-xs text-[var(--ink-soft)]">
-                {searchQuery
-                  ? 'Tidak ada tiket dengan kata kunci pencarian tersebut.'
+                {filterTab !== 'all'
+                  ? 'Tidak ada tiket dalam kategori ini.'
                   : 'Anda belum memesan tiket wisata alam. Yuk jelajahi berbagai destinasi alam menarik!'}
               </p>
             </div>
