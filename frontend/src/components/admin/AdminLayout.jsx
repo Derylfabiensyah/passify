@@ -229,6 +229,27 @@ export default function AdminLayout({ children }) {
           </div>
 
           <div className="flex shrink-0 items-center gap-2.5">
+            {/* Tenant Selector Dropdown */}
+            <div className="flex items-center gap-1.5 rounded-full border border-emerald-900/15 bg-white/95 px-3 py-1 text-xs font-bold text-[#14281a] shadow-2xs">
+              <Building2 className="h-3.5 w-3.5 text-emerald-800 shrink-0" />
+              <select
+                aria-label="Pilih Destinasi Tenant"
+                value={activeTenantSlug}
+                onChange={(e) => {
+                  const newSlug = e.target.value;
+                  localStorage.setItem('passify_current_tenant', newSlug);
+                  localStorage.setItem('passify_last_active_tenant', newSlug);
+                  window.dispatchEvent(new Event('storage'));
+                  window.location.reload();
+                }}
+                className="bg-transparent text-xs font-bold text-[#14281a] outline-none cursor-pointer pr-1"
+              >
+                <option value="curug-cikanteh">Curug Cikanteh</option>
+                <option value="curug-citambur">Curug Citambur</option>
+                <option value="curug-cibereum">Curug Cibereum</option>
+              </select>
+            </div>
+
             {/* View Public Portal Link */}
             <Link
               to={`/?tenant=${activeTenantSlug}`}

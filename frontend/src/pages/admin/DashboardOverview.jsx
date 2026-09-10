@@ -26,7 +26,7 @@ import {
 import { Bar, Line } from 'react-chartjs-2';
 
 import { useTenant } from '../../contexts/TenantContext';
-import { fetchDashboardOverviewTelemetry } from '../../api/admin';
+import { fetchDashboardOverviewTelemetry, getActiveAdminTenant } from '../../api/admin';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
 import { ChartContainerSkeleton } from '../../components/common/Skeleton';
@@ -54,12 +54,14 @@ ChartJS.register(
 
 export default function DashboardOverview() {
   const { slug } = useTenant();
+  const activeTenant = getActiveAdminTenant();
+  const effectiveSlug = slug || activeTenant?.slug || 'curug-cikanteh';
   const [telemetry, setTelemetry] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const loadData = async () => {
     try {
-      const data = await fetchDashboardOverviewTelemetry(slug);
+      const data = await fetchDashboardOverviewTelemetry(effectiveSlug);
       setTelemetry(data);
     } catch (err) {
       console.warn('Live telemetry load fallback:', err);
@@ -76,7 +78,7 @@ export default function DashboardOverview() {
       clearInterval(interval);
       window.removeEventListener('storage', handleStorage);
     };
-  }, [slug]);
+  }, [effectiveSlug]);
 
   const stats = telemetry?.stats || DASHBOARD_STATS;
   const today = stats?.today || DASHBOARD_STATS.today;

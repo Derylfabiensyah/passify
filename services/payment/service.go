@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -612,11 +613,17 @@ func (s *PaymentService) CreateSnapTransaction(req *CreateSnapOrderRequest) (*Pa
 	var destinationID uuid.UUID
 	if req.DestinationID != nil && *req.DestinationID != uuid.Nil {
 		destinationID = *req.DestinationID
+		if req.TenantID == nil || *req.TenantID == uuid.Nil {
+			var d models.Destination
+			if err := s.db.Where("id = ?", destinationID).First(&d).Error; err == nil && d.TenantID != uuid.Nil {
+				tenantID = d.TenantID
+			}
+		}
 	} else if req.DestinationSlug != "" {
 		var d models.Destination
 		if err := s.db.Where("slug = ?", req.DestinationSlug).First(&d).Error; err == nil {
 			destinationID = d.ID
-			if d.TenantID != uuid.Nil {
+			if d.TenantID != uuid.Nil && (req.TenantID == nil || *req.TenantID == uuid.Nil) {
 				tenantID = d.TenantID
 			}
 		}
@@ -625,7 +632,7 @@ func (s *PaymentService) CreateSnapTransaction(req *CreateSnapOrderRequest) (*Pa
 		var d models.Destination
 		if err := s.db.First(&d).Error; err == nil {
 			destinationID = d.ID
-			if d.TenantID != uuid.Nil {
+			if d.TenantID != uuid.Nil && (req.TenantID == nil || *req.TenantID == uuid.Nil) {
 				tenantID = d.TenantID
 			}
 		}
@@ -767,7 +774,38 @@ func (s *PaymentService) FinishSnapPayment(orderNumber string) error {
 		}
 
 		// Activate any tickets linked to this transaction
-		_ = txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active")
+		res := txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active")
+		if res.RowsAffected == 0 && tx.DestinationID != uuid.Nil {
+			var cat models.TicketCategory
+			if err := txDB.Where("destination_id = ?", tx.DestinationID).First(&cat).Error; err == nil {
+				vCount := tx.VisitorCount
+				if vCount <= 0 {
+					vCount = 1
+				}
+				for i := 0; i < vCount; i++ {
+					tCode := fmt.Sprintf("TWA-%s-%04d", time.Now().Format("20060102"), rand.Intn(9000)+1000)
+					totpKey := fmt.Sprintf("TOTP%s%04d", tx.ID.String()[:8], i)
+					visName := "Wisatawan Terverifikasi"
+					newTkt := &models.Ticket{
+						BaseModel: models.BaseModel{
+							ID: uuid.New(),
+						},
+						TenantID:      tx.TenantID,
+						TransactionID: tx.ID,
+						CategoryID:    cat.ID,
+						DestinationID: tx.DestinationID,
+						TicketCode:    tCode,
+						VisitDate:     tx.VisitDate,
+						TimeSlotID:    tx.TimeSlotID,
+						VisitorName:   &visName,
+						UnitPrice:     cat.BasePrice,
+						TOTPSecretKey: totpKey,
+						Status:        "active",
+					}
+					_ = txDB.Create(newTkt)
+				}
+			}
+		}
 		return nil
 	})
 }
