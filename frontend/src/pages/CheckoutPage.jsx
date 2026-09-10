@@ -57,6 +57,19 @@ export default function CheckoutPage() {
   const [destination, setDestination] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const effectiveTenantSlug =
+    tenantSlug ||
+    destinationId ||
+    destination?.slug ||
+    searchParams.get('tenant') ||
+    searchParams.get('dest') ||
+    contextSlug ||
+    sessionStorage.getItem('passify_last_active_tenant') ||
+    localStorage.getItem('passify_last_active_tenant');
+
+  const tenantPortalUrl = effectiveTenantSlug ? `/?tenant=${effectiveTenantSlug}` : (contextSlug ? '/' : '/jelajah');
+  const tenantPortalName = destination?.name ? `Portal ${destination.name}` : 'Portal Wisata';
+
   // Stepper State: 1 = Isi Data & Jadwal, 2 = Pembayaran, 3 = Sukses
   const [step, setStep] = useState(1);
 
@@ -123,6 +136,11 @@ export default function CheckoutPage() {
         searchParams.get('dest') ||
         contextSlug ||
         'curug-cibereum';
+
+      if (targetSlug) {
+        sessionStorage.setItem('passify_last_active_tenant', targetSlug);
+        localStorage.setItem('passify_last_active_tenant', targetSlug);
+      }
 
       // 1. Check local admin destination cache (only if exact slug match)
       let adminDest = null;
@@ -762,10 +780,13 @@ export default function CheckoutPage() {
           )}
 
           <Link
-            to="/jelajah"
+            to={tenantPortalUrl}
             className="text-xs font-bold text-[var(--forest)] hover:underline flex items-center gap-1"
+            title={`Kembali ke ${tenantPortalName}`}
           >
-            Portal Wisata <ChevronRight className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{tenantPortalName}</span>
+            <span className="sm:hidden">Portal Wisata</span>
+            <ChevronRight className="h-3.5 w-3.5" />
           </Link>
         </div>
       </header>
@@ -1447,10 +1468,10 @@ export default function CheckoutPage() {
                 </Link>
 
                 <Link
-                  to="/"
+                  to={tenantPortalUrl}
                   className="w-full btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold no-underline"
                 >
-                  Kembali ke Beranda
+                  Kembali ke {tenantPortalName}
                 </Link>
               </div>
             </div>
