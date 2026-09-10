@@ -937,7 +937,7 @@ export default function CheckoutPage() {
                             <span className="text-[10px] font-normal text-[var(--ink-soft)] ml-1">/ orang</span>
                           </p>
                           <p className="text-[10px] text-[var(--ink-soft)] mt-0.5">
-                            Asuransi: {formatRupiah(cat.insurance)} Â· Retribusi: {formatRupiah(cat.retribusi)}
+                            Asuransi: {formatRupiah(cat.insurance)} · Retribusi: {formatRupiah(cat.retribusi)}
                           </p>
                         </div>
 
@@ -949,7 +949,7 @@ export default function CheckoutPage() {
                             disabled={qty === 0}
                             className="h-8 w-8 rounded-xl bg-white text-[var(--forest)] font-bold shadow-xs hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center text-lg"
                           >
-                            âˆ’
+                            −
                           </button>
                           <span className="w-5 text-center text-sm font-extrabold">{qty}</span>
                           <button
@@ -1144,7 +1144,7 @@ export default function CheckoutPage() {
                     className="rounded text-[var(--forest)] accent-[var(--forest)] h-3.5 w-3.5"
                   />
                   <span>
-                    âš¡ <strong>Simulasi Flash Sale:</strong> Uji Ruang Tunggu Virtual
+                    ⚡ <strong>Simulasi Flash Sale:</strong> Uji Ruang Tunggu Virtual
                   </span>
                 </label>
 
@@ -1428,7 +1428,7 @@ export default function CheckoutPage() {
                 <div>
                   <strong className="block font-bold">Fitur Keamanan Dynamic TOTP QR 30 Detik (PDF Spec Hal. 4 Poin 7.B):</strong>
                   <p className="text-[11px] text-amber-800 mt-0.5">
-                    QR tiket diperbarui otomatis setiap 30 detik (AES-256 Token A â†’ Token B â†’ Token C) di layar HP Anda saat dibuka di gerbang. Tangkapan layar (screenshot) statis otomatis kedaluwarsa.
+                    QR tiket diperbarui otomatis setiap 30 detik (AES-256 Token A → Token B → Token C) di layar HP Anda saat dibuka di gerbang. Tangkapan layar (screenshot) statis otomatis kedaluwarsa.
                   </p>
                 </div>
               </div>
@@ -1577,7 +1577,7 @@ export default function CheckoutPage() {
 
               <div className="space-y-1.5">
                 <span className="inline-block rounded-full bg-amber-100 text-amber-900 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider">
-                  Virtual Waiting Room Â· High Traffic
+                  Virtual Waiting Room · High Traffic
                 </span>
                 <h3 className="text-xl font-bold text-[var(--forest-deep)]">
                   Anda Berada Dalam Antrean
@@ -1588,15 +1588,15 @@ export default function CheckoutPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-[var(--fog)] p-4 text-center">
+                <div className="rounded-xl bg-gray-50 p-3">
                   <span className="text-[10px] uppercase font-bold text-[var(--ink-soft)]">Posisi Antrean</span>
-                  <div className="text-2xl font-extrabold text-[var(--forest-deep)] mt-1 font-mono">
+                  <div className="text-2xl font-extrabold text-[var(--forest)] mt-1 font-mono">
                     #{queuePosition}
                   </div>
-                  <span className="text-[10px] text-[var(--ink-soft)]">dari 42 antrean aktif</span>
+                  <span className="text-[10px] text-[var(--ink-soft)]">di depan Anda</span>
                 </div>
 
-                <div className="rounded-2xl bg-[var(--fog)] p-4 text-center">
+                <div className="rounded-xl bg-gray-50 p-3">
                   <span className="text-[10px] uppercase font-bold text-[var(--ink-soft)]">Estimasi Tunggu</span>
                   <div className="text-2xl font-extrabold text-[var(--bark)] mt-1 font-mono">
                     ~{queueWaitSeconds}s
@@ -1651,11 +1651,9 @@ export default function CheckoutPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 bg-white py-6 text-center text-xs text-[var(--ink-soft)]">
-        Â© {new Date().getFullYear()} Passify Cloud OS Â· Platform Reservasi & E-Ticketing Wisata Alam
+      <footer className="mt-12 w-full bg-white/85 backdrop-blur-2xl rounded-t-[2rem] sm:rounded-t-[2.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-lg py-7 text-center text-xs text-[#3b4836]">
+        © {new Date().getFullYear()} Passify Cloud OS · Platform Reservasi & E-Ticketing Wisata Alam
       </footer>
     </div>
   );
 }
-
-

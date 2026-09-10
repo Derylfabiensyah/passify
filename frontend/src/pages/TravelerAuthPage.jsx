@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Compass, Lock, Mail, Phone, ShieldCheck, User, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
@@ -320,7 +320,7 @@ export default function TravelerAuthPage({ mode }) {
                     className="field-control pl-10 pr-10 text-xs font-medium"
                     value={login.password}
                     onChange={(e) => setLogin({ ...login, password: e.target.value })}
-                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                    placeholder="••••••••"
                     required
                   />
                   <button

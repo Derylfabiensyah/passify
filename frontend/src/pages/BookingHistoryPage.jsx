@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   AlertCircle,
@@ -466,7 +466,7 @@ export default function BookingHistoryPage() {
                         <div className="space-y-1">
                           {(ticket.visitors || [{ name: ticket.visitorName || 'Pengunjung' }]).map((v, vIdx) => (
                             <div key={vIdx} className="flex justify-between text-[11px] text-[var(--ink)]">
-                              <span>â€¢ {v.name}</span>
+                              <span>• {v.name}</span>
                               {v.nik && <span className="font-mono text-gray-500 text-[10px]">NIK: {v.nik}</span>}
                             </div>
                           ))}
@@ -542,8 +542,8 @@ export default function BookingHistoryPage() {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-gray-100 bg-white py-6 text-center text-xs text-[var(--ink-soft)]">
-        Â© {new Date().getFullYear()} Passify Cloud OS Â· Platform Reservasi & E-Ticketing Wisata Alam
+      <footer className="mt-12 w-full bg-white/85 backdrop-blur-2xl rounded-t-[2rem] sm:rounded-t-[2.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-lg py-7 text-center text-xs text-[#3b4836]">
+        © {new Date().getFullYear()} Passify Cloud OS · Platform Reservasi & E-Ticketing Wisata Alam
       </footer>
     </div>
   );

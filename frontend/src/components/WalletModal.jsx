@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   X,
   Wallet,
@@ -93,7 +93,7 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
 
   const handlePayMerchant = (merch) => {
     if (walletBalance < merch.price) {
-      setIsSuccessMsg('âŒ Saldo dompet Anda tidak mencukupi untuk transaksi ini.');
+      setIsSuccessMsg('❌ Saldo dompet Anda tidak mencukupi untuk transaksi ini.');
       setTimeout(() => setIsSuccessMsg(''), 3000);
       return;
     }
@@ -107,13 +107,13 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
       time: 'Baru saja'
     });
 
-    setIsSuccessMsg(`âœ“ Pembayaran Rp ${merch.price.toLocaleString('id-ID')} ke ${merch.name} berhasil!`);
+    setIsSuccessMsg(`✓ Pembayaran Rp ${merch.price.toLocaleString('id-ID')} ke ${merch.name} berhasil!`);
     setTimeout(() => setIsSuccessMsg(''), 3500);
   };
 
   const handleInstantRefund = () => {
     if (walletBalance <= 0) {
-      setIsSuccessMsg('âŒ Saldo dompet sudah kosong atau telah ditarik.');
+      setIsSuccessMsg('❌ Saldo dompet sudah kosong atau telah ditarik.');
       setTimeout(() => setIsSuccessMsg(''), 3000);
       return;
     }
@@ -128,13 +128,13 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
       time: 'Baru saja'
     });
 
-    setIsSuccessMsg(`âœ“ Refund Rp ${currentBal.toLocaleString('id-ID')} telah dikirim tanpa potongan biaya!`);
+    setIsSuccessMsg(`✓ Refund Rp ${currentBal.toLocaleString('id-ID')} telah dikirim tanpa potongan biaya!`);
     setTimeout(() => setIsSuccessMsg(''), 4000);
   };
 
   const handleSyncWristband = () => {
     setNfcLinked(true);
-    setIsSuccessMsg(`âœ“ Gelang NFC ${nfcUid} tersinkron ke dompet & e-Ticket Anda.`);
+    setIsSuccessMsg(`✓ Gelang NFC ${nfcUid} tersinkron ke dompet & e-Ticket Anda.`);
     setTimeout(() => setIsSuccessMsg(''), 3000);
   };
 
@@ -407,7 +407,7 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
             <div className="p-4 rounded-xl bg-[var(--canvas)] border border-[var(--border)] text-xs text-[var(--ink-soft)] space-y-2 shadow-2xs">
               <div className="font-semibold text-[var(--forest-deep)]">Rekening Tujuan Refund Terdaftar:</div>
               <div className="flex items-center justify-between p-2.5 rounded-lg bg-[var(--surface)] border border-[var(--border)]">
-                <span className="text-[var(--forest-deep)] font-medium">Bank BCA â€¢â€¢â€¢â€¢ 8821 (Akun Klien)</span>
+                <span className="text-[var(--forest-deep)] font-medium">Bank BCA •••• 8821 (Akun Klien)</span>
                 <span className="text-[10px] text-[var(--forest-deep)] font-bold bg-[var(--leaf-pale)] px-2 py-0.5 rounded border border-[var(--border)]">UTAMA</span>
               </div>
             </div>

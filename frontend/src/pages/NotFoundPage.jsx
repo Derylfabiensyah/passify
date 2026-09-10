@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Compass, Home, Search, ArrowLeft, Ticket, ShieldAlert } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
@@ -51,7 +51,7 @@ export default function NotFoundPage() {
           {/* 404 Code & Heading */}
           <div className="space-y-3">
             <span className="font-mono text-sm font-bold tracking-widest uppercase text-[var(--bark)] bg-[var(--bark-pale)]/50 px-3 py-1 rounded-full">
-              Error 404 â€¢ Halaman Tidak Ditemukan
+              Error 404 • Halaman Tidak Ditemukan
             </span>
             <h1 className="font-heading text-3xl sm:text-4xl font-extrabold text-[var(--forest-deep)] tracking-tight">
               Tersesat di Jalur Wisata?

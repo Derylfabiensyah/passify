@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Trees, 
@@ -543,7 +543,7 @@ export default function RegisterTenantPage() {
 
       {/* Footer */}
       <footer className="border-t border-[rgba(23,59,50,0.1)] px-4 py-6 text-center text-xs text-[var(--ink-soft)]">
-        Â© 2026 Passify. Platform SaaS Tiket Wisata Alam White-Label.
+        © {new Date().getFullYear()} Passify. Platform SaaS Tiket Wisata Alam White-Label.
       </footer>
     </div>
   );

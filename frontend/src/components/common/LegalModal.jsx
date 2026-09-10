@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { ShieldCheck, FileText, HelpCircle, CheckCircle2, Lock } from 'lucide-react';
 import ModalWrapper from './ModalWrapper';
 
@@ -57,7 +57,7 @@ export default function LegalModal({ isOpen, onClose, type = 'privacy' }) {
         },
         {
           heading: '3. Kontak Resmi Layanan Pelanggan',
-          text: 'Email: hello@passify.id / support@passify.id â€¢ Jam Operasional: Senin - Minggu (06.00 - 18.00 WIB).'
+          text: 'Email: hello@passify.id / support@passify.id • Jam Operasional: Senin - Minggu (06.00 - 18.00 WIB).'
         }
       ]
     }

@@ -235,7 +235,7 @@ export default function TenantPortal() {
                   <History className="h-4 w-4 text-emerald-300" />
                   Riwayat Pesanan
                 </Link>
-                <span className="inline-flex items-center gap-2 text-xs font-medium text-[var(--ink)]">
+                <span className="inline-flex items-center gap-2 text-xs font-medium text-white/85">
                   <ShieldCheck className="h-4 w-4 text-emerald-400" />
                   QR aman untuk gerbang
                 </span>

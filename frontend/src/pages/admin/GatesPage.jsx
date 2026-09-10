@@ -111,7 +111,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
           </span>
           <div className="flex items-center gap-1">
             <span className="font-mono text-[10px] text-gray-600">
-              {keyVisible ? (device.hmac_key || 'a3f8c2d1e6b9') : 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢'}
+              {keyVisible ? (device.hmac_key || 'a3f8c2d1e6b9') : '••••••••••••'}
             </span>
             <button
               type="button"
@@ -433,7 +433,7 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
               <span>{result.message || 'Tiket berhasil divalidasi!'}</span>
             </div>
             <div className="text-[11px] text-emerald-700">
-              Kode: <span className="font-mono font-bold">{result.ticket_code}</span> â€¢ Pengunjung: {result.visitor_name || 'Wisatawan'}
+              Kode: <span className="font-mono font-bold">{result.ticket_code}</span> • Pengunjung: {result.visitor_name || 'Wisatawan'}
             </div>
           </div>
         )}
