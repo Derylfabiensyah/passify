@@ -658,7 +658,7 @@ function PortalLivePreview({ destination, template }) {
 
             {/* Desktop Hero Section */}
             <div className="p-6">
-              <div className="relative isolate overflow-hidden rounded-3xl p-6 text-white transition-colors duration-300 shadow-xl border border-white/10" style={{ backgroundColor: '#111811' }}>
+              <div className="relative isolate overflow-hidden rounded-2xl p-6 text-white transition-colors duration-300 shadow-xl border border-white/10" style={{ backgroundColor: '#111811' }}>
                 <img
                   src={coverImage}
                   alt=""
@@ -698,7 +698,7 @@ function PortalLivePreview({ destination, template }) {
                   {/* Desktop Real Availability Card */}
                   {template.show_availability !== false && (
                     <div
-                      className="relative isolate overflow-hidden rounded-3xl border p-5 text-white shadow-xl backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300"
+                      className="relative isolate overflow-hidden rounded-2xl border p-5 text-white shadow-xl backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300"
                       style={{
                         background: `linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%), ${hexToRgba(primaryBg, 0.32)}`,
                         borderColor: 'rgba(255, 255, 255, 0.35)',

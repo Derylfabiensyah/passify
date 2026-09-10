@@ -371,7 +371,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            <div className="overflow-hidden rounded-3xl glass-panel p-6 sm:p-8 shadow-xl border border-white/80">
+            <div className="overflow-hidden rounded-2xl glass-panel p-6 sm:p-8 shadow-xl border border-white/80">
               {/* Header Card */}
               <div className="flex items-start justify-between gap-4 pb-5 border-b border-black/[0.08] dark:border-white/10">
                 <div className="flex items-center gap-3">

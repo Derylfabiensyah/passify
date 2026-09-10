@@ -134,7 +134,7 @@ export default function ProfilePage() {
 
         {/* Empty / Not logged in State */}
         <main className="mx-auto max-w-md w-full px-4 py-16 flex-1 flex flex-col items-center justify-center text-center">
-          <div className="h-20 w-20 rounded-3xl bg-emerald-100/80 border border-emerald-200/80 flex items-center justify-center text-emerald-800 shadow-sm mb-6">
+          <div className="h-20 w-20 rounded-2xl bg-emerald-100/80 border border-emerald-200/80 flex items-center justify-center text-emerald-800 shadow-sm mb-6">
             <UserIcon className="h-10 w-10" />
           </div>
           <h1 className="text-2xl font-black text-[#14281a]">Belum Masuk ke Akun</h1>
@@ -199,11 +199,11 @@ export default function ProfilePage() {
 
       <main className="mx-auto max-w-4xl w-full px-4 py-8 sm:px-6 flex-1 space-y-6">
         {/* User Identity Card */}
-        <section className="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden shadow-xs">
+        <section className="glass-panel p-6 sm:p-8 rounded-2xl relative overflow-hidden shadow-xs">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div className="flex items-center gap-4 sm:gap-6">
               <div className="relative">
-                <span className="grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-3xl bg-emerald-800 text-2xl sm:text-3xl font-black text-white shadow-md">
+                <span className="grid h-16 w-16 sm:h-20 sm:w-20 place-items-center rounded-2xl bg-emerald-800 text-2xl sm:text-3xl font-black text-white shadow-md">
                   {initial}
                 </span>
                 <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-emerald-500 text-white border-2 border-white shadow-xs">
@@ -296,7 +296,7 @@ export default function ProfilePage() {
         </section>
 
         {/* Passify Cashless Wallet Card */}
-        <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-[#102d20] via-[#143a29] to-[#0d2218] p-6 sm:p-8 text-white shadow-lg">
+        <section className="relative isolate overflow-hidden rounded-2xl bg-gradient-to-br from-[#102d20] via-[#143a29] to-[#0d2218] p-6 sm:p-8 text-white shadow-lg">
           <div className="absolute right-0 top-0 -z-10 translate-x-12 -translate-y-8 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
           
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -332,7 +332,7 @@ export default function ProfilePage() {
         <section>
           <Link
             to={currentTenantSlug ? `/riwayat-pesanan?tenant=${currentTenantSlug}` : '/riwayat-pesanan'}
-            className="glass-panel p-6 sm:p-7 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 no-underline group block"
+            className="glass-panel p-6 sm:p-7 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 no-underline group block"
           >
             <div className="flex items-start sm:items-center gap-4 sm:gap-5">
               <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">

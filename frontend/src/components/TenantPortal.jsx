@@ -188,7 +188,7 @@ export default function TenantPortal() {
 
       <main className="mx-auto max-w-[1240px] px-4 pb-28 pt-5 sm:px-6 sm:pt-7 lg:px-8">
         <section
-          className="relative isolate overflow-hidden rounded-3xl text-white shadow-2xl border border-white/10 transition-colors duration-300"
+          className="relative isolate overflow-hidden rounded-2xl text-white shadow-2xl border border-white/10 transition-colors duration-300"
           style={{ backgroundColor: '#111811' }}
         >
           <img
@@ -244,7 +244,7 @@ export default function TenantPortal() {
 
             {template.show_availability !== false && (
               <aside
-                className="relative isolate overflow-hidden rounded-3xl p-6 sm:p-7 text-white backdrop-blur-2xl backdrop-saturate-150 border transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.45)]"
+                className="relative isolate overflow-hidden rounded-2xl p-6 sm:p-7 text-white backdrop-blur-2xl backdrop-saturate-150 border transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.4),inset_0_1px_1px_rgba(255,255,255,0.45)]"
                 style={{
                   background: `linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%), ${hexToRgba(primaryColor, 0.32)}`,
                   borderColor: 'rgba(255, 255, 255, 0.35)',
@@ -302,7 +302,7 @@ export default function TenantPortal() {
             </p>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
               {(destination.ticket_categories || []).length === 0 ? (
-                <div className="col-span-full glass-panel p-8 text-center">
+                <div className="col-span-full glass-panel rounded-2xl p-8 text-center">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-800">
                     <Ticket className="h-6 w-6" />
                   </div>
@@ -317,7 +317,7 @@ export default function TenantPortal() {
                   return (
                     <article
                       key={category.id}
-                      className="glass-panel flex min-h-[200px] flex-col justify-between p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-200 group"
+                      className="glass-panel rounded-2xl flex min-h-[200px] flex-col justify-between p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-200 group"
                     >
                       <div>
                         <h3 className="text-xl font-bold text-[#14281a] group-hover:text-emerald-800 transition-colors">{category.name}</h3>
@@ -348,7 +348,7 @@ export default function TenantPortal() {
               )}
             </div>
           </div>
-          <aside className="glass-panel h-fit p-6 lg:sticky lg:top-24 shadow-xs">
+          <aside className="glass-panel rounded-2xl h-fit p-6 lg:sticky lg:top-24 shadow-xs">
             <h2 className="text-xl font-bold text-[#14281a]">Kunjungan tertata</h2>
             <ul className="mt-4 space-y-3 text-xs font-medium leading-5 text-[#2f382a]">
               <li className="flex items-start gap-2.5">
@@ -370,7 +370,7 @@ export default function TenantPortal() {
         {(template.show_facilities !== false || template.show_rules !== false) && (
           <section className="mt-10 grid gap-6 md:grid-cols-2">
             {template.show_facilities !== false && (
-              <article className="glass-panel p-6 shadow-xs">
+              <article className="glass-panel rounded-2xl p-6 shadow-xs">
                 <div>
                   <h2 className="text-xl font-bold text-[#14281a]">Fasilitas kawasan</h2>
                 </div>
@@ -389,7 +389,7 @@ export default function TenantPortal() {
             )}
 
             {template.show_rules !== false && (
-              <article className="glass-panel p-6 shadow-xs">
+              <article className="glass-panel rounded-2xl p-6 shadow-xs">
                 <p className="eyebrow !text-emerald-800">Etika berkunjung</p>
                 <h2 className="mt-1.5 text-xl font-bold text-[#14281a]">Jaga kawasan bersama</h2>
                 <p className="mt-4 text-sm font-medium leading-relaxed text-[#2f382a] whitespace-pre-line">
