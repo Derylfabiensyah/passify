@@ -2,19 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
-  Calendar,
   CheckCircle2,
   ChevronRight,
-  CreditCard,
   Edit3,
-  HelpCircle,
-  History,
-  Info,
   LogOut,
   Mail,
-  MapPin,
   Phone,
-  QrCode,
   Save,
   ShieldCheck,
   Sparkles,
@@ -335,84 +328,38 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        {/* Feature & Activity Cards */}
-        <section className="grid gap-4 sm:grid-cols-2">
-          {/* Riwayat Pesanan */}
+        {/* Riwayat Pemesanan & E-Tiket */}
+        <section>
           <Link
             to={currentTenantSlug ? `/riwayat-pesanan?tenant=${currentTenantSlug}` : '/riwayat-pesanan'}
-            className="glass-panel p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-1 hover:shadow-md transition-all duration-200 no-underline group"
+            className="glass-panel p-6 sm:p-7 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-6 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 no-underline group block"
           >
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
-                  <Ticket className="h-6 w-6" />
-                </span>
-                {activeTicketsCount > 0 && (
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide shadow-xs">
-                    <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                    {activeTicketsCount} Tiket Aktif
-                  </span>
-                )}
+            <div className="flex items-start sm:items-center gap-4 sm:gap-5">
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-emerald-100 text-emerald-800 shadow-2xs group-hover:scale-105 transition-transform">
+                <Ticket className="h-7 w-7" />
+              </span>
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <h2 className="text-lg font-bold text-[#14281a] group-hover:text-emerald-800 transition-colors">
+                    Riwayat Pemesanan & E-Tiket
+                  </h2>
+                  {activeTicketsCount > 0 && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 text-white px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide shadow-xs">
+                      <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                      {activeTicketsCount} Tiket Aktif
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed font-medium max-w-xl">
+                  Lihat daftar e-tiket aktif, barcode QR masuk gerbang otomatis (TOTP), dan unduh bukti invoice PDF resmi.
+                </p>
               </div>
-              <h2 className="text-lg font-bold text-[#14281a] group-hover:text-emerald-800 transition-colors">
-                Riwayat Pemesanan & E-Tiket
-              </h2>
-              <p className="mt-1.5 text-xs text-gray-600 leading-relaxed font-medium">
-                Lihat daftar e-tiket aktif, barcode QR masuk gerbang otomatis (TOTP), dan unduh bukti invoice PDF resmi.
-              </p>
             </div>
-            <div className="mt-6 flex items-center justify-between border-t border-gray-200/80 pt-4 text-xs font-bold text-emerald-800">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 shrink-0 self-end sm:self-center border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-200/60 w-full sm:w-auto justify-between sm:justify-start">
               <span>Buka Tiket Saya</span>
               <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
-
-          {/* Eksplorasi Wisata / Beranda */}
-          <Link
-            to={backUrl}
-            className="glass-panel p-6 rounded-3xl flex flex-col justify-between hover:-translate-y-1 hover:shadow-md transition-all duration-200 no-underline group"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-100 text-amber-800 shadow-2xs group-hover:scale-105 transition-transform">
-                  <MapPin className="h-6 w-6" />
-                </span>
-                <span className="text-[11px] font-bold text-gray-500">Katalog Wisata</span>
-              </div>
-              <h2 className="text-lg font-bold text-[#14281a] group-hover:text-emerald-800 transition-colors">
-                Eksplorasi Destinasi Wisata
-              </h2>
-              <p className="mt-1.5 text-xs text-gray-600 leading-relaxed font-medium">
-                Cek ketersediaan kuota hari ini dan pesan tiket langsung ke kawasan konservasi alam terkelola.
-              </p>
-            </div>
-            <div className="mt-6 flex items-center justify-between border-t border-gray-200/80 pt-4 text-xs font-bold text-emerald-800">
-              <span>Jelajahi Sekarang</span>
-              <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-        </section>
-
-        {/* Security & System Info */}
-        <section className="glass-panel p-6 rounded-3xl shadow-xs">
-          <h3 className="text-sm font-bold text-[#14281a] mb-4 flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4 text-emerald-700" />
-            Keamanan & Info Akun Passify
-          </h3>
-          <div className="grid gap-3 sm:grid-cols-3 text-xs text-gray-600">
-            <div className="p-3.5 rounded-2xl bg-white/70 border border-gray-200/70">
-              <strong className="block text-[#14281a] font-bold mb-1">Enkripsi Tiket Dinamis</strong>
-              <p className="text-[11px] leading-relaxed">Barcode QR diperbarui setiap beberapa detik untuk mencegah duplikasi dan percaloan tiket.</p>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-white/70 border border-gray-200/70">
-              <strong className="block text-[#14281a] font-bold mb-1">Dompet Offline-Ready</strong>
-              <p className="text-[11px] leading-relaxed">Saldo dompet terhubung dengan sistem pembaca gerbang dan kartu NFC tanpa ketergantungan internet.</p>
-            </div>
-            <div className="p-3.5 rounded-2xl bg-white/70 border border-gray-200/70">
-              <strong className="block text-[#14281a] font-bold mb-1">Bantuan & Layanan</strong>
-              <p className="text-[11px] leading-relaxed">Butuh bantuan transaksi atau ubah jadwal kunjungan? Hubungi pengelola melalui tiket atau helpdesk.</p>
-            </div>
-          </div>
         </section>
       </main>
 
