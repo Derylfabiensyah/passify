@@ -19,6 +19,14 @@ const menuItems = [
   { id: 'finance', label: 'Keuangan & Payout', icon: Landmark, path: '/admin/finance' },
 ];
 
+const superAdminMenuItems = [
+  { id: 'dashboard', label: 'Ringkasan Platform', icon: LayoutDashboard, path: '/admin' },
+  { id: 'destinations', label: 'Mitra & Destinasi', icon: MapPin, path: '/admin/destinations' },
+  { id: 'quotas', label: 'Kuota & Sesi', icon: CalendarClock, path: '/admin/quotas' },
+  { id: 'gates', label: 'Perangkat Gerbang', icon: ScanLine, path: '/admin/gates' },
+  { id: 'finance', label: 'Keuangan & Settlement', icon: Landmark, path: '/admin/finance' },
+];
+
 const adminThemeStyles = `
   .admin-shell { background: transparent; color: var(--ink); font-family: var(--font-body); min-height: 100vh; }
   .admin-shell h1, .admin-shell h2, .admin-shell h3, .admin-shell h4 { font-family: var(--font-body); letter-spacing: -.03em; }
@@ -53,9 +61,11 @@ function Brand({ collapsed = false }) {
 
 function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout }) {
   const adminUser = getAdminUser();
+  const isSuperAdmin = adminUser.role === 'super_admin';
   const activeTenant = getActiveAdminTenant();
-  const tenantDisplayName = activeTenant.name || adminUser.tenant_name || 'Curug Citambur';
+  const tenantDisplayName = isSuperAdmin ? 'Super Admin Platform' : (activeTenant.name || adminUser.tenant_name || 'Curug Citambur');
   const userInitial = (adminUser.name || 'P').charAt(0).toUpperCase();
+  const currentNavItems = isSuperAdmin ? superAdminMenuItems : menuItems;
 
   return (
     <>
@@ -64,9 +74,9 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
       </div>
       <nav className="flex-1 space-y-1.5 overflow-y-auto px-3.5 py-5" aria-label="Navigasi pengelola">
         <p className={`mb-2.5 px-3 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#4d5c48] ${collapsed ? 'sr-only' : ''}`}>
-          Operasional
+          {isSuperAdmin ? 'Manajemen Platform' : 'Operasional'}
         </p>
-        {menuItems.map((item) => {
+        {currentNavItems.map((item) => {
           const isActive = location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path));
           const Icon = item.icon;
           return (
@@ -97,7 +107,9 @@ function SidebarContent({ collapsed, location, onNavigate, onToggle, onLogout })
               </span>
               <div className="min-w-0">
                 <span className="block truncate text-xs font-bold text-[#14281a]">{adminUser.name}</span>
-                <span className="block truncate text-[10px] font-semibold text-[#4d5c48]">{tenantDisplayName}</span>
+                <span className={`block truncate text-[10px] font-semibold ${isSuperAdmin ? 'text-emerald-800 font-bold' : 'text-[#4d5c48]'}`}>
+                  {tenantDisplayName}
+                </span>
               </div>
             </div>
             <button
@@ -137,7 +149,7 @@ export default function AdminLayout({ children }) {
   const { slug: currentSlug } = useTenant();
 
   const activeTenant = getActiveAdminTenant();
-  const activeTenantSlug = activeTenant.slug || currentSlug || 'curug-citambur';
+  const activeTenantSlug = activeTenant.slug || currentSlug || 'curug-cikanteh';
 
   const currentItem = menuItems.find(
     (item) => location.pathname === item.path || (item.path !== '/admin' && location.pathname.startsWith(item.path))
@@ -245,8 +257,6 @@ export default function AdminLayout({ children }) {
                 className="bg-transparent text-xs font-bold text-[#14281a] outline-none cursor-pointer pr-1"
               >
                 <option value="curug-cikanteh">Curug Cikanteh</option>
-                <option value="curug-citambur">Curug Citambur</option>
-                <option value="curug-cibereum">Curug Cibereum</option>
               </select>
             </div>
 

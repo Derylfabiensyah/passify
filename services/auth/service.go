@@ -45,6 +45,14 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type GoogleLoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Name     string `json:"name"`
+	Avatar   string `json:"avatar"`
+	IDToken  string `json:"id_token"`
+	Role     string `json:"role,omitempty"`
+}
+
 type LoginResponse struct {
 	AccessToken  string       `json:"access_token"`
 	RefreshToken string       `json:"refresh_token"`
@@ -71,6 +79,7 @@ type AuthService interface {
 	CheckSubdomain(subdomain string) (bool, error)
 	VerifyEmail(token string) error
 	Login(req LoginRequest) (*LoginResponse, error)
+	GoogleLogin(req GoogleLoginRequest) (*LoginResponse, error)
 	RefreshToken(req RefreshTokenRequest) (*LoginResponse, error)
 	GetProfile(userID uuid.UUID) (*models.User, error)
 	UpdateProfile(userID uuid.UUID, req UpdateProfileRequest) (*models.User, error)
@@ -137,6 +146,81 @@ func (s *authService) Login(req LoginRequest) (*LoginResponse, error) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
 		return nil, errors.New("email atau kata sandi tidak valid")
+	}
+
+	if !user.IsActive {
+		return nil, errors.New("akun pengguna tidak aktif")
+	}
+
+	now := time.Now()
+	user.LastLoginAt = &now
+	_ = s.repo.UpdateUser(user)
+
+	accessToken, err := middleware.GenerateToken(
+		user.ID,
+		user.Email,
+		user.Role,
+		user.TenantID,
+		s.cfg.JWT.Secret,
+		s.cfg.JWT.ExpiryHours,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("gagal membuat token akses: %w", err)
+	}
+
+	refreshTokenStr := middleware.GenerateRefreshToken()
+	tokenHash := hashToken(refreshTokenStr)
+
+	expiresAt := time.Now().Add(time.Duration(s.cfg.JWT.ExpiryHours) * time.Hour)
+	refreshExpiresAt := time.Now().Add(time.Duration(s.cfg.JWT.RefreshExpiryHours) * time.Hour)
+
+	refreshTokenModel := &models.RefreshToken{
+		UserID:    user.ID,
+		TokenHash: tokenHash,
+		ExpiresAt: refreshExpiresAt,
+		Revoked:   false,
+	}
+
+	if err := s.repo.SaveRefreshToken(refreshTokenModel); err != nil {
+		return nil, fmt.Errorf("gagal menyimpan token refresh: %w", err)
+	}
+
+	return &LoginResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshTokenStr,
+		ExpiresAt:    expiresAt,
+		User:         user,
+	}, nil
+}
+
+func (s *authService) GoogleLogin(req GoogleLoginRequest) (*LoginResponse, error) {
+	user, err := s.repo.GetUserByEmail(req.Email)
+	if err != nil || user == nil {
+		// User does not exist, create a new Google user account
+		role := req.Role
+		if role == "" {
+			role = models.RoleVisitor
+		}
+		name := req.Name
+		if name == "" {
+			name = strings.Split(req.Email, "@")[0]
+		}
+		dummyPass := uuid.New().String()
+		hashedPass, _ := bcrypt.GenerateFromPassword([]byte(dummyPass), bcrypt.DefaultCost)
+
+		newUser := &models.User{
+			Email:        req.Email,
+			FullName:     name,
+			PasswordHash: string(hashedPass),
+			Role:         role,
+			AvatarURL:    &req.Avatar,
+			IsActive:     true,
+			Nationality:  "WNI",
+		}
+		if err := s.repo.CreateUser(newUser); err != nil {
+			return nil, fmt.Errorf("gagal membuat akun google: %w", err)
+		}
+		user = newUser
 	}
 
 	if !user.IsActive {

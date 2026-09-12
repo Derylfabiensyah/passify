@@ -490,7 +490,7 @@ function PortalLivePreview({ destination, template }) {
         </div>
 
         <a
-          href={`/?tenant=${destination?.slug || 'curug-citambur'}`}
+          href={`/?tenant=${destination?.slug || 'curug-cikanteh'}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-bold text-[var(--forest)] hover:underline flex items-center gap-1 shrink-0"
@@ -894,11 +894,11 @@ export default function TemplateEditorPage() {
       || (formData.name ? formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : null)
       || slug
       || localStorage.getItem('passify_current_tenant')
-      || 'curug-citambur';
+      || 'curug-cikanteh';
 
     const effectiveTenantId = activeDest.tenant_id
       || (activeDest.id && !String(activeDest.id).startsWith('dest-') ? activeDest.id : null)
-      || '002bdabd-c79d-40b4-b624-4fbcdc31d390';
+      || '413baace-9c74-4abb-8aa4-a8310ffc4c0b';
 
     const portalTemplatePayload = {
       eyebrow: formData.eyebrow,
@@ -1228,7 +1228,7 @@ export default function TemplateEditorPage() {
           province: formData.province,
           facilities: formData.facilities,
           rules: formData.rules,
-          slug: currentDestination?.slug || 'curug-citambur',
+          slug: currentDestination?.slug || 'curug-cikanteh',
         }}
         template={{
           eyebrow: formData.eyebrow,

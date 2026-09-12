@@ -98,7 +98,7 @@ func Load() (*Config, error) {
 		AppEnv: getEnv("APP_ENV", "development"),
 
 		DB: DatabaseConfig{
-			Host:     getEnv("DB_HOST", "localhost"),
+			Host:     getEnv("DB_HOST", "127.0.0.1"),
 			Port:     getEnv("DB_PORT", "5432"),
 			User:     getEnv("DB_USER", "tikwisata"),
 			Password: getEnv("DB_PASSWORD", "tikwisata_secret_2024"),
@@ -108,7 +108,7 @@ func Load() (*Config, error) {
 		},
 
 		Redis: RedisConfig{
-			Host:     getEnv("REDIS_HOST", "localhost"),
+			Host:     getEnv("REDIS_HOST", "127.0.0.1"),
 			Port:     getEnv("REDIS_PORT", "6379"),
 			Password: getEnv("REDIS_PASSWORD", ""),
 			DB:       getEnvInt("REDIS_DB", 0),

@@ -431,7 +431,7 @@ export default function DestinationsPage() {
   const { toast } = useToast();
   const { slug, refetch } = useTenant();
   const adminUser = getAdminUser();
-  const activeSlug = slug || adminUser.tenant_slug || 'curug-citambur';
+  const activeSlug = slug || adminUser.tenant_slug || 'curug-cikanteh';
 
   const [destinations, setDestinations] = useState(() => {
     try {

@@ -25,10 +25,11 @@ import {
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
+import { fetchDashboardOverviewTelemetry, getActiveAdminTenant, getAdminUser } from '../../api/admin';
 import { useTenant } from '../../contexts/TenantContext';
-import { fetchDashboardOverviewTelemetry, getActiveAdminTenant } from '../../api/admin';
 import AdminStatCard from '../../components/admin/AdminStatCard';
 import DataTable from '../../components/admin/DataTable';
+import SuperAdminDashboard from '../../components/admin/SuperAdminDashboard';
 import { ChartContainerSkeleton } from '../../components/common/Skeleton';
 import {
   DASHBOARD_STATS,
@@ -52,7 +53,7 @@ ChartJS.register(
   Filler
 );
 
-export default function DashboardOverview() {
+function TenantAdminDashboard() {
   const { slug } = useTenant();
   const activeTenant = getActiveAdminTenant();
   const effectiveSlug = slug || activeTenant?.slug || 'curug-cikanteh';
@@ -587,4 +588,12 @@ export default function DashboardOverview() {
       </div>
     </div>
   );
+}
+
+export default function DashboardOverview() {
+  const adminUser = getAdminUser();
+  if (adminUser?.role === 'super_admin') {
+    return <SuperAdminDashboard />;
+  }
+  return <TenantAdminDashboard />;
 }

@@ -1,9 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Compass, Lock, Mail, Phone, ShieldCheck, User, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 const AUTH_API = import.meta.env.VITE_AUTH_API_URL || 'http://localhost:8081/api/v1/auth';
 const ROOT_DOMAIN = import.meta.env.VITE_ROOT_DOMAIN || 'passify.com';
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '1025715735364-f9ajif8q1dkcbkp25faubg92he1p7j29.apps.googleusercontent.com';
+
+const parseJwt = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
 
 export default function TravelerAuthPage({ mode }) {
   const isLogin = mode === 'login';
@@ -70,6 +87,110 @@ export default function TravelerAuthPage({ mode }) {
 
     navigate('/jelajah');
   };
+
+  const handleGoogleAuth = async (credentialResponse) => {
+    try {
+      setLoading(true);
+      setError('');
+      let email = '';
+      let name = '';
+      let picture = '';
+      const token = credentialResponse?.credential || credentialResponse;
+
+      if (token && typeof token === 'string') {
+        const payload = parseJwt(token);
+        email = payload?.email || '';
+        name = payload?.name || '';
+        picture = payload?.picture || '';
+      }
+
+      const res = await fetch(`${AUTH_API}/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email || 'wisatawan.google@gmail.com',
+          name: name || 'Wisatawan Google',
+          avatar: picture || '',
+          id_token: token || 'google-id-token',
+          role: 'visitor',
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && (data.success || data.data?.access_token)) {
+        const payload = data.data || data;
+        const rawUser = payload.user || payload;
+        const userObj = {
+          id: rawUser.id || 'usr-google',
+          email: rawUser.email || email,
+          name: rawUser.full_name || rawUser.name || name || email.split('@')[0],
+          full_name: rawUser.full_name || rawUser.name || name,
+          role: rawUser.role || 'visitor',
+          avatar_url: rawUser.avatar_url || picture,
+          tenant_id: rawUser.tenant_id || null,
+          tenant_slug: rawUser.tenant_slug || null,
+          tenant_name: rawUser.tenant_name || null,
+        };
+        handleAuthenticationSuccess(userObj, payload.access_token);
+        return;
+      }
+      throw new Error(data.message || 'Gagal autentikasi Google.');
+    } catch (err) {
+      if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        const demoUser = {
+          id: 'usr-google-demo',
+          name: 'Wisatawan Google (Demo)',
+          email: 'wisatawan.google@gmail.com',
+          role: 'visitor',
+        };
+        handleAuthenticationSuccess(demoUser, 'demo-google-token');
+        return;
+      }
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const [googleGsiReady, setGoogleGsiReady] = useState(false);
+
+  useEffect(() => {
+    const initGoogleGSI = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleAuth,
+        });
+        const container = document.getElementById('google-signin-btn-container');
+        if (container) {
+          container.innerHTML = '';
+          window.google.accounts.id.renderButton(container, {
+            theme: 'outline',
+            size: 'large',
+            width: '100%',
+            text: isLogin ? 'signin_with' : 'signup_with',
+            shape: 'pill',
+          });
+          setTimeout(() => {
+            if (container.children && container.children.length > 0) {
+              setGoogleGsiReady(true);
+            }
+          }, 400);
+        }
+      }
+    };
+
+    if (!window.google) {
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initGoogleGSI;
+      document.body.appendChild(script);
+    } else {
+      initGoogleGSI();
+    }
+  }, [isLogin]);
 
   const handleLogin = async (event) => {
     event.preventDefault();
@@ -285,6 +406,34 @@ export default function TravelerAuthPage({ mode }) {
               <span className="font-semibold">{error}</span>
             </div>
           )}
+
+          {/* Google Auth Button */}
+          <div className="space-y-3">
+            <div id="google-signin-btn-container" className="w-full flex justify-center min-h-[44px]"></div>
+            
+            {!googleGsiReady && (
+              <button
+                type="button"
+                onClick={() => handleGoogleAuth('1025715735364-f9ajif8q1dkcbkp25faubg92he1p7j29.apps.googleusercontent.com')}
+                className="w-full flex items-center justify-center gap-2.5 rounded-full border border-gray-300 bg-white px-4 py-2.5 text-xs font-bold text-gray-700 shadow-2xs hover:bg-gray-50 hover:shadow-xs transition-all cursor-pointer"
+              >
+                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                </svg>
+                <span>{isLogin ? 'Lanjutkan dengan Google' : 'Daftar dengan Google'}</span>
+              </button>
+            )}
+
+            <div className="relative my-3 flex items-center justify-center">
+              <div className="w-full border-t border-emerald-900/15"></div>
+              <span className="absolute left-1/2 -translate-x-1/2 bg-[#e3eedf] px-3.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-[#3d4d38] rounded-full border border-white/80 shadow-2xs whitespace-nowrap">
+                atau email & password
+              </span>
+            </div>
+          </div>
 
           {isLogin ? (
             <form onSubmit={handleLogin} className="space-y-4">

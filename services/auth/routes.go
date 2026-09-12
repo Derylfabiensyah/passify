@@ -13,6 +13,7 @@ func RegisterRoutes(router *gin.RouterGroup, handler *AuthHandler, jwtSecret str
 	router.GET("/check-subdomain", handler.HandleCheckSubdomain)
 	router.GET("/verify-email", handler.HandleVerifyEmail)
 	router.POST("/login", handler.HandleLogin)
+	router.POST("/google", handler.HandleGoogleAuth)
 	router.POST("/refresh-token", handler.HandleRefreshToken)
 
 	// Protected routes

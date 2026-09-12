@@ -119,6 +119,23 @@ func (h *AuthHandler) HandleLogin(c *gin.Context) {
 	response.OK(c, "Login berhasil", res)
 }
 
+// HandleGoogleAuth handles POST /google
+func (h *AuthHandler) HandleGoogleAuth(c *gin.Context) {
+	var req GoogleLoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.BadRequest(c, "Data autentikasi Google tidak valid", err.Error())
+		return
+	}
+
+	res, err := h.service.GoogleLogin(req)
+	if err != nil {
+		response.BadRequest(c, err.Error(), nil)
+		return
+	}
+
+	response.OK(c, "Autentikasi Google berhasil", res)
+}
+
 // HandleRefreshToken handles POST /refresh-token
 func (h *AuthHandler) HandleRefreshToken(c *gin.Context) {
 	var req RefreshTokenRequest

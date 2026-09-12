@@ -135,7 +135,7 @@ export default function CheckoutPage() {
         searchParams.get('tenant') ||
         searchParams.get('dest') ||
         contextSlug ||
-        'curug-cibereum';
+        'curug-cikanteh';
 
       if (targetSlug) {
         sessionStorage.setItem('passify_last_active_tenant', targetSlug);
@@ -595,6 +595,23 @@ export default function CheckoutPage() {
         status: 'active',
         createdAt: new Date().toISOString(),
       };
+
+      if (paymentMethod === 'simulation') {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await fetch('http://localhost:8084/api/v1/payments/snap/finish', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ order_number: orderNumber }),
+        }).catch(() => {});
+
+        finalizeBookingSuccess({
+          ...orderData,
+          paymentMethod: 'SIMULASI_INSTAN',
+          paymentRef: `SIM-${orderNumber}`,
+          paymentType: 'SIMULASI_INSTAN',
+        });
+        return;
+      }
 
       if (paymentMethod === 'wallet') {
         await new Promise((resolve) => setTimeout(resolve, 800));
@@ -1311,6 +1328,38 @@ export default function CheckoutPage() {
                       <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${paymentMethod === 'wallet' ? 'bg-[var(--forest)]' : 'bg-gray-300'}`}>
                         {paymentMethod === 'wallet' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Option 3: Simulasi Pembayaran Instan (Testing Mode) */}
+                <div
+                  onClick={() => setPaymentMethod('simulation')}
+                  className={`cursor-pointer rounded-2xl p-5 transition-all ${
+                    paymentMethod === 'simulation'
+                      ? 'bg-emerald-50/90 border-2 border-emerald-600 shadow-[0_8px_24px_rgba(16,45,32,.08)]'
+                      : 'bg-[var(--fog)] hover:bg-[var(--sand)]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3.5">
+                      <div className="h-11 w-11 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-800 shrink-0 shadow-2xs">
+                        <Sparkles className="h-6 w-6" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-[var(--forest-deep)]">Simulasi Pembayaran (Mode Uji Coba)</h4>
+                          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-200">
+                            Instan 1-Klik
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[var(--ink-soft)] mt-0.5">
+                          Uji coba penerbitan tiket QR, invoice, dan pencatatan laporan admin langsung tanpa gateway pembayaran.
+                        </p>
+                      </div>
+                    </div>
+                    <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${paymentMethod === 'simulation' ? 'bg-emerald-700' : 'bg-gray-300'}`}>
+                      {paymentMethod === 'simulation' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
                     </div>
                   </div>
                 </div>
