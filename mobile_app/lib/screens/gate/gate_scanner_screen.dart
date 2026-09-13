@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -221,24 +222,18 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
           // 2. Custom Overlay & Reticle
           ScannerOverlay(scanWindow: scanWindow),
 
-          // 3. Top Action Bar
+          // 3. Top Action Bar (Frosted Glass)
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Back / Close
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.5),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                    ),
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 20),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
+                  // Back / Close Frosted Circle Button
+                  _buildFrostedCircleButton(
+                    icon: Icons.arrow_back_rounded,
+                    color: Colors.white,
+                    onTap: () => Navigator.of(context).pop(),
                   ),
 
                   // Mode Switcher (Continuous HUD vs Detail Modal) & Online/Offline
@@ -254,36 +249,45 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                             _hudResult = null;
                           });
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          margin: const EdgeInsets.only(right: 6),
-                          decoration: BoxDecoration(
-                            color: _isContinuousMode
-                                ? AppColors.forestSoft.withValues(alpha: 0.9)
-                                : Colors.black54,
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                            border: Border.all(
-                              color: _isContinuousMode ? AppColors.leafPale : Colors.white24,
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                _isContinuousMode ? Icons.bolt_rounded : Icons.view_agenda_rounded,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                _isContinuousMode ? 'KONTINU' : 'DETAIL',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w800,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(AppRadius.xl),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                              margin: const EdgeInsets.only(right: 6),
+                              decoration: BoxDecoration(
+                                color: _isContinuousMode
+                                    ? AppColors.forestSoft.withValues(alpha: 0.85)
+                                    : Colors.black.withValues(alpha: 0.4),
+                                borderRadius: BorderRadius.circular(AppRadius.xl),
+                                border: Border.all(
+                                  color: _isContinuousMode
+                                      ? AppColors.leafPale.withValues(alpha: 0.8)
+                                      : Colors.white.withValues(alpha: 0.2),
+                                  width: 1.2,
                                 ),
                               ),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    _isContinuousMode ? Icons.bolt_rounded : Icons.view_agenda_rounded,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _isContinuousMode ? 'KONTINU' : 'DETAIL',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -294,107 +298,90 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           HapticFeedback.selectionClick();
                           scannerProvider.toggleOfflineMode();
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: scannerProvider.forceOfflineMode ? AppColors.bark : AppColors.forest,
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                            border: Border.all(color: Colors.white30),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                scannerProvider.forceOfflineMode ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
-                                color: Colors.white,
-                                size: 14,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                scannerProvider.forceOfflineMode ? 'OFFLINE' : 'ONLINE',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10.5,
-                                  fontWeight: FontWeight.w800,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(AppRadius.xl),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                              decoration: BoxDecoration(
+                                color: scannerProvider.forceOfflineMode
+                                    ? AppColors.bark.withValues(alpha: 0.85)
+                                    : AppColors.forest.withValues(alpha: 0.85),
+                                borderRadius: BorderRadius.circular(AppRadius.xl),
+                                border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.25),
+                                  width: 1.2,
                                 ),
                               ),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    scannerProvider.forceOfflineMode ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
+                                    color: Colors.white,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    scannerProvider.forceOfflineMode ? 'OFFLINE' : 'ONLINE',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10.5,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ],
                   ),
 
-                  // Torch & Switch Camera Controls
+                  // Torch & Switch Camera Controls (Frosted Glass Buttons)
                   Row(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            scannerProvider.isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
-                            color: scannerProvider.isTorchOn ? AppColors.gold : Colors.white,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            HapticFeedback.selectionClick();
-                            _scannerController.toggleTorch();
-                            scannerProvider.toggleTorch();
-                          },
-                        ),
+                      _buildFrostedCircleButton(
+                        icon: scannerProvider.isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                        color: scannerProvider.isTorchOn ? AppColors.gold : Colors.white,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          _scannerController.toggleTorch();
+                          scannerProvider.toggleTorch();
+                        },
                       ),
                       const SizedBox(width: 6),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.flip_camera_ios_rounded, color: Colors.white, size: 20),
-                          onPressed: () {
-                            HapticFeedback.selectionClick();
-                            _scannerController.switchCamera();
-                          },
-                        ),
+                      _buildFrostedCircleButton(
+                        icon: Icons.flip_camera_ios_rounded,
+                        color: Colors.white,
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          _scannerController.switchCamera();
+                        },
                       ),
                       const SizedBox(width: 6),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.qr_code_scanner_rounded, color: AppColors.leafPale, size: 20),
-                          tooltip: 'Pairing Gerbang',
-                          onPressed: () {
-                            HapticFeedback.selectionClick();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
-                            );
-                          },
-                        ),
+                      _buildFrostedCircleButton(
+                        icon: Icons.qr_code_scanner_rounded,
+                        color: AppColors.leafPale,
+                        tooltip: 'Pairing Gerbang',
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
+                          );
+                        },
                       ),
                       const SizedBox(width: 6),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 20),
-                          tooltip: 'Input Kode Manual',
-                          onPressed: () {
-                            HapticFeedback.selectionClick();
-                            _showManualInputDialog();
-                          },
-                        ),
+                      _buildFrostedCircleButton(
+                        icon: Icons.edit_note_rounded,
+                        color: Colors.white,
+                        tooltip: 'Input Kode Manual',
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          _showManualInputDialog();
+                        },
                       ),
                     ],
                   ),
@@ -403,113 +390,142 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
             ),
           ),
 
-          // 4. Instructions & Scan Target Text
+          // 4. Instructions & Scan Target Text (Frosted Glass Card)
           Positioned(
-            top: screenSize.height * 0.42 + (scanWindowSize / 2) + 20,
-            left: 20,
-            right: 20,
-            child: Column(
-              children: [
-                const Text(
-                  'Arahkan kamera ke QR Code Tiket Pengunjung',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    shadows: [Shadow(color: Colors.black87, blurRadius: 8)],
+            top: screenSize.height * 0.42 + (scanWindowSize / 2) + 18,
+            left: 24,
+            right: 24,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.18),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Arahkan kamera ke QR Code Tiket Pengunjung',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        _isContinuousMode
+                            ? '⚡ Mode Kontinu Aktif • Scan instan berurutan'
+                            : 'Mendukung Dynamic QR & Tiket Fisik',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  _isContinuousMode
-                      ? '⚡ Mode Kontinu Aktif • Scan instan otomatis'
-                      : 'Mendukung Dynamic QR & Tiket Fisik',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    shadows: const [Shadow(color: Colors.black87, blurRadius: 8)],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
 
           // 5. Continuous Mode Floating HUD Toast (Auto-Dismiss)
           if (_hudResult != null) _buildHudToast(_hudResult!),
 
-          // 6. Bottom Live Stats Dashboard
+          // 6. Bottom Live Stats Dashboard (Frosted Dark Glass)
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-              decoration: BoxDecoration(
-                color: AppColors.forestDeep.withValues(alpha: 0.96),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 16,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildStatItem('Total Scan', '${scannerProvider.sessionTotal}', Colors.white),
-                      _buildStatDivider(),
-                      _buildStatItem('Tiket Valid', '${scannerProvider.sessionValid}', AppColors.leafPale),
-                      _buildStatDivider(),
-                      _buildStatItem('Ditolak', '${scannerProvider.sessionInvalid}', Colors.redAccent),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
-                            );
-                          },
-                          icon: const Icon(Icons.storage_rounded, size: 16, color: Colors.white),
-                          label: const Text('Cache Offline', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                          ),
-                        ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                  decoration: BoxDecoration(
+                    color: AppColors.forestDeep.withValues(alpha: 0.84),
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+                    border: Border(
+                      top: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        width: 1.2,
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const GateStatsScreen()),
-                            );
-                          },
-                          icon: const Icon(Icons.bar_chart_rounded, size: 16, color: Colors.white),
-                          label: const Text('Statistik Gate', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                          ),
-                        ),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        blurRadius: 20,
+                        offset: const Offset(0, -4),
                       ),
                     ],
                   ),
-                ],
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildStatItem('Total Scan', '${scannerProvider.sessionTotal}', Colors.white),
+                          _buildStatDivider(),
+                          _buildStatItem('Tiket Valid', '${scannerProvider.sessionValid}', AppColors.leafPale),
+                          _buildStatDivider(),
+                          _buildStatItem('Ditolak', '${scannerProvider.sessionInvalid}', Colors.redAccent),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
+                                );
+                              },
+                              icon: const Icon(Icons.storage_rounded, size: 16, color: Colors.white),
+                              label: const Text('Cache Offline', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: Colors.white.withValues(alpha: 0.1),
+                                side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => const GateStatsScreen()),
+                                );
+                              },
+                              icon: const Icon(Icons.bar_chart_rounded, size: 16, color: Colors.white),
+                              label: const Text('Statistik Gate', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: Colors.white.withValues(alpha: 0.1),
+                                side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                                padding: const EdgeInsets.symmetric(vertical: 10),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -518,12 +534,43 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
     );
   }
 
+  Widget _buildFrostedCircleButton({
+    required IconData icon,
+    required Color color,
+    String? tooltip,
+    required VoidCallback onTap,
+  }) {
+    return ClipOval(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: Colors.black.withValues(alpha: 0.42),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.22),
+              width: 1.2,
+            ),
+          ),
+          child: IconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(icon, color: color, size: 20),
+            tooltip: tooltip,
+            onPressed: onTap,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHudToast(ValidateResultModel result) {
     final isValid = result.valid;
     final statusColor = isValid ? const Color(0xFF10B981) : const Color(0xFFEF4444);
     final bgCardColor = isValid
-        ? const Color(0xFF1B3B24).withValues(alpha: 0.96)
-        : const Color(0xFF5A1E1E).withValues(alpha: 0.96);
+        ? const Color(0xFF0F2B17).withValues(alpha: 0.88)
+        : const Color(0xFF3B1212).withValues(alpha: 0.88);
 
     return Positioned(
       top: 90,
@@ -531,73 +578,79 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
       right: 16,
       child: GestureDetector(
         onTap: () => _showDetailModal(result),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: bgCardColor,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: statusColor, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: statusColor.withValues(alpha: 0.35),
-                blurRadius: 18,
-                spreadRadius: 2,
-                offset: const Offset(0, 4),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: bgCardColor,
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(color: statusColor.withValues(alpha: 0.75), width: 1.8),
+                boxShadow: [
+                  BoxShadow(
+                    color: statusColor.withValues(alpha: 0.35),
+                    blurRadius: 20,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Row(
-            children: [
-              // Large Status Icon with Circular border
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.25),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: statusColor, width: 2),
-                ),
-                child: Icon(
-                  isValid ? Icons.check_circle_rounded : Icons.cancel_rounded,
-                  color: statusColor,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 12),
+              child: Row(
+                children: [
+                  // Large Status Icon with Circular border
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.22),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: statusColor, width: 2),
+                    ),
+                    child: Icon(
+                      isValid ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                      color: statusColor,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
 
-              // Info Column
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      isValid ? 'TIKET VALID • DIPERBOLEHKAN MASUK' : 'TIKET DITOLAK',
-                      style: TextStyle(
-                        color: statusColor,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                      ),
+                  // Info Column
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          isValid ? 'TIKET VALID • DIPERBOLEHKAN MASUK' : 'TIKET DITOLAK',
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          result.visitorName.isNotEmpty
+                              ? '${result.visitorName} (${result.categoryName.isNotEmpty ? result.categoryName : 'Pengunjung'})'
+                              : result.message,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      result.visitorName.isNotEmpty
-                          ? '${result.visitorName} (${result.categoryName.isNotEmpty ? result.categoryName : 'Pengunjung'})'
-                          : result.message,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
