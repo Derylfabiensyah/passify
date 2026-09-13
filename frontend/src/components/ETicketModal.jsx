@@ -10,6 +10,7 @@ import {
   RefreshCw,
   ShieldAlert,
   ShieldCheck,
+  Wifi,
   X
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -263,6 +264,12 @@ export default function ETicketModal({ order, onClose }) {
                     Sisa waktu aktif: <span className="font-mono font-bold text-[#14281a]">{formatTimer(secondsLeft)}</span>
                   </p>
                 </div>
+              </div>
+
+              {/* Offline Readiness Badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100/90 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[11px] font-bold border border-emerald-300/80 dark:border-emerald-800 shadow-xs">
+                <Wifi className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400" />
+                <span>Tersedia Offline · QR & TOTP Tetap Aktif Tanpa Internet</span>
               </div>
 
               {/* Anti-screenshot notice */}

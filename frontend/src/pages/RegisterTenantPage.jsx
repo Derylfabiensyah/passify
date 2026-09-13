@@ -67,7 +67,7 @@ export default function RegisterTenantPage() {
     });
   };
 
-  // Real-time check for subdomain availability with debounce
+  // Real-time check for subdomain availability with debounce & reserved word protection
   useEffect(() => {
     const cleanSubdomain = formData.subdomain.trim().toLowerCase();
     if (!cleanSubdomain || cleanSubdomain.length < 3) {
@@ -75,6 +75,21 @@ export default function RegisterTenantPage() {
         checking: false,
         available: null,
         message: cleanSubdomain ? 'Minimal 3 karakter' : ''
+      });
+      return;
+    }
+
+    // Instant check for reserved system subdomains
+    const reservedList = [
+      'admin', 'api', 'app', 'auth', 'billing', 'cashless', 'dashboard',
+      'gate', 'help', 'login', 'mail', 'passify', 'payment', 'portal',
+      'root', 'status', 'superadmin', 'support', 'system', 'test', 'ticket', 'www'
+    ];
+    if (reservedList.includes(cleanSubdomain)) {
+      setSubdomainStatus({
+        checking: false,
+        available: false,
+        message: `Subdomain "${cleanSubdomain}" dilindungi sistem Passify dan tidak dapat digunakan`
       });
       return;
     }

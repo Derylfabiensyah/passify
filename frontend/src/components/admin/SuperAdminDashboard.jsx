@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Activity, ArrowUpRight, Building2, CheckCircle2, ChevronRight,
   Clock, DollarSign, ExternalLink, Globe, HardDrive, Layers,
-  RefreshCw, ScanLine, ShieldCheck, Ticket, Users, AlertCircle
+  RefreshCw, ScanLine, ShieldCheck, Ticket, Users, AlertCircle, KeyRound
 } from 'lucide-react';
 import {
   Chart as ChartJS,
@@ -284,12 +284,29 @@ export default function SuperAdminDashboard() {
       id: 'actions',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('passify_impersonated_tenant', JSON.stringify({
+                id: row.original.id,
+                name: row.original.name,
+                slug: row.original.slug,
+              }));
+              localStorage.setItem('passify_last_active_tenant', row.original.slug);
+              window.location.href = '/admin/destinations';
+            }}
+            title="Kelola Panel Wisata (Impersonasi)"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 text-white text-xs font-bold hover:bg-emerald-900 transition-all cursor-pointer shadow-xs active:scale-95 min-h-[36px]"
+          >
+            <KeyRound className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Kelola Panel</span>
+          </button>
           <Link
             to={`/?tenant=${row.original.slug}`}
             target="_blank"
             rel="noopener noreferrer"
             title="Buka Portal Publik"
-            className="p-1.5 rounded-lg border border-white/80 bg-white/90 text-[#2a3426] hover:text-[#14281a] hover:bg-white transition-colors cursor-pointer shadow-2xs"
+            className="min-h-[36px] min-w-[36px] flex items-center justify-center rounded-xl border border-white/80 bg-white/90 text-[#2a3426] hover:text-[#14281a] hover:bg-white transition-colors cursor-pointer shadow-2xs"
           >
             <ExternalLink className="h-3.5 w-3.5" />
           </Link>

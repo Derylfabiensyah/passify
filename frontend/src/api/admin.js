@@ -28,6 +28,33 @@ export function getAdminUser() {
     if (raw) user = JSON.parse(raw);
   } catch (_) {}
 
+  // Impersonation mode check (SuperAdmin acting as Tenant)
+  let impersonated = null;
+  try {
+    const rawImp = localStorage.getItem('passify_impersonated_tenant');
+    if (rawImp) impersonated = JSON.parse(rawImp);
+  } catch (_) {}
+
+  if (impersonated && impersonated.slug) {
+    return {
+      id: user?.id || 'usr-admin-impersonated',
+      name: user?.name || user?.full_name || 'Super Administrator',
+      email: user?.email || 'admin@passify.id',
+      role: 'tenant_admin',
+      is_impersonating: true,
+      impersonated_tenant: impersonated,
+      original_role: user?.role || 'super_admin',
+      tenant_id: impersonated.id || '413baace-9c74-4abb-8aa4-a8310ffc4c0b',
+      tenant_slug: impersonated.slug,
+      tenant_name: impersonated.name || impersonated.slug,
+      tenant: {
+        id: impersonated.id || '413baace-9c74-4abb-8aa4-a8310ffc4c0b',
+        name: impersonated.name || impersonated.slug,
+        slug: impersonated.slug,
+      },
+    };
+  }
+
   // 1. Logged in user's explicit tenant info (Highest Priority)
   const userTenant = user?.tenant || {};
   const userTenantName = userTenant.name || user?.tenant_name || null;

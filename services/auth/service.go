@@ -378,13 +378,8 @@ func (s *authService) RegisterTenant(req RegisterTenantRequest) (*models.Tenant,
 	}
 
 	// Check reserved subdomains
-	reserved := map[string]bool{
-		"admin": true, "api": true, "app": true, "auth": true,
-		"dashboard": true, "mail": true, "root": true, "superadmin": true,
-		"test": true, "www": true, "gate": true, "payment": true,
-	}
-	if reserved[cleanSubdomain] {
-		return nil, nil, "", errors.New("subdomain ini tidak tersedia (reserved)")
+	if isReservedSubdomain(cleanSubdomain) {
+		return nil, nil, "", errors.New("subdomain ini tidak tersedia (dilindungi sistem Passify)")
 	}
 
 	// Check if subdomain already exists
@@ -444,6 +439,19 @@ func (s *authService) RegisterTenant(req RegisterTenantRequest) (*models.Tenant,
 	return tenant, user, verifyToken, nil
 }
 
+var reservedSubdomains = map[string]bool{
+	"admin": true, "api": true, "app": true, "auth": true,
+	"billing": true, "cashless": true, "dashboard": true,
+	"gate": true, "help": true, "login": true, "mail": true,
+	"passify": true, "payment": true, "portal": true, "root": true,
+	"status": true, "superadmin": true, "support": true,
+	"system": true, "test": true, "ticket": true, "www": true,
+}
+
+func isReservedSubdomain(subdomain string) bool {
+	return reservedSubdomains[strings.ToLower(strings.TrimSpace(subdomain))]
+}
+
 func (s *authService) CheckSubdomain(subdomain string) (bool, error) {
 	clean := strings.ToLower(strings.TrimSpace(subdomain))
 	re := regexp.MustCompile(`^[a-z0-9]+(-[a-z0-9]+)*$`)
@@ -451,12 +459,7 @@ func (s *authService) CheckSubdomain(subdomain string) (bool, error) {
 		return false, nil
 	}
 
-	reserved := map[string]bool{
-		"admin": true, "api": true, "app": true, "auth": true,
-		"dashboard": true, "mail": true, "root": true, "superadmin": true,
-		"test": true, "www": true, "gate": true, "payment": true,
-	}
-	if reserved[clean] {
+	if isReservedSubdomain(clean) {
 		return false, nil
 	}
 
