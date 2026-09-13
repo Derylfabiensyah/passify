@@ -18,6 +18,8 @@ import {
   ExternalLink
 } from 'lucide-react';
 
+import { validateSubdomainInput } from '../utils/subdomainValidation';
+
 const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID ||
   '1025715735364-f9ajif8q1dkcbkp25faubg92he1p7j29.apps.googleusercontent.com';
@@ -67,29 +69,24 @@ export default function RegisterTenantPage() {
     });
   };
 
-  // Real-time check for subdomain availability with debounce & reserved word protection
+  // Real-time check for subdomain availability with debounce & centralized validation utility
   useEffect(() => {
     const cleanSubdomain = formData.subdomain.trim().toLowerCase();
-    if (!cleanSubdomain || cleanSubdomain.length < 3) {
+    if (!cleanSubdomain) {
       setSubdomainStatus({
         checking: false,
         available: null,
-        message: cleanSubdomain ? 'Minimal 3 karakter' : ''
+        message: ''
       });
       return;
     }
 
-    // Instant check for reserved system subdomains
-    const reservedList = [
-      'admin', 'api', 'app', 'auth', 'billing', 'cashless', 'dashboard',
-      'gate', 'help', 'login', 'mail', 'passify', 'payment', 'portal',
-      'root', 'status', 'superadmin', 'support', 'system', 'test', 'ticket', 'www'
-    ];
-    if (reservedList.includes(cleanSubdomain)) {
+    const validation = validateSubdomainInput(cleanSubdomain);
+    if (!validation.isValid) {
       setSubdomainStatus({
         checking: false,
         available: false,
-        message: `Subdomain "${cleanSubdomain}" dilindungi sistem Passify dan tidak dapat digunakan`
+        message: validation.message
       });
       return;
     }

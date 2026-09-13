@@ -23,6 +23,7 @@ import { formatRupiah } from '../../api/client';
 import AdminStatCard from './AdminStatCard';
 import DataTable from './DataTable';
 import { ChartContainerSkeleton } from '../common/Skeleton';
+import { startImpersonation } from '../../utils/impersonation';
 
 // Register Chart.js
 ChartJS.register(
@@ -286,15 +287,7 @@ export default function SuperAdminDashboard() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => {
-              localStorage.setItem('passify_impersonated_tenant', JSON.stringify({
-                id: row.original.id,
-                name: row.original.name,
-                slug: row.original.slug,
-              }));
-              localStorage.setItem('passify_last_active_tenant', row.original.slug);
-              window.location.href = '/admin/destinations';
-            }}
+            onClick={() => startImpersonation(row.original)}
             title="Kelola Panel Wisata (Impersonasi)"
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 text-white text-xs font-bold hover:bg-emerald-900 transition-all cursor-pointer shadow-xs active:scale-95 min-h-[36px]"
           >

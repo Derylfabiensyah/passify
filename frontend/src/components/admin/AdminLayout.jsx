@@ -7,8 +7,8 @@ import {
 } from 'lucide-react';
 import { getAdminUser, getActiveAdminTenant } from '../../api/admin';
 import { useTenant } from '../../contexts/TenantContext';
-import { useToast } from '../../contexts/ToastContext';
 import ModalWrapper from '../common/ModalWrapper';
+import { stopImpersonation } from '../../utils/impersonation';
 
 const menuItems = [
   { id: 'dashboard', label: 'Ringkasan', icon: LayoutDashboard, path: '/admin' },
@@ -233,10 +233,7 @@ export default function AdminLayout({ children }) {
             </div>
             <button
               type="button"
-              onClick={() => {
-                localStorage.removeItem('passify_impersonated_tenant');
-                window.location.href = '/admin';
-              }}
+              onClick={() => stopImpersonation('/admin')}
               className="px-2.5 py-1 bg-slate-950 text-white rounded-lg text-[11px] font-extrabold hover:bg-slate-800 transition-all cursor-pointer shadow-xs active:scale-95"
             >
               Kembali ke Super Admin
