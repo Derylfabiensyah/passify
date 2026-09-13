@@ -151,18 +151,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: AppColors.canvas,
+      backgroundColor: const Color(0xFF0B120A),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight + 1),
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: const Color(0xFF111C10).withValues(alpha: 0.78),
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: Colors.white.withValues(alpha: 0.08),
                     width: 1,
                   ),
                 ),
@@ -173,17 +173,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(7),
                       decoration: BoxDecoration(
-                        color: AppColors.forestDeep,
+                        color: const Color(0xFF10B981).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(AppRadius.sm),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.forestDeep.withValues(alpha: 0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        border: Border.all(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                          width: 1,
+                        ),
                       ),
-                      child: const Icon(Icons.forest_rounded, color: Colors.white, size: 19),
+                      child: const Icon(Icons.forest_rounded, color: Color(0xFF34D399), size: 19),
                     ),
                     const SizedBox(width: 10),
                     Column(
@@ -191,11 +188,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         const Text(
                           'Passify Field Ops',
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.forestDeep),
+                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: Colors.white),
                         ),
                         Text(
-                          user?.role == 'tenant_admin' ? 'Pengelola Wisata' : 'Operasional Gerbang & Kasir',
-                          style: const TextStyle(fontSize: 11, color: AppColors.inkSoft, fontWeight: FontWeight.w600),
+                          user?.role == 'tenant_admin' ? 'Pengelola Destinasi' : 'Operasional Gerbang & Kasir',
+                          style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -205,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 elevation: 0,
                 actions: [
                   IconButton(
-                    icon: const Icon(Icons.settings_outlined, color: AppColors.forestDeep, size: 22),
+                    icon: const Icon(Icons.settings_outlined, color: Colors.white70, size: 21),
                     tooltip: 'Pengaturan Server',
                     onPressed: () {
                       Navigator.of(context).push(
@@ -214,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.logout_rounded, color: AppColors.error, size: 22),
+                    icon: const Icon(Icons.logout_rounded, color: Color(0xFFF87171), size: 21),
                     tooltip: 'Keluar',
                     onPressed: _showLogoutConfirmationDialog,
                   ),
@@ -226,213 +223,132 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Stack(
         children: [
-          // Ambient Gradient Orbs for Glassmorphism depth
+          // 1. Ambient Glowing Neon/Emerald Orbs for Visible Glass Refraction
           Positioned(
-            top: -80,
-            left: -40,
+            top: -60,
+            right: -40,
             child: Container(
-              width: 280,
-              height: 280,
+              width: 320,
+              height: 320,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.leaf.withValues(alpha: 0.35),
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF10B981).withValues(alpha: 0.32),
+                    const Color(0xFF10B981).withValues(alpha: 0.0),
+                  ],
+                ),
               ),
             ),
           ),
           Positioned(
-            top: 250,
+            top: 280,
+            left: -80,
+            child: Container(
+              width: 340,
+              height: 340,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF059669).withValues(alpha: 0.25),
+                    const Color(0xFF059669).withValues(alpha: 0.0),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 40,
             right: -60,
             child: Container(
               width: 300,
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.gold.withValues(alpha: 0.25),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -50,
-            left: -30,
-            child: Container(
-              width: 320,
-              height: 320,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.forestDeep.withValues(alpha: 0.2),
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFFD4AF37).withValues(alpha: 0.18),
+                    const Color(0xFFD4AF37).withValues(alpha: 0.0),
+                  ],
+                ),
               ),
             ),
           ),
 
-          // Global Soft Blur Filter
+          // 2. Global Soft Blur Filter
           Positioned.fill(
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+              filter: ImageFilter.blur(sigmaX: 45, sigmaY: 45),
               child: Container(
-                color: AppColors.canvas.withValues(alpha: 0.55),
+                color: Colors.transparent,
               ),
             ),
           ),
 
-          // Scrollable Screen Content
+          // 3. Scrollable Content
           SafeArea(
             child: RefreshIndicator(
               onRefresh: () => sync.refreshDatabaseCounts(),
-              color: AppColors.forest,
+              color: const Color(0xFF10B981),
+              backgroundColor: const Color(0xFF162315),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.fromLTRB(18, kToolbarHeight + 14, 18, 28),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Sylvan Earth Frosted Hero Officer Card
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            AppColors.forestDeep.withValues(alpha: 0.92),
-                            AppColors.forest.withValues(alpha: 0.88),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(AppRadius.xl),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          width: 1.5,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.forestDeep.withValues(alpha: 0.28),
-                            blurRadius: 18,
-                            offset: const Offset(0, 8),
+                    // Officer & Device Info Glass Capsule
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF142013).withValues(alpha: 0.72),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              width: 1.2,
+                            ),
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                          child: Row(
                             children: [
                               CircleAvatar(
-                                radius: 22,
-                                backgroundColor: AppColors.leafPale,
+                                radius: 18,
+                                backgroundColor: const Color(0xFF10B981).withValues(alpha: 0.2),
                                 child: Text(
                                   (user?.fullName.isNotEmpty == true ? user!.fullName[0] : 'P').toUpperCase(),
-                                  style: const TextStyle(color: AppColors.forestDeep, fontWeight: FontWeight.w900, fontSize: 18),
+                                  style: const TextStyle(
+                                    color: Color(0xFF34D399),
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 15,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 10),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       user?.fullName ?? 'Petugas Lapangan',
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      user?.email ?? 'Petugas Aktif',
-                                      style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 11.5, fontWeight: FontWeight.w500),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Container(width: 6, height: 6, decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle)),
-                                    const SizedBox(width: 5),
-                                    const Text(
-                                      'ONLINE',
-                                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    // Gate Device Pairing Frosted Card
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.68),
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              width: 1.5,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 14,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(9),
-                                decoration: BoxDecoration(
-                                  color: AppColors.leafPale,
-                                  borderRadius: BorderRadius.circular(AppRadius.md),
-                                ),
-                                child: const Icon(Icons.sensor_door_rounded, color: AppColors.forestDeep, size: 22),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          auth.selectedDeviceCode,
-                                          style: const TextStyle(
-                                            fontSize: 10.5,
-                                            fontWeight: FontWeight.w800,
-                                            color: AppColors.forest,
-                                            letterSpacing: 0.5,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Container(
-                                          width: 6,
-                                          height: 6,
-                                          decoration: const BoxDecoration(
-                                            color: Color(0xFF10B981),
-                                            shape: BoxShape.circle,
-                                          ),
-                                        ),
-                                      ],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     const SizedBox(height: 1),
                                     Text(
-                                      auth.selectedDeviceName,
+                                      auth.selectedDeviceName.isNotEmpty ? auth.selectedDeviceName : 'Gerbang Utama',
                                       style: const TextStyle(
-                                        fontSize: 13.5,
-                                        fontWeight: FontWeight.w800,
-                                        color: AppColors.forestDeep,
+                                        color: Color(0xFF9CA3AF),
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -440,8 +356,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                               ),
-                              ElevatedButton.icon(
-                                onPressed: () async {
+                              // Pairing Chip
+                              GestureDetector(
+                                onTap: () async {
                                   HapticFeedback.selectionClick();
                                   final paired = await Navigator.of(context).push<bool>(
                                     MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
@@ -452,17 +369,39 @@ class _HomeScreenState extends State<HomeScreen> {
                                     }
                                   }
                                 },
-                                icon: const Icon(Icons.qr_code_scanner_rounded, size: 15),
-                                label: const Text(
-                                  'Pairing',
-                                  style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.forestDeep,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                                    border: Border.all(
+                                      color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF10B981),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        auth.selectedDeviceCode,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
@@ -471,9 +410,138 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 16),
 
-                    // Offline Sync Status Frosted Card
+                    // PRIMARY HERO SCANNER CARD (Prominent, Elegant Glassmorphism)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                const Color(0xFF163E24).withValues(alpha: 0.85),
+                                const Color(0xFF0F2618).withValues(alpha: 0.9),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
+                            border: Border.all(
+                              color: const Color(0xFF10B981).withValues(alpha: 0.45),
+                              width: 1.5,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                                blurRadius: 28,
+                                spreadRadius: 1,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                HapticFeedback.heavyImpact();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => const GateScannerScreen()),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                                child: Column(
+                                  children: [
+                                    // Big Glowing Scanner Reticle Icon Badge
+                                    Container(
+                                      width: 68,
+                                      height: 68,
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981).withValues(alpha: 0.18),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: const Color(0xFF34D399).withValues(alpha: 0.6),
+                                          width: 2,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFF10B981).withValues(alpha: 0.35),
+                                            blurRadius: 20,
+                                            spreadRadius: 2,
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Icon(
+                                        Icons.qr_code_scanner_rounded,
+                                        color: Colors.white,
+                                        size: 36,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Gate Scanner Tiket',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        letterSpacing: -0.3,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Sentuh di sini untuk memindai tiket pengunjung',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 12.5,
+                                        color: Colors.white.withValues(alpha: 0.75),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 18),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF10B981),
+                                        borderRadius: BorderRadius.circular(AppRadius.md),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                                            blurRadius: 14,
+                                            offset: const Offset(0, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            'Buka Kamera Pemindai',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Offline Sync & Cache Frosted Strip
                     ClipRRect(
                       borderRadius: BorderRadius.circular(AppRadius.lg),
                       child: BackdropFilter(
@@ -481,70 +549,71 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.68),
+                            color: const Color(0xFF142013).withValues(alpha: 0.72),
                             borderRadius: BorderRadius.circular(AppRadius.lg),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.85),
-                              width: 1.5,
+                              color: Colors.white.withValues(alpha: 0.12),
+                              width: 1.2,
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.03),
-                                blurRadius: 14,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
                           ),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Row(
                                     children: [
-                                      Icon(Icons.cloud_sync_rounded, color: AppColors.forest, size: 20),
+                                      Icon(Icons.cloud_sync_rounded, color: Color(0xFF34D399), size: 18),
                                       SizedBox(width: 8),
                                       Text(
                                         'Status Sinkronisasi & Cache',
-                                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: AppColors.forestDeep),
+                                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white),
                                       ),
                                     ],
                                   ),
                                   if (sync.isSyncing)
                                     const SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: CircularProgressIndicator(color: AppColors.forest, strokeWidth: 2),
+                                      width: 14,
+                                      height: 14,
+                                      child: CircularProgressIndicator(color: Color(0xFF34D399), strokeWidth: 2),
                                     ),
                                 ],
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 12),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  _buildSyncMetric('${sync.cachedTicketsCount}', 'Tiket di Cache'),
-                                  Container(width: 1, height: 26, color: AppColors.border),
-                                  _buildSyncMetric('${sync.pendingScansCount}', 'Antrean Sync', isWarning: sync.pendingScansCount > 0),
-                                  Container(width: 1, height: 26, color: AppColors.border),
-                                  _buildSyncMetric(
+                                  _buildDarkSyncMetric('${sync.cachedTicketsCount}', 'Tiket di Cache'),
+                                  Container(width: 1, height: 26, color: Colors.white12),
+                                  _buildDarkSyncMetric(
+                                    '${sync.pendingScansCount}',
+                                    'Antrean Sync',
+                                    isWarning: sync.pendingScansCount > 0,
+                                  ),
+                                  Container(width: 1, height: 26, color: Colors.white12),
+                                  _buildDarkSyncMetric(
                                     sync.lastSyncTime != null ? DateFormat('HH:mm').format(sync.lastSyncTime!) : '-',
-                                    'Sinkron Terakhir',
+                                    'Terakhir Sync',
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 12),
                               ElevatedButton.icon(
                                 onPressed: sync.isSyncing ? null : _handleSync,
-                                icon: const Icon(Icons.sync_rounded, size: 18),
+                                icon: const Icon(Icons.sync_rounded, size: 16),
                                 label: Text(
                                   sync.isSyncing ? 'Sedang Menyinkronkan...' : 'Sinkronkan Tiket & Log Lapangan',
-                                  style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800),
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800),
                                 ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.forestSoft,
-                                  foregroundColor: Colors.white,
-                                  minimumSize: const Size.fromHeight(42),
+                                  backgroundColor: const Color(0xFF1B321C),
+                                  foregroundColor: const Color(0xFF6EE7B7),
+                                  side: BorderSide(
+                                    color: const Color(0xFF34D399).withValues(alpha: 0.3),
+                                    width: 1,
+                                  ),
+                                  minimumSize: const Size.fromHeight(38),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
                                   elevation: 0,
                                 ),
@@ -555,81 +624,65 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 20),
                     const Text(
-                      'MENU OPERASIONAL LAPANGAN',
+                      'ALAT OPERASIONAL LAINNYA',
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.1,
-                        color: AppColors.forestDeep,
+                        color: Color(0xFF9CA3AF),
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
 
-                    // Operational Cards Grid (Frosted Glass)
-                    GridView.count(
-                      crossAxisCount: 2,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      childAspectRatio: 1.05,
+                    // Secondary Tools (3 Clean Frosted Tiles)
+                    Row(
                       children: [
-                        _buildMenuCard(
-                          title: 'Gate Scanner',
-                          subtitle: 'Scan QR Tiket Pengunjung',
-                          icon: Icons.qr_code_scanner_rounded,
-                          color: AppColors.forest,
-                          tag: 'Gerbang',
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const GateScannerScreen()),
-                            );
-                          },
+                        Expanded(
+                          child: _buildDarkToolCard(
+                            title: 'Kasir POS',
+                            icon: Icons.point_of_sale_rounded,
+                            color: const Color(0xFFF59E0B),
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const BoothPosScreen()),
+                              );
+                            },
+                          ),
                         ),
-                        _buildMenuCard(
-                          title: 'Kasir Booth POS',
-                          subtitle: 'Pembayaran Stan & Gelang',
-                          icon: Icons.point_of_sale_rounded,
-                          color: AppColors.bark,
-                          tag: 'Stan / POS',
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const BoothPosScreen()),
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildDarkToolCard(
+                            title: 'Manifest',
+                            icon: Icons.storage_rounded,
+                            color: const Color(0xFF38BDF8),
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
+                              );
+                            },
+                          ),
                         ),
-                        _buildMenuCard(
-                          title: 'Manifest Offline',
-                          subtitle: 'Daftar & Check-In Manual',
-                          icon: Icons.storage_rounded,
-                          color: AppColors.forestSoft,
-                          tag: 'Cache',
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const OfflineManifestScreen()),
-                            );
-                          },
-                        ),
-                        _buildMenuCard(
-                          title: 'Statistik Gate',
-                          subtitle: 'Laporan Kuota & Total Masuk',
-                          icon: Icons.bar_chart_rounded,
-                          color: AppColors.forestDeep,
-                          tag: 'Laporan',
-                          onTap: () {
-                            HapticFeedback.selectionClick();
-                            Navigator.of(context).push(
-                              MaterialPageRoute(builder: (_) => const GateStatsScreen()),
-                            );
-                          },
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildDarkToolCard(
+                            title: 'Statistik',
+                            icon: Icons.bar_chart_rounded,
+                            color: const Color(0xFFA78BFA),
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (_) => const GateStatsScreen()),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -640,120 +693,77 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSyncMetric(String value, String label, {bool isWarning = false}) {
+  Widget _buildDarkSyncMetric(String value, String label, {bool isWarning = false}) {
     return Column(
       children: [
         Text(
           value,
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 18,
             fontWeight: FontWeight.w900,
-            color: isWarning ? AppColors.warning : AppColors.forestDeep,
+            color: isWarning ? const Color(0xFFF59E0B) : Colors.white,
           ),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 1),
         Text(
           label,
-          style: const TextStyle(fontSize: 11, color: AppColors.inkSoft, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 10.5, color: Color(0xFF9CA3AF), fontWeight: FontWeight.w600),
         ),
       ],
     );
   }
 
-  Widget _buildMenuCard({
+  Widget _buildDarkToolCard({
     required String title,
-    required String subtitle,
     required IconData icon,
     required Color color,
-    String? tag,
     required VoidCallback onTap,
   }) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.lg),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.68),
-            borderRadius: BorderRadius.circular(AppRadius.lg),
+            color: const Color(0xFF142013).withValues(alpha: 0.72),
+            borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.85),
-              width: 1.5,
+              color: Colors.white.withValues(alpha: 0.12),
+              width: 1.2,
             ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.forestDeep.withValues(alpha: 0.04),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
-            ],
           ),
           child: Material(
             color: Colors.transparent,
             child: InkWell(
               onTap: onTap,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              splashColor: color.withValues(alpha: 0.12),
-              highlightColor: color.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               child: Padding(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          width: 42,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.14),
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                            border: Border.all(
-                              color: color.withValues(alpha: 0.25),
-                              width: 1,
-                            ),
-                          ),
-                          child: Icon(icon, color: color, size: 22),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                        border: Border.all(
+                          color: color.withValues(alpha: 0.35),
+                          width: 1,
                         ),
-                        if (tag != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: color.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(AppRadius.sm),
-                              border: Border.all(
-                                color: color.withValues(alpha: 0.2),
-                                width: 0.8,
-                              ),
-                            ),
-                            child: Text(
-                              tag,
-                              style: TextStyle(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w800,
-                                color: color,
-                              ),
-                            ),
-                          ),
-                      ],
+                      ),
+                      child: Icon(icon, color: color, size: 20),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13.5, color: AppColors.forestDeep),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          subtitle,
-                          style: const TextStyle(fontSize: 10.5, color: AppColors.inkSoft, fontWeight: FontWeight.w600),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                    const SizedBox(height: 8),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 11.5,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
