@@ -7,7 +7,7 @@ import {
   getPaginationRowModel,
   flexRender
 } from '@tanstack/react-table';
-import { Search, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
+import { Search, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown, Loader2, FolderX, RotateCcw } from 'lucide-react';
 
 export default function DataTable({
   data = [],
@@ -160,9 +160,31 @@ export default function DataTable({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-8 text-center text-xs text-[var(--ink-soft)]"
+                  className="px-4 py-12 text-center"
                 >
-                  Tidak ada data yang sesuai.
+                  <div className="flex flex-col items-center justify-center max-w-xs mx-auto text-center space-y-2">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/30 flex items-center justify-center text-emerald-800 dark:text-emerald-400 shadow-xs mb-1">
+                      {globalFilter ? <Search className="w-6 h-6" /> : <FolderX className="w-6 h-6" />}
+                    </div>
+                    <p className="text-sm font-bold text-[#14281a] dark:text-white">
+                      {globalFilter ? 'Pencarian Tidak Ditemukan' : 'Belum Ada Data Tersedia'}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                      {globalFilter
+                        ? `Tidak ada hasil yang cocok dengan kata kunci "${globalFilter}". Coba kata kunci lain.`
+                        : 'Data operasional untuk kategori ini masih kosong atau belum dicatat.'}
+                    </p>
+                    {globalFilter && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchValue('')}
+                        className="mt-2 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 transition-colors cursor-pointer active:scale-95 border border-emerald-200/60"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Reset Pencarian
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             )}
@@ -198,13 +220,13 @@ export default function DataTable({
             (Hal. <strong className="text-[var(--ink)] font-semibold">{pageIndex + 1}</strong>/{totalPages})
           </span>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
               aria-label="Halaman sebelumnya"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-white/80 dark:border-white/10 text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
+              className="min-h-[38px] min-w-[38px] rounded-xl bg-white/80 dark:bg-neutral-800 border border-black/5 dark:border-white/10 text-[var(--ink-soft)] hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-2xs flex items-center justify-center cursor-pointer active:scale-95"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -213,7 +235,7 @@ export default function DataTable({
               aria-label="Halaman berikutnya"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-white/80 dark:border-white/10 text-[var(--ink-soft)] hover:bg-[var(--leaf-pale)] hover:text-[var(--forest-deep)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-2xs"
+              className="min-h-[38px] min-w-[38px] rounded-xl bg-white/80 dark:bg-neutral-800 border border-black/5 dark:border-white/10 text-[var(--ink-soft)] hover:bg-emerald-50 hover:text-emerald-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-2xs flex items-center justify-center cursor-pointer active:scale-95"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

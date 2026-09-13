@@ -144,7 +144,7 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
       onClose={onClose}
       size="lg"
       showCloseButton={false}
-      className="p-6 sm:p-8 bg-[var(--surface)] border-[var(--border)]"
+      className="p-6 sm:p-8 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xl border border-white/60 dark:border-white/10 shadow-2xl"
       ariaLabel="Dompet Non-Tunai Passify"
     >
       <div className="relative">
@@ -153,45 +153,47 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
           id="close-wallet-modal-btn"
           type="button"
           onClick={onClose}
-          className="absolute -top-2 -right-2 w-8 h-8 rounded-lg bg-[var(--canvas)] text-[var(--ink-soft)] hover:text-[var(--ink)] hover:bg-[var(--border)] flex items-center justify-center transition-colors cursor-pointer"
+          className="absolute -top-2 -right-2 min-h-[44px] min-w-[44px] rounded-xl bg-gray-100 dark:bg-neutral-800 text-gray-500 hover:text-gray-900 dark:hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-95"
           aria-label="Tutup dompet"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-[var(--leaf-pale)] border border-[var(--border)] flex items-center justify-center text-[var(--forest-deep)] font-bold shadow-2xs">
+        <div className="flex items-center gap-3 mb-6 pr-10">
+          <div className="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/40 flex items-center justify-center text-emerald-800 dark:text-emerald-300 font-bold shadow-xs">
             <Wallet className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-[var(--forest-deep)] font-heading">
+            <h2 className="text-lg font-bold text-[#14281a] dark:text-white font-heading">
               Passify Cashless Tenant Wallet
             </h2>
-            <p className="text-xs text-[var(--ink-soft)]">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               Modul Transaksi Non-Tunai Kawasan (NFC & QR)
             </p>
           </div>
         </div>
 
-        {/* Balance Card */}
-        <div className="p-4 rounded-xl bg-[var(--canvas)] border border-[var(--border)] flex items-center justify-between mb-5 shadow-2xs">
-          <div>
-            <span className="text-xs text-[var(--ink-soft)] font-medium block mb-0.5">Saldo Tersedia Sekarang</span>
-            <span className="text-2xl font-bold text-[var(--forest)] font-heading">
+        {/* Balance Card - Modern Glassmorphism Accent */}
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#0c1f15] via-[#14281a] to-[#1e3d29] text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 shadow-lg border border-emerald-800/30 relative overflow-hidden">
+          <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10">
+            <span className="text-[11px] text-emerald-200/80 font-medium block mb-1 uppercase tracking-wider">Saldo Tersedia Sekarang</span>
+            <span className="text-3xl font-extrabold text-white font-heading tracking-tight">
               Rp {walletBalance.toLocaleString('id-ID')}
             </span>
           </div>
-          <div className="flex flex-col items-end">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--surface)] text-[11px] font-semibold text-[var(--forest-deep)] border border-[var(--border)] shadow-xs">
-              <span className="status-dot" />
+          <div className="relative z-10 flex flex-row sm:flex-col items-start sm:items-end justify-between sm:justify-center gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/20 backdrop-blur-md text-xs font-semibold text-emerald-300 border border-emerald-400/30 shadow-xs">
+              <span className={`w-2 h-2 rounded-full ${nfcLinked ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
               <span>{nfcLinked ? 'Gelang NFC Aktif' : 'NFC Belum Taut'}</span>
             </span>
+            <span className="text-[10px] text-emerald-200/60 font-mono">UID: {nfcUid}</span>
           </div>
         </div>
 
         {/* Tabs Grid */}
-        <div role="tablist" aria-label="Kategori Menu Dompet Non-Tunai" className="grid grid-cols-4 gap-1 p-1 bg-[var(--canvas)] rounded-xl border border-[var(--border)] mb-6">
+        <div role="tablist" aria-label="Kategori Menu Dompet Non-Tunai" className="grid grid-cols-4 gap-1.5 p-1.5 bg-gray-100/80 dark:bg-black/40 backdrop-blur-md rounded-2xl border border-gray-200/80 dark:border-white/10 mb-6">
           <button
             id="tab-nfc-wristband"
             role="tab"
@@ -199,13 +201,13 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
             aria-controls="panel-nfc"
             type="button"
             onClick={() => { setActiveTab('nfc'); setIsSuccessMsg(''); }}
-            className={`py-2 rounded-lg text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
+            className={`min-h-[44px] py-2.5 px-2 rounded-xl text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'nfc'
-                ? 'bg-[var(--surface)] text-[var(--forest-deep)] border border-[var(--border)] shadow-xs'
-                : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
+                ? 'bg-white dark:bg-neutral-800 text-[#14281a] dark:text-emerald-300 shadow-sm border border-black/5 dark:border-white/10'
+                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-black/5'
             }`}
           >
-            <Radio className="w-3.5 h-3.5" />
+            <Radio className="w-4 h-4" />
             <span>Gelang NFC</span>
           </button>
 
@@ -216,13 +218,13 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
             aria-controls="panel-qr"
             type="button"
             onClick={() => { setActiveTab('qr'); setIsSuccessMsg(''); }}
-            className={`py-2 rounded-lg text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
+            className={`min-h-[44px] py-2.5 px-2 rounded-xl text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'qr'
-                ? 'bg-[var(--surface)] text-[var(--forest-deep)] border border-[var(--border)] shadow-xs'
-                : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
+                ? 'bg-white dark:bg-neutral-800 text-[#14281a] dark:text-emerald-300 shadow-sm border border-black/5 dark:border-white/10'
+                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-black/5'
             }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5" />
+            <ShoppingBag className="w-4 h-4" />
             <span>Merchant</span>
           </button>
 
@@ -233,13 +235,13 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
             aria-controls="panel-refund"
             type="button"
             onClick={() => { setActiveTab('refund'); setIsSuccessMsg(''); }}
-            className={`py-2 rounded-lg text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
+            className={`min-h-[44px] py-2.5 px-2 rounded-xl text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'refund'
-                ? 'bg-[var(--surface)] text-[var(--forest-deep)] border border-[var(--border)] shadow-xs'
-                : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
+                ? 'bg-white dark:bg-neutral-800 text-[#14281a] dark:text-emerald-300 shadow-sm border border-black/5 dark:border-white/10'
+                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-black/5'
             }`}
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="w-4 h-4" />
             <span>Refund</span>
           </button>
 
@@ -250,13 +252,13 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
             aria-controls="panel-topup"
             type="button"
             onClick={() => { setActiveTab('topup'); setIsSuccessMsg(''); }}
-            className={`py-2 rounded-lg text-xs font-semibold transition-all flex flex-col items-center gap-1 ${
+            className={`min-h-[44px] py-2.5 px-2 rounded-xl text-xs font-semibold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'topup'
-                ? 'bg-[var(--surface)] text-[var(--forest-deep)] border border-[var(--border)] shadow-xs'
-                : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
+                ? 'bg-white dark:bg-neutral-800 text-[#14281a] dark:text-emerald-300 shadow-sm border border-black/5 dark:border-white/10'
+                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white hover:bg-black/5'
             }`}
           >
-            <Wallet className="w-3.5 h-3.5" />
+            <Wallet className="w-4 h-4" />
             <span>Top Up</span>
           </button>
         </div>

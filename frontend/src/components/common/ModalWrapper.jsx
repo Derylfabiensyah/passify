@@ -134,7 +134,7 @@ export default function ModalWrapper({
 
   return (
     <div
-      className={`modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs transition-opacity animate-in fade-in duration-200 ${overlayClassName}`}
+      className={`modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-6 bg-slate-950/60 backdrop-blur-md transition-opacity animate-in fade-in duration-200 ${overlayClassName}`}
       onClick={handleBackdropClick}
       role="presentation"
     >
@@ -145,16 +145,16 @@ export default function ModalWrapper({
         aria-labelledby={generatedTitleId}
         aria-label={!generatedTitleId ? (ariaLabel || (typeof title === 'string' ? title : 'Dialog Modal')) : undefined}
         tabIndex={-1}
-        className={`modal-content relative w-full ${resolvedMaxWidth} max-h-[90vh] overflow-y-auto bg-white/95 dark:bg-black/85 backdrop-blur-2xl rounded-2xl shadow-2xl border border-white/80 dark:border-white/10 outline-none animate-in zoom-in-95 duration-200 ${className}`}
+        className={`modal-content relative w-full ${resolvedMaxWidth} max-h-[90vh] overflow-y-auto bg-white/95 dark:bg-neutral-900/90 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] border border-white/80 dark:border-white/10 ring-1 ring-black/5 outline-none animate-in zoom-in-95 duration-200 ${className}`}
       >
         {/* Custom Header or Default Header if title/close button provided */}
         {customHeader ? (
           customHeader
         ) : (title || showCloseButton) ? (
-          <div className="flex items-center justify-between gap-4 p-5 sm:p-6 pb-3 sm:pb-4 border-b border-white/60 dark:border-white/10">
+          <div className="flex items-center justify-between gap-4 p-5 sm:p-6 pb-3 sm:pb-4 border-b border-gray-100 dark:border-white/10">
             {title ? (
               typeof title === 'string' ? (
-                <h3 id={generatedTitleId} className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">
+                <h3 id={generatedTitleId} className="text-base sm:text-lg font-bold text-gray-900 dark:text-white tracking-tight">
                   {title}
                 </h3>
               ) : (
@@ -166,10 +166,10 @@ export default function ModalWrapper({
               <button
                 type="button"
                 onClick={onClose}
-                className="p-1.5 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors cursor-pointer"
+                className="min-h-[44px] min-w-[44px] p-2 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
                 aria-label="Tutup modal"
               >
-                <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                <X className="w-5 h-5" />
               </button>
             )}
           </div>
