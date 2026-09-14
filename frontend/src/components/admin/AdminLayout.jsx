@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getAdminUser, getActiveAdminTenant } from '../../api/admin';
 import { useTenant } from '../../contexts/TenantContext';
+import { useToast } from '../../contexts/ToastContext';
 import ModalWrapper from '../common/ModalWrapper';
 import { stopImpersonation } from '../../utils/impersonation';
 
