@@ -263,8 +263,8 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                 borderRadius: BorderRadius.circular(AppRadius.xl),
                                 border: Border.all(
                                   color: _isContinuousMode
-                                      ? AppColors.leafPale.withValues(alpha: 0.8)
-                                      : Colors.white.withValues(alpha: 0.2),
+                                      ? AppColors.success
+                                      : AppColors.glassBorder,
                                   width: 1.2,
                                 ),
                               ),
@@ -273,14 +273,14 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                 children: [
                                   Icon(
                                     _isContinuousMode ? Icons.bolt_rounded : Icons.view_agenda_rounded,
-                                    color: Colors.white,
+                                    color: _isContinuousMode ? AppColors.success : AppColors.forestDeep,
                                     size: 14,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     _isContinuousMode ? 'KONTINU' : 'DETAIL',
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: _isContinuousMode ? AppColors.success : AppColors.forestDeep,
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -306,11 +306,11 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
                               decoration: BoxDecoration(
                                 color: scannerProvider.forceOfflineMode
-                                    ? AppColors.bark.withValues(alpha: 0.85)
-                                    : AppColors.forest.withValues(alpha: 0.85),
+                                    ? AppColors.warningBg
+                                    : AppColors.glassWhiteSolid,
                                 borderRadius: BorderRadius.circular(AppRadius.xl),
                                 border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.25),
+                                  color: scannerProvider.forceOfflineMode ? AppColors.warning : AppColors.glassBorder,
                                   width: 1.2,
                                 ),
                               ),
@@ -319,14 +319,14 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                 children: [
                                   Icon(
                                     scannerProvider.forceOfflineMode ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
-                                    color: Colors.white,
+                                    color: scannerProvider.forceOfflineMode ? AppColors.warning : AppColors.forestDeep,
                                     size: 14,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     scannerProvider.forceOfflineMode ? 'OFFLINE' : 'ONLINE',
                                     style: const TextStyle(
-                                      color: Colors.white,
+                                      color: _isContinuousMode ? AppColors.success : AppColors.forestDeep,
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w800,
                                     ),

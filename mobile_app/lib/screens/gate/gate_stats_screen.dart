@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
@@ -45,15 +46,17 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
     final validRate = totalScans > 0 ? ((validScans / totalScans) * 100).toInt() : 100;
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFF9F9F8),
       appBar: AppBar(
         title: const Text(
           'Statistik Pintu Masuk',
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.forestDeep),
         ),
-        backgroundColor: AppColors.surface,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.ink,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
         actions: [
           IconButton(
@@ -63,12 +66,26 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
         ],
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, color: AppColors.border),
+          child: Divider(height: 1, color: AppColors.glassBorder),
         ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.forest))
-          : SingleChildScrollView(
+      body: Stack(
+        children: [
+          // Background Orbs
+          Positioned(top: -50, right: -50, child: Container(width: 300, height: 300, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.orbEmerald))),
+          Positioned(bottom: -100, left: -50, child: Container(width: 350, height: 350, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.orbGold))),
+          
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          
+          SafeArea(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator(color: AppColors.success))
+                : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +94,7 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                   Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: AppColors.forestDeep,
+                      color: AppColors.success,
                       borderRadius: BorderRadius.circular(AppRadius.lg),
                       boxShadow: [
                         BoxShadow(
@@ -217,9 +234,9 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                       padding: const EdgeInsets.all(24),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: AppColors.glassWhiteSolid,
                         borderRadius: BorderRadius.circular(AppRadius.lg),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: AppColors.glassBorder),
                       ),
                       child: const Text('Belum ada tiket yang di-scan pada sesi ini.', style: TextStyle(color: AppColors.textMuted)),
                     )
@@ -233,10 +250,11 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                         final log = scannerProvider.scanHistory[idx];
                         return Card(
                           elevation: 0,
-                          color: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+                          color: AppColors.glassWhiteSolid,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(AppRadius.md),
-                            side: const BorderSide(color: AppColors.border),
+                            side: const BorderSide(color: AppColors.glassBorder),
                           ),
                           child: ListTile(
                             leading: Container(
@@ -270,6 +288,9 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -283,9 +304,9 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.glassWhiteSolid,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.glassBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

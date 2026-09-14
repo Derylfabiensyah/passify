@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,7 +70,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
       builder: (ctx) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-          backgroundColor: AppColors.surface,
+          backgroundColor: Colors.transparent,
           title: Row(
             children: [
               Container(
@@ -107,7 +108,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.canvas,
                   borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: AppColors.glassBorder),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,6 +143,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                 backgroundColor: AppColors.forest,
                 foregroundColor: Colors.white,
                 elevation: 0,
+        surfaceTintColor: Colors.transparent,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                 padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
               ),
@@ -183,27 +185,43 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFF9F9F8),
       appBar: AppBar(
         title: const Text(
           'Manifest Tiket Offline',
           style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.forestDeep),
         ),
-        backgroundColor: AppColors.surface,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.ink,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, color: AppColors.border),
+          child: Divider(height: 1, color: AppColors.glassBorder),
         ),
       ),
-      body: Column(
+      body: Stack(
+        children: [
+          // Background Orbs
+          Positioned(top: -50, right: -50, child: Container(width: 300, height: 300, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.orbEmerald))),
+          Positioned(bottom: -100, left: -50, child: Container(width: 350, height: 350, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.orbGold))),
+          
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          
+          SafeArea(
+            child: Column(
         children: [
           // Search Box
           Container(
             padding: const EdgeInsets.all(16),
-            color: AppColors.surface,
+            color: Colors.transparent,
             child: TextField(
               controller: _searchController,
               onChanged: _onSearchChanged,
@@ -222,15 +240,15 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: AppColors.inputBg,
+                fillColor: AppColors.glassWhiteSolid,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
-                  borderSide: const BorderSide(color: AppColors.border),
+                  borderSide: const BorderSide(color: AppColors.glassBorder),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadius.md),
@@ -299,7 +317,8 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
 
                           return Card(
                             elevation: 0,
-                            color: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+                            color: Colors.transparent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(AppRadius.lg),
                               side: BorderSide(color: isUsed ? AppColors.border : AppColors.borderHover),
@@ -373,7 +392,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                                       decoration: BoxDecoration(
                                         color: AppColors.leafPale.withValues(alpha: 0.5),
                                         borderRadius: BorderRadius.circular(AppRadius.sm),
-                                        border: Border.all(color: AppColors.border),
+                                        border: Border.all(color: AppColors.glassBorder),
                                       ),
                                       child: const Text(
                                         'SUDAH MASUK',
@@ -386,6 +405,9 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                           );
                         },
                       ),
+          ),
+        ],
+      ),
           ),
         ],
       ),
