@@ -28,6 +28,7 @@ import { fetchAdminQuotas } from '../api/admin';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
 import WalletModal from '../components/WalletModal';
+import { useToast } from '../contexts/ToastContext';
 
 const getPaymentDeadline = (slug) => {
   try {
@@ -48,6 +49,7 @@ const clearPaymentDeadline = () => {
 };
 
 export default function CheckoutPage() {
+  const { toast } = useToast();
   const { tenantSlug, destinationId } = useParams();
   const [searchParams] = useSearchParams();
   const { slug: contextSlug, destination: contextDest } = useTenant();
@@ -529,19 +531,23 @@ export default function CheckoutPage() {
               paymentType: result?.payment_type || 'MIDTRANS_SNAP',
             });
           },
-          onPending: async (result) => {
-            finalizeBookingSuccess({
-              ...ordData,
-              paymentRef: result?.transaction_id || token,
-              paymentType: result?.payment_type || 'MIDTRANS_SNAP_PENDING',
-            });
+          onPending: (result) => {
+            console.log('Midtrans Snap pending/unpaid:', result);
+            setIsProcessingPayment(false);
+            setShowSnapModal(false);
+            toast.info('Pembayaran belum diselesaikan. Anda dapat memilih metode pembayaran lain atau melanjutkan transfer.');
           },
-          onError: () => {
-            setFormError('Pembayaran melalui Midtrans tidak berhasil. Silakan coba kembali.');
-            setShowSnapModal(true);
+          onError: (result) => {
+            console.warn('Midtrans Snap error:', result);
+            setIsProcessingPayment(false);
+            setShowSnapModal(false);
+            setFormError('Pembayaran melalui Midtrans tidak berhasil. Silakan coba kembali atau pilih metode lain.');
           },
           onClose: () => {
-            setShowSnapModal(true);
+            console.log('Midtrans Snap popup closed by user');
+            setIsProcessingPayment(false);
+            setShowSnapModal(false);
+            toast.info('Pembayaran dibatalkan. Silakan pilih metode pembayaran lain jika diinginkan.');
           },
         });
         return true;
@@ -703,41 +709,6 @@ export default function CheckoutPage() {
       }
     } catch (err) {
       setFormError(err.message || 'Pembayaran gagal diproses. Silakan coba lagi.');
-    } finally {
-      setIsProcessingPayment(false);
-    }
-  };
-
-  // Simulate Webhook Trigger / Confirmation for instant verification
-  const handleSimulateWebhook = async () => {
-    if (!snapData) return;
-    setIsProcessingPayment(true);
-    try {
-      // 1. Notify payment-service finish
-      await fetch('http://localhost:8084/api/v1/payments/snap/finish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order_number: snapData.orderNumber,
-        }),
-      }).catch(() => {});
-
-      // 2. Also send webhook notification to Payment microservice
-      await fetch('http://localhost:8084/api/webhooks/midtrans', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order_id: snapData.orderNumber,
-          status_code: '200',
-          transaction_status: 'settlement',
-          payment_type: 'bank_transfer',
-          gross_amount: String(totals.grandTotal),
-        }),
-      }).catch(() => {});
-
-      finalizeBookingSuccess(snapData.orderData);
-    } catch (e) {
-      finalizeBookingSuccess(snapData.orderData);
     } finally {
       setIsProcessingPayment(false);
     }
@@ -1512,8 +1483,12 @@ export default function CheckoutPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setShowSnapModal(false)}
-                  className="h-8 w-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center text-xs font-bold"
+                  onClick={() => {
+                    setShowSnapModal(false);
+                    setIsProcessingPayment(false);
+                  }}
+                  className="h-8 w-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center text-xs font-bold cursor-pointer transition-colors"
+                  aria-label="Tutup dan Ganti Metode Pembayaran"
                 >
                   ✕
                 </button>
@@ -1539,7 +1514,7 @@ export default function CheckoutPage() {
               <div className="rounded-xl bg-emerald-50/70 border border-emerald-200/60 p-3 text-[11px] text-emerald-900 leading-relaxed flex items-start gap-2">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5" />
                 <span>
-                  Transaksi ini telah resmi terbit di <strong>Midtrans Sandbox</strong> Anda. Silakan pilih opsi di bawah untuk membuka form pembayaran:
+                  Silakan selesaikan pembayaran Anda melalui gerai/aplikasi bank pilihan di Midtrans. Tiket baru akan aktif setelah pembayaran diverifikasi lunas.
                 </span>
               </div>
 
@@ -1552,7 +1527,7 @@ export default function CheckoutPage() {
                     const opened = openSnapPopup(snapData.token, snapData.redirectUrl, snapData.orderData);
                     if (opened) setShowSnapModal(false);
                   }}
-                  className="w-full btn-primary py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md"
+                  className="w-full btn-primary py-3.5 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md cursor-pointer"
                 >
                   <QrCode className="h-4 w-4" /> Buka Pop-up Midtrans Snap
                 </button>
@@ -1569,33 +1544,15 @@ export default function CheckoutPage() {
                   </a>
                 )}
 
-                {/* 3. Sync & Confirm Completed Payment */}
                 <button
                   type="button"
-                  onClick={handleSimulateWebhook}
-                  disabled={isProcessingPayment}
-                  className="w-full py-2.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold bg-gray-50 text-[var(--ink)] border border-gray-200 hover:bg-gray-100 transition-colors disabled:opacity-50"
+                  onClick={() => {
+                    setShowSnapModal(false);
+                    setIsProcessingPayment(false);
+                  }}
+                  className="w-full py-2 text-xs text-[var(--ink-soft)] hover:text-[var(--forest-deep)] font-bold text-center cursor-pointer transition-colors"
                 >
-                  {isProcessingPayment ? (
-                    <>
-                      <div className="h-3.5 w-3.5 border-2 border-[var(--forest)] border-t-transparent rounded-full animate-spin" />
-                      <span>Memproses Konfirmasi...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
-                      <span>Konfirmasi Lunas / Selesai Bayar</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setShowSnapModal(false)}
-                  disabled={isProcessingPayment}
-                  className="w-full py-2 text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] font-medium text-center"
-                >
-                  Tutup / Kembali
+                  Batal / Ganti Metode Pembayaran
                 </button>
               </div>
 
