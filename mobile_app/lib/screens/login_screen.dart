@@ -76,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
       behavior: HitTestBehavior.opaque,
       child: Scaffold(
         extendBodyBehindAppBar: true,
+        backgroundColor: const Color(0xFFF9F9F8),
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -102,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.leaf.withValues(alpha: 0.4),
+                  color: AppColors.orbMint,
                 ),
               ),
             ),
@@ -114,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 350,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.gold.withValues(alpha: 0.3),
+                  color: AppColors.orbGold,
                 ),
               ),
             ),
@@ -126,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.forestDeep.withValues(alpha: 0.2),
+                  color: AppColors.orbEmerald,
                 ),
               ),
             ),
@@ -136,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
                 child: Container(
-                  color: AppColors.canvas.withValues(alpha: 0.6),
+                  color: Colors.transparent,
                 ),
               ),
             ),
@@ -157,17 +158,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 76,
                           height: 76,
                           decoration: BoxDecoration(
-                            color: AppColors.forestDeep.withValues(alpha: 0.9),
+                            color: AppColors.success,
                             borderRadius: BorderRadius.circular(AppRadius.xl),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.forestDeep.withValues(alpha: 0.3),
+                                color: AppColors.success.withValues(alpha: 0.3),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
                             ],
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: AppColors.glassBorder,
                               width: 1.5,
                             ),
                           ),
@@ -236,15 +237,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.6),
+                              color: AppColors.glassWhiteSolid,
                               borderRadius: BorderRadius.circular(AppRadius.xl),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.8),
+                                color: AppColors.glassBorder,
                                 width: 1.5,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.05),
+                                  color: AppColors.glassShadow,
                                   blurRadius: 24,
                                   offset: const Offset(0, 8),
                                 ),
@@ -271,7 +272,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     hintText: 'budi@gmail.com',
                                     prefixIcon: const Icon(Icons.email_outlined, color: AppColors.forestSoft, size: 20),
                                     filled: true,
-                                    fillColor: Colors.white.withValues(alpha: 0.7),
+                                    fillColor: AppColors.glassWhiteSoft,
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -279,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(AppRadius.md),
-                                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+                                      borderSide: BorderSide(color: AppColors.glassBorder),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -318,7 +319,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       },
                                     ),
                                     filled: true,
-                                    fillColor: Colors.white.withValues(alpha: 0.7),
+                                    fillColor: AppColors.glassWhiteSoft,
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -326,7 +327,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(AppRadius.md),
-                                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+                                      borderSide: BorderSide(color: AppColors.glassBorder),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(AppRadius.md),
@@ -425,20 +426,20 @@ class _LoginScreenState extends State<LoginScreen> {
                               ActionChip(
                                 avatar: const Icon(Icons.forest_rounded, size: 16, color: AppColors.forestDeep),
                                 label: const Text('Citambur (budi)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
-                                backgroundColor: Colors.white.withValues(alpha: 0.7),
+                                backgroundColor: AppColors.glassWhiteSoft,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(AppRadius.sm),
-                                  side: BorderSide(color: Colors.white.withValues(alpha: 0.8)),
+                                  side: BorderSide(color: AppColors.glassBorder),
                                 ),
                                 onPressed: () => _fillDemoAccount('budi@gmail.com', 'admin123'),
                               ),
                               ActionChip(
                                 avatar: const Icon(Icons.terrain_rounded, size: 16, color: AppColors.bark),
                                 label: const Text('Cikanteh (kiano)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
-                                backgroundColor: Colors.white.withValues(alpha: 0.7),
+                                backgroundColor: AppColors.glassWhiteSoft,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(AppRadius.sm),
-                                  side: BorderSide(color: Colors.white.withValues(alpha: 0.8)),
+                                  side: BorderSide(color: AppColors.glassBorder),
                                 ),
                                 onPressed: () => _fillDemoAccount('kiano@gmail.com', 'admin123'),
                               ),
