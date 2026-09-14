@@ -225,7 +225,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
           // 3. Top Action Bar (Frosted Glass)
           SafeArea(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -254,11 +254,11 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
-                              margin: const EdgeInsets.only(right: 6),
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+                              margin: const EdgeInsets.only(right: 5),
                               decoration: BoxDecoration(
                                 color: _isContinuousMode
-                                    ? AppColors.forestSoft.withValues(alpha: 0.85)
+                                    ? AppColors.forestSoft.withValues(alpha: 0.9)
                                     : Colors.black.withValues(alpha: 0.4),
                                 borderRadius: BorderRadius.circular(AppRadius.xl),
                                 border: Border.all(
@@ -274,14 +274,14 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                   Icon(
                                     _isContinuousMode ? Icons.bolt_rounded : Icons.view_agenda_rounded,
                                     color: _isContinuousMode ? AppColors.success : AppColors.forestDeep,
-                                    size: 14,
+                                    size: 13,
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 3),
                                   Text(
                                     _isContinuousMode ? 'KONTINU' : 'DETAIL',
                                     style: TextStyle(
                                       color: _isContinuousMode ? AppColors.success : AppColors.forestDeep,
-                                      fontSize: 10.5,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
@@ -303,7 +303,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                           child: BackdropFilter(
                             filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
                               decoration: BoxDecoration(
                                 color: scannerProvider.forceOfflineMode
                                     ? AppColors.warningBg
@@ -320,14 +320,14 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                   Icon(
                                     scannerProvider.forceOfflineMode ? Icons.cloud_off_rounded : Icons.cloud_done_rounded,
                                     color: scannerProvider.forceOfflineMode ? AppColors.warning : AppColors.forestDeep,
-                                    size: 14,
+                                    size: 13,
                                   ),
-                                  const SizedBox(width: 4),
+                                  const SizedBox(width: 3),
                                   Text(
                                     scannerProvider.forceOfflineMode ? 'OFFLINE' : 'ONLINE',
                                     style: TextStyle(
                                       color: scannerProvider.forceOfflineMode ? AppColors.warning : AppColors.forestDeep,
-                                      fontSize: 10.5,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
@@ -340,48 +340,36 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                     ],
                   ),
 
-                  // Torch & Switch Camera Controls (Frosted Glass Buttons)
+                  // Quick Controls: Torch, Flip, More
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildFrostedCircleButton(
                         icon: scannerProvider.isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
                         color: scannerProvider.isTorchOn ? AppColors.gold : Colors.white,
+                        tooltip: 'Flashlight',
                         onTap: () {
                           HapticFeedback.selectionClick();
                           _scannerController.toggleTorch();
                           scannerProvider.toggleTorch();
                         },
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       _buildFrostedCircleButton(
                         icon: Icons.flip_camera_ios_rounded,
                         color: Colors.white,
+                        tooltip: 'Ganti Kamera',
                         onTap: () {
                           HapticFeedback.selectionClick();
                           _scannerController.switchCamera();
                         },
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 5),
                       _buildFrostedCircleButton(
-                        icon: Icons.qr_code_scanner_rounded,
-                        color: AppColors.leafPale,
-                        tooltip: 'Pairing Gerbang',
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
-                          );
-                        },
-                      ),
-                      const SizedBox(width: 6),
-                      _buildFrostedCircleButton(
-                        icon: Icons.edit_note_rounded,
+                        icon: Icons.more_vert_rounded,
                         color: Colors.white,
-                        tooltip: 'Input Kode Manual',
-                        onTap: () {
-                          HapticFeedback.selectionClick();
-                          _showManualInputDialog();
-                        },
+                        tooltip: 'Menu Lainnya',
+                        onTap: _showMoreOptionsMenu,
                       ),
                     ],
                   ),
@@ -392,9 +380,9 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
 
           // 4. Instructions & Scan Target Text (Frosted Glass Card)
           Positioned(
-            top: screenSize.height * 0.42 + (scanWindowSize / 2) + 18,
-            left: 24,
-            right: 24,
+            top: screenSize.height * 0.42 + (scanWindowSize / 2) + 14,
+            left: 20,
+            right: 20,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(AppRadius.lg),
               child: BackdropFilter(
@@ -410,13 +398,14 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                     ),
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Text(
                         'Arahkan kamera ke QR Code Tiket Pengunjung',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 13,
+                          fontSize: 12.5,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -428,8 +417,35 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 11.5,
+                          fontSize: 11,
                           fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      InkWell(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          _showManualInputDialog();
+                        },
+                        borderRadius: BorderRadius.circular(6),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.keyboard_outlined, size: 14, color: AppColors.leafPale),
+                              SizedBox(width: 4),
+                              Text(
+                                'Ada kendala scan? Input Kode Manual',
+                                style: TextStyle(
+                                  color: AppColors.leafPale,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -534,9 +550,92 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
     );
   }
 
+  void _showMoreOptionsMenu() {
+    HapticFeedback.selectionClick();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                'Menu Operasional Gerbang',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.forestDeep,
+                ),
+              ),
+              const SizedBox(height: 14),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.forestSoft,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.edit_note_rounded, color: AppColors.forestDeep, size: 22),
+                ),
+                title: const Text('Input Kode Tiket Manual', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                subtitle: const Text('Ketik kode jika tiket fisik basah / barcode tidak terbaca', style: TextStyle(fontSize: 11.5)),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _showManualInputDialog();
+                },
+              ),
+              const Divider(height: 12),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.forestSoft,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.qr_code_scanner_rounded, color: AppColors.forestDeep, size: 22),
+                ),
+                title: const Text('Pairing Gerbang Turnstile', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                subtitle: const Text('Sinkronkan smartphone dengan barrier gate gerbang IoT', style: TextStyle(fontSize: 11.5)),
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildFrostedCircleButton({
     required IconData icon,
     required Color color,
+    double size = 36,
     String? tooltip,
     required VoidCallback onTap,
   }) {
@@ -544,8 +643,8 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          width: 40,
-          height: 40,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.42),
             shape: BoxShape.circle,
@@ -556,7 +655,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
           ),
           child: IconButton(
             padding: EdgeInsets.zero,
-            icon: Icon(icon, color: color, size: 20),
+            icon: Icon(icon, color: color, size: size * 0.52),
             tooltip: tooltip,
             onPressed: onTap,
           ),
