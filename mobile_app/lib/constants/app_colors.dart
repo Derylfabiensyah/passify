@@ -30,6 +30,17 @@ class AppColors {
   static const Color darkInkSoft = Color(0xFFD4D8C4);
   static const Color darkTextMuted = Color(0xFF9EA48E);
 
+  // Premium Light Glassmorphism Tokens
+  static const Color glassWhiteSoft = Color(0x99FFFFFF); // White with 60% opacity
+  static const Color glassWhiteSolid = Color(0xCCFFFFFF); // White with 80% opacity
+  static const Color glassBorder = Color(0xE6FFFFFF); // White with 90% opacity
+  static const Color glassShadow = Color(0x0A000000); // Very subtle black shadow
+
+  // Gradient Orb Colors for Light Background
+  static const Color orbEmerald = Color(0x3310B981); // Soft vibrant emerald
+  static const Color orbGold = Color(0x22D4AF37); // Soft gold
+  static const Color orbMint = Color(0x446EE7B7); // Bright mint
+
   // Status & Feedback
   static const Color success = Color(0xFF257335);
   static const Color successBg = Color(0xFFE8F5E9);
