@@ -279,7 +279,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                   const SizedBox(width: 4),
                                   Text(
                                     _isContinuousMode ? 'KONTINU' : 'DETAIL',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: _isContinuousMode ? AppColors.success : AppColors.forestDeep,
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w800,
@@ -325,8 +325,8 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                                   const SizedBox(width: 4),
                                   Text(
                                     scannerProvider.forceOfflineMode ? 'OFFLINE' : 'ONLINE',
-                                    style: const TextStyle(
-                                      color: _isContinuousMode ? AppColors.success : AppColors.forestDeep,
+                                    style: TextStyle(
+                                      color: scannerProvider.forceOfflineMode ? AppColors.warning : AppColors.forestDeep,
                                       fontSize: 10.5,
                                       fontWeight: FontWeight.w800,
                                     ),

@@ -202,7 +202,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 elevation: 0,
                 actions: [
                   IconButton(
-                    icon: const Icon(Icons.settings_outlined, color: AppColors.forestDeep70, size: 21),
+                    icon: const Icon(Icons.settings_outlined, color: AppColors.forestDeep, size: 21),
                     tooltip: 'Pengaturan Server',
                     onPressed: () {
                       Navigator.of(context).push(
