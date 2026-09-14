@@ -149,6 +149,7 @@ export default function AdminLayout({ children }) {
   const { toast } = useToast();
   const { slug: currentSlug } = useTenant();
 
+  const adminUser = getAdminUser();
   const activeTenant = getActiveAdminTenant();
   const activeTenantSlug = activeTenant.slug || currentSlug || 'curug-cikanteh';
 
