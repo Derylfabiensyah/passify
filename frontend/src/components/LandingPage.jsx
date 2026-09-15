@@ -40,9 +40,54 @@ function SectionHeading({ eyebrow, title, children, className = '' }) {
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [legalModal, setLegalModal] = useState({ open: false, type: 'privacy' });
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeSection, setActiveSection] = useState('');
 
   const openLegal = (type) => {
     setLegalModal({ open: true, type });
+  };
+
+  // Track window scroll for dynamic floating navbar, progress bar, and active section
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 20);
+
+      // Calculate scroll progress percentage (0 - 100)
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      if (docHeight > 0) {
+        setScrollProgress(Math.min(100, Math.max(0, (scrollY / docHeight) * 100)));
+      }
+
+      // Determine active section
+      const sections = ['masalah', 'alur', 'white-label', 'contact'];
+      let currentSection = '';
+      for (const sectionId of sections) {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const top = el.getBoundingClientRect().top;
+          if (top <= 140) {
+            currentSection = sectionId;
+          }
+        }
+      }
+      setActiveSection(currentSection);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Smooth scroll handler for anchor links
+  const handleNavClick = (e, targetId) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // Close drawer on Escape key and handle body scroll lock
@@ -65,32 +110,75 @@ export default function LandingPage() {
   }, [mobileMenuOpen]);
 
   const navLinks = [
-    { label: 'Kawasan', href: '#masalah' },
-    { label: 'Cara kerja', href: '#alur' },
-    { label: 'White-label', href: '#white-label' },
+    { label: 'Kawasan', href: '#masalah', id: 'masalah' },
+    { label: 'Cara kerja', href: '#alur', id: 'alur' },
+    { label: 'White-label', href: '#white-label', id: 'white-label' },
+    { label: 'Kontak', href: '#contact', id: 'contact' },
   ];
 
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-transparent text-[var(--ink)]">
-      <header className="sticky top-0 z-40 border-b border-white/80 bg-white/85 backdrop-blur-2xl shadow-xs transition-all">
-        <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="text-2xl font-black tracking-[-.05em] text-[#14281a] no-underline" aria-label="Passify beranda">
-            passify
+      {/* Dynamic Sticky/Fixed Header */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled
+            ? 'bg-white/95 backdrop-blur-xl border-b border-stone-200/90 shadow-md shadow-emerald-950/5'
+            : 'bg-white/85 backdrop-blur-lg border-b border-white/80 shadow-xs'
+        }`}
+      >
+        <div
+          className={`mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8 transition-all duration-300 ${
+            isScrolled ? 'min-h-[58px] py-1.5' : 'min-h-[68px] py-3'
+          }`}
+        >
+          <Link
+            to="/"
+            className="text-2xl font-black tracking-[-.05em] text-[#14281a] no-underline group flex items-center gap-2"
+            aria-label="Passify beranda"
+          >
+            <span>passify</span>
+            {isScrolled && (
+              <span className="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 tracking-wide uppercase border border-emerald-200/70 animate-in fade-in duration-300">
+                SaaS
+              </span>
+            )}
           </Link>
 
-          <nav className="hidden items-center gap-6 text-xs font-bold text-[#14281a] lg:flex" aria-label="Navigasi utama">
-            {navLinks.map((link, idx) => (
-              <a key={idx} href={link.href} className="transition-colors hover:text-emerald-700">
-                {link.label}
-              </a>
-            ))}
+          <nav className="hidden items-center gap-1.5 text-xs font-bold text-[#14281a] lg:flex" aria-label="Navigasi utama">
+            {navLinks.map((link, idx) => {
+              const isActive = activeSection === link.id;
+              return (
+                <a
+                  key={idx}
+                  href={link.href}
+                  onClick={(e) => handleNavClick(e, link.id)}
+                  className={`px-3.5 py-1.5 rounded-full transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? 'bg-emerald-100/90 text-emerald-800 font-black shadow-2xs border border-emerald-200/50'
+                      : 'text-[#14281a]/80 hover:text-emerald-800 hover:bg-white/70'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <Link to="/jelajah" className="hidden text-xs font-bold text-[#14281a] transition-colors hover:text-emerald-700 sm:inline">
+            <Link
+              to="/jelajah"
+              className="hidden text-xs font-bold text-[#14281a] transition-colors hover:text-emerald-700 sm:inline px-3 py-1.5 rounded-xl hover:bg-white/50"
+            >
               Jelajah Wisata
             </Link>
-            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px] font-bold shadow-xs">
+            <Link
+              to="/daftar-wisata"
+              className={`btn-primary whitespace-nowrap rounded-xl font-bold shadow-xs transition-all duration-200 ${
+                isScrolled
+                  ? 'px-3 py-2 text-[11px] sm:px-3.5 sm:text-xs'
+                  : 'px-3 py-2.5 text-[11px] sm:px-4 sm:text-[13px]'
+              }`}
+            >
               Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
 
@@ -106,6 +194,13 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
+
+        {/* Dynamic scroll reading progress indicator */}
+        <div
+          className="absolute bottom-0 left-0 h-[2.5px] bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 transition-all duration-150"
+          style={{ width: `${scrollProgress}%` }}
+          aria-hidden="true"
+        />
 
         {/* Mobile Slide-Over Navigation Drawer */}
         {mobileMenuOpen && (
@@ -143,17 +238,24 @@ export default function LandingPage() {
                 <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-muted)] px-3 mb-2">
                   Navigasi Halaman
                 </div>
-                {navLinks.map((link, idx) => (
-                  <a
-                    key={idx}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
-                  >
-                    <span>{link.label}</span>
-                    <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
-                  </a>
-                ))}
+                {navLinks.map((link, idx) => {
+                  const isActive = activeSection === link.id;
+                  return (
+                    <a
+                      key={idx}
+                      href={link.href}
+                      onClick={(e) => handleNavClick(e, link.id)}
+                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
+                        isActive
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'text-[var(--ink)] hover:text-[var(--forest)] hover:bg-emerald-50/50'
+                      }`}
+                    >
+                      <span>{link.label}</span>
+                      <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
+                    </a>
+                  );
+                })}
 
                 <div className="pt-4 mt-4 border-t border-[var(--border)]">
                   <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-muted)] px-3 mb-2">
@@ -208,6 +310,9 @@ export default function LandingPage() {
           </div>
         )}
       </header>
+
+      {/* Spacer to offset fixed navbar */}
+      <div className={`transition-all duration-300 ${isScrolled ? 'h-[58px]' : 'h-[68px]'}`} aria-hidden="true" />
 
       <main>
         <section className="relative isolate overflow-hidden bg-[var(--forest-deep)] text-white">
@@ -428,7 +533,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section id="contact" className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
+        <section id="contact" className="scroll-mt-24 mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
           <div className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]">
             <img src={trailImage} alt="Jalur hutan yang tenang" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-60 saturate-[.85]" />
             <div aria-hidden="true" className="absolute inset-0 -z-10" style={{ backgroundImage: 'linear-gradient(90deg, rgba(16,45,32,.92), rgba(16,45,32,.72), rgba(16,45,32,.35))' }} />
