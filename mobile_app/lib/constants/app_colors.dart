@@ -34,12 +34,13 @@ class AppColors {
   static const Color glassWhiteSoft = Color(0x99FFFFFF); // White with 60% opacity
   static const Color glassWhiteSolid = Color(0xCCFFFFFF); // White with 80% opacity
   static const Color glassBorder = Color(0xE6FFFFFF); // White with 90% opacity
-  static const Color glassShadow = Color(0x0A000000); // Very subtle black shadow
+  static const Color glassShadow = Color(0x12000000); // Ambient soft shadow
 
-  // Gradient Orb Colors for Light Background
-  static const Color orbEmerald = Color(0x3310B981); // Soft vibrant emerald
-  static const Color orbGold = Color(0x22D4AF37); // Soft gold
-  static const Color orbMint = Color(0x446EE7B7); // Bright mint
+  // Gradient Orb Colors for Atmospheric Light Glass Refraction
+  static const Color orbEmerald = Color(0x5510B981); // Vibrant Emerald (33% opacity)
+  static const Color orbMint = Color(0x4D06B6D4); // Vibrant Cyan/Mint
+  static const Color orbGold = Color(0x44F59E0B); // Warm Amber/Gold
+  static const Color orbLime = Color(0x3D84CC16); // Soft Forest Lime
 
   // Status & Feedback
   static const Color success = Color(0xFF257335);
