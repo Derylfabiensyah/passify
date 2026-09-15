@@ -30,6 +30,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
 
   bool _isModalShowing = false;
   bool _isContinuousMode = true; // Continuous HUD Mode by default for high throughput
+  int _quarterTurns = 0; // Manual rotation correction (0, 90, 180, 270) if sensor hardware requires it
   ValidateResultModel? _hudResult;
   Timer? _hudTimer;
   String? _lastScannedPayload;
@@ -212,11 +213,14 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
       backgroundColor: Colors.black,
       body: Stack(
         children: [
-          // 1. Mobile Scanner View
-          MobileScanner(
-            controller: _scannerController,
-            scanWindow: scanWindow,
-            onDetect: _onDetect,
+          // 1. Mobile Scanner View (with rotation offset if device sensor needs correction)
+          RotatedBox(
+            quarterTurns: _quarterTurns,
+            child: MobileScanner(
+              controller: _scannerController,
+              scanWindow: scanWindow,
+              onDetect: _onDetect,
+            ),
           ),
 
           // 2. Custom Overlay & Reticle
@@ -623,6 +627,39 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
                   );
+                },
+              ),
+              const Divider(height: 12),
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.forestSoft,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.rotate_90_degrees_cw_rounded, color: AppColors.forestDeep, size: 22),
+                ),
+                title: const Text('Koreksi Putar Kamera (90°)', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                subtitle: Text('Sudut saat ini: ${_quarterTurns * 90}° • Klik untuk memutar viewfinder 90°', style: const TextStyle(fontSize: 11.5)),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.forestSoft,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '${_quarterTurns * 90}°',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.forestDeep),
+                  ),
+                ),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  setState(() {
+                    _quarterTurns = (_quarterTurns + 1) % 4;
+                  });
+                  Navigator.of(ctx).pop();
                 },
               ),
             ],
