@@ -1,15 +1,18 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiEndpoints {
-  // Default host for development (can be configured in app settings)
-  // 10.0.2.2 for Android Emulator, 192.168.18.87 for physical devices on same Wi-Fi
-  static const String defaultHost = '192.168.18.87';
+  // Default host for development (current Wi-Fi IP: 192.168.0.135)
+  static const String defaultHost = '192.168.0.135';
 
   static const String prefHostKey = 'passify_server_host';
 
   static Future<String> getHost() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(prefHostKey) ?? defaultHost;
+    final saved = prefs.getString(prefHostKey);
+    if (saved == null || saved == '192.168.18.87') {
+      return defaultHost;
+    }
+    return saved;
   }
 
   static Future<void> setHost(String host) async {

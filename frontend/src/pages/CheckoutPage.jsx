@@ -28,6 +28,7 @@ import { fetchAdminQuotas } from '../api/admin';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
 import WalletModal from '../components/WalletModal';
+import ETicketModal from '../components/ETicketModal';
 import { useToast } from '../contexts/ToastContext';
 
 const getPaymentDeadline = (slug) => {
@@ -98,6 +99,7 @@ export default function CheckoutPage() {
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showSnapModal, setShowSnapModal] = useState(false);
+  const [showETicketModal, setShowETicketModal] = useState(false);
   const [snapData, setSnapData] = useState(null);
 
   useEffect(() => {
@@ -511,6 +513,45 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Real-time live gate scan status polling for Step 3 (Success Screen)
+  useEffect(() => {
+    if (step !== 3 || !completedOrder || completedOrder.status === 'used') return;
+    const codeToPoll = completedOrder.ticketCode || completedOrder.orderNumber;
+    if (!codeToPoll) return;
+
+    const checkLiveScanStatus = async () => {
+      try {
+        let res = await fetch(`http://localhost:8086/api/v1/gate/status/${codeToPoll}`);
+        if (!res.ok && completedOrder.orderNumber && completedOrder.orderNumber !== codeToPoll) {
+          res = await fetch(`http://localhost:8086/api/v1/gate/status/${completedOrder.orderNumber}`);
+        }
+        if (res.ok) {
+          const resJson = await res.json();
+          if (resJson?.data?.status === 'used') {
+            const usedAt = resJson.data.used_at || new Date().toISOString();
+            setCompletedOrder((prev) => (prev ? { ...prev, status: 'used', usedAt } : prev));
+            try {
+              const raw = localStorage.getItem('passify_my_tickets');
+              if (raw) {
+                const list = JSON.parse(raw);
+                const updated = list.map((t) =>
+                  t.orderNumber === completedOrder.orderNumber || t.ticketCode === codeToPoll
+                    ? { ...t, status: 'used', usedAt }
+                    : t
+                );
+                localStorage.setItem('passify_my_tickets', JSON.stringify(updated));
+                window.dispatchEvent(new Event('storage'));
+              }
+            } catch (_) {}
+          }
+        }
+      } catch (_) {}
+    };
+
+    const interval = setInterval(checkLiveScanStatus, 2000);
+    return () => clearInterval(interval);
+  }, [step, completedOrder]);
+
   // Helper to trigger official Midtrans Snap Popup
   const openSnapPopup = (token, redirectUrl, ordData) => {
     // Real Midtrans Snap tokens are UUID/hex strings. Tokens starting with "SNAP-" are local simulation fallbacks.
@@ -582,7 +623,7 @@ export default function CheckoutPage() {
       const orderData = {
         orderNumber,
         ticketId: `tkt-${Math.random().toString(36).substring(2, 9)}`,
-        ticketCode: `TWA-QR-${Math.floor(10000 + Math.random() * 90000)}`,
+        ticketCode: orderNumber,
         destinationId: destination.id,
         destinationSlug: destination.slug,
         destinationName: destination.name,
@@ -1395,20 +1436,42 @@ export default function CheckoutPage() {
           <div className="max-w-xl mx-auto py-8">
             <div className="rounded-2xl glass-panel p-8 sm:p-10 shadow-sm text-center space-y-6">
               {/* Success Badge Icon */}
-              <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-50 text-emerald-600 shadow-sm animate-bounce-short">
-                <CheckCircle2 className="h-10 w-10" />
-              </div>
+              {completedOrder.status === 'used' ? (
+                <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-blue-50 text-blue-600 shadow-sm animate-bounce-short">
+                  <CheckCircle2 className="h-10 w-10" />
+                </div>
+              ) : (
+                <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-50 text-emerald-600 shadow-sm animate-bounce-short">
+                  <CheckCircle2 className="h-10 w-10" />
+                </div>
+              )}
 
               <div className="space-y-2">
-                <span className="inline-block rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[var(--forest)]">
-                  Pembayaran Berhasil
-                </span>
-                <h1 className="text-2xl sm:text-3xl font-bold text-[var(--forest-deep)]">
-                  Tiket Siap Digunakan!
-                </h1>
-                <p className="text-xs text-[var(--ink-soft)] max-w-md mx-auto">
-                  Terima kasih! Tiket kunjungan Anda telah diterbitkan dengan kode reservasi di bawah ini.
-                </p>
+                {completedOrder.status === 'used' ? (
+                  <>
+                    <span className="inline-block rounded-full bg-blue-100 text-blue-800 px-3 py-1 text-xs font-extrabold uppercase tracking-wider">
+                      Selesai Dipindai di Gerbang
+                    </span>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--forest-deep)]">
+                      Tiket Telah Digunakan
+                    </h1>
+                    <p className="text-xs text-[var(--ink-soft)] max-w-md mx-auto">
+                      Tiket ini telah berhasil dipindai dan diverifikasi masuk oleh petugas gerbang. Selamat menikmati kunjungan wisata Anda!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <span className="inline-block rounded-full bg-[var(--leaf-pale)] px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[var(--forest)]">
+                      Pembayaran Berhasil
+                    </span>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-[var(--forest-deep)]">
+                      Tiket Siap Digunakan!
+                    </h1>
+                    <p className="text-xs text-[var(--ink-soft)] max-w-md mx-auto">
+                      Terima kasih! Tiket kunjungan Anda telah diterbitkan dengan kode reservasi di bawah ini.
+                    </p>
+                  </>
+                )}
               </div>
 
               {/* Order Info Card */}
@@ -1416,6 +1479,18 @@ export default function CheckoutPage() {
                 <div className="flex justify-between border-b border-gray-200/60 pb-2">
                   <span className="text-[var(--ink-soft)] font-medium">Nomor Reservasi</span>
                   <strong className="font-mono text-sm text-[var(--forest-deep)]">{completedOrder.orderNumber}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--ink-soft)]">Status Tiket</span>
+                  {completedOrder.status === 'used' ? (
+                    <span className="inline-flex items-center gap-1 font-bold text-blue-700">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Sudah Dipindai di Gate
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 font-bold text-emerald-700">
+                      <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" /> Siap Digunakan
+                    </span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--ink-soft)]">Destinasi</span>
@@ -1448,22 +1523,39 @@ export default function CheckoutPage() {
 
               {/* Action Buttons as requested by User */}
               <div className="space-y-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowETicketModal(true)}
+                  className="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md cursor-pointer"
+                >
+                  <QrCode className="h-4 w-4" />
+                  <span>{completedOrder.status === 'used' ? 'Lihat Bukti E-Ticket' : 'Buka E-Ticket Digital (Live Dynamic QR)'}</span>
+                </button>
+
                 <Link
                   to="/riwayat-pesanan"
-                  className="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-extrabold shadow-md no-underline"
+                  className="w-full btn-secondary py-3.5 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold shadow-xs no-underline"
                 >
                   <Ticket className="h-4 w-4" /> Lihat Tiket di Riwayat Saya
                 </Link>
 
                 <Link
                   to={tenantPortalUrl}
-                  className="w-full btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold no-underline"
+                  className="w-full btn-secondary py-3 rounded-2xl flex items-center justify-center gap-2 text-xs font-bold no-underline opacity-85 hover:opacity-100"
                 >
                   Kembali ke {tenantPortalName}
                 </Link>
               </div>
             </div>
           </div>
+        )}
+
+        {/* E-Ticket Dynamic QR Modal Triggered from Step 3 */}
+        {showETicketModal && completedOrder && (
+          <ETicketModal
+            order={completedOrder}
+            onClose={() => setShowETicketModal(false)}
+          />
         )}
 
         {/* Midtrans Snap Checkout Modal (Direct / Fallback / Sandbox) */}
