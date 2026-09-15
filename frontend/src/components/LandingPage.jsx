@@ -84,7 +84,7 @@ export default function LandingPage() {
   return (
     <div className="landing-page min-h-screen overflow-x-hidden bg-transparent text-[var(--ink)]">
       {/* Sticky / Fixed Navbar that follows on scroll without changing appearance */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/80 bg-white/85 backdrop-blur-2xl shadow-xs transition-all">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/60 bg-white/65 backdrop-blur-xl backdrop-saturate-150 shadow-xs transition-all">
         <div className="mx-auto flex min-h-[68px] max-w-[1240px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
           <Link to="/" className="text-2xl font-black tracking-[-.05em] text-[#14281a] no-underline" aria-label="Passify beranda">
             passify

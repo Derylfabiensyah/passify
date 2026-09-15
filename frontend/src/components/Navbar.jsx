@@ -65,7 +65,7 @@ export default function Navbar({
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 px-4 lg:px-8 py-3.5 bg-white/85 backdrop-blur-lg border-b border-gray-200/80 shadow-2xs transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 z-50 px-4 lg:px-8 py-3.5 bg-white/65 backdrop-blur-xl backdrop-saturate-150 border-b border-white/60 shadow-xs transition-all duration-300">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
         {/* Brand - B2B/B2G Enterprise SaaS Logo */}
         <Link to="/" className="flex items-center gap-3 decoration-none group flex-shrink-0">
