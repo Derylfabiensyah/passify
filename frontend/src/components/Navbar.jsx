@@ -27,16 +27,6 @@ export default function Navbar({
   onLogout
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleScrollTo = (id) => {
     setMobileMenuOpen(false);
@@ -75,13 +65,7 @@ export default function Navbar({
   ];
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 px-4 lg:px-8 transition-all duration-300 ${
-        isScrolled
-          ? 'py-2.5 bg-white/95 backdrop-blur-xl border-b border-stone-200/90 shadow-md shadow-emerald-950/5'
-          : 'py-3.5 bg-white/85 backdrop-blur-lg border-b border-gray-200/80 shadow-2xs'
-      }`}
-    >
+    <header className="fixed top-0 left-0 right-0 z-50 px-4 lg:px-8 py-3.5 bg-white/85 backdrop-blur-lg border-b border-gray-200/80 shadow-2xs transition-all duration-300">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
         {/* Brand - B2B/B2G Enterprise SaaS Logo */}
         <Link to="/" className="flex items-center gap-3 decoration-none group flex-shrink-0">
