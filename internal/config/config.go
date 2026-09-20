@@ -30,8 +30,7 @@ type Config struct {
 	CashlessServicePort string
 	GateServicePort    string
 
-	// Payment Gateway
-	PaymentGateway      string
+	// Payment Gateway (Midtrans)
 	XenditSecretKey     string
 	XenditWebhookToken  string
 	MidtransServerKey   string
@@ -40,11 +39,6 @@ type Config struct {
 
 	// Platform Fee
 	PlatformFeePerTicket float64
-
-	// QR / TOTP
-	QRTOTPIssuer  string
-	QRTOTPPeriod  int
-	QRHMACSecret  string
 
 	// CORS
 	CORSAllowedOrigins []string
@@ -127,7 +121,6 @@ func Load() (*Config, error) {
 		CashlessServicePort: getEnv("CASHLESS_SERVICE_PORT", "8085"),
 		GateServicePort:    getEnv("GATE_SERVICE_PORT", "8086"),
 
-		PaymentGateway:     getEnv("PAYMENT_GATEWAY", "xendit"),
 		XenditSecretKey:    getEnv("XENDIT_SECRET_KEY", ""),
 		XenditWebhookToken: getEnv("XENDIT_WEBHOOK_TOKEN", ""),
 		MidtransServerKey:    getEnv("MIDTRANS_SERVER_KEY", ""),
@@ -135,10 +128,6 @@ func Load() (*Config, error) {
 		MidtransIsProduction: getEnvBool("MIDTRANS_IS_PRODUCTION", false),
 
 		PlatformFeePerTicket: getEnvFloat("PLATFORM_FEE_PER_TICKET", 2500),
-
-		QRTOTPIssuer: getEnv("QR_TOTP_ISSUER", "TiketWisataAlam"),
-		QRTOTPPeriod: getEnvInt("QR_TOTP_PERIOD", 30),
-		QRHMACSecret: getEnv("QR_HMAC_SECRET", "change-me-hmac-secret"),
 
 		CORSAllowedOrigins: strings.Split(getEnv("CORS_ALLOWED_ORIGINS", "http://localhost:3000"), ","),
 	}
