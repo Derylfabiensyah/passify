@@ -46,15 +46,3 @@ func NewPostgresConnection(cfg *config.DatabaseConfig, appEnv string) (*gorm.DB,
 	log.Println("✅ PostgreSQL connected successfully")
 	return db, nil
 }
-
-// SetTenantContext sets the current tenant ID for Row-Level Security (RLS)
-// This must be called at the beginning of each request that needs tenant isolation
-func SetTenantContext(db *gorm.DB, tenantID string) *gorm.DB {
-	return db.Exec(fmt.Sprintf("SET app.current_tenant_id = '%s'", tenantID))
-}
-
-// WithTenantScope returns a GORM session scoped to a specific tenant
-// This is used as an alternative to RLS when RLS policies are bypassed (e.g., superadmin)
-func WithTenantScope(db *gorm.DB, tenantID string) *gorm.DB {
-	return db.Where("tenant_id = ?", tenantID)
-}
