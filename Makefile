@@ -9,7 +9,7 @@ help: ## Show this help
 # ==============================================================================
 # Infrastructure
 # ==============================================================================
-infra-up: ## Start PostgreSQL, Redis, RabbitMQ via Docker Compose
+infra-up: ## Start PostgreSQL and Redis via Docker Compose
 	docker compose up -d
 
 infra-down: ## Stop all infrastructure containers
