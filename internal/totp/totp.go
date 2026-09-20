@@ -2,6 +2,7 @@ package totp
 
 import (
 	"crypto/rand"
+	"encoding/base32"
 	"encoding/hex"
 	"fmt"
 	"time"
@@ -124,28 +125,7 @@ func SecondsUntilRefresh() int {
 	return TOTPPeriod - (int(time.Now().Unix()) % TOTPPeriod)
 }
 
-// base32Encode encodes bytes to uppercase base32 without padding
+// base32Encode encodes bytes to uppercase base32 without padding using standard library
 func base32Encode(src []byte) string {
-	const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"
-	var encoded []byte
-	for i := 0; i < len(src); i += 5 {
-		chunk := make([]byte, 5)
-		copy(chunk, src[i:])
-		encoded = append(encoded,
-			alphabet[chunk[0]>>3],
-			alphabet[(chunk[0]&0x07)<<2|(chunk[1]>>6)],
-			alphabet[(chunk[1]&0x3f)>>1],
-			alphabet[(chunk[1]&0x01)<<4|(chunk[2]>>4)],
-			alphabet[(chunk[2]&0x0f)<<1|(chunk[3]>>7)],
-			alphabet[(chunk[3]&0x7f)>>2],
-			alphabet[(chunk[3]&0x03)<<3|(chunk[4]>>5)],
-			alphabet[chunk[4]&0x1f],
-		)
-	}
-	// Trim to exact length
-	exactLen := (len(src)*8 + 4) / 5
-	if exactLen > len(encoded) {
-		exactLen = len(encoded)
-	}
-	return string(encoded[:exactLen])
+	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(src)
 }
