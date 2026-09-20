@@ -11,11 +11,11 @@ import (
 
 // GateHandler handles HTTP requests for Gate Access Control Service
 type GateHandler struct {
-	service GateService
+	service *GateService
 }
 
 // NewGateHandler creates a new instance of GateHandler
-func NewGateHandler(service GateService) *GateHandler {
+func NewGateHandler(service *GateService) *GateHandler {
 	return &GateHandler{service: service}
 }
 

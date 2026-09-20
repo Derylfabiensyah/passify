@@ -80,33 +80,14 @@ type UpdateDestinationRequest struct {
 	IsActive         *bool               `json:"is_active"`
 }
 
-// TenantService interface defines business logic operations
-type TenantService interface {
-	CreateTenant(req CreateTenantRequest) (*models.Tenant, error)
-	GetTenant(id uuid.UUID) (*models.Tenant, error)
-	ListTenants(page, perPage int) ([]models.Tenant, int64, error)
-	UpdateTenant(id uuid.UUID, req UpdateTenantRequest) (*models.Tenant, error)
-	DeleteTenant(id uuid.UUID) error
-	CreateDestination(tenantID uuid.UUID, req CreateDestinationRequest) (*models.Destination, error)
-	GetDestination(id uuid.UUID) (*models.Destination, error)
-	ListDestinations(tenantID uuid.UUID, page, perPage int) ([]models.Destination, int64, error)
-	UpdateDestination(id uuid.UUID, req UpdateDestinationRequest) (*models.Destination, error)
-	DeleteDestination(id uuid.UUID) error
-	UpsertSetting(tenantID uuid.UUID, key, value string) error
-	GetSettings(tenantID uuid.UUID) ([]models.TenantSetting, error)
-
-	// Public (no auth) operations for tenant portal
-	ResolveTenantByHostname(hostname string) (*models.Tenant, error)
-	GetPublicDestinationByTenantSlug(slug string) (*models.Destination, error)
-}
-
-type service struct {
-	repo TenantRepository
+// TenantService handles business logic operations for tenant and destination
+type TenantService struct {
+	repo *TenantRepository
 }
 
 // NewService creates a new instance of TenantService
-func NewService(repo TenantRepository) TenantService {
-	return &service{repo: repo}
+func NewService(repo *TenantRepository) *TenantService {
+	return &TenantService{repo: repo}
 }
 
 // GenerateSlug generates a URL-friendly slug from a string (lowercase, replace spaces with hyphens, remove special characters)
@@ -135,7 +116,7 @@ func stringPtr(s string) *string {
 	return &s
 }
 
-func (s *service) CreateTenant(req CreateTenantRequest) (*models.Tenant, error) {
+func (s *TenantService) CreateTenant(req CreateTenantRequest) (*models.Tenant, error) {
 	primaryColor := req.PrimaryColor
 	if primaryColor == "" {
 		primaryColor = "#059669"
@@ -168,15 +149,15 @@ func (s *service) CreateTenant(req CreateTenantRequest) (*models.Tenant, error) 
 	return tenant, nil
 }
 
-func (s *service) GetTenant(id uuid.UUID) (*models.Tenant, error) {
+func (s *TenantService) GetTenant(id uuid.UUID) (*models.Tenant, error) {
 	return s.repo.GetTenantByID(id)
 }
 
-func (s *service) ListTenants(page, perPage int) ([]models.Tenant, int64, error) {
+func (s *TenantService) ListTenants(page, perPage int) ([]models.Tenant, int64, error) {
 	return s.repo.ListTenants(page, perPage)
 }
 
-func (s *service) UpdateTenant(id uuid.UUID, req UpdateTenantRequest) (*models.Tenant, error) {
+func (s *TenantService) UpdateTenant(id uuid.UUID, req UpdateTenantRequest) (*models.Tenant, error) {
 	tenant, err := s.repo.GetTenantByID(id)
 	if err != nil {
 		return nil, err
@@ -227,11 +208,11 @@ func (s *service) UpdateTenant(id uuid.UUID, req UpdateTenantRequest) (*models.T
 	return tenant, nil
 }
 
-func (s *service) DeleteTenant(id uuid.UUID) error {
+func (s *TenantService) DeleteTenant(id uuid.UUID) error {
 	return s.repo.DeleteTenant(id)
 }
 
-func (s *service) CreateDestination(tenantID uuid.UUID, req CreateDestinationRequest) (*models.Destination, error) {
+func (s *TenantService) CreateDestination(tenantID uuid.UUID, req CreateDestinationRequest) (*models.Destination, error) {
 	destType := req.DestinationType
 	if destType == "" {
 		destType = "lainnya"
@@ -272,15 +253,15 @@ func (s *service) CreateDestination(tenantID uuid.UUID, req CreateDestinationReq
 	return dest, nil
 }
 
-func (s *service) GetDestination(id uuid.UUID) (*models.Destination, error) {
+func (s *TenantService) GetDestination(id uuid.UUID) (*models.Destination, error) {
 	return s.repo.GetDestinationByID(id)
 }
 
-func (s *service) ListDestinations(tenantID uuid.UUID, page, perPage int) ([]models.Destination, int64, error) {
+func (s *TenantService) ListDestinations(tenantID uuid.UUID, page, perPage int) ([]models.Destination, int64, error) {
 	return s.repo.ListDestinations(tenantID, page, perPage)
 }
 
-func (s *service) UpdateDestination(id uuid.UUID, req UpdateDestinationRequest) (*models.Destination, error) {
+func (s *TenantService) UpdateDestination(id uuid.UUID, req UpdateDestinationRequest) (*models.Destination, error) {
 	dest, err := s.repo.GetDestinationByID(id)
 	if err != nil {
 		return nil, err
@@ -340,11 +321,11 @@ func (s *service) UpdateDestination(id uuid.UUID, req UpdateDestinationRequest) 
 	return dest, nil
 }
 
-func (s *service) DeleteDestination(id uuid.UUID) error {
+func (s *TenantService) DeleteDestination(id uuid.UUID) error {
 	return s.repo.DeleteDestination(id)
 }
 
-func (s *service) UpsertSetting(tenantID uuid.UUID, key, value string) error {
+func (s *TenantService) UpsertSetting(tenantID uuid.UUID, key, value string) error {
 	setting := &models.TenantSetting{
 		TenantID:     tenantID,
 		SettingKey:   key,
@@ -353,13 +334,13 @@ func (s *service) UpsertSetting(tenantID uuid.UUID, key, value string) error {
 	return s.repo.SaveTenantSetting(setting)
 }
 
-func (s *service) GetSettings(tenantID uuid.UUID) ([]models.TenantSetting, error) {
+func (s *TenantService) GetSettings(tenantID uuid.UUID) ([]models.TenantSetting, error) {
 	return s.repo.GetTenantSettings(tenantID)
 }
 
 // ResolveTenantByHostname resolves a tenant from a custom domain or subdomain.
 // Only active tenants are returned.
-func (s *service) ResolveTenantByHostname(hostname string) (*models.Tenant, error) {
+func (s *TenantService) ResolveTenantByHostname(hostname string) (*models.Tenant, error) {
 	hostname = strings.ToLower(strings.TrimSpace(hostname))
 	hostname = strings.TrimPrefix(hostname, "www.")
 
@@ -393,7 +374,7 @@ func (s *service) ResolveTenantByHostname(hostname string) (*models.Tenant, erro
 
 // GetPublicDestinationByTenantSlug returns the first active destination of a
 // tenant identified by its slug. Used by the public tenant portal.
-func (s *service) GetPublicDestinationByTenantSlug(slug string) (*models.Destination, error) {
+func (s *TenantService) GetPublicDestinationByTenantSlug(slug string) (*models.Destination, error) {
 	tenant, err := s.repo.GetTenantBySlug(strings.ToLower(strings.TrimSpace(slug)))
 	if err != nil {
 		return nil, err

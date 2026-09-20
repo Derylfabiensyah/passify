@@ -174,32 +174,22 @@ type TicketStatusResponse struct {
 	UsedAt     *time.Time `json:"used_at,omitempty"`
 }
 
-// GateService interface definition
-type GateService interface {
-	RegisterDevice(tenantID uuid.UUID, req RegisterDeviceRequest) (*models.GateDevice, error)
-	ListDevices(destinationID uuid.UUID) ([]models.GateDevice, error)
-	GenerateManifest(deviceID uuid.UUID, date time.Time) (*ManifestResponse, error)
-	ValidateTicketOnline(req OnlineValidateRequest) (*ValidateResponse, error)
-	SyncOfflineLogs(req SyncLogsRequest) (*SyncResponse, error)
-	GetScanStats(destinationID uuid.UUID, date time.Time) (*ScanStatsResponse, error)
-	GetTicketStatus(code string) (*TicketStatusResponse, error)
-}
-
-type gateService struct {
+// GateService handles gate business logic operations
+type GateService struct {
 	db   *gorm.DB
-	repo GateRepository
+	repo *GateRepository
 }
 
 // NewGateService creates a new instance of GateService
-func NewGateService(db *gorm.DB, repo GateRepository) GateService {
-	return &gateService{
+func NewGateService(db *gorm.DB, repo *GateRepository) *GateService {
+	return &GateService{
 		db:   db,
 		repo: repo,
 	}
 }
 
 // RegisterDevice registers a new physical gate device and generates an HMAC shared key
-func (s *gateService) RegisterDevice(tenantID uuid.UUID, req RegisterDeviceRequest) (*models.GateDevice, error) {
+func (s *GateService) RegisterDevice(tenantID uuid.UUID, req RegisterDeviceRequest) (*models.GateDevice, error) {
 	hmacKey, err := generateHMACKey()
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate HMAC shared key: %w", err)
@@ -231,12 +221,12 @@ func (s *gateService) RegisterDevice(tenantID uuid.UUID, req RegisterDeviceReque
 }
 
 // ListDevices returns all devices for a given destination
-func (s *gateService) ListDevices(destinationID uuid.UUID) ([]models.GateDevice, error) {
+func (s *GateService) ListDevices(destinationID uuid.UUID) ([]models.GateDevice, error) {
 	return s.repo.ListGateDevices(destinationID)
 }
 
 // GenerateManifest generates a ticket manifest for offline gate scanning
-func (s *gateService) GenerateManifest(deviceID uuid.UUID, date time.Time) (*ManifestResponse, error) {
+func (s *GateService) GenerateManifest(deviceID uuid.UUID, date time.Time) (*ManifestResponse, error) {
 	device, err := s.repo.GetGateDeviceByID(deviceID)
 	if err != nil {
 		return nil, fmt.Errorf("gate device not found: %w", err)
@@ -293,7 +283,7 @@ func (s *gateService) GenerateManifest(deviceID uuid.UUID, date time.Time) (*Man
 }
 
 // ValidateTicketOnline performs real-time online validation of a scanned ticket
-func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*ValidateResponse, error) {
+func (s *GateService) ValidateTicketOnline(req OnlineValidateRequest) (*ValidateResponse, error) {
 	// If a full QR payload is provided or ticket_code contains QR formatting, extract clean ticket code
 	rawInput := strings.TrimSpace(req.TicketCode)
 	if req.QRPayload != "" {
@@ -610,7 +600,7 @@ func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*Validate
 }
 
 // SyncOfflineLogs receives batch scan logs from an offline gate scanner device
-func (s *gateService) SyncOfflineLogs(req SyncLogsRequest) (*SyncResponse, error) {
+func (s *GateService) SyncOfflineLogs(req SyncLogsRequest) (*SyncResponse, error) {
 	device, err := s.repo.GetGateDeviceByID(req.DeviceID)
 	if err != nil || device == nil {
 		var activeDevice models.GateDevice
@@ -732,7 +722,7 @@ func (s *gateService) SyncOfflineLogs(req SyncLogsRequest) (*SyncResponse, error
 }
 
 // GetScanStats calculates scan statistics for a destination on a specific date
-func (s *gateService) GetScanStats(destinationID uuid.UUID, date time.Time) (*ScanStatsResponse, error) {
+func (s *GateService) GetScanStats(destinationID uuid.UUID, date time.Time) (*ScanStatsResponse, error) {
 	devices, err := s.repo.ListGateDevices(destinationID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list gate devices: %w", err)
@@ -896,7 +886,7 @@ func (s *gateService) GetScanStats(destinationID uuid.UUID, date time.Time) (*Sc
 }
 
 // GetTicketStatus returns the live status of a ticket by code
-func (s *gateService) GetTicketStatus(code string) (*TicketStatusResponse, error) {
+func (s *GateService) GetTicketStatus(code string) (*TicketStatusResponse, error) {
 	code = cleanTicketCode(code)
 	ticket, err := s.repo.GetTicketByCode(code)
 	if err != nil || ticket == nil {

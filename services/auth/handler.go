@@ -8,11 +8,11 @@ import (
 
 // AuthHandler handles HTTP requests for authentication
 type AuthHandler struct {
-	service AuthService
+	service *AuthService
 }
 
 // NewAuthHandler creates a new AuthHandler instance
-func NewAuthHandler(service AuthService) *AuthHandler {
+func NewAuthHandler(service *AuthService) *AuthHandler {
 	return &AuthHandler{
 		service: service,
 	}

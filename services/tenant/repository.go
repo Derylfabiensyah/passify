@@ -8,44 +8,24 @@ import (
 	"gorm.io/gorm"
 )
 
-// TenantRepository defines database operations for tenant and destination entities
-type TenantRepository interface {
-	CreateTenant(tenant *models.Tenant) error
-	GetTenantByID(id uuid.UUID) (*models.Tenant, error)
-	GetTenantBySubdomain(subdomain string) (*models.Tenant, error)
-	GetTenantBySlug(slug string) (*models.Tenant, error)
-	GetTenantByCustomDomain(domain string) (*models.Tenant, error)
-	ListTenants(page, perPage int) ([]models.Tenant, int64, error)
-	UpdateTenant(tenant *models.Tenant) error
-	DeleteTenant(id uuid.UUID) error
-	CreateDestination(dest *models.Destination) error
-	GetDestinationByID(id uuid.UUID) (*models.Destination, error)
-	GetDestinationBySlug(tenantID uuid.UUID, slug string) (*models.Destination, error)
-	GetFirstActiveDestinationByTenantID(tenantID uuid.UUID) (*models.Destination, error)
-	ListDestinations(tenantID uuid.UUID, page, perPage int) ([]models.Destination, int64, error)
-	UpdateDestination(dest *models.Destination) error
-	DeleteDestination(id uuid.UUID) error
-	SaveTenantSetting(setting *models.TenantSetting) error
-	GetTenantSettings(tenantID uuid.UUID) ([]models.TenantSetting, error)
-}
-
-type repository struct {
+// TenantRepository handles database operations for tenant and destination entities
+type TenantRepository struct {
 	db *gorm.DB
 }
 
 // NewRepository creates a new instance of TenantRepository
-func NewRepository(db *gorm.DB) TenantRepository {
-	return &repository{db: db}
+func NewRepository(db *gorm.DB) *TenantRepository {
+	return &TenantRepository{db: db}
 }
 
-func (r *repository) CreateTenant(tenant *models.Tenant) error {
+func (r *TenantRepository) CreateTenant(tenant *models.Tenant) error {
 	if tenant.ID == uuid.Nil {
 		tenant.ID = uuid.New()
 	}
 	return r.db.Create(tenant).Error
 }
 
-func (r *repository) GetTenantByID(id uuid.UUID) (*models.Tenant, error) {
+func (r *TenantRepository) GetTenantByID(id uuid.UUID) (*models.Tenant, error) {
 	var tenant models.Tenant
 	if err := r.db.First(&tenant, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -53,7 +33,7 @@ func (r *repository) GetTenantByID(id uuid.UUID) (*models.Tenant, error) {
 	return &tenant, nil
 }
 
-func (r *repository) GetTenantBySubdomain(subdomain string) (*models.Tenant, error) {
+func (r *TenantRepository) GetTenantBySubdomain(subdomain string) (*models.Tenant, error) {
 	var tenant models.Tenant
 	if err := r.db.First(&tenant, "subdomain = ?", subdomain).Error; err != nil {
 		return nil, err
@@ -61,7 +41,7 @@ func (r *repository) GetTenantBySubdomain(subdomain string) (*models.Tenant, err
 	return &tenant, nil
 }
 
-func (r *repository) GetTenantBySlug(slug string) (*models.Tenant, error) {
+func (r *TenantRepository) GetTenantBySlug(slug string) (*models.Tenant, error) {
 	var tenant models.Tenant
 	if err := r.db.First(&tenant, "slug = ?", slug).Error; err != nil {
 		return nil, err
@@ -69,7 +49,7 @@ func (r *repository) GetTenantBySlug(slug string) (*models.Tenant, error) {
 	return &tenant, nil
 }
 
-func (r *repository) GetTenantByCustomDomain(domain string) (*models.Tenant, error) {
+func (r *TenantRepository) GetTenantByCustomDomain(domain string) (*models.Tenant, error) {
 	var tenant models.Tenant
 	if err := r.db.First(&tenant, "custom_domain = ?", domain).Error; err != nil {
 		return nil, err
@@ -77,7 +57,7 @@ func (r *repository) GetTenantByCustomDomain(domain string) (*models.Tenant, err
 	return &tenant, nil
 }
 
-func (r *repository) GetFirstActiveDestinationByTenantID(tenantID uuid.UUID) (*models.Destination, error) {
+func (r *TenantRepository) GetFirstActiveDestinationByTenantID(tenantID uuid.UUID) (*models.Destination, error) {
 	var dest models.Destination
 	err := r.db.Preload("TicketCategories").Preload("TimeSlots").
 		Where("tenant_id = ? AND is_active = ?", tenantID, true).
@@ -89,7 +69,7 @@ func (r *repository) GetFirstActiveDestinationByTenantID(tenantID uuid.UUID) (*m
 	return &dest, nil
 }
 
-func (r *repository) ListTenants(page, perPage int) ([]models.Tenant, int64, error) {
+func (r *TenantRepository) ListTenants(page, perPage int) ([]models.Tenant, int64, error) {
 	var tenants []models.Tenant
 	var total int64
 
@@ -106,22 +86,22 @@ func (r *repository) ListTenants(page, perPage int) ([]models.Tenant, int64, err
 	return tenants, total, nil
 }
 
-func (r *repository) UpdateTenant(tenant *models.Tenant) error {
+func (r *TenantRepository) UpdateTenant(tenant *models.Tenant) error {
 	return r.db.Save(tenant).Error
 }
 
-func (r *repository) DeleteTenant(id uuid.UUID) error {
+func (r *TenantRepository) DeleteTenant(id uuid.UUID) error {
 	return r.db.Delete(&models.Tenant{}, "id = ?", id).Error
 }
 
-func (r *repository) CreateDestination(dest *models.Destination) error {
+func (r *TenantRepository) CreateDestination(dest *models.Destination) error {
 	if dest.ID == uuid.Nil {
 		dest.ID = uuid.New()
 	}
 	return r.db.Create(dest).Error
 }
 
-func (r *repository) GetDestinationByID(id uuid.UUID) (*models.Destination, error) {
+func (r *TenantRepository) GetDestinationByID(id uuid.UUID) (*models.Destination, error) {
 	var dest models.Destination
 	if err := r.db.First(&dest, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -129,7 +109,7 @@ func (r *repository) GetDestinationByID(id uuid.UUID) (*models.Destination, erro
 	return &dest, nil
 }
 
-func (r *repository) GetDestinationBySlug(tenantID uuid.UUID, slug string) (*models.Destination, error) {
+func (r *TenantRepository) GetDestinationBySlug(tenantID uuid.UUID, slug string) (*models.Destination, error) {
 	var dest models.Destination
 	err := r.db.Where("tenant_id = ? AND slug = ?", tenantID, slug).First(&dest).Error
 	if err != nil {
@@ -138,7 +118,7 @@ func (r *repository) GetDestinationBySlug(tenantID uuid.UUID, slug string) (*mod
 	return &dest, nil
 }
 
-func (r *repository) ListDestinations(tenantID uuid.UUID, page, perPage int) ([]models.Destination, int64, error) {
+func (r *TenantRepository) ListDestinations(tenantID uuid.UUID, page, perPage int) ([]models.Destination, int64, error) {
 	var dests []models.Destination
 	var total int64
 
@@ -156,15 +136,15 @@ func (r *repository) ListDestinations(tenantID uuid.UUID, page, perPage int) ([]
 	return dests, total, nil
 }
 
-func (r *repository) UpdateDestination(dest *models.Destination) error {
+func (r *TenantRepository) UpdateDestination(dest *models.Destination) error {
 	return r.db.Save(dest).Error
 }
 
-func (r *repository) DeleteDestination(id uuid.UUID) error {
+func (r *TenantRepository) DeleteDestination(id uuid.UUID) error {
 	return r.db.Delete(&models.Destination{}, "id = ?", id).Error
 }
 
-func (r *repository) SaveTenantSetting(setting *models.TenantSetting) error {
+func (r *TenantRepository) SaveTenantSetting(setting *models.TenantSetting) error {
 	var existing models.TenantSetting
 	err := r.db.Where("tenant_id = ? AND setting_key = ?", setting.TenantID, setting.SettingKey).First(&existing).Error
 	if err == nil {
@@ -179,7 +159,7 @@ func (r *repository) SaveTenantSetting(setting *models.TenantSetting) error {
 	return err
 }
 
-func (r *repository) GetTenantSettings(tenantID uuid.UUID) ([]models.TenantSetting, error) {
+func (r *TenantRepository) GetTenantSettings(tenantID uuid.UUID) ([]models.TenantSetting, error) {
 	var settings []models.TenantSetting
 	err := r.db.Where("tenant_id = ?", tenantID).Find(&settings).Error
 	if err != nil {

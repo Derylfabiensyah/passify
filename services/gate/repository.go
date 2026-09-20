@@ -8,44 +8,21 @@ import (
 	"gorm.io/gorm"
 )
 
-// GateRepository defines interface for gate access control database operations
-type GateRepository interface {
-	CreateGateDevice(device *models.GateDevice) error
-	GetGateDeviceByID(id uuid.UUID) (*models.GateDevice, error)
-	GetGateDeviceByCode(code string) (*models.GateDevice, error)
-	ListGateDevices(destinationID uuid.UUID) ([]models.GateDevice, error)
-	UpdateGateDevice(device *models.GateDevice) error
-	UpdateManifestSyncTime(deviceID uuid.UUID, syncTime time.Time) error
-	UpdateLogSyncTime(deviceID uuid.UUID, syncTime time.Time) error
-	CreateScanLog(log *models.ScanLog) error
-	CreateScanLogs(logs []models.ScanLog) error
-	ListScanLogs(gateDeviceID uuid.UUID, date time.Time, page, perPage int) ([]models.ScanLog, int64, error)
-	GetUnsyncedScanLogs(gateDeviceID uuid.UUID) ([]models.ScanLog, error)
-	MarkScanLogsSynced(ids []uuid.UUID, syncedAt time.Time) error
-	GetTicketForValidation(ticketCode string, visitDate time.Time) (*models.Ticket, error)
-	GetActiveTicketsForDestinationDate(destinationID uuid.UUID, visitDate time.Time) ([]models.Ticket, error)
-	GetTicketByCode(ticketCode string) (*models.Ticket, error)
-	UpdateTicketStatus(ticketID uuid.UUID, status string, usedAt *time.Time, gateDeviceID *uuid.UUID) error
-	GetScanLogsForDestinationDate(destinationID uuid.UUID, date time.Time) ([]models.ScanLog, error)
-	GetAllScanLogsForDestination(destinationID uuid.UUID) ([]models.ScanLog, error)
-	GetUsedTicketsCountForDestination(destinationID uuid.UUID) (int64, error)
-	GetDeviceTotalScans(deviceID uuid.UUID) (int64, error)
-}
-
-type gateRepository struct {
+// GateRepository handles gate access control database operations
+type GateRepository struct {
 	db *gorm.DB
 }
 
 // NewGateRepository creates a new instance of GateRepository
-func NewGateRepository(db *gorm.DB) GateRepository {
-	return &gateRepository{db: db}
+func NewGateRepository(db *gorm.DB) *GateRepository {
+	return &GateRepository{db: db}
 }
 
-func (r *gateRepository) CreateGateDevice(device *models.GateDevice) error {
+func (r *GateRepository) CreateGateDevice(device *models.GateDevice) error {
 	return r.db.Create(device).Error
 }
 
-func (r *gateRepository) GetGateDeviceByID(id uuid.UUID) (*models.GateDevice, error) {
+func (r *GateRepository) GetGateDeviceByID(id uuid.UUID) (*models.GateDevice, error) {
 	var device models.GateDevice
 	err := r.db.Preload("Destination").First(&device, "id = ?", id).Error
 	if err != nil {
@@ -54,7 +31,7 @@ func (r *gateRepository) GetGateDeviceByID(id uuid.UUID) (*models.GateDevice, er
 	return &device, nil
 }
 
-func (r *gateRepository) GetGateDeviceByCode(code string) (*models.GateDevice, error) {
+func (r *GateRepository) GetGateDeviceByCode(code string) (*models.GateDevice, error) {
 	var device models.GateDevice
 	err := r.db.Preload("Destination").First(&device, "device_code = ?", code).Error
 	if err != nil {
@@ -63,40 +40,40 @@ func (r *gateRepository) GetGateDeviceByCode(code string) (*models.GateDevice, e
 	return &device, nil
 }
 
-func (r *gateRepository) ListGateDevices(destinationID uuid.UUID) ([]models.GateDevice, error) {
+func (r *GateRepository) ListGateDevices(destinationID uuid.UUID) ([]models.GateDevice, error) {
 	var devices []models.GateDevice
 	err := r.db.Where("destination_id = ?", destinationID).Order("created_at DESC").Find(&devices).Error
 	return devices, err
 }
 
-func (r *gateRepository) UpdateGateDevice(device *models.GateDevice) error {
+func (r *GateRepository) UpdateGateDevice(device *models.GateDevice) error {
 	return r.db.Save(device).Error
 }
 
-func (r *gateRepository) UpdateManifestSyncTime(deviceID uuid.UUID, syncTime time.Time) error {
+func (r *GateRepository) UpdateManifestSyncTime(deviceID uuid.UUID, syncTime time.Time) error {
 	return r.db.Model(&models.GateDevice{}).
 		Where("id = ?", deviceID).
 		Update("last_manifest_sync_at", syncTime).Error
 }
 
-func (r *gateRepository) UpdateLogSyncTime(deviceID uuid.UUID, syncTime time.Time) error {
+func (r *GateRepository) UpdateLogSyncTime(deviceID uuid.UUID, syncTime time.Time) error {
 	return r.db.Model(&models.GateDevice{}).
 		Where("id = ?", deviceID).
 		Update("last_log_sync_at", syncTime).Error
 }
 
-func (r *gateRepository) CreateScanLog(log *models.ScanLog) error {
+func (r *GateRepository) CreateScanLog(log *models.ScanLog) error {
 	return r.db.Create(log).Error
 }
 
-func (r *gateRepository) CreateScanLogs(logs []models.ScanLog) error {
+func (r *GateRepository) CreateScanLogs(logs []models.ScanLog) error {
 	if len(logs) == 0 {
 		return nil
 	}
 	return r.db.Create(&logs).Error
 }
 
-func (r *gateRepository) ListScanLogs(gateDeviceID uuid.UUID, date time.Time, page, perPage int) ([]models.ScanLog, int64, error) {
+func (r *GateRepository) ListScanLogs(gateDeviceID uuid.UUID, date time.Time, page, perPage int) ([]models.ScanLog, int64, error) {
 	var logs []models.ScanLog
 	var total int64
 
@@ -127,7 +104,7 @@ func (r *gateRepository) ListScanLogs(gateDeviceID uuid.UUID, date time.Time, pa
 	return logs, total, nil
 }
 
-func (r *gateRepository) GetUnsyncedScanLogs(gateDeviceID uuid.UUID) ([]models.ScanLog, error) {
+func (r *GateRepository) GetUnsyncedScanLogs(gateDeviceID uuid.UUID) ([]models.ScanLog, error) {
 	var logs []models.ScanLog
 	err := r.db.Where("gate_device_id = ? AND synced_at IS NULL", gateDeviceID).
 		Order("scanned_at ASC").
@@ -135,7 +112,7 @@ func (r *gateRepository) GetUnsyncedScanLogs(gateDeviceID uuid.UUID) ([]models.S
 	return logs, err
 }
 
-func (r *gateRepository) MarkScanLogsSynced(ids []uuid.UUID, syncedAt time.Time) error {
+func (r *GateRepository) MarkScanLogsSynced(ids []uuid.UUID, syncedAt time.Time) error {
 	if len(ids) == 0 {
 		return nil
 	}
@@ -144,7 +121,7 @@ func (r *gateRepository) MarkScanLogsSynced(ids []uuid.UUID, syncedAt time.Time)
 		Update("synced_at", syncedAt).Error
 }
 
-func (r *gateRepository) GetTicketForValidation(ticketCode string, visitDate time.Time) (*models.Ticket, error) {
+func (r *GateRepository) GetTicketForValidation(ticketCode string, visitDate time.Time) (*models.Ticket, error) {
 	var ticket models.Ticket
 	dateStr := visitDate.Format("2006-01-02")
 	err := r.db.Preload("Category").
@@ -158,7 +135,7 @@ func (r *gateRepository) GetTicketForValidation(ticketCode string, visitDate tim
 	return &ticket, nil
 }
 
-func (r *gateRepository) GetActiveTicketsForDestinationDate(destinationID uuid.UUID, visitDate time.Time) ([]models.Ticket, error) {
+func (r *GateRepository) GetActiveTicketsForDestinationDate(destinationID uuid.UUID, visitDate time.Time) ([]models.Ticket, error) {
 	var tickets []models.Ticket
 	dateStr := visitDate.Format("2006-01-02")
 	err := r.db.Preload("Category").
@@ -168,7 +145,7 @@ func (r *gateRepository) GetActiveTicketsForDestinationDate(destinationID uuid.U
 	return tickets, err
 }
 
-func (r *gateRepository) GetTicketByCode(ticketCode string) (*models.Ticket, error) {
+func (r *GateRepository) GetTicketByCode(ticketCode string) (*models.Ticket, error) {
 	var ticket models.Ticket
 	err := r.db.Preload("Category").
 		Preload("Destination").
@@ -181,7 +158,7 @@ func (r *gateRepository) GetTicketByCode(ticketCode string) (*models.Ticket, err
 	return &ticket, nil
 }
 
-func (r *gateRepository) UpdateTicketStatus(ticketID uuid.UUID, status string, usedAt *time.Time, gateDeviceID *uuid.UUID) error {
+func (r *GateRepository) UpdateTicketStatus(ticketID uuid.UUID, status string, usedAt *time.Time, gateDeviceID *uuid.UUID) error {
 	updates := map[string]interface{}{
 		"status":     status,
 		"updated_at": time.Now(),
@@ -195,7 +172,7 @@ func (r *gateRepository) UpdateTicketStatus(ticketID uuid.UUID, status string, u
 	return r.db.Model(&models.Ticket{}).Where("id = ?", ticketID).Updates(updates).Error
 }
 
-func (r *gateRepository) GetScanLogsForDestinationDate(destinationID uuid.UUID, date time.Time) ([]models.ScanLog, error) {
+func (r *GateRepository) GetScanLogsForDestinationDate(destinationID uuid.UUID, date time.Time) ([]models.ScanLog, error) {
 	var logs []models.ScanLog
 	startOfDay := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
 	endOfDay := startOfDay.Add(24 * time.Hour)
@@ -207,7 +184,7 @@ func (r *gateRepository) GetScanLogsForDestinationDate(destinationID uuid.UUID, 
 	return logs, err
 }
 
-func (r *gateRepository) GetAllScanLogsForDestination(destinationID uuid.UUID) ([]models.ScanLog, error) {
+func (r *GateRepository) GetAllScanLogsForDestination(destinationID uuid.UUID) ([]models.ScanLog, error) {
 	var logs []models.ScanLog
 	err := r.db.Joins("JOIN gate_devices ON scan_logs.gate_device_id = gate_devices.id").
 		Where("gate_devices.destination_id = ?", destinationID).
@@ -216,7 +193,7 @@ func (r *gateRepository) GetAllScanLogsForDestination(destinationID uuid.UUID) (
 	return logs, err
 }
 
-func (r *gateRepository) GetUsedTicketsCountForDestination(destinationID uuid.UUID) (int64, error) {
+func (r *GateRepository) GetUsedTicketsCountForDestination(destinationID uuid.UUID) (int64, error) {
 	var count int64
 	err := r.db.Model(&models.Ticket{}).
 		Where("destination_id = ? AND (status = 'used' OR used_at IS NOT NULL)", destinationID).
@@ -224,7 +201,7 @@ func (r *gateRepository) GetUsedTicketsCountForDestination(destinationID uuid.UU
 	return count, err
 }
 
-func (r *gateRepository) GetDeviceTotalScans(deviceID uuid.UUID) (int64, error) {
+func (r *GateRepository) GetDeviceTotalScans(deviceID uuid.UUID) (int64, error) {
 	var count int64
 	err := r.db.Model(&models.ScanLog{}).
 		Where("gate_device_id = ? AND scan_result = 'valid'", deviceID).

@@ -77,36 +77,23 @@ type UpdateProfileRequest struct {
 	Nationality  string  `json:"nationality,omitempty"`
 }
 
-// AuthService defines authentication business logic interface
-type AuthService interface {
-	Register(req RegisterRequest) (*models.User, error)
-	RegisterTenant(req RegisterTenantRequest) (*models.Tenant, *models.User, string, error)
-	CheckSubdomain(subdomain string) (bool, error)
-	VerifyEmail(token string) error
-	Login(req LoginRequest) (*LoginResponse, error)
-	GoogleLogin(req GoogleLoginRequest) (*LoginResponse, error)
-	RefreshToken(req RefreshTokenRequest) (*LoginResponse, error)
-	GetProfile(userID uuid.UUID) (*models.User, error)
-	UpdateProfile(userID uuid.UUID, req UpdateProfileRequest) (*models.User, error)
-	Logout(userID uuid.UUID) error
-}
-
-type authService struct {
-	repo  AuthRepository
+// AuthService handles authentication business logic
+type AuthService struct {
+	repo  *AuthRepository
 	cfg   *config.Config
 	redis *redis.Client
 }
 
 // NewAuthService creates a new AuthService instance
-func NewAuthService(repo AuthRepository, cfg *config.Config, rdb *redis.Client) AuthService {
-	return &authService{
+func NewAuthService(repo *AuthRepository, cfg *config.Config, rdb *redis.Client) *AuthService {
+	return &AuthService{
 		repo:  repo,
 		cfg:   cfg,
 		redis: rdb,
 	}
 }
 
-func (s *authService) Register(req RegisterRequest) (*models.User, error) {
+func (s *AuthService) Register(req RegisterRequest) (*models.User, error) {
 	existing, err := s.repo.GetUserByEmail(req.Email)
 	if err == nil && existing != nil {
 		return nil, errors.New("email sudah terdaftar")
@@ -143,7 +130,7 @@ func (s *authService) Register(req RegisterRequest) (*models.User, error) {
 	return user, nil
 }
 
-func (s *authService) Login(req LoginRequest) (*LoginResponse, error) {
+func (s *AuthService) Login(req LoginRequest) (*LoginResponse, error) {
 	user, err := s.repo.GetUserByEmail(req.Email)
 	if err != nil {
 		return nil, errors.New("email atau kata sandi tidak valid")
@@ -198,7 +185,7 @@ func (s *authService) Login(req LoginRequest) (*LoginResponse, error) {
 	}, nil
 }
 
-func (s *authService) GoogleLogin(req GoogleLoginRequest) (*LoginResponse, error) {
+func (s *AuthService) GoogleLogin(req GoogleLoginRequest) (*LoginResponse, error) {
 	user, err := s.repo.GetUserByEmail(req.Email)
 	if err != nil || user == nil {
 		// User does not exist, create a new Google user account
@@ -273,7 +260,7 @@ func (s *authService) GoogleLogin(req GoogleLoginRequest) (*LoginResponse, error
 	}, nil
 }
 
-func (s *authService) RefreshToken(req RefreshTokenRequest) (*LoginResponse, error) {
+func (s *AuthService) RefreshToken(req RefreshTokenRequest) (*LoginResponse, error) {
 	tokenHash := hashToken(req.RefreshToken)
 	tokenModel, err := s.repo.GetRefreshToken(tokenHash)
 	if err != nil || tokenModel.Revoked || tokenModel.ExpiresAt.Before(time.Now()) {
@@ -324,7 +311,7 @@ func (s *authService) RefreshToken(req RefreshTokenRequest) (*LoginResponse, err
 	}, nil
 }
 
-func (s *authService) GetProfile(userID uuid.UUID) (*models.User, error) {
+func (s *AuthService) GetProfile(userID uuid.UUID) (*models.User, error) {
 	user, err := s.repo.GetUserByID(userID)
 	if err != nil {
 		return nil, errors.New("pengguna tidak ditemukan")
@@ -332,7 +319,7 @@ func (s *authService) GetProfile(userID uuid.UUID) (*models.User, error) {
 	return user, nil
 }
 
-func (s *authService) UpdateProfile(userID uuid.UUID, req UpdateProfileRequest) (*models.User, error) {
+func (s *AuthService) UpdateProfile(userID uuid.UUID, req UpdateProfileRequest) (*models.User, error) {
 	user, err := s.repo.GetUserByID(userID)
 	if err != nil {
 		return nil, errors.New("pengguna tidak ditemukan")
@@ -361,14 +348,14 @@ func (s *authService) UpdateProfile(userID uuid.UUID, req UpdateProfileRequest) 
 	return user, nil
 }
 
-func (s *authService) Logout(userID uuid.UUID) error {
+func (s *AuthService) Logout(userID uuid.UUID) error {
 	if err := s.repo.RevokeAllUserTokens(userID); err != nil {
 		return fmt.Errorf("gagal mencabut token refresh: %w", err)
 	}
 	return nil
 }
 
-func (s *authService) RegisterTenant(req RegisterTenantRequest) (*models.Tenant, *models.User, string, error) {
+func (s *AuthService) RegisterTenant(req RegisterTenantRequest) (*models.Tenant, *models.User, string, error) {
 	// 1. Check if email already registered
 	existing, err := s.repo.GetUserByEmail(req.Email)
 	if err == nil && existing != nil {
@@ -458,7 +445,7 @@ func isReservedSubdomain(subdomain string) bool {
 	return reservedSubdomains[strings.ToLower(strings.TrimSpace(subdomain))]
 }
 
-func (s *authService) CheckSubdomain(subdomain string) (bool, error) {
+func (s *AuthService) CheckSubdomain(subdomain string) (bool, error) {
 	clean := strings.ToLower(strings.TrimSpace(subdomain))
 	re := regexp.MustCompile(`^[a-z0-9]+(-[a-z0-9]+)*$`)
 	if len(clean) < 3 || len(clean) > 50 || !re.MatchString(clean) {
@@ -477,7 +464,7 @@ func (s *authService) CheckSubdomain(subdomain string) (bool, error) {
 	return true, nil
 }
 
-func (s *authService) VerifyEmail(token string) error {
+func (s *AuthService) VerifyEmail(token string) error {
 	cleanToken := strings.TrimSpace(token)
 	if cleanToken == "" {
 		return errors.New("token verifikasi tidak boleh kosong")

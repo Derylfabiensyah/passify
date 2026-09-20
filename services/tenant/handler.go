@@ -13,11 +13,11 @@ import (
 
 // TenantHandler handles HTTP requests for tenant and destination resources
 type TenantHandler struct {
-	service TenantService
+	service *TenantService
 }
 
 // NewHandler creates a new instance of TenantHandler
-func NewHandler(service TenantService) *TenantHandler {
+func NewHandler(service *TenantService) *TenantHandler {
 	return &TenantHandler{service: service}
 }
 

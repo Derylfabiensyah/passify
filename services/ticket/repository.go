@@ -8,44 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-type TicketRepository interface {
-	CreateTicketCategory(cat *models.TicketCategory) error
-	GetTicketCategoryByID(id uuid.UUID) (*models.TicketCategory, error)
-	ListTicketCategories(destinationID uuid.UUID) ([]models.TicketCategory, error)
-	UpdateTicketCategory(cat *models.TicketCategory) error
-	DeleteTicketCategory(id uuid.UUID) error
-	GetOrCreateDailyQuota(destinationID, tenantID uuid.UUID, visitDate time.Time, totalQuota int) (*models.DailyQuota, error)
-	GetDailyQuota(destinationID uuid.UUID, visitDate time.Time) (*models.DailyQuota, error)
-	IncrementBookedQuota(quotaID uuid.UUID, count int) error
-	DecrementBookedQuota(quotaID uuid.UUID, count int) error
-	ListDailyQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error)
-	CreateTimeSlot(slot *models.TimeSlot) error
-	GetTimeSlotByID(id uuid.UUID) (*models.TimeSlot, error)
-	UpdateTimeSlot(slot *models.TimeSlot) error
-	DeleteTimeSlot(id uuid.UUID) error
-	ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error)
-	GetOrCreateSlotQuota(dailyQuotaID, timeSlotID, tenantID uuid.UUID) (*models.SlotQuota, error)
-	IncrementSlotBookedQuota(slotQuotaID uuid.UUID, count int) error
-	CreateTransaction(tx *models.Transaction) error
-	GetTransactionByID(id uuid.UUID) (*models.Transaction, error)
-	CreateTicket(ticket *models.Ticket) error
-	CreateTickets(tickets []models.Ticket) error
-	GetTicketByID(id uuid.UUID) (*models.Ticket, error)
-	GetTicketByCode(code string) (*models.Ticket, error)
-	ListTicketsByTransaction(transactionID uuid.UUID) ([]models.Ticket, error)
-	UpdateTicketStatus(id uuid.UUID, status string, usedAt *time.Time, gateDeviceID *uuid.UUID) error
-	ListTicketsByVisitDate(destinationID uuid.UUID, visitDate time.Time) ([]models.Ticket, error)
-}
-
-type ticketRepository struct {
+type TicketRepository struct {
 	db *gorm.DB
 }
 
-func NewTicketRepository(db *gorm.DB) TicketRepository {
-	return &ticketRepository{db: db}
+func NewTicketRepository(db *gorm.DB) *TicketRepository {
+	return &TicketRepository{db: db}
 }
 
-func (r *ticketRepository) CreateTicketCategory(cat *models.TicketCategory) error {
+func (r *TicketRepository) CreateTicketCategory(cat *models.TicketCategory) error {
 	if cat.TenantID == uuid.Nil {
 		var dest models.Destination
 		if err := r.db.First(&dest, "id = ?", cat.DestinationID).Error; err == nil {
@@ -55,7 +26,7 @@ func (r *ticketRepository) CreateTicketCategory(cat *models.TicketCategory) erro
 	return r.db.Create(cat).Error
 }
 
-func (r *ticketRepository) GetTicketCategoryByID(id uuid.UUID) (*models.TicketCategory, error) {
+func (r *TicketRepository) GetTicketCategoryByID(id uuid.UUID) (*models.TicketCategory, error) {
 	var cat models.TicketCategory
 	if err := r.db.First(&cat, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -63,7 +34,7 @@ func (r *ticketRepository) GetTicketCategoryByID(id uuid.UUID) (*models.TicketCa
 	return &cat, nil
 }
 
-func (r *ticketRepository) ListTicketCategories(destinationID uuid.UUID) ([]models.TicketCategory, error) {
+func (r *TicketRepository) ListTicketCategories(destinationID uuid.UUID) ([]models.TicketCategory, error) {
 	var cats []models.TicketCategory
 	if err := r.db.Where("destination_id = ?", destinationID).Find(&cats).Error; err != nil {
 		return nil, err
@@ -71,15 +42,15 @@ func (r *ticketRepository) ListTicketCategories(destinationID uuid.UUID) ([]mode
 	return cats, nil
 }
 
-func (r *ticketRepository) UpdateTicketCategory(cat *models.TicketCategory) error {
+func (r *TicketRepository) UpdateTicketCategory(cat *models.TicketCategory) error {
 	return r.db.Save(cat).Error
 }
 
-func (r *ticketRepository) DeleteTicketCategory(id uuid.UUID) error {
+func (r *TicketRepository) DeleteTicketCategory(id uuid.UUID) error {
 	return r.db.Delete(&models.TicketCategory{}, "id = ?", id).Error
 }
 
-func (r *ticketRepository) GetOrCreateDailyQuota(destinationID, tenantID uuid.UUID, visitDate time.Time, totalQuota int) (*models.DailyQuota, error) {
+func (r *TicketRepository) GetOrCreateDailyQuota(destinationID, tenantID uuid.UUID, visitDate time.Time, totalQuota int) (*models.DailyQuota, error) {
 	var quota models.DailyQuota
 	err := r.db.Where(models.DailyQuota{DestinationID: destinationID, VisitDate: visitDate}).
 		Assign(models.DailyQuota{TotalQuota: totalQuota, TenantID: tenantID}).
@@ -87,7 +58,7 @@ func (r *ticketRepository) GetOrCreateDailyQuota(destinationID, tenantID uuid.UU
 	return &quota, err
 }
 
-func (r *ticketRepository) GetDailyQuota(destinationID uuid.UUID, visitDate time.Time) (*models.DailyQuota, error) {
+func (r *TicketRepository) GetDailyQuota(destinationID uuid.UUID, visitDate time.Time) (*models.DailyQuota, error) {
 	var quota models.DailyQuota
 	if err := r.db.First(&quota, "destination_id = ? AND visit_date = ?", destinationID, visitDate).Error; err != nil {
 		return nil, err
@@ -95,17 +66,17 @@ func (r *ticketRepository) GetDailyQuota(destinationID uuid.UUID, visitDate time
 	return &quota, nil
 }
 
-func (r *ticketRepository) IncrementBookedQuota(quotaID uuid.UUID, count int) error {
+func (r *TicketRepository) IncrementBookedQuota(quotaID uuid.UUID, count int) error {
 	return r.db.Model(&models.DailyQuota{}).Where("id = ?", quotaID).
 		UpdateColumn("booked_quota", gorm.Expr("booked_quota + ?", count)).Error
 }
 
-func (r *ticketRepository) DecrementBookedQuota(quotaID uuid.UUID, count int) error {
+func (r *TicketRepository) DecrementBookedQuota(quotaID uuid.UUID, count int) error {
 	return r.db.Model(&models.DailyQuota{}).Where("id = ?", quotaID).
 		UpdateColumn("booked_quota", gorm.Expr("booked_quota - ?", count)).Error
 }
 
-func (r *ticketRepository) ListDailyQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error) {
+func (r *TicketRepository) ListDailyQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error) {
 	var quotas []models.DailyQuota
 	if err := r.db.Where("destination_id = ? AND visit_date >= ? AND visit_date <= ?", destinationID, startDate, endDate).Find(&quotas).Error; err != nil {
 		return nil, err
@@ -113,7 +84,7 @@ func (r *ticketRepository) ListDailyQuotas(destinationID uuid.UUID, startDate, e
 	return quotas, nil
 }
 
-func (r *ticketRepository) CreateTimeSlot(slot *models.TimeSlot) error {
+func (r *TicketRepository) CreateTimeSlot(slot *models.TimeSlot) error {
 	if slot.TenantID == uuid.Nil {
 		var dest models.Destination
 		if err := r.db.First(&dest, "id = ?", slot.DestinationID).Error; err == nil {
@@ -123,7 +94,7 @@ func (r *ticketRepository) CreateTimeSlot(slot *models.TimeSlot) error {
 	return r.db.Create(slot).Error
 }
 
-func (r *ticketRepository) GetTimeSlotByID(id uuid.UUID) (*models.TimeSlot, error) {
+func (r *TicketRepository) GetTimeSlotByID(id uuid.UUID) (*models.TimeSlot, error) {
 	var slot models.TimeSlot
 	if err := r.db.First(&slot, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -131,15 +102,15 @@ func (r *ticketRepository) GetTimeSlotByID(id uuid.UUID) (*models.TimeSlot, erro
 	return &slot, nil
 }
 
-func (r *ticketRepository) UpdateTimeSlot(slot *models.TimeSlot) error {
+func (r *TicketRepository) UpdateTimeSlot(slot *models.TimeSlot) error {
 	return r.db.Save(slot).Error
 }
 
-func (r *ticketRepository) DeleteTimeSlot(id uuid.UUID) error {
+func (r *TicketRepository) DeleteTimeSlot(id uuid.UUID) error {
 	return r.db.Delete(&models.TimeSlot{}, "id = ?", id).Error
 }
 
-func (r *ticketRepository) ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error) {
+func (r *TicketRepository) ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error) {
 	var slots []models.TimeSlot
 	if err := r.db.Where("destination_id = ?", destinationID).Find(&slots).Error; err != nil {
 		return nil, err
@@ -147,7 +118,7 @@ func (r *ticketRepository) ListTimeSlots(destinationID uuid.UUID) ([]models.Time
 	return slots, nil
 }
 
-func (r *ticketRepository) GetOrCreateSlotQuota(dailyQuotaID, timeSlotID, tenantID uuid.UUID) (*models.SlotQuota, error) {
+func (r *TicketRepository) GetOrCreateSlotQuota(dailyQuotaID, timeSlotID, tenantID uuid.UUID) (*models.SlotQuota, error) {
 	var sq models.SlotQuota
 	err := r.db.Where(models.SlotQuota{DailyQuotaID: dailyQuotaID, TimeSlotID: timeSlotID}).
 		Assign(models.SlotQuota{TenantID: tenantID}).
@@ -155,16 +126,16 @@ func (r *ticketRepository) GetOrCreateSlotQuota(dailyQuotaID, timeSlotID, tenant
 	return &sq, err
 }
 
-func (r *ticketRepository) IncrementSlotBookedQuota(slotQuotaID uuid.UUID, count int) error {
+func (r *TicketRepository) IncrementSlotBookedQuota(slotQuotaID uuid.UUID, count int) error {
 	return r.db.Model(&models.SlotQuota{}).Where("id = ?", slotQuotaID).
 		UpdateColumn("booked_quota", gorm.Expr("booked_quota + ?", count)).Error
 }
 
-func (r *ticketRepository) CreateTransaction(tx *models.Transaction) error {
+func (r *TicketRepository) CreateTransaction(tx *models.Transaction) error {
 	return r.db.Create(tx).Error
 }
 
-func (r *ticketRepository) GetTransactionByID(id uuid.UUID) (*models.Transaction, error) {
+func (r *TicketRepository) GetTransactionByID(id uuid.UUID) (*models.Transaction, error) {
 	var tx models.Transaction
 	if err := r.db.Preload("User").Preload("Destination").Preload("Tickets").First(&tx, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -172,15 +143,15 @@ func (r *ticketRepository) GetTransactionByID(id uuid.UUID) (*models.Transaction
 	return &tx, nil
 }
 
-func (r *ticketRepository) CreateTicket(ticket *models.Ticket) error {
+func (r *TicketRepository) CreateTicket(ticket *models.Ticket) error {
 	return r.db.Create(ticket).Error
 }
 
-func (r *ticketRepository) CreateTickets(tickets []models.Ticket) error {
+func (r *TicketRepository) CreateTickets(tickets []models.Ticket) error {
 	return r.db.CreateInBatches(tickets, 100).Error
 }
 
-func (r *ticketRepository) GetTicketByID(id uuid.UUID) (*models.Ticket, error) {
+func (r *TicketRepository) GetTicketByID(id uuid.UUID) (*models.Ticket, error) {
 	var ticket models.Ticket
 	if err := r.db.First(&ticket, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -188,7 +159,7 @@ func (r *ticketRepository) GetTicketByID(id uuid.UUID) (*models.Ticket, error) {
 	return &ticket, nil
 }
 
-func (r *ticketRepository) GetTicketByCode(code string) (*models.Ticket, error) {
+func (r *TicketRepository) GetTicketByCode(code string) (*models.Ticket, error) {
 	var ticket models.Ticket
 	if err := r.db.First(&ticket, "ticket_code = ?", code).Error; err != nil {
 		return nil, err
@@ -196,7 +167,7 @@ func (r *ticketRepository) GetTicketByCode(code string) (*models.Ticket, error) 
 	return &ticket, nil
 }
 
-func (r *ticketRepository) ListTicketsByTransaction(transactionID uuid.UUID) ([]models.Ticket, error) {
+func (r *TicketRepository) ListTicketsByTransaction(transactionID uuid.UUID) ([]models.Ticket, error) {
 	var tickets []models.Ticket
 	if err := r.db.Where("transaction_id = ?", transactionID).Find(&tickets).Error; err != nil {
 		return nil, err
@@ -204,7 +175,7 @@ func (r *ticketRepository) ListTicketsByTransaction(transactionID uuid.UUID) ([]
 	return tickets, nil
 }
 
-func (r *ticketRepository) UpdateTicketStatus(id uuid.UUID, status string, usedAt *time.Time, gateDeviceID *uuid.UUID) error {
+func (r *TicketRepository) UpdateTicketStatus(id uuid.UUID, status string, usedAt *time.Time, gateDeviceID *uuid.UUID) error {
 	updates := map[string]interface{}{"status": status}
 	if usedAt != nil {
 		updates["used_at"] = usedAt
@@ -215,7 +186,7 @@ func (r *ticketRepository) UpdateTicketStatus(id uuid.UUID, status string, usedA
 	return r.db.Model(&models.Ticket{}).Where("id = ?", id).Updates(updates).Error
 }
 
-func (r *ticketRepository) ListTicketsByVisitDate(destinationID uuid.UUID, visitDate time.Time) ([]models.Ticket, error) {
+func (r *TicketRepository) ListTicketsByVisitDate(destinationID uuid.UUID, visitDate time.Time) ([]models.Ticket, error) {
 	var tickets []models.Ticket
 	if err := r.db.Where("destination_id = ? AND visit_date = ?", destinationID, visitDate).Find(&tickets).Error; err != nil {
 		return nil, err

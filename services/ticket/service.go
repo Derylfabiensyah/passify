@@ -143,41 +143,21 @@ type LiveQRResponse struct {
 	VisitDate       string `json:"visit_date"`
 }
 
-type TicketService interface {
-	CreateCategory(tenantID uuid.UUID, req CreateCategoryRequest) (*models.TicketCategory, error)
-	ListCategories(destinationID uuid.UUID) ([]models.TicketCategory, error)
-	UpdateCategory(id uuid.UUID, req UpdateCategoryRequest) (*models.TicketCategory, error)
-	DeleteCategory(id uuid.UUID) error
-	CreateTimeSlot(tenantID uuid.UUID, req CreateTimeSlotRequest) (*models.TimeSlot, error)
-	UpdateTimeSlot(id uuid.UUID, req UpdateTimeSlotRequest) (*models.TimeSlot, error)
-	DeleteTimeSlot(id uuid.UUID) error
-	ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error)
-	CheckAvailability(req CheckAvailabilityRequest) (*AvailabilityResponse, error)
-	BookTickets(tenantID, userID uuid.UUID, req BookTicketsRequest) (*BookingResponse, error)
-	JoinQueue(userID uuid.UUID, req JoinQueueRequest) (*QueueResponse, error)
-	CheckQueueStatus(userID uuid.UUID, destinationID uuid.UUID, visitDate string) (*QueueResponse, error)
-	GetTicket(id uuid.UUID) (*models.Ticket, error)
-	GetTicketByCode(code string) (*models.Ticket, error)
-	GetLiveQRPayload(id uuid.UUID) (*LiveQRResponse, error)
-	ListQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error)
-	CancelTicket(id uuid.UUID) error
-}
-
-type ticketService struct {
-	repo  TicketRepository
+type TicketService struct {
+	repo  *TicketRepository
 	redis *redis.Client
 	cfg   *config.Config
 }
 
-func NewTicketService(repo TicketRepository, redisClient *redis.Client, cfg *config.Config) TicketService {
-	return &ticketService{
+func NewTicketService(repo *TicketRepository, redisClient *redis.Client, cfg *config.Config) *TicketService {
+	return &TicketService{
 		repo:  repo,
 		redis: redisClient,
 		cfg:   cfg,
 	}
 }
 
-func (s *ticketService) CreateCategory(tenantID uuid.UUID, req CreateCategoryRequest) (*models.TicketCategory, error) {
+func (s *TicketService) CreateCategory(tenantID uuid.UUID, req CreateCategoryRequest) (*models.TicketCategory, error) {
 	cat := &models.TicketCategory{
 		DestinationID:  req.DestinationID,
 		TenantID:       tenantID,
@@ -199,11 +179,11 @@ func (s *ticketService) CreateCategory(tenantID uuid.UUID, req CreateCategoryReq
 	return cat, nil
 }
 
-func (s *ticketService) ListCategories(destinationID uuid.UUID) ([]models.TicketCategory, error) {
+func (s *TicketService) ListCategories(destinationID uuid.UUID) ([]models.TicketCategory, error) {
 	return s.repo.ListTicketCategories(destinationID)
 }
 
-func (s *ticketService) UpdateCategory(id uuid.UUID, req UpdateCategoryRequest) (*models.TicketCategory, error) {
+func (s *TicketService) UpdateCategory(id uuid.UUID, req UpdateCategoryRequest) (*models.TicketCategory, error) {
 	cat, err := s.repo.GetTicketCategoryByID(id)
 	if err != nil {
 		return nil, err
@@ -249,11 +229,11 @@ func (s *ticketService) UpdateCategory(id uuid.UUID, req UpdateCategoryRequest) 
 	return cat, nil
 }
 
-func (s *ticketService) DeleteCategory(id uuid.UUID) error {
+func (s *TicketService) DeleteCategory(id uuid.UUID) error {
 	return s.repo.DeleteTicketCategory(id)
 }
 
-func (s *ticketService) CreateTimeSlot(tenantID uuid.UUID, req CreateTimeSlotRequest) (*models.TimeSlot, error) {
+func (s *TicketService) CreateTimeSlot(tenantID uuid.UUID, req CreateTimeSlotRequest) (*models.TimeSlot, error) {
 	label := req.SlotLabel
 	if label == "" {
 		label = req.Label
@@ -299,7 +279,7 @@ func (s *ticketService) CreateTimeSlot(tenantID uuid.UUID, req CreateTimeSlotReq
 	return slot, nil
 }
 
-func (s *ticketService) UpdateTimeSlot(id uuid.UUID, req UpdateTimeSlotRequest) (*models.TimeSlot, error) {
+func (s *TicketService) UpdateTimeSlot(id uuid.UUID, req UpdateTimeSlotRequest) (*models.TimeSlot, error) {
 	slot, err := s.repo.GetTimeSlotByID(id)
 	if err != nil {
 		return nil, err
@@ -355,15 +335,15 @@ func (s *ticketService) UpdateTimeSlot(id uuid.UUID, req UpdateTimeSlotRequest) 
 	return slot, nil
 }
 
-func (s *ticketService) DeleteTimeSlot(id uuid.UUID) error {
+func (s *TicketService) DeleteTimeSlot(id uuid.UUID) error {
 	return s.repo.DeleteTimeSlot(id)
 }
 
-func (s *ticketService) ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error) {
+func (s *TicketService) ListTimeSlots(destinationID uuid.UUID) ([]models.TimeSlot, error) {
 	return s.repo.ListTimeSlots(destinationID)
 }
 
-func (s *ticketService) CheckAvailability(req CheckAvailabilityRequest) (*AvailabilityResponse, error) {
+func (s *TicketService) CheckAvailability(req CheckAvailabilityRequest) (*AvailabilityResponse, error) {
 	// Simple implementation
 	dq, err := s.repo.GetDailyQuota(req.DestinationID, req.VisitDate)
 	if err != nil {
@@ -403,7 +383,7 @@ func generateRandomString(n int) string {
 	return string(ret)
 }
 
-func (s *ticketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsRequest) (*BookingResponse, error) {
+func (s *TicketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsRequest) (*BookingResponse, error) {
 	ctx := context.Background()
 
 	// 1. Idempotency Check
@@ -537,23 +517,23 @@ func (s *ticketService) BookTickets(tenantID, userID uuid.UUID, req BookTicketsR
 	}, nil
 }
 
-func (s *ticketService) GetTicket(id uuid.UUID) (*models.Ticket, error) {
+func (s *TicketService) GetTicket(id uuid.UUID) (*models.Ticket, error) {
 	return s.repo.GetTicketByID(id)
 }
 
-func (s *ticketService) GetTicketByCode(code string) (*models.Ticket, error) {
+func (s *TicketService) GetTicketByCode(code string) (*models.Ticket, error) {
 	return s.repo.GetTicketByCode(code)
 }
 
-func (s *ticketService) ListQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error) {
+func (s *TicketService) ListQuotas(destinationID uuid.UUID, startDate, endDate time.Time) ([]models.DailyQuota, error) {
 	return s.repo.ListDailyQuotas(destinationID, startDate, endDate)
 }
 
-func (s *ticketService) CancelTicket(id uuid.UUID) error {
+func (s *TicketService) CancelTicket(id uuid.UUID) error {
 	return s.repo.UpdateTicketStatus(id, "cancelled", nil, nil)
 }
 
-func (s *ticketService) JoinQueue(userID uuid.UUID, req JoinQueueRequest) (*QueueResponse, error) {
+func (s *TicketService) JoinQueue(userID uuid.UUID, req JoinQueueRequest) (*QueueResponse, error) {
 	ctx := context.Background()
 	queueKey := fmt.Sprintf("queue:%s:%s", req.DestinationID.String(), req.VisitDate)
 	
@@ -583,7 +563,7 @@ func (s *ticketService) JoinQueue(userID uuid.UUID, req JoinQueueRequest) (*Queu
 	}, nil
 }
 
-func (s *ticketService) CheckQueueStatus(userID uuid.UUID, destinationID uuid.UUID, visitDate string) (*QueueResponse, error) {
+func (s *TicketService) CheckQueueStatus(userID uuid.UUID, destinationID uuid.UUID, visitDate string) (*QueueResponse, error) {
 	ctx := context.Background()
 	queueKey := fmt.Sprintf("queue:%s:%s", destinationID.String(), visitDate)
 	
@@ -616,7 +596,7 @@ func (s *ticketService) CheckQueueStatus(userID uuid.UUID, destinationID uuid.UU
 
 // GetLiveQRPayload generates a fresh TOTP QR code payload for the given ticket ID.
 // The payload changes every 30 seconds and includes the seconds until next refresh.
-func (s *ticketService) GetLiveQRPayload(id uuid.UUID) (*LiveQRResponse, error) {
+func (s *TicketService) GetLiveQRPayload(id uuid.UUID) (*LiveQRResponse, error) {
 	ticket, err := s.repo.GetTicketByID(id)
 	if err != nil || ticket == nil {
 		return nil, fmt.Errorf("ticket not found")

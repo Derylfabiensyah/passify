@@ -11,10 +11,10 @@ import (
 )
 
 type TicketHandler struct {
-	service TicketService
+	service *TicketService
 }
 
-func NewTicketHandler(service TicketService) *TicketHandler {
+func NewTicketHandler(service *TicketService) *TicketHandler {
 	return &TicketHandler{service: service}
 }
 
