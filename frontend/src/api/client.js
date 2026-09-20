@@ -31,11 +31,7 @@ export function resolveServiceUrl(endpoint) {
   if (cleanEndpoint.startsWith('/api/v1/auth')) {
     return `${SERVICE_URLS.auth}${cleanEndpoint}`;
   }
-  if (
-    cleanEndpoint.startsWith('/api/v1/tickets') ||
-    cleanEndpoint.startsWith('/api/v1/seatmap') ||
-    cleanEndpoint.startsWith('/api/v1/nfc')
-  ) {
+  if (cleanEndpoint.startsWith('/api/v1/tickets')) {
     return `${SERVICE_URLS.ticket}${cleanEndpoint}`;
   }
   if (

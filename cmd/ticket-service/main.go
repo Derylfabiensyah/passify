@@ -9,7 +9,6 @@ import (
 	"github.com/tiket-wisata-alam/backend/internal/config"
 	"github.com/tiket-wisata-alam/backend/internal/database"
 	"github.com/tiket-wisata-alam/backend/internal/middleware"
-	"github.com/tiket-wisata-alam/backend/services/nfc"
 	"github.com/tiket-wisata-alam/backend/services/ticket"
 )
 
@@ -47,12 +46,6 @@ func main() {
 	// Register ticket service routes
 	ticketGroup := router.Group("/api/v1/tickets")
 	ticket.RegisterRoutes(ticketGroup, handler, cfg.JWT.Secret, redisClient)
-
-	// Register NFC wristband sync & tap routes
-	nfcSvc := nfc.NewNFCService(db)
-	nfcHandler := nfc.NewNFCHandler(nfcSvc)
-	nfcGroup := router.Group("/api/v1/nfc")
-	nfc.RegisterRoutes(nfcGroup, nfcHandler, cfg.JWT.Secret)
 
 	port := cfg.TicketServicePort
 	if !strings.HasPrefix(port, ":") {
