@@ -171,14 +171,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               child: AppBar(
-                title: Text(
-                  'passify',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 22,
-                    color: AppColors.forestDeep,
-                    letterSpacing: -0.6,
-                  ),
+                title: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Image.asset(
+                        'assets/logo-passify.png',
+                        width: 26,
+                        height: 26,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'passify',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 22,
+                        color: AppColors.forestDeep,
+                        letterSpacing: -0.6,
+                      ),
+                    ),
+                  ],
                 ),
                 backgroundColor: Colors.transparent,
                 elevation: 0,

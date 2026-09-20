@@ -108,27 +108,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Brand Logo Badge
                       Center(
                         child: Container(
-                          width: 76,
-                          height: 76,
+                          width: 80,
+                          height: 80,
                           decoration: BoxDecoration(
-                            color: AppColors.success,
                             borderRadius: BorderRadius.circular(AppRadius.xl),
                             boxShadow: [
                               BoxShadow(
-                                color: AppColors.success.withValues(alpha: 0.3),
+                                color: AppColors.success.withValues(alpha: 0.25),
                                 blurRadius: 20,
                                 offset: const Offset(0, 8),
                               ),
                             ],
-                            border: Border.all(
-                              color: AppColors.glassBorder,
-                              width: 1.5,
-                            ),
                           ),
-                          child: const Icon(
-                            Icons.forest_rounded,
-                            color: Colors.white,
-                            size: 40,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(AppRadius.xl),
+                            child: Image.asset(
+                              'assets/logo-passify.png',
+                              width: 80,
+                              height: 80,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                color: AppColors.success,
+                                child: const Icon(
+                                  Icons.forest_rounded,
+                                  color: Colors.white,
+                                  size: 40,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                       ),
