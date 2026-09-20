@@ -5,6 +5,9 @@ import '../constants/app_colors.dart';
 /// Reusable Glassmorphism Container providing frosted backdrop blur,
 /// multi-stop specular gradient borders, and soft ambient drop shadows.
 class GlassContainer extends StatelessWidget {
+  /// Standardized blur value for deep, distinct frosted glass refraction
+  static const double standardBlur = 24.0;
+
   final Widget child;
   final BorderRadius? borderRadius;
   final double blur;
@@ -23,8 +26,8 @@ class GlassContainer extends StatelessWidget {
     super.key,
     required this.child,
     this.borderRadius,
-    this.blur = 18.0,
-    this.borderWidth = 1.2,
+    this.blur = standardBlur,
+    this.borderWidth = 1.4,
     this.borderGradient,
     this.fillGradient,
     this.fillColor,
@@ -41,10 +44,11 @@ class GlassContainer extends StatelessWidget {
     Key? key,
     required Widget child,
     BorderRadius? borderRadius,
-    double blur = 18.0,
-    double borderWidth = 1.2,
+    double blur = standardBlur,
+    double borderWidth = 1.4,
     Gradient? borderGradient,
     Gradient? fillGradient,
+    Color? fillColor,
     List<BoxShadow>? boxShadow,
     EdgeInsetsGeometry? padding,
     EdgeInsetsGeometry? margin,
@@ -64,30 +68,33 @@ class GlassContainer extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [
               Colors.white.withValues(alpha: 0.95),
-              Colors.white.withValues(alpha: 0.25),
+              Colors.white.withValues(alpha: 0.20),
             ],
             stops: const [0.0, 1.0],
           ),
-      fillGradient: fillGradient ??
-          LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white.withValues(alpha: 0.65),
-              Colors.white.withValues(alpha: 0.38),
-            ],
-          ),
+      fillGradient: fillColor != null
+          ? null
+          : (fillGradient ??
+              LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Colors.white.withValues(alpha: 0.58),
+                  Colors.white.withValues(alpha: 0.28),
+                ],
+              )),
+      fillColor: fillColor,
       boxShadow: boxShadow ??
           [
             BoxShadow(
-              color: const Color(0xFF1F2B1A).withValues(alpha: 0.08),
-              blurRadius: 24,
+              color: const Color(0xFF1F2B1A).withValues(alpha: 0.07),
+              blurRadius: 28,
               spreadRadius: 0,
-              offset: const Offset(0, 8),
+              offset: const Offset(0, 10),
             ),
             BoxShadow(
-              color: Colors.white.withValues(alpha: 0.6),
-              blurRadius: 2,
+              color: Colors.white.withValues(alpha: 0.7),
+              blurRadius: 3,
               spreadRadius: 0,
               offset: const Offset(0, 1),
             ),
@@ -106,7 +113,7 @@ class GlassContainer extends StatelessWidget {
     Key? key,
     required Widget child,
     BorderRadius? borderRadius,
-    double blur = 20.0,
+    double blur = standardBlur,
     double borderWidth = 1.2,
     Gradient? borderGradient,
     Gradient? fillGradient,
@@ -128,8 +135,8 @@ class GlassContainer extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF34D399).withValues(alpha: 0.55),
-              Colors.white.withValues(alpha: 0.15),
+              Colors.white.withValues(alpha: 0.22),
+              Colors.white.withValues(alpha: 0.06),
             ],
           ),
       fillGradient: fillGradient ??
@@ -137,8 +144,8 @@ class GlassContainer extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              const Color(0xFF13251B).withValues(alpha: 0.65),
-              const Color(0xFF09140E).withValues(alpha: 0.45),
+              const Color(0xFF0F1713).withValues(alpha: 0.75),
+              const Color(0xFF080C0A).withValues(alpha: 0.65),
             ],
           ),
       boxShadow: boxShadow ??

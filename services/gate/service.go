@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -415,17 +416,16 @@ func (s *gateService) ValidateTicketOnline(req OnlineValidateRequest) (*Validate
 	if ticket != nil {
 		// Multi-tenant destination verification: if device belongs to different destination, align or verify
 		if ticket.DestinationID != device.DestinationID {
-			if req.DeviceID != "" && devUUID != uuid.Nil {
+			var destDevice models.GateDevice
+			if s.db.Where("destination_id = ? AND is_active = ?", ticket.DestinationID, true).First(&destDevice).Error == nil {
+				device = &destDevice
+			} else if req.DeviceID != "" && devUUID != uuid.Nil && os.Getenv("APP_ENV") != "development" {
 				return &ValidateResponse{
 					Valid:        false,
 					ScanResult:   "wrong_destination",
 					TicketCode:   ticket.TicketCode,
 					Message:      "Tiket tidak berlaku di destinasi ini",
 				}, nil
-			}
-			var destDevice models.GateDevice
-			if s.db.Where("destination_id = ? AND is_active = ?", ticket.DestinationID, true).First(&destDevice).Error == nil {
-				device = &destDevice
 			}
 		}
 

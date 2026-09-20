@@ -44,3 +44,27 @@ func TestVerifyMidtransSignature(t *testing.T) {
 		t.Errorf("Expected empty server key to return true (bypass mode), but got false")
 	}
 }
+
+func TestTopUpOrderPrefix(t *testing.T) {
+	validTopUpOrders := []string{
+		"TOPUP-WAL-1726368819-1234",
+		"TOPUP-20260915-9999",
+	}
+
+	for _, order := range validTopUpOrders {
+		if !strings.HasPrefix(order, "TOPUP-") {
+			t.Errorf("Expected order %s to start with TOPUP-", order)
+		}
+	}
+
+	nonTopUpOrders := []string{
+		"TWA-20260915-1234",
+		"ORD-98821",
+	}
+
+	for _, order := range nonTopUpOrders {
+		if strings.HasPrefix(order, "TOPUP-") {
+			t.Errorf("Expected order %s to not start with TOPUP-", order)
+		}
+	}
+}

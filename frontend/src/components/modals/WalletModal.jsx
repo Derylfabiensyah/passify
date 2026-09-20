@@ -14,9 +14,14 @@ import {
   Shirt,
   Banknote,
   History,
-  ShieldCheck
+  ShieldCheck,
+  CreditCard,
+  Lock,
+  ExternalLink,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
-import ModalWrapper from './common/ModalWrapper';
+import ModalWrapper from '../common/ModalWrapper';
 
 export default function WalletModal({ walletBalance: propBalance, onTopUp, onClose }) {
   const [activeTab, setActiveTab] = useState('nfc'); // 'nfc' | 'qr' | 'refund' | 'topup'
@@ -24,6 +29,10 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
   const [isSuccessMsg, setIsSuccessMsg] = useState('');
   const [nfcLinked, setNfcLinked] = useState(true);
   const [nfcUid] = useState('CLIENT-NFC-88219');
+  const [isProcessingTopUp, setIsProcessingTopUp] = useState(false);
+  const [topupError, setTopupError] = useState('');
+  const [showSnapFallbackModal, setShowSnapFallbackModal] = useState(false);
+  const [snapTopUpData, setSnapTopUpData] = useState(null);
 
   const [localBalance, setLocalBalance] = useState(() => {
     const saved = localStorage.getItem('passify_wallet_balance');
@@ -74,21 +83,151 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
     { id: 'm3', name: 'Souvenir Resmi Kawasan Wisata', item: 'Topi & Suvenir Alam', price: 75000, icon: <Shirt className="w-4 h-4 text-blue-500" /> }
   ];
 
-  const handleTopUpSubmit = (e) => {
-    e.preventDefault();
-    if (amount <= 0) return;
+  // Helper to trigger official Midtrans Snap Popup for Top-Up
+  const openSnapPopup = (token, redirectUrl, ordNumber, topUpAmt) => {
+    if (window.snap && typeof window.snap.pay === 'function' && token && !token.startsWith('SNAP-SIMULATOR')) {
+      try {
+        window.snap.pay(token, {
+          onSuccess: async (result) => {
+            await finalizeTopUpSuccess(
+              ordNumber,
+              topUpAmt,
+              result?.transaction_id || token,
+              result?.payment_type || 'MIDTRANS_SNAP'
+            );
+          },
+          onPending: (result) => {
+            console.log('Midtrans Snap Top-Up pending:', result);
+            setIsProcessingTopUp(false);
+            setShowSnapFallbackModal(false);
+            setIsSuccessMsg('⏳ Transaksi top-up tercatat. Menunggu penyelesaian transfer Anda.');
+            setTimeout(() => setIsSuccessMsg(''), 5000);
+          },
+          onError: (result) => {
+            console.warn('Midtrans Snap Top-Up error:', result);
+            setIsProcessingTopUp(false);
+            setShowSnapFallbackModal(false);
+            setTopupError('Pembayaran melalui Midtrans tidak berhasil. Silakan coba kembali.');
+          },
+          onClose: () => {
+            console.log('Midtrans Snap Top-Up closed by user');
+            setIsProcessingTopUp(false);
+            setShowSnapFallbackModal(false);
+          },
+        });
+        return true;
+      } catch (e) {
+        console.warn('Gagal memanggil window.snap.pay:', e);
+      }
+    }
+    return false;
+  };
 
-    applyDelta(amount);
+  const finalizeTopUpSuccess = async (ordNumber, topUpAmt, payRef, payType) => {
+    try {
+      await fetch('http://localhost:8084/api/v1/payments/snap/finish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order_number: ordNumber }),
+      });
+    } catch (e) {
+      console.warn('Gagal mengonfirmasi status finish ke payment-service:', e);
+    }
+
+    applyDelta(topUpAmt);
     updateTransactions({
       id: `TX-${Date.now()}`,
-      title: 'Top Up Saldo Mandiri',
-      amount: amount,
+      title: `Top Up Saldo (${payType ? `Midtrans ${payType.toUpperCase()}` : 'Midtrans Snap'})`,
+      amount: topUpAmt,
       type: 'topup',
-      time: 'Baru saja'
+      time: 'Baru saja',
     });
 
-    setIsSuccessMsg(`Top-Up Rp ${amount.toLocaleString('id-ID')} berhasil ditambahkan!`);
-    setTimeout(() => setIsSuccessMsg(''), 3000);
+    setShowSnapFallbackModal(false);
+    setIsProcessingTopUp(false);
+    setTopupError('');
+    setIsSuccessMsg(`✓ Top-Up Rp ${topUpAmt.toLocaleString('id-ID')} via Midtrans berhasil! Saldo telah ditambahkan.`);
+    setTimeout(() => setIsSuccessMsg(''), 4500);
+  };
+
+  const handleTopUpSubmit = async (e) => {
+    e.preventDefault();
+    if (amount <= 0) {
+      setTopupError('Nominal top-up harus lebih dari Rp 0.');
+      return;
+    }
+
+    setIsProcessingTopUp(true);
+    setTopupError('');
+    setIsSuccessMsg('');
+
+    const orderNumber = `TOPUP-WAL-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    let savedUser = null;
+    try {
+      savedUser = JSON.parse(localStorage.getItem('passify_user') || 'null');
+    } catch (_) {}
+
+    const customerName = savedUser?.full_name || savedUser?.name || 'Pengguna Passify';
+    const customerEmail = savedUser?.email || 'visitor@passify.id';
+    const customerPhone = savedUser?.phone || '08123456789';
+    const userId = savedUser?.id || undefined;
+
+    let realSnapToken = '';
+    let realRedirectUrl = '';
+
+    try {
+      const snapPayload = {
+        order_number: orderNumber,
+        gross_amount: amount,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        customer_phone: customerPhone,
+        user_id: userId,
+        items: [
+          {
+            id: 'WALLET-TOPUP',
+            name: 'Top Up Saldo Passify Cashless Wallet',
+            price: amount,
+            quantity: 1,
+          },
+        ],
+      };
+
+      const res = await fetch('http://localhost:8084/api/v1/payments/snap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(snapPayload),
+      });
+
+      if (res.ok) {
+        const snapJson = await res.json();
+        realSnapToken = snapJson.data?.snap_token;
+        realRedirectUrl = snapJson.data?.redirect_url;
+      } else {
+        const errJson = await res.json().catch(() => null);
+        console.warn('Gagal mendapatkan token Snap dari backend:', errJson?.message || res.statusText);
+      }
+    } catch (err) {
+      console.warn('Gagal menghubungi payment-service backend:', err);
+    }
+
+    const activeToken = realSnapToken || `SNAP-SIMULATOR-${orderNumber}`;
+    const activeRedirectUrl = realRedirectUrl || `https://app.sandbox.midtrans.com/snap/v2/vtweb/${activeToken}`;
+
+    const snapInfo = {
+      orderNumber,
+      token: activeToken,
+      redirectUrl: activeRedirectUrl,
+      amount,
+    };
+    setSnapTopUpData(snapInfo);
+
+    const popupOpened = openSnapPopup(activeToken, activeRedirectUrl, orderNumber, amount);
+    if (!popupOpened) {
+      setShowSnapFallbackModal(true);
+      setIsProcessingTopUp(false);
+    }
   };
 
   const handlePayMerchant = (merch) => {
@@ -416,11 +555,17 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
           </div>
         )}
 
-        {/* Tab 4: Top-Up Saldo */}
+        {/* Tab 4: Top-Up Saldo via Midtrans Snap */}
         {activeTab === 'topup' && (
           <form id="panel-topup" role="tabpanel" aria-labelledby="tab-topup-action" onSubmit={handleTopUpSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-[var(--forest-deep)] mb-2">Pilih Nominal Top-Up</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-medium text-[var(--forest-deep)]">Pilih Nominal Top-Up</label>
+                <span className="text-[10px] text-[var(--forest)] font-semibold flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3" />
+                  Midtrans Secured
+                </span>
+              </div>
               <div className="grid grid-cols-2 gap-2 mb-3">
                 {presets.map((val) => (
                   <button
@@ -438,25 +583,173 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
                 ))}
               </div>
 
-              <input
-                id="topup-amount-input"
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                placeholder="Nominal lainnya"
-                className="w-full bg-[var(--canvas)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--ink)] focus:border-[var(--forest)] focus:bg-[var(--surface)] focus:outline-none"
-              />
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">Rp</span>
+                <input
+                  id="topup-amount-input"
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(Number(e.target.value))}
+                  placeholder="Nominal lainnya"
+                  min="10000"
+                  step="5000"
+                  className="w-full bg-[var(--canvas)] border border-[var(--border)] rounded-xl pl-9 pr-4 py-2.5 text-sm font-semibold text-[var(--ink)] focus:border-[var(--forest)] focus:bg-[var(--surface)] focus:outline-none"
+                />
+              </div>
             </div>
+
+            {/* Midtrans Channel Showcase */}
+            <div className="p-3.5 rounded-xl bg-gradient-to-br from-emerald-50/70 to-teal-50/40 dark:from-neutral-800/80 dark:to-emerald-950/20 border border-emerald-200/70 dark:border-emerald-800/30 text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[var(--forest-deep)] dark:text-emerald-300 flex items-center gap-1.5">
+                  <CreditCard className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  Metode Pembayaran Resmi Midtrans
+                </span>
+                <span className="text-[9px] font-extrabold uppercase bg-emerald-600 text-white px-2 py-0.5 rounded-full tracking-wider">
+                  SNAP V2
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-1.5 pt-1">
+                <div className="p-1.5 rounded-lg bg-white/80 dark:bg-neutral-900/80 border border-black/5 dark:border-white/5 text-center text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                  ⚡ QRIS &amp; E-Wallet
+                </div>
+                <div className="p-1.5 rounded-lg bg-white/80 dark:bg-neutral-900/80 border border-black/5 dark:border-white/5 text-center text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                  🏦 Virtual Account
+                </div>
+                <div className="p-1.5 rounded-lg bg-white/80 dark:bg-neutral-900/80 border border-black/5 dark:border-white/5 text-center text-[10px] font-semibold text-gray-700 dark:text-gray-300">
+                  💳 Kartu Debit/Kredit
+                </div>
+              </div>
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed pt-0.5">
+                Saldo otomatis bertambah dan tersinkronisasi ke gelang NFC segera setelah pembayaran diverifikasi oleh Midtrans.
+              </p>
+            </div>
+
+            {/* Error Alert */}
+            {topupError && (
+              <div className="p-3 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+                <span>{topupError}</span>
+              </div>
+            )}
 
             <button
               id="submit-topup-btn"
               type="submit"
-              className="w-full btn-primary py-3 justify-center text-sm font-semibold rounded-xl shadow-2xs"
+              disabled={isProcessingTopUp || amount <= 0}
+              className="w-full btn-primary py-3 justify-center text-sm font-semibold rounded-xl shadow-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed transition-all active:scale-[0.99] flex items-center gap-2"
             >
-              <span>Konfirmasi Top-Up Rp {amount.toLocaleString('id-ID')}</span>
-              <ArrowRight className="w-4 h-4" />
+              {isProcessingTopUp ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Menyiapkan Midtrans Snap...</span>
+                </>
+              ) : (
+                <>
+                  <Lock className="w-4 h-4 text-emerald-200" />
+                  <span>Bayar &amp; Top-Up Rp {amount.toLocaleString('id-ID')} via Midtrans</span>
+                  <ArrowRight className="w-4 h-4 ml-1 text-emerald-200" />
+                </>
+              )}
             </button>
           </form>
+        )}
+
+        {/* Midtrans Snap Fallback / Simulation Modal */}
+        {showSnapFallbackModal && snapTopUpData && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+            <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-neutral-900 border border-emerald-500/30 p-5 shadow-2xl space-y-4 text-[var(--ink)] text-center">
+              <div className="mx-auto w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm">
+                <CreditCard className="w-6 h-6" />
+              </div>
+
+              <div className="space-y-1">
+                <span className="inline-block rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider">
+                  Midtrans Snap Gateway
+                </span>
+                <h3 className="text-base font-bold text-[var(--forest-deep)] dark:text-white">
+                  Selesaikan Pembayaran Top-Up
+                </h3>
+                <p className="text-xs text-[var(--ink-soft)]">
+                  Nomor Order: <span className="font-mono font-semibold">{snapTopUpData.orderNumber}</span>
+                </p>
+              </div>
+
+              <div className="rounded-xl bg-gray-50 dark:bg-neutral-800 p-3 flex items-center justify-between">
+                <span className="text-xs text-gray-500 dark:text-gray-400">Total Tagihan Top-Up:</span>
+                <span className="text-base font-extrabold text-[var(--forest)] dark:text-emerald-400 font-heading">
+                  Rp {snapTopUpData.amount.toLocaleString('id-ID')}
+                </span>
+              </div>
+
+              <div className="space-y-2 pt-1">
+                {/* 1. Official Snap Popup Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const opened = openSnapPopup(
+                      snapTopUpData.token,
+                      snapTopUpData.redirectUrl,
+                      snapTopUpData.orderNumber,
+                      snapTopUpData.amount
+                    );
+                    if (opened) setShowSnapFallbackModal(false);
+                  }}
+                  className="w-full btn-primary py-2.5 rounded-xl flex items-center justify-center gap-2 text-xs font-bold shadow-sm cursor-pointer"
+                >
+                  <QrCode className="w-3.5 h-3.5" />
+                  <span>Buka Pop-up Midtrans Snap</span>
+                </button>
+
+                {/* 2. Direct Web Redirect in New Tab */}
+                {snapTopUpData.redirectUrl && (
+                  <a
+                    href={snapTopUpData.redirectUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2 px-3 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold no-underline text-[var(--forest-deep)] dark:text-emerald-300 bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 hover:bg-emerald-100 transition-colors"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Buka Halaman Midtrans (Tab Baru)</span>
+                  </a>
+                )}
+
+                {/* 3. Sandbox Instant Simulator */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    finalizeTopUpSuccess(
+                      snapTopUpData.orderNumber,
+                      snapTopUpData.amount,
+                      `SIM-${snapTopUpData.orderNumber}`,
+                      'SANDBOX_SIMULATOR'
+                    )
+                  }
+                  className="w-full py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/50 hover:bg-amber-100 transition-colors cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Simulasi Bayar Sukses (Midtrans Sandbox)</span>
+                </button>
+
+                {/* 4. Cancel */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSnapFallbackModal(false);
+                    setIsProcessingTopUp(false);
+                  }}
+                  className="w-full py-1.5 text-xs text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 font-medium cursor-pointer"
+                >
+                  Batal / Ganti Nominal
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-1 text-[10px] text-gray-400">
+                <Lock className="w-3 h-3 text-emerald-600" />
+                <span>Terhubung ke Payment Gateway Sandbox</span>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Recent Transaction Log (Always visible at bottom) */}

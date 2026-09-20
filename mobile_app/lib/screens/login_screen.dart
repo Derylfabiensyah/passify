@@ -1,9 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../providers/auth_provider.dart';
+import '../widgets/glass_container.dart';
+import '../widgets/mesh_gradient_background.dart';
 import 'home_screen.dart';
 import 'settings/server_config_screen.dart';
 
@@ -92,60 +94,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ],
         ),
-        body: Stack(
-          children: [
-            // Background Orbs for Glassmorphism
-            Positioned(
-              top: -100,
-              left: -50,
-              child: Container(
-                width: 300,
-                height: 300,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.orbMint,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: -50,
-              right: -100,
-              child: Container(
-                width: 350,
-                height: 350,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.orbGold,
-                ),
-              ),
-            ),
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.4,
-              left: MediaQuery.of(context).size.width * 0.6,
-              child: Container(
-                width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.orbEmerald,
-                ),
-              ),
-            ),
-            
-            // Blur Layer
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
-                child: Container(
-                  color: Colors.transparent,
-                ),
-              ),
-            ),
-
-            // Content
-            Center(
+        body: MeshGradientBackground(
+          child: SafeArea(
+            child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -182,14 +135,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 20),
 
                       // Title & Tagline
-                      const Text(
-                        'Passify Field Ops',
+                      Text(
+                        'passify',
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 26,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 32,
                           fontWeight: FontWeight.w900,
                           color: AppColors.forestDeep,
-                          letterSpacing: -0.5,
+                          letterSpacing: -0.8,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -230,30 +183,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
 
                       // Glassmorphism Form Container
-                      ClipRRect(
+                      GlassContainer.light(
+                        padding: const EdgeInsets.all(24),
                         borderRadius: BorderRadius.circular(AppRadius.xl),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: AppColors.glassWhiteSolid,
-                              borderRadius: BorderRadius.circular(AppRadius.xl),
-                              border: Border.all(
-                                color: AppColors.glassBorder,
-                                width: 1.5,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.glassShadow,
-                                  blurRadius: 24,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
                                 // Email Field
                                 TextFormField(
                                   controller: _emailController,
@@ -399,8 +334,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             ),
-                          ),
-                        ),
                       ),
 
                       const SizedBox(height: 28),
@@ -424,24 +357,24 @@ class _LoginScreenState extends State<LoginScreen> {
                             alignment: WrapAlignment.center,
                             children: [
                               ActionChip(
-                                avatar: const Icon(Icons.forest_rounded, size: 16, color: AppColors.forestDeep),
-                                label: const Text('Citambur (budi)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                                avatar: const Icon(Icons.qr_code_scanner_rounded, size: 16, color: AppColors.forestDeep),
+                                label: const Text('Petugas Gate (Cikanteh)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
                                 backgroundColor: AppColors.glassWhiteSoft,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(AppRadius.sm),
                                   side: BorderSide(color: AppColors.glassBorder),
-                                ),
-                                onPressed: () => _fillDemoAccount('budi@gmail.com', 'admin123'),
+                                  ),
+                                onPressed: () => _fillDemoAccount('gate@curugcikanteh.com', 'password123'),
                               ),
                               ActionChip(
                                 avatar: const Icon(Icons.terrain_rounded, size: 16, color: AppColors.bark),
-                                label: const Text('Cikanteh (kiano)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
+                                label: const Text('Admin (kiano)', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w700)),
                                 backgroundColor: AppColors.glassWhiteSoft,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(AppRadius.sm),
                                   side: BorderSide(color: AppColors.glassBorder),
                                 ),
-                                onPressed: () => _fillDemoAccount('kiano@gmail.com', 'admin123'),
+                                onPressed: () => _fillDemoAccount('kiano@gmail.com', 'password123'),
                               ),
                             ],
                           ),
@@ -453,7 +386,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );

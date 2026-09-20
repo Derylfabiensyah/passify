@@ -16,12 +16,15 @@ import {
   Sparkles,
   Ticket,
   Smartphone,
-  Monitor,
   UploadCloud,
+  Compass,
+  ArrowRight,
+  History,
   Trash2,
   Link2,
   Check,
-  RefreshCw
+  RefreshCw,
+  LogIn
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { fetchAdminDestinations, getActiveAdminTenant } from '../../api/admin';
@@ -426,7 +429,10 @@ function formatCleanLocation(dest) {
 }
 
 function PortalLivePreview({ destination, template }) {
-  const [viewMode, setViewMode] = useState('mobile'); // 'mobile' | 'desktop'
+  const user = React.useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('passify_user') || 'null'); } catch { return null; }
+  }, []);
+
   const heading = template.hero_heading || destination?.name || 'Kawasan Wisata Alam';
   const eyebrow = template.eyebrow || 'Tiket Resmi Kawasan';
   const copy = template.hero_copy || destination?.description || 'Nikmati keindahan panorama dan konservasi alam yang teratur.';
@@ -434,7 +440,7 @@ function PortalLivePreview({ destination, template }) {
   const locationText = formatCleanLocation(destination);
   const primaryBg = template.primary_color || '#394032';
   const actionColor = template.accent_color || '#454f2d';
-  const facilities = destination?.facilities && destination.facilities.length > 0
+  const facilities = Array.isArray(destination?.facilities) && destination.facilities.length > 0
     ? destination.facilities
     : ['Area Parkir', 'Toilet Bersih', 'Musholla', 'Pusat Informasi'];
   const rules = destination?.rules || 'Patuhi batas daya dukung lingkungan, jaga kebersihan, dan tunjukkan E-Ticket QR di pintu gerbang.';
@@ -452,41 +458,15 @@ function PortalLivePreview({ destination, template }) {
 
   return (
     <aside className="glass-panel rounded-2xl flex flex-col h-full sticky top-6 overflow-hidden" aria-label="Pratinjau portal wisatawan">
-      {/* Top Bar with Device Switcher */}
+      {/* Top Bar with Live Indicator & Mobile Badge */}
       <div className="p-3.5 border-b border-[var(--border)] flex flex-wrap items-center justify-between gap-3 bg-white/80 backdrop-blur-md">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <p className="font-bold text-xs sm:text-sm text-[var(--forest-deep)] font-serif">Pratinjau Langsung</p>
-        </div>
-
-        {/* Device Switcher Toggle */}
-        <div className="flex items-center bg-[var(--sand)] rounded-xl p-1 border border-[var(--border)]">
-          <button
-            type="button"
-            onClick={() => setViewMode('mobile')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              viewMode === 'mobile'
-                ? 'bg-white text-[var(--forest-deep)] shadow-2xs'
-                : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
-            }`}
-            title="Tampilan Android / Mobile"
-          >
-            <Smartphone className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[var(--forest)] bg-[var(--leaf-pale)] border border-[var(--border)] px-2.5 py-0.5 rounded-full ml-1">
+            <Smartphone className="w-3.5 h-3.5 text-[var(--forest)]" />
             <span>Mobile</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('desktop')}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-              viewMode === 'desktop'
-                ? 'bg-white text-[var(--forest-deep)] shadow-2xs'
-                : 'text-[var(--ink-soft)] hover:text-[var(--ink)]'
-            }`}
-            title="Tampilan Desktop / Web"
-          >
-            <Monitor className="w-3.5 h-3.5" />
-            <span>Web Desktop</span>
-          </button>
+          </span>
         </div>
 
         <a
@@ -495,127 +475,217 @@ function PortalLivePreview({ destination, template }) {
           rel="noopener noreferrer"
           className="text-xs font-bold text-[var(--forest)] hover:underline flex items-center gap-1 shrink-0"
         >
-          <span>Buka di tab baru</span>
+          <span>Buka website resmi</span>
           <ExternalLink className="h-3.5 w-3.5" />
         </a>
       </div>
 
-      <div className="p-4 sm:p-5 flex-1 bg-transparent overflow-y-auto flex justify-center">
-        {viewMode === 'mobile' ? (
-          /* Mobile / Android Frame */
-          <div className="w-full max-w-[360px] h-fit overflow-hidden rounded-[2.5rem] border-[6px] border-white shadow-2xl bg-transparent transition-all duration-300">
-            {/* Mobile Header Bar */}
-            <div className="bg-white px-4 py-2.5 flex items-center justify-between border-b border-[var(--border)]">
-              <span className="text-xs font-black tracking-tight text-[var(--forest-deep)] font-serif truncate max-w-[180px]">{heading}</span>
-              <span className="text-[10px] font-bold text-[var(--forest)] bg-[var(--leaf-pale)] px-2 py-0.5 rounded-full">Portal Resmi</span>
+      <div className="p-4 sm:p-5 flex-1 bg-transparent overflow-y-auto flex justify-center items-start">
+        {/* Mobile Smartphone Frame Mockup */}
+        <div className="w-full max-w-[320px] h-[580px] max-h-[calc(100vh-13rem)] rounded-[2.5rem] p-[7px] bg-[#1e241d] shadow-2xl flex flex-col transition-all duration-300 relative isolate">
+          {/* Inner Screen Container - Hardware clips all layers strictly inside chassis */}
+          <div className="w-full h-full rounded-[2.1rem] bg-[#fafbfa] flex flex-col overflow-hidden [clip-path:inset(0_round_2.1rem)] relative">
+            {/* Phone Status Bar / Notch (Fixed Top) */}
+          <div className="bg-[#1e241d] px-5 py-1.5 flex items-center justify-between text-white/70 text-[10px] shrink-0">
+            <span className="font-semibold text-[9px]">09:41</span>
+            <div className="w-12 h-2.5 bg-black/70 rounded-full" />
+            <div className="flex items-center gap-1 text-[8px]">
+              <span>5G</span>
+              <span className="inline-block w-3 h-1.5 border border-white/70 rounded-xs relative after:content-[''] after:absolute after:inset-0.5 after:bg-white after:rounded-2xs" />
             </div>
+          </div>
 
-            {/* Mobile Hero */}
-            <div className="relative isolate overflow-hidden p-5 text-white" style={{ backgroundColor: '#111811' }}>
+          {/* Mobile Header Bar (Fixed Top) */}
+          <div className="bg-white/95 px-3 py-2 flex items-center justify-between border-b border-[var(--border)] gap-2 shadow-2xs backdrop-blur-md shrink-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <span
+                className="grid h-6 w-6 shrink-0 place-items-center rounded-lg text-white shadow-2xs transition-colors"
+                style={{ backgroundColor: primaryBg }}
+              >
+                <Compass className="h-3.5 w-3.5" />
+              </span>
+              <div className="min-w-0">
+                <span className="block truncate text-[11px] font-black text-[#14281a] font-serif leading-tight">
+                  {destination?.name || heading}
+                </span>
+                <span className="block truncate text-[7.5px] font-extrabold uppercase tracking-wider text-[var(--forest)] leading-tight">
+                  {eyebrow}
+                </span>
+              </div>
+            </div>
+            {user ? (
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="grid h-6 w-6 place-items-center rounded-lg bg-emerald-800 text-white text-[9px] font-black shadow-2xs">
+                  {user.avatar || user.name?.charAt(0)?.toUpperCase() || 'P'}
+                </span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#14281a] bg-white border border-gray-200/90 px-2 py-0.5 rounded-lg shadow-2xs shrink-0">
+                <LogIn className="h-2.5 w-2.5 text-emerald-800" />
+                <span>Masuk</span>
+              </div>
+            )}
+          </div>
+
+          {/* Scrollable Screen Content */}
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-0 space-y-0 scrollbar-none mesh-background">
+            {/* Mobile Hero Section */}
+            <div className="relative isolate overflow-hidden p-4 text-white" style={{ backgroundColor: primaryBg || '#1e2e22' }}>
               <img
                 src={coverImage}
                 alt=""
                 className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-95 saturate-[1.1] scale-105 transition-all duration-300"
               />
               <div
-                className="absolute inset-0 -z-10"
+                className="absolute inset-0 -z-10 transition-colors duration-300"
                 style={{
-                  backgroundImage: `linear-gradient(to bottom, ${hexToRgba(primaryBg, 0.88)} 0%, ${hexToRgba(primaryBg, 0.55)} 60%, ${hexToRgba(primaryBg, 0.22)} 100%)`
+                  backgroundImage: `linear-gradient(to bottom, ${hexToRgba(primaryBg, 0.90)} 0%, ${hexToRgba(primaryBg, 0.65)} 55%, ${hexToRgba(primaryBg, 0.25)} 100%)`
                 }}
               />
 
-              <div className="pt-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-xl shadow-sm">
+              <div className="space-y-2.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-2.5 py-1 text-[9px] font-semibold text-white backdrop-blur-xl shadow-xs">
                   <MapPin className="h-3 w-3 text-emerald-300" />
                   <span className="truncate max-w-[200px]">{locationText}</span>
                 </span>
 
-                <p className="mt-3 text-[10px] font-extrabold uppercase tracking-widest text-emerald-300">
-                  {eyebrow}
-                </p>
-                <h2 className="mt-1 text-xl font-extrabold leading-tight text-white font-serif">
-                  {heading}
-                </h2>
-                <p className="mt-2 text-xs leading-relaxed text-white/90 line-clamp-3">
+                <div>
+                  <p className="text-[9px] font-extrabold uppercase tracking-widest text-emerald-300 drop-shadow-xs">
+                    {eyebrow}
+                  </p>
+                  <h2 className="mt-0.5 text-lg font-extrabold leading-tight text-white font-serif drop-shadow-sm">
+                    {heading}
+                  </h2>
+                </div>
+
+                <p className="text-[10.5px] leading-relaxed text-white/90 line-clamp-3 drop-shadow-xs">
                   {copy}
                 </p>
 
-                <button
-                  type="button"
-                  className="mt-4 w-full min-h-9 rounded-xl text-xs font-bold text-white shadow-md flex items-center justify-center gap-2 cursor-pointer"
-                  style={{ backgroundColor: actionColor }}
-                >
-                  <Ticket className="h-3.5 w-3.5" /> Pesan Tiket Sekarang
-                </button>
+                <div className="pt-1 space-y-2">
+                  <button
+                    type="button"
+                    className="w-full py-2 px-3 rounded-xl text-xs font-bold text-white shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all hover:brightness-110 active:scale-[0.98]"
+                    style={{ backgroundColor: actionColor }}
+                  >
+                    <Ticket className="h-3.5 w-3.5" /> Pesan Tiket Sekarang
+                  </button>
+
+                  <div className="flex items-center justify-between text-[8.5px] text-white/85 pt-0.5 px-0.5">
+                    <span className="inline-flex items-center gap-1">
+                      <ShieldCheck className="h-3 w-3 text-emerald-400" /> QR aman untuk gerbang
+                    </span>
+                    <span className="inline-flex items-center gap-1 font-semibold text-white/90">
+                      <History className="h-3 w-3 text-emerald-300" /> Riwayat
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Mobile Content Stack */}
-            <div className="space-y-3.5 p-4 bg-transparent">
-              {/* Real Availability Card */}
+            <div className="space-y-3 p-3 bg-transparent">
+              {/* Real Availability Card (True Glassmorphism) */}
               {template.show_availability !== false && (
-                <div
-                  className="relative isolate overflow-hidden rounded-2xl border p-3.5 text-white shadow-lg backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300"
-                  style={{
-                    background: `linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%), ${hexToRgba(primaryBg, 0.32)}`,
-                    borderColor: 'rgba(255, 255, 255, 0.35)',
-                  }}
-                >
-                  <div className="flex items-center justify-between border-b border-white/20 pb-2.5">
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">Ketersediaan Hari Ini</span>
-                    <span className="text-[8px] font-bold text-white bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/25">Sistem Aktif</span>
+                <div className="glass-panel relative isolate overflow-hidden rounded-2xl p-3.5 shadow-sm border border-white/80 transition-all duration-300">
+                  <div className="flex items-center justify-between border-b border-black/[0.07] pb-2">
+                    <span className="eyebrow !text-emerald-800 text-[10px] font-black tracking-wider">Ketersediaan Hari Ini</span>
+                    <span className="inline-flex items-center gap-1 text-[8px] font-bold text-emerald-900 bg-emerald-50/80 backdrop-blur-md px-2 py-0.5 rounded-full border border-emerald-300/60 shadow-2xs">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Sistem Aktif
+                    </span>
                   </div>
-                  <div className="mt-2 flex items-end justify-between">
-                    <span className="text-[10px] text-white/80">Kuota terisi</span>
-                    <strong className="text-base font-extrabold text-white">{quotaPct}%</strong>
+                  <div className="mt-2.5 flex items-end justify-between">
+                    <span className="text-[10.5px] font-bold text-[#3b4836]">Kuota terisi</span>
+                    <strong className="text-base font-black text-[#14281a]">{quotaPct}%</strong>
                   </div>
-                  <div className="mt-1 h-2 w-full bg-black/35 rounded-full overflow-hidden p-0.5 border border-white/15">
-                    <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.6)]" style={{ width: `${Math.min(100, Math.max(0, quotaPct))}%` }} />
+                  <div className="mt-1.5 h-2.5 w-full bg-black/[0.08] rounded-full overflow-hidden p-0.5 border border-white/80 shadow-inner">
+                    <div
+                      className="h-full rounded-full transition-all duration-500 shadow-sm"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, quotaPct))}%`,
+                        backgroundColor: actionColor || '#10b981'
+                      }}
+                    />
                   </div>
                   <div className="mt-2.5 grid grid-cols-2 gap-2 text-center">
-                    <div className="rounded-lg bg-black/25 p-1.5 border border-white/20 backdrop-blur-md">
-                      <span className="block text-[8px] uppercase tracking-wider text-white/70">Tersisa</span>
-                      <span className="font-extrabold text-xs text-white">{remaining.toLocaleString('id-ID')} pax</span>
+                    <div className="rounded-xl bg-white/70 hover:bg-white/85 border border-white/90 p-2 shadow-2xs backdrop-blur-md">
+                      <span className="block text-[8px] uppercase tracking-wider text-[#556350] font-extrabold">Tersisa</span>
+                      <strong className="mt-0.5 block font-black text-xs text-[#14281a]">{remaining.toLocaleString('id-ID')} pax</strong>
                     </div>
-                    <div className="rounded-lg bg-black/25 p-1.5 border border-white/20 backdrop-blur-md">
-                      <span className="block text-[8px] uppercase tracking-wider text-emerald-300">Mulai dari</span>
-                      <span className="font-extrabold text-xs text-emerald-300">Rp {minPrice.toLocaleString('id-ID')}</span>
+                    <div className="rounded-xl bg-white/70 hover:bg-white/85 border border-white/90 p-2 shadow-2xs backdrop-blur-md">
+                      <span className="block text-[8px] uppercase tracking-wider text-emerald-800 font-extrabold">Mulai dari</span>
+                      <strong className="mt-0.5 block font-black text-xs text-emerald-800">Rp {minPrice.toLocaleString('id-ID')}</strong>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Real Ticket Categories Preview */}
-              <div className="rounded-2xl bg-white p-3.5 shadow-2xs border border-[var(--border)] space-y-2">
-                <p className="text-xs font-bold text-[var(--forest-deep)] font-serif">Pilihan Tiket Masuk</p>
-                {categories.length > 0 ? (
-                  categories.map((cat) => {
-                    const catTotal = Number(cat.price || cat.base_price || 0) + Number(cat.insurance || cat.insurance_fee || 0) + Number(cat.retribusi || cat.retribusi_fee || 0);
-                    return (
-                      <div key={cat.id} className="p-2.5 rounded-xl bg-transparent border border-[var(--border)] flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-bold text-[var(--forest-deep)]">{cat.name}</p>
-                          <p className="text-[10px] text-[var(--ink-soft)]">Total: Rp {catTotal.toLocaleString('id-ID')}</p>
+              <div className="glass-panel rounded-2xl p-3.5 shadow-xs space-y-3">
+                <div>
+                  <p className="eyebrow !text-emerald-800 text-[10px]">Pilih tiket</p>
+                  <h3 className="mt-0.5 text-sm font-black text-[#14281a]">Satu perjalanan, satu tiket resmi</h3>
+                  <p className="mt-0.5 text-[10px] text-[#3b4836]">
+                    Pilih tiket yang sesuai, kemudian lengkapi jadwal dan data pengunjung dalam tiga langkah singkat.
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  {categories.length > 0 ? (
+                    categories.map((cat) => {
+                      const catTotal = Number(cat.price || cat.base_price || 0) + Number(cat.insurance || cat.insurance_fee || 0) + Number(cat.retribusi || cat.retribusi_fee || 0);
+                      return (
+                        <div key={cat.id} className="p-2.5 rounded-xl bg-white/85 border border-black/[0.07] flex items-center justify-between shadow-2xs hover:shadow-xs transition-all gap-2">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-bold text-[#14281a] truncate">{cat.name}</p>
+                            <p className="text-[10px] text-[#4a5845] mt-0.5">Total: <strong className="text-[#14281a] font-bold">Rp {catTotal.toLocaleString('id-ID')}</strong> / org</p>
+                          </div>
+                          <button
+                            type="button"
+                            className="btn-primary btn-sm rounded-lg font-bold shadow-xs hover:shadow-md cursor-pointer px-3 py-1.5 text-[11px] shrink-0 flex items-center gap-1"
+                            style={{ backgroundColor: actionColor }}
+                          >
+                            <span>Pilih</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
                         </div>
-                        <span className="text-[10px] font-bold text-white bg-[var(--forest)] px-2.5 py-1 rounded-lg">Pilih</span>
-                      </div>
-                    );
-                  })
-                ) : (
-                  <p className="text-[11px] text-[var(--ink-soft)] italic">Tiket aktif dari Destinasi & Tiket akan otomatis tampil di sini.</p>
-                )}
+                      );
+                    })
+                  ) : (
+                    <p className="text-[10px] text-[#4a5845] italic">Tiket aktif dari Destinasi & Tiket akan otomatis tampil di sini.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Kunjungan Tertata Guide */}
+              <div className="glass-panel rounded-2xl p-3.5 shadow-xs">
+                <h4 className="text-xs font-bold text-[#14281a] mb-2">Kunjungan Tertata</h4>
+                <ul className="space-y-1.5 text-[10px] text-[#2f382a] font-medium">
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                    <span>Pilih tanggal dan sesi kedatangan.</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                    <span>Isi data pemegang tiket online.</span>
+                  </li>
+                  <li className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-700" />
+                    <span>Tunjukkan E-Ticket QR di gerbang.</span>
+                  </li>
+                </ul>
               </div>
 
               {/* Real Facilities */}
               {template.show_facilities !== false && (
-                <div className="rounded-2xl bg-white p-3.5 shadow-2xs border border-[var(--border)]">
-                  <p className="text-xs font-bold text-[var(--forest-deep)] mb-2 font-serif">Fasilitas Kawasan</p>
-                  <div className="flex flex-wrap gap-1">
+                <div className="glass-panel rounded-2xl p-3.5 shadow-xs space-y-2">
+                  <h4 className="text-xs font-bold text-[#14281a]">Fasilitas Kawasan</h4>
+                  <div className="grid grid-cols-2 gap-1.5">
                     {facilities.map((f) => (
-                      <span key={f} className="inline-flex items-center gap-1 text-[10px] font-medium bg-transparent text-[var(--ink-soft)] px-2 py-1 rounded-md">
-                        <CheckCircle2 className="h-3 w-3 text-[var(--forest)]" />
-                        {f}
-                      </span>
+                      <div key={f} className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white/70 border border-white/80 text-[10px] font-bold text-[#14281a] shadow-2xs">
+                        <CheckCircle2 className="h-3 w-3 shrink-0 text-emerald-700" />
+                        <span className="truncate">{f}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -623,168 +693,50 @@ function PortalLivePreview({ destination, template }) {
 
               {/* Glassmorphic Rules */}
               {template.show_rules !== false && (
-                <div className="rounded-2xl bg-white/70 backdrop-blur-xl p-3.5 border border-white/60 shadow-2xs">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--bark)] mb-0.5">Etika Berkunjung</p>
-                  <h4 className="text-xs font-bold text-[var(--forest-deep)] mb-1 font-serif">Jaga Kawasan Bersama</h4>
-                  <p className="text-[11px] leading-relaxed text-[var(--ink-soft)]">
+                <div className="glass-panel rounded-2xl p-3.5 shadow-xs space-y-1">
+                  <p className="eyebrow !text-emerald-800 text-[9px]">Etika Berkunjung</p>
+                  <h4 className="text-xs font-bold text-[#14281a]">Jaga Kawasan Bersama</h4>
+                  <p className="text-[10px] leading-relaxed text-[#2f382a] whitespace-pre-line mt-1">
                     {rules || 'Patuhi batas daya dukung lingkungan, buang sampah pada tempatnya, dan tunjukkan E-Ticket QR saat di gerbang.'}
                   </p>
                 </div>
               )}
-            </div>
-          </div>
-        ) : (
-          /* Desktop / Web Browser Frame */
-          <div className="w-full max-w-2xl h-fit overflow-hidden rounded-2xl border border-[var(--border)] shadow-xl bg-transparent transition-all duration-300">
-            {/* Desktop Browser Topbar */}
-            <div className="bg-[var(--fog)] px-4 py-2 border-b border-[var(--border)] flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-              </div>
-              <div className="flex-1 bg-white rounded-lg px-3 py-1 text-[10px] text-[var(--ink-soft)] font-mono border border-[var(--border)] truncate">
-                https://{destination?.slug || 'wisata'}.passify.id
-              </div>
-            </div>
 
-            {/* Desktop Navbar */}
-            <div className="bg-white/90 px-6 py-3 border-b border-[var(--border)] flex items-center justify-between">
-              <span className="text-sm font-bold text-[var(--forest-deep)] font-serif">{heading}</span>
-              <span className="text-[10px] font-bold text-[var(--forest)] bg-[var(--leaf-pale)] px-3 py-1 rounded-full">
-                Portal Resmi Kawasan
-              </span>
-            </div>
-
-            {/* Desktop Hero Section */}
-            <div className="p-6">
-              <div className="relative isolate overflow-hidden rounded-2xl p-6 text-white transition-colors duration-300 shadow-xl border border-white/10" style={{ backgroundColor: '#111811' }}>
-                <img
-                  src={coverImage}
-                  alt=""
-                  className="absolute inset-0 -z-20 h-full w-full object-cover object-center brightness-95 saturate-[1.1] scale-105"
-                />
-                <div
-                  className="absolute inset-0 -z-10 transition-colors duration-300"
-                  style={{
-                    backgroundImage: `linear-gradient(90deg, ${hexToRgba(primaryBg, 0.90)} 0%, ${hexToRgba(primaryBg, 0.65)} 48%, ${hexToRgba(primaryBg, 0.18)} 100%)`
-                  }}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-[1.4fr_1fr] gap-6 items-center">
-                  <div className="space-y-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/20 px-3 py-1 text-[10px] font-semibold text-white backdrop-blur-xl shadow-sm">
-                      <MapPin className="h-3 w-3 text-emerald-300" />
-                      <span className="truncate">{locationText}</span>
-                    </span>
-                    <p className="text-[10px] font-extrabold uppercase tracking-widest text-emerald-300 pt-1">
-                      {eyebrow}
-                    </p>
-                    <h2 className="text-2xl font-extrabold leading-tight text-white font-serif">
-                      {heading}
-                    </h2>
-                    <p className="text-xs leading-relaxed text-white/90 line-clamp-3">
-                      {copy}
-                    </p>
-                    <button
-                      type="button"
-                      className="mt-3 px-5 py-2.5 rounded-xl text-xs font-bold text-white shadow-md flex items-center gap-2 cursor-pointer"
-                      style={{ backgroundColor: actionColor }}
-                    >
-                      <Ticket className="h-3.5 w-3.5" /> Pesan Tiket Sekarang
-                    </button>
-                  </div>
-
-                  {/* Desktop Real Availability Card */}
-                  {template.show_availability !== false && (
-                    <div
-                      className="relative isolate overflow-hidden rounded-2xl border p-5 text-white shadow-xl backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300"
-                      style={{
-                        background: `linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 100%), ${hexToRgba(primaryBg, 0.32)}`,
-                        borderColor: 'rgba(255, 255, 255, 0.35)',
-                      }}
-                    >
-                      <div className="flex items-center justify-between border-b border-white/20 pb-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Ketersediaan Hari Ini</span>
-                        <span className="text-[9px] font-bold text-white bg-white/20 backdrop-blur-md px-2.5 py-0.5 rounded-full border border-white/25">Sistem Aktif</span>
-                      </div>
-                      <div className="mt-3 flex items-end justify-between">
-                        <span className="text-xs text-white/80">Kuota Terisi</span>
-                        <strong className="text-xl font-extrabold text-white">{quotaPct}%</strong>
-                      </div>
-                      <div className="mt-2 h-2.5 w-full bg-black/35 rounded-full overflow-hidden p-0.5 border border-white/15">
-                        <div className="h-full bg-gradient-to-r from-emerald-400 to-teal-300 rounded-full shadow-[0_0_10px_rgba(52,211,153,0.6)]" style={{ width: `${Math.min(100, Math.max(0, quotaPct))}%` }} />
-                      </div>
-                      <div className="mt-4 grid grid-cols-2 gap-2 text-center">
-                        <div className="rounded-xl bg-black/25 p-2.5 border border-white/20 backdrop-blur-md">
-                          <span className="block text-[9px] uppercase tracking-wider text-white/70">Tersisa</span>
-                          <span className="font-extrabold text-sm text-white">{remaining.toLocaleString('id-ID')} pax</span>
-                        </div>
-                        <div className="rounded-xl bg-black/25 p-2.5 border border-white/20 backdrop-blur-md">
-                          <span className="block text-[9px] uppercase tracking-wider text-emerald-300">Mulai dari</span>
-                          <span className="font-extrabold text-sm text-emerald-300">Rp {minPrice.toLocaleString('id-ID')}</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Desktop Content Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
-                {/* Real Ticket Categories */}
-                <div className="rounded-2xl bg-white p-4 shadow-2xs border border-[var(--border)] space-y-2.5">
-                  <p className="text-xs font-bold text-[var(--forest-deep)] font-serif">Daftar Tiket Resmi Kawasan</p>
-                  {categories.length > 0 ? (
-                    categories.map((cat) => {
-                      const catTotal = Number(cat.price || cat.base_price || 0) + Number(cat.insurance || cat.insurance_fee || 0) + Number(cat.retribusi || cat.retribusi_fee || 0);
-                      return (
-                        <div key={cat.id} className="p-3 rounded-xl bg-transparent border border-[var(--border)] flex items-center justify-between">
-                          <div>
-                            <p className="text-xs font-bold text-[var(--forest-deep)]">{cat.name}</p>
-                            <p className="text-[10px] text-[var(--ink-soft)]">Total: Rp {catTotal.toLocaleString('id-ID')}</p>
-                          </div>
-                          <span className="text-[10px] font-bold text-white bg-[var(--forest)] px-3 py-1 rounded-lg">Pilih</span>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="text-xs text-[var(--ink-soft)] italic">Tiket aktif dari Destinasi & Tiket akan otomatis tampil di sini.</p>
-                  )}
-                </div>
-
-                <div className="space-y-4">
-                  {/* Real Facilities */}
-                  {template.show_facilities !== false && (
-                    <div className="rounded-2xl bg-white p-4 shadow-2xs border border-[var(--border)]">
-                      <p className="text-xs font-bold text-[var(--forest-deep)] mb-2.5 font-serif">Fasilitas Kawasan</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {facilities.map((f) => (
-                          <span key={f} className="inline-flex items-center gap-1.5 text-xs font-medium bg-transparent text-[var(--ink-soft)] px-2.5 py-1 rounded-lg border border-[var(--border)]">
-                            <CheckCircle2 className="h-3.5 w-3.5 text-[var(--forest)]" />
-                            {f}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Glassmorphic Rules */}
-                  {template.show_rules !== false && (
-                    <div className="rounded-2xl bg-white/70 backdrop-blur-xl p-4 border border-white/60 shadow-2xs">
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--bark)] mb-0.5">Etika Berkunjung</p>
-                      <h4 className="text-xs font-bold text-[var(--forest-deep)] mb-1 font-serif">Jaga Kawasan Bersama</h4>
-                      <p className="text-xs leading-relaxed text-[var(--ink-soft)]">
-                        {rules || 'Patuhi batas daya dukung lingkungan, buang sampah pada tempatnya, dan tunjukkan E-Ticket QR saat di gerbang.'}
-                      </p>
-                    </div>
-                  )}
-                </div>
+              {/* Mobile Footer */}
+              <div className="bg-white/85 backdrop-blur-2xl rounded-2xl border border-white/80 py-3 px-3 text-center text-[9px] text-[#3b4836] space-y-0.5 mt-2">
+                <p className="font-bold text-[#14281a]">{heading} · Passify Official Portal</p>
+                <p className="text-[8px] text-[#4a5845]">Konservasi &amp; Tiket Wisata Alam Terintegrasi</p>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Mobile Sticky Bottom Action Bar & Home Indicator (Seamlessly Integrated) */}
+          <div className="bg-white/95 backdrop-blur-md border-t border-black/[0.06] px-3 pt-2 pb-1.5 flex flex-col gap-1.5 shrink-0 z-10">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                className="flex-1 py-2 px-3 rounded-xl text-xs font-extrabold text-white flex items-center justify-center gap-1.5 shadow-xs cursor-pointer hover:brightness-110 active:scale-[0.98] transition-all"
+                style={{ backgroundColor: actionColor }}
+              >
+                <Ticket className="w-3.5 h-3.5" />
+                <span>Pesan tiket</span>
+              </button>
+              <div className="px-2.5 py-1.5 rounded-xl bg-white border border-gray-200/90 text-[#14281a] text-[10px] font-bold flex items-center gap-1.5 shadow-2xs shrink-0">
+                <span className="w-4 h-4 rounded-full text-white text-[8px] font-bold flex items-center justify-center bg-emerald-800" style={{ backgroundColor: primaryBg }}>
+                  {user?.avatar || user?.name?.charAt(0)?.toUpperCase() || 'P'}
+                </span>
+                <span>Profil</span>
+              </div>
+            </div>
+
+            {/* Phone Bottom Home Indicator */}
+            <div className="flex justify-center pb-0.5">
+              <div className="w-20 h-1 bg-black/30 rounded-full" />
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
     </aside>
   );
 }
@@ -1224,8 +1176,10 @@ export default function TemplateEditorPage() {
           name: formData.hero_heading || formData.name,
           description: formData.hero_copy,
           cover_image_url: formData.cover_image_url,
-          location: formData.location,
+          location: [formData.location, formData.province].filter(Boolean).join(', '),
           province: formData.province,
+          address: formData.location,
+          city: formData.location,
           facilities: formData.facilities,
           rules: formData.rules,
           slug: currentDestination?.slug || 'curug-cikanteh',

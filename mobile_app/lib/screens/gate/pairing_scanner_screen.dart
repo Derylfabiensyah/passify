@@ -9,6 +9,7 @@ import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/api_service.dart';
 import '../../services/database_helper.dart';
+import '../../widgets/glass_container.dart';
 import '../../widgets/scanner_overlay.dart';
 
 class PairingScannerScreen extends StatefulWidget {
@@ -168,86 +169,73 @@ class _PairingScannerScreenState extends State<PairingScannerScreen> {
           ),
 
           // Header Bar
-          Positioned(
-            top: 48,
-            left: 16,
-            right: 16,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 26),
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.black45,
-                    shape: const CircleBorder(),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_rounded, color: Colors.white, size: 26),
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black45,
+                      shape: const CircleBorder(),
+                    ),
                   ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white24),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.qr_code_scanner_rounded, color: AppColors.leafPale, size: 16),
-                      SizedBox(width: 6),
-                      Text(
-                        'PAIRING GERBANG',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                          letterSpacing: 0.5,
+                  GlassContainer.frostedPill(
+                    isDark: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.qr_code_scanner_rounded, color: AppColors.leafPale, size: 16),
+                        SizedBox(width: 6),
+                        Text(
+                          'PAIRING GERBANG',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                            letterSpacing: 0.5,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    _isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
-                    color: _isTorchOn ? AppColors.gold : Colors.white,
-                    size: 22,
+                  IconButton(
+                    icon: Icon(
+                      _isTorchOn ? Icons.flash_on_rounded : Icons.flash_off_rounded,
+                      color: _isTorchOn ? AppColors.gold : Colors.white,
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      setState(() => _isTorchOn = !_isTorchOn);
+                      _scannerController.toggleTorch();
+                    },
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black45,
+                      shape: const CircleBorder(),
+                    ),
                   ),
-                  onPressed: () {
-                    setState(() => _isTorchOn = !_isTorchOn);
-                    _scannerController.toggleTorch();
-                  },
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.black45,
-                    shape: const CircleBorder(),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
 
           // Bottom Instruction Card
           Positioned(
-            bottom: 40,
-            left: 20,
-            right: 20,
-            child: Container(
+            bottom: 28,
+            left: 18,
+            right: 18,
+            child: GlassContainer.dark(
+              borderRadius: BorderRadius.circular(24),
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: _isSuccess
-                    ? const Color(0xFF1B3B24).withValues(alpha: 0.95)
-                    : Colors.black.withValues(alpha: 0.85),
-                borderRadius: BorderRadius.circular(24),
-                border: Border.all(
-                  color: _isSuccess ? AppColors.leaf : Colors.white24,
-                  width: 1.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.4),
-                    blurRadius: 16,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
+              borderGradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: _isSuccess
+                    ? [AppColors.leaf, AppColors.leaf.withValues(alpha: 0.3)]
+                    : [Colors.white.withValues(alpha: 0.3), Colors.white.withValues(alpha: 0.08)],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,

@@ -1,10 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/gate_scanner_provider.dart';
 import '../../services/api_service.dart';
+import '../../widgets/glass_container.dart';
+import '../../widgets/mesh_gradient_background.dart';
 
 class GateStatsScreen extends StatefulWidget {
   const GateStatsScreen({super.key});
@@ -69,43 +70,45 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
           child: Divider(height: 1, color: AppColors.glassBorder),
         ),
       ),
-      body: Stack(
-        children: [
-          // Background Orbs
-          Positioned(top: -50, right: -50, child: Container(width: 300, height: 300, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.orbEmerald))),
-          Positioned(bottom: -100, left: -50, child: Container(width: 350, height: 350, decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.orbGold))),
-          
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-              child: Container(color: Colors.transparent),
-            ),
-          ),
-          
-          SafeArea(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: AppColors.success))
-                : SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Hero Summary Card
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: AppColors.success,
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+      body: MeshGradientBackground(
+        child: SafeArea(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator(color: AppColors.success))
+              : SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Hero Summary Glass Card
+                GlassContainer(
+                  padding: const EdgeInsets.all(18),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  borderWidth: 1.4,
+                  borderGradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.forestSoft.withValues(alpha: 0.8),
+                      Colors.white.withValues(alpha: 0.25),
+                    ],
+                  ),
+                  fillGradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      AppColors.forestDeep.withValues(alpha: 0.90),
+                      const Color(0xFF132B1A).withValues(alpha: 0.85),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.forestDeep.withValues(alpha: 0.25),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -230,15 +233,12 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                   const SizedBox(height: 10),
 
                   if (scannerProvider.scanHistory.isEmpty)
-                    Container(
+                    GlassContainer.light(
                       padding: const EdgeInsets.all(24),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: AppColors.glassWhiteSolid,
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                        border: Border.all(color: AppColors.glassBorder),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      child: const Center(
+                        child: Text('Belum ada tiket yang di-scan pada sesi ini.', style: TextStyle(color: AppColors.textMuted)),
                       ),
-                      child: const Text('Belum ada tiket yang di-scan pada sesi ini.', style: TextStyle(color: AppColors.textMuted)),
                     )
                   else
                     ListView.separated(
@@ -248,14 +248,8 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
                       separatorBuilder: (_, _) => const SizedBox(height: 8),
                       itemBuilder: (ctx, idx) {
                         final log = scannerProvider.scanHistory[idx];
-                        return Card(
-                          elevation: 0,
-        surfaceTintColor: Colors.transparent,
-                          color: AppColors.glassWhiteSolid,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                            side: const BorderSide(color: AppColors.glassBorder),
-                          ),
+                        return GlassContainer.light(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                           child: ListTile(
                             leading: Container(
                               padding: const EdgeInsets.all(8),
@@ -289,8 +283,7 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
               ),
             ),
           ),
-        ],
-      ),
+        ),
     );
   }
 
@@ -301,13 +294,9 @@ class _GateStatsScreenState extends State<GateStatsScreen> {
     required Color color,
     required Color bgColor,
   }) {
-    return Container(
+    return GlassContainer.light(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.glassWhiteSolid,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.glassBorder),
-      ),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

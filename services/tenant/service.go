@@ -426,6 +426,7 @@ func (s *service) GetPublicDestinationByTenantSlug(slug string) (*models.Destina
 			Slug:             tenant.Slug,
 			Description:      &desc,
 			DestinationType:  "lainnya",
+			Address:          tenant.Address,
 			MaxDailyCapacity: 1000,
 			OpeningTime:      "07:00:00",
 			ClosingTime:      "17:00:00",

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../../constants/api_endpoints.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/glass_container.dart';
+import '../../widgets/mesh_gradient_background.dart';
 
 class ServerConfigScreen extends StatefulWidget {
   const ServerConfigScreen({super.key});
@@ -101,57 +103,56 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFF9F9F8),
       appBar: AppBar(
-        title: const Text('Konfigurasi Server API', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: AppColors.surface,
+        title: const Text('Konfigurasi Server API', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.forestDeep)),
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.ink,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(1),
-          child: Divider(height: 1, color: AppColors.border),
+          child: Divider(height: 1, color: AppColors.glassBorder),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Alamat IP Backend Microservice',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Masukkan IP host komputer yang menjalankan microservices Go (auth, gate, cashless, tiket).',
-              style: TextStyle(fontSize: 13, color: AppColors.inkSoft),
-            ),
-            const SizedBox(height: 20),
+      body: MeshGradientBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Alamat IP Backend Microservice',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.ink),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Masukkan IP host komputer yang menjalankan microservices Go (auth, gate, cashless, tiket).',
+                  style: TextStyle(fontSize: 13, color: AppColors.inkSoft),
+                ),
+                const SizedBox(height: 20),
 
-            // Input field
-            TextField(
-              controller: _hostController,
-              decoration: InputDecoration(
-                labelText: 'Host IP / Domain',
-                hintText: 'Contoh: 192.168.18.87 atau 10.0.2.2',
-                filled: true,
-                fillColor: AppColors.surface,
-                prefixIcon: const Icon(Icons.dns, color: AppColors.forestSoft),
-                border: OutlineInputBorder(
-                  borderRadius: AppRadius.radiusMd,
-                  borderSide: const BorderSide(color: AppColors.border),
+                // Input field
+                GlassContainer.light(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: TextField(
+                    controller: _hostController,
+                    decoration: const InputDecoration(
+                      labelText: 'Host IP / Domain',
+                      hintText: 'Contoh: 192.168.18.91 atau 10.0.2.2',
+                      filled: false,
+                      prefixIcon: Icon(Icons.dns, color: AppColors.forestSoft),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    ),
+                  ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: AppRadius.radiusMd,
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                focusedBorder: const OutlineInputBorder(
-                  borderRadius: AppRadius.radiusMd,
-                  borderSide: BorderSide(color: AppColors.forest, width: 2),
-                ),
-              ),
-            ),
-            const SizedBox(height: 14),
+                const SizedBox(height: 14),
 
             // Buttons Row: Uji Koneksi & Simpan
             Row(
@@ -238,9 +239,9 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
             const SizedBox(height: 12),
 
             _buildPresetTile(
-              title: 'Wi-Fi Lokal Host (192.168.18.87)',
+              title: 'Wi-Fi Lokal Host (192.168.18.91)',
               subtitle: 'Untuk HP Fisik terhubung ke Wi-Fi yang sama',
-              host: '192.168.18.87',
+              host: '192.168.18.91',
             ),
             const SizedBox(height: 8),
             _buildPresetTile(
@@ -254,22 +255,54 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
               subtitle: 'Untuk iOS Simulator / Desktop App',
               host: '127.0.0.1',
             ),
-          ],
+            const SizedBox(height: 24),
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: AppColors.leafPale.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.forestSoft.withValues(alpha: 0.3)),
+              ),
+              child: const Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.wifi_tethering_rounded, color: AppColors.forest, size: 22),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Cara Pakai Hotspot HP Scanner:',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.forestDeep),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          '1. Aktifkan Hotspot di HP ini dan sambungkan laptop Anda ke hotspot ini.\n'
+                          '2. Di laptop buka CMD/PowerShell, ketik "ipconfig".\n'
+                          '3. Masukkan alamat IPv4 laptop (misal: 192.168.43.xxx) ke kolom Host di atas.\n'
+                          '4. Klik "Uji Koneksi" lalu "Simpan Host".',
+                          style: TextStyle(fontSize: 11.5, color: AppColors.inkSoft, height: 1.4),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildPresetTile({required String title, required String subtitle, required String host}) {
-    return Card(
-      elevation: 0,
-      color: AppColors.surface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppColors.border),
-      ),
+    return GlassContainer.light(
+      borderRadius: BorderRadius.circular(12),
       child: ListTile(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5, color: AppColors.forestDeep)),
         subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: AppColors.inkSoft)),
         trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.forestSoft),
         onTap: () => _saveHost(host),

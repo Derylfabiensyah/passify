@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -16,9 +17,10 @@ import {
   Building2,
   Sparkles,
   PhoneCall,
-  Layers
+  Layers,
+  LogIn
 } from 'lucide-react';
-import LegalModal from './common/LegalModal';
+import LegalModal from '../components/common/LegalModal';
 
 const heroImage = 'https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=1800&q=88';
 const trailImage = 'https://images.unsplash.com/photo-1511497584788-876760111969?auto=format&fit=crop&w=1400&q=85';
@@ -39,6 +41,7 @@ function SectionHeading({ eyebrow, title, children, className = '' }) {
 
 export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
   const [legalModal, setLegalModal] = useState({ open: false, type: 'privacy' });
 
   const openLegal = (type) => {
@@ -48,6 +51,7 @@ export default function LandingPage() {
   // Smooth scroll handler for anchor links
   const handleNavClick = (e, targetId) => {
     e.preventDefault();
+    setActiveSection(targetId);
     setMobileMenuOpen(false);
     const el = document.getElementById(targetId);
     if (el) {
@@ -124,114 +128,154 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Mobile Slide-Over Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu Navigasi Mobile">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
-              onClick={() => setMobileMenuOpen(false)}
-              aria-hidden="true"
-            />
+      </header>
 
-            {/* Drawer Panel */}
-            <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-transparent shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300 border-l border-[var(--border)]">
-              {/* Drawer Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] bg-transparent">
+      {/* Mobile Slide-Over Navigation Drawer with authentic Frosted Glassmorphism */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu Navigasi Mobile">
+          {/* Translucent Dimmed Backdrop */}
+          <div
+            className="fixed inset-0 bg-[#0a140d]/45 transition-opacity duration-300 animate-in fade-in"
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Frosted Glass Drawer Panel - Consistent with Passify Brand Glassmorphism */}
+          <div
+            className="fixed inset-y-0 right-0 w-[85%] max-w-sm flex flex-col z-[10000] animate-in slide-in-from-right duration-300 border-l border-white/80 shadow-[-20px_0_50px_-10px_rgba(16,40,24,0.22)]"
+            style={{
+              background: 'linear-gradient(165deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 50%, rgba(255, 255, 255, 0.84) 100%)',
+              backdropFilter: 'blur(32px) saturate(190%)',
+              WebkitBackdropFilter: 'blur(32px) saturate(190%)',
+              boxShadow: '-20px 0 50px -10px rgba(16, 40, 24, 0.22), inset 1px 0 0 0 rgba(255, 255, 255, 0.95), inset 0 1px 0 0 rgba(255, 255, 255, 0.8)',
+            }}
+          >
+            {/* Seamless Frosted Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/60">
+              <div className="flex items-center gap-2">
                 <Link
                   to="/"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-2xl font-bold tracking-[-.05em] text-[var(--forest-deep)] no-underline"
+                  className="text-2xl font-black tracking-[-.05em] text-[var(--forest-deep)] no-underline"
                 >
                   passify
                 </Link>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-xl text-[var(--ink-soft)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
-                  aria-label="Tutup menu"
-                >
-                  <X className="h-5 w-5" />
-                </button>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-800/10 text-emerald-800 border border-emerald-800/20 uppercase tracking-wider">
+                  Menu
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/70 hover:bg-white border border-white/80 shadow-2xs text-[#14281a] transition-all active:scale-95 cursor-pointer"
+                aria-label="Tutup menu"
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </div>
+
+            {/* Navigation Links */}
+            <div className="flex-1 overflow-y-auto px-4 py-5 space-y-4">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#4d5c48] px-1 mb-2.5">
+                  Navigasi Halaman
+                </p>
+                <div className="space-y-1.5">
+                  {navLinks.map((link, idx) => {
+                    const isActive = activeSection === link.id;
+                    return (
+                      <a
+                        key={idx}
+                        href={link.href}
+                        onClick={(e) => handleNavClick(e, link.id)}
+                        className={`flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                          isActive
+                            ? 'bg-[#284430] text-white shadow-[0_6px_20px_rgba(30,55,38,0.22)]'
+                            : 'bg-white/40 hover:bg-white/80 border border-white/65 hover:border-white/90 shadow-2xs text-[#2a3426] hover:text-[#14281a]'
+                        }`}
+                      >
+                        <span>{link.label}</span>
+                        <ChevronRight className={`h-4 w-4 ${isActive ? 'text-white' : 'text-[#4d5c48]'}`} />
+                      </a>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Navigation Links */}
-              <div className="flex-1 overflow-y-auto px-4 py-5 space-y-2">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-muted)] px-3 mb-2">
-                  Navigasi Halaman
-                </div>
-                {navLinks.map((link, idx) => {
-                  const isActive = activeSection === link.id;
-                  return (
-                    <a
-                      key={idx}
-                      href={link.href}
-                      onClick={(e) => handleNavClick(e, link.id)}
-                      className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold transition-colors ${
-                        isActive
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'text-[var(--ink)] hover:text-[var(--forest)] hover:bg-emerald-50/50'
-                      }`}
-                    >
-                      <span>{link.label}</span>
-                      <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
-                    </a>
-                  );
-                })}
-
-                <div className="pt-4 mt-4 border-t border-[var(--border)]">
-                  <div className="text-[10px] font-bold uppercase tracking-wider text-[var(--ink-muted)] px-3 mb-2">
-                    Portal Wisata & Mitra
-                  </div>
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#4d5c48] px-1 mb-2.5">
+                  Portal Wisata & Mitra
+                </p>
+                <div className="p-2 rounded-2xl bg-white/50 backdrop-blur-md border border-white/80 shadow-xs space-y-1">
                   <Link
                     to="/jelajah"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#14281a] hover:bg-emerald-800/10 transition-colors no-underline"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Compass className="h-4 w-4 text-[var(--forest)]" />
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100/90 border border-emerald-200/60 flex items-center justify-center text-emerald-800 shadow-2xs">
+                        <Compass className="h-4 w-4" />
+                      </div>
                       <span>Jelajah Wisata</span>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
+                    <ChevronRight className="h-4 w-4 text-[#4d5c48]" />
                   </Link>
+
                   <Link
                     to="/daftar-wisata"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[var(--ink)] hover:text-[var(--forest)] hover:bg-transparent transition-colors"
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#14281a] hover:bg-emerald-800/10 transition-colors no-underline"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Building2 className="h-4 w-4 text-[var(--forest)]" />
+                      <div className="w-7 h-7 rounded-lg bg-amber-100/90 border border-amber-200/60 flex items-center justify-center text-amber-900 shadow-2xs">
+                        <Building2 className="h-4 w-4" />
+                      </div>
                       <span>Daftarkan Wisata Anda</span>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-[var(--ink-muted)]" />
+                    <ChevronRight className="h-4 w-4 text-[#4d5c48]" />
+                  </Link>
+
+                  <Link
+                    to="/masuk"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#14281a] hover:bg-emerald-800/10 transition-colors no-underline"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-slate-100/90 border border-slate-200/60 flex items-center justify-center text-slate-800 shadow-2xs">
+                        <LogIn className="h-4 w-4" />
+                      </div>
+                      <span>Masuk Konsol Pengelola</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-[#4d5c48]" />
                   </Link>
                 </div>
               </div>
+            </div>
 
-              {/* Drawer Bottom Actions */}
-              <div className="p-4 border-t border-[var(--border)] bg-transparent space-y-2.5">
-                <Link
-                  to="/daftar-wisata"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn-clay w-full py-3 justify-center text-xs font-bold rounded-xl shadow-sm"
-                >
-                  <span>Daftarkan Wisata Anda</span>
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+            {/* Seamless Frosted Bottom Actions */}
+            <div className="p-4 border-t border-white/60 bg-white/40 backdrop-blur-md space-y-2.5 pb-8">
+              <Link
+                to="/daftar-wisata"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-3.5 flex items-center justify-center gap-2 rounded-xl bg-[var(--forest-deep)] hover:bg-[var(--forest)] text-white text-xs font-bold shadow-md shadow-emerald-950/20 active:scale-98 transition-all"
+              >
+                <span>Daftarkan Wisata Anda</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
 
-                <Link
-                  to="/jelajah"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="btn-secondary w-full py-2.5 justify-center text-xs font-bold rounded-xl border border-[var(--border)]"
-                >
-                  <Compass className="h-4 w-4" />
-                  <span>Portal Wisatawan</span>
-                </Link>
-              </div>
+              <Link
+                to="/jelajah"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-2.5 flex items-center justify-center gap-2 rounded-xl bg-white/80 hover:bg-white border border-white/90 text-xs font-bold text-[var(--forest-deep)] shadow-2xs active:scale-98 transition-all"
+              >
+                <Compass className="h-4 w-4 text-emerald-700" />
+                <span>Portal Wisatawan</span>
+              </Link>
             </div>
           </div>
-        )}
-      </header>
+        </div>,
+        document.body
+      )}
 
       {/* Spacer to offset fixed navbar */}
       <div className="h-[68px]" aria-hidden="true" />

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, Ticket, User, Users, X } from 'lucide-react';
-import ModalWrapper from './common/ModalWrapper';
-import { formatRupiah } from '../api/client';
+import ModalWrapper from '../common/ModalWrapper';
+import { formatRupiah } from '../../api/client';
 
 const steps = [
   { number: '01', label: 'Jadwal' },

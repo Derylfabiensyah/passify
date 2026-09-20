@@ -25,6 +25,7 @@ import { useTenant } from '../../contexts/TenantContext';
 import { fetchAdminDestinations, getAdminUser } from '../../api/admin';
 import { getLocalBookedCount } from '../../api/tenant';
 import { apiRequest } from '../../api/client';
+import LocationPickerMap from '../../components/common/LocationPickerMap';
 
 function DeleteCategoryConfirmationModal({ isOpen, onClose, onConfirm, categoryName }) {
   return (
@@ -126,7 +127,8 @@ function DestinationCard({
   isExpanded,
   onAddCategory,
   onEditCategory,
-  onDeleteCategory
+  onDeleteCategory,
+  onEditLocation,
 }) {
   const capacity = Number(dest.max_daily_capacity || 1000);
   const localCount = getLocalBookedCount(dest.id, dest.slug, dest.name).total;
@@ -163,12 +165,21 @@ function DestinationCard({
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onEditLocation(dest)}
+                  className="btn-secondary text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 font-bold cursor-pointer hover:bg-emerald-50 hover:text-emerald-800 transition-all shadow-2xs"
+                  title="Ubah Alamat & Posisi Peta"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Ubah Alamat &amp; Peta</span>
+                </button>
                 <Link
                   to={`/?tenant=${dest.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-secondary text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 no-underline font-bold"
+                  className="btn-secondary text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 no-underline font-bold shadow-2xs"
                   title="Lihat Halaman Website Resmi"
                 >
                   <Eye className="w-3.5 h-3.5" /> Pratinjau Website <ExternalLink className="w-3 h-3" />
@@ -275,6 +286,209 @@ function DestinationCard({
         </div>
       )}
     </div>
+  );
+}
+
+function EditLocationModal({ dest, isOpen, onClose, onSave }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    address: '',
+    city: '',
+    province: '',
+    latitude: -7.1738,
+    longitude: 106.5292,
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (dest) {
+      setFormData({
+        name: dest.name || '',
+        address: dest.address || dest.location || '',
+        city: dest.city || '',
+        province: dest.province || 'Jawa Barat',
+        latitude: dest.latitude != null ? Number(dest.latitude) : -7.1738,
+        longitude: dest.longitude != null ? Number(dest.longitude) : 106.5292,
+      });
+    }
+  }, [dest]);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await onSave(formData);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <ModalWrapper isOpen={isOpen} onClose={onClose} size="lg" ariaLabel="Edit Alamat & Lokasi Peta">
+      <div className="flex flex-col max-h-[90vh]">
+        <div className="bg-[var(--forest-deep)] text-white p-4 sm:p-5 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-emerald-300">
+              <MapPin className="h-4 w-4" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold font-serif">Ubah Alamat &amp; Titik Lokasi Peta</h3>
+              <p className="text-[11px] text-white/75 mt-0.5">
+                Pengaturan alamat resmi dan pin koordinat peta Leaflet untuk {dest?.name}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white cursor-pointer"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4 overflow-y-auto text-xs">
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
+              Nama Kawasan Wisata
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="field-control font-bold"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1.5">
+              Alamat Lengkap Kawasan <span className="text-red-500">*</span>
+            </label>
+            <textarea
+              rows={2}
+              value={formData.address}
+              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+              placeholder="Contoh: Jl. Ciletuh No. 12, Desa Ciwaru, Ciemas"
+              className="field-control leading-relaxed"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1">
+                Kota / Kabupaten
+              </label>
+              <input
+                type="text"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                placeholder="Contoh: Sukabumi"
+                className="field-control"
+              />
+            </div>
+            <div>
+              <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)] mb-1">
+                Provinsi
+              </label>
+              <input
+                type="text"
+                value={formData.province}
+                onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+                placeholder="Contoh: Jawa Barat"
+                className="field-control"
+              />
+            </div>
+          </div>
+
+          {/* Interactive Leaflet Map Picker */}
+          <div className="space-y-2 pt-2 border-t border-gray-100">
+            <div className="flex items-center justify-between">
+              <label className="block font-bold uppercase tracking-wider text-[var(--forest-deep)]">
+                Peta Lokasi &amp; Koordinat Presisi (Leaflet)
+              </label>
+              <span className="text-[10px] text-gray-500">
+                Klik atau seret pin untuk memindahkan posisi
+              </span>
+            </div>
+
+            <LocationPickerMap
+              latitude={formData.latitude}
+              longitude={formData.longitude}
+              address={formData.address}
+              height="260px"
+              onChange={({ latitude, longitude, suggestedAddress }) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  latitude,
+                  longitude,
+                  address: prev.address || suggestedAddress || prev.address,
+                }));
+              }}
+            />
+
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-[var(--ink-soft)] mb-1">
+                  Latitude
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  value={formData.latitude ?? ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      latitude: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                    })
+                  }
+                  className="field-control font-mono font-bold"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-[var(--ink-soft)] mb-1">
+                  Longitude
+                </label>
+                <input
+                  type="number"
+                  step="any"
+                  value={formData.longitude ?? ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      longitude: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                    })
+                  }
+                  className="field-control font-mono font-bold"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-100">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary px-4 py-2 rounded-xl font-bold cursor-pointer"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={isSaving}
+              className="btn-primary px-5 py-2 rounded-xl font-bold shadow-xs cursor-pointer flex items-center gap-1.5"
+            >
+              {isSaving ? 'Menyimpan...' : 'Simpan Lokasi & Peta'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </ModalWrapper>
   );
 }
 
@@ -448,6 +662,7 @@ export default function DestinationsPage() {
     return [];
   });
   const [isExpanded, setIsExpanded] = useState(true);
+  const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [editingCatContext, setEditingCatContext] = useState(null);
   const [deleteConfirmContext, setDeleteConfirmContext] = useState(null);
 
@@ -504,9 +719,9 @@ export default function DestinationsPage() {
   const destId = dest.id;
 
   const handleSaveCategory = async (categoryData) => {
-    let effectiveDestId = destId;
+    let effectiveDestId = dest.destination_id || destId;
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(effectiveDestId)) {
+    if (!uuidRegex.test(effectiveDestId) || effectiveDestId === dest.tenant_id || effectiveDestId === adminUser.tenant_id) {
       try {
         const destRes = await apiRequest(`/api/v1/public/tenants/${dest.slug || activeSlug}/destination`);
         if (destRes?.data?.id) {
@@ -601,6 +816,53 @@ export default function DestinationsPage() {
     }
   };
 
+  const handleSaveLocation = async (locationData) => {
+    let effectiveDestId = dest.destination_id || destId;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(effectiveDestId) || effectiveDestId === dest.tenant_id || effectiveDestId === adminUser.tenant_id) {
+      try {
+        const destRes = await apiRequest(`/api/v1/public/tenants/${dest.slug || activeSlug}/destination`);
+        if (destRes?.data?.id) {
+          effectiveDestId = destRes.data.id;
+        }
+      } catch (_) {}
+    }
+
+    try {
+      if (uuidRegex.test(effectiveDestId)) {
+        await apiRequest(`/api/v1/destinations/${effectiveDestId}`, {
+          method: 'PUT',
+          body: {
+            name: locationData.name,
+            address: locationData.address,
+            city: locationData.city,
+            province: locationData.province,
+            latitude: locationData.latitude != null ? Number(locationData.latitude) : null,
+            longitude: locationData.longitude != null ? Number(locationData.longitude) : null,
+          },
+        });
+      }
+    } catch (err) {
+      console.warn('Sync to destination backend API failed:', err);
+    }
+
+    const updatedDest = {
+      ...dest,
+      id: effectiveDestId,
+      name: locationData.name || dest.name,
+      address: locationData.address,
+      city: locationData.city,
+      province: locationData.province,
+      location: [locationData.address, locationData.city, locationData.province].filter(Boolean).join(', '),
+      latitude: locationData.latitude,
+      longitude: locationData.longitude,
+    };
+
+    saveDestinationsList([updatedDest]);
+    setIsEditingLocation(false);
+    toast.success('Alamat dan titik koordinat peta berhasil disimpan!');
+  };
+
   const capacity = Number(dest.max_daily_capacity || 1000);
   const localCount = getLocalBookedCount(dest.id, dest.slug, dest.name).total;
   const booked = Math.max(Number(dest.booked_today || 0), localCount);
@@ -661,6 +923,15 @@ export default function DestinationsPage() {
         onAddCategory={() => setEditingCatContext({ cat: null })}
         onEditCategory={(_, cat) => setEditingCatContext({ cat })}
         onDeleteCategory={(_, catId) => handleDeleteCategory(catId)}
+        onEditLocation={() => setIsEditingLocation(true)}
+      />
+
+      {/* Modal Edit Destination Location & Map */}
+      <EditLocationModal
+        dest={dest}
+        isOpen={isEditingLocation}
+        onClose={() => setIsEditingLocation(false)}
+        onSave={handleSaveLocation}
       />
 
       {/* Modal Edit Ticket Category */}

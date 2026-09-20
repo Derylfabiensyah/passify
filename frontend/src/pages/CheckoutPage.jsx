@@ -27,8 +27,8 @@ import { fetchDestinationBySlug } from '../api/tenant';
 import { fetchAdminQuotas } from '../api/admin';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
-import WalletModal from '../components/WalletModal';
-import ETicketModal from '../components/ETicketModal';
+import WalletModal from '../components/modals/WalletModal';
+import ETicketModal from '../components/modals/ETicketModal';
 import { useToast } from '../contexts/ToastContext';
 
 const getPaymentDeadline = (slug) => {

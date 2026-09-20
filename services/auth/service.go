@@ -32,12 +32,17 @@ type RegisterRequest struct {
 }
 
 type RegisterTenantRequest struct {
-	FullName   string  `json:"full_name" binding:"required"`
-	Email      string  `json:"email" binding:"required,email"`
-	Password   string  `json:"password" binding:"required,min=6"`
-	Phone      *string `json:"phone,omitempty"`
-	TenantName string  `json:"tenant_name" binding:"required"`
-	Subdomain  string  `json:"subdomain" binding:"required"`
+	FullName   string   `json:"full_name" binding:"required"`
+	Email      string   `json:"email" binding:"required,email"`
+	Password   string   `json:"password" binding:"required,min=6"`
+	Phone      *string  `json:"phone,omitempty"`
+	TenantName string   `json:"tenant_name" binding:"required"`
+	Subdomain  string   `json:"subdomain" binding:"required"`
+	Address    *string  `json:"address,omitempty"`
+	City       *string  `json:"city,omitempty"`
+	Province   *string  `json:"province,omitempty"`
+	Latitude   *float64 `json:"latitude,omitempty"`
+	Longitude  *float64 `json:"longitude,omitempty"`
 }
 
 type LoginRequest struct {
@@ -397,6 +402,7 @@ func (s *authService) RegisterTenant(req RegisterTenantRequest) (*models.Tenant,
 		SecondaryColor: "#047857",
 		ContactEmail:   &req.Email,
 		ContactPhone:   req.Phone,
+		Address:        req.Address,
 		IsActive:       false,
 	}
 	if err := s.repo.CreateTenant(tenant); err != nil {

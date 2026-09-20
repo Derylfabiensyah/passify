@@ -236,6 +236,97 @@ func (s *PaymentService) CreatePaymentInvoice(transactionID uuid.UUID) (*Payment
 	}, nil
 }
 
+// creditWalletForTopup atomically credits the user's wallet if this transaction is a wallet top-up
+func creditWalletForTopup(txDB *gorm.DB, tx *models.Transaction) error {
+	if !strings.HasPrefix(tx.OrderNumber, "TOPUP-") {
+		return nil
+	}
+
+	// Idempotency check: check if already credited via reference_id
+	var existingTx models.WalletTransaction
+	if err := txDB.Where("reference_id = ?", tx.OrderNumber).First(&existingTx).Error; err == nil {
+		// Already credited, do not duplicate
+		return nil
+	}
+
+	// Resolve user ID
+	targetUserID := tx.UserID
+	if targetUserID == uuid.Nil {
+		var firstUser models.User
+		if err := txDB.First(&firstUser).Error; err == nil {
+			targetUserID = firstUser.ID
+		}
+	}
+
+	if targetUserID == uuid.Nil {
+		return errors.New("user id tidak ditemukan untuk topup wallet")
+	}
+
+	// Find or create wallet for user
+	var wallet models.Wallet
+	err := txDB.Where("user_id = ?", targetUserID).First(&wallet).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			var tenantID *uuid.UUID
+			if tx.TenantID != uuid.Nil {
+				tenantID = &tx.TenantID
+			}
+			wallet = models.Wallet{
+				BaseModel: models.BaseModel{
+					ID: uuid.New(),
+				},
+				UserID:   targetUserID,
+				TenantID: tenantID,
+				Balance:  0,
+				IsActive: true,
+			}
+			if err := txDB.Create(&wallet).Error; err != nil {
+				return fmt.Errorf("gagal membuat wallet baru: %w", err)
+			}
+		} else {
+			return fmt.Errorf("gagal mencari wallet user: %w", err)
+		}
+	}
+
+	balanceBefore := wallet.Balance
+	balanceAfter := balanceBefore + tx.GrandTotal
+
+	if err := txDB.Model(&wallet).Update("balance", balanceAfter).Error; err != nil {
+		return fmt.Errorf("gagal memperbarui saldo wallet: %w", err)
+	}
+
+	refStr := tx.OrderNumber
+	paymentTypeStr := "Midtrans Snap"
+	if tx.PaymentMethod != nil && *tx.PaymentMethod != "" {
+		paymentTypeStr = fmt.Sprintf("Midtrans (%s)", *tx.PaymentMethod)
+	}
+	descStr := fmt.Sprintf("Top up saldo via %s", paymentTypeStr)
+
+	var tenantID *uuid.UUID
+	if tx.TenantID != uuid.Nil {
+		tenantID = &tx.TenantID
+	}
+
+	walletTx := &models.WalletTransaction{
+		ID:            uuid.New(),
+		WalletID:      wallet.ID,
+		TenantID:      tenantID,
+		TxType:        "topup",
+		Amount:        tx.GrandTotal,
+		BalanceBefore: balanceBefore,
+		BalanceAfter:  balanceAfter,
+		ReferenceID:   &refStr,
+		Description:   &descStr,
+		CreatedAt:     time.Now(),
+	}
+
+	if err := txDB.Create(walletTx).Error; err != nil {
+		return fmt.Errorf("gagal mencatat riwayat transaksi wallet: %w", err)
+	}
+
+	return nil
+}
+
 // HandleMidtransNotification processes Midtrans notification webhook
 func (s *PaymentService) HandleMidtransNotification(notif MidtransNotificationRequest) error {
 	if notif.SignatureKey != "" && s.cfg.MidtransServerKey != "" {
@@ -303,6 +394,9 @@ func (s *PaymentService) HandleMidtransNotification(notif MidtransNotificationRe
 			if err := txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active").Error; err != nil {
 				return fmt.Errorf("failed to update tickets to active: %w", err)
 			}
+			if err := creditWalletForTopup(txDB, tx); err != nil {
+				return fmt.Errorf("failed to credit wallet for topup: %w", err)
+			}
 		} else if targetStatus == "failed" || targetStatus == "expired" {
 			if err := txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "cancelled").Error; err != nil {
 				return fmt.Errorf("failed to update tickets to cancelled: %w", err)
@@ -360,6 +454,9 @@ func (s *PaymentService) HandlePaymentWebhook(req WebhookRequest) error {
 		if targetStatus == "paid" {
 			if err := txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active").Error; err != nil {
 				return fmt.Errorf("failed to update ticket status to active: %w", err)
+			}
+			if err := creditWalletForTopup(txDB, tx); err != nil {
+				return fmt.Errorf("failed to credit wallet for topup: %w", err)
 			}
 		} else if targetStatus == "expired" || targetStatus == "failed" {
 			if err := txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "cancelled").Error; err != nil {
@@ -547,7 +644,11 @@ func (s *PaymentService) CreateSnapTransaction(req *CreateSnapOrderRequest) (*Pa
 		if itemsTotal != grossAmt || len(items) == 0 {
 			name := req.DestinationName
 			if name == "" {
-				name = "Tiket Wisata Alam"
+				if strings.HasPrefix(req.OrderNumber, "TOPUP-") {
+					name = "Top Up Saldo Passify Cashless Wallet"
+				} else {
+					name = "Tiket Wisata Alam"
+				}
 			}
 			items = []midtrans.ItemDetails{
 				{
@@ -666,6 +767,9 @@ func (s *PaymentService) CreateSnapTransaction(req *CreateSnapOrderRequest) (*Pa
 	if platformFee <= 0 {
 		platformFee = 2500
 	}
+	if strings.HasPrefix(req.OrderNumber, "TOPUP-") {
+		platformFee = 0
+	}
 	subtotal := float64(grossAmt) - platformFee
 	if subtotal < 0 {
 		subtotal = float64(grossAmt)
@@ -773,36 +877,43 @@ func (s *PaymentService) FinishSnapPayment(orderNumber string) error {
 			return err
 		}
 
-		// Activate any tickets linked to this transaction
-		res := txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active")
-		if res.RowsAffected == 0 && tx.DestinationID != uuid.Nil {
-			var cat models.TicketCategory
-			if err := txDB.Where("destination_id = ?", tx.DestinationID).First(&cat).Error; err == nil {
-				vCount := tx.VisitorCount
-				if vCount <= 0 {
-					vCount = 1
-				}
-				for i := 0; i < vCount; i++ {
-					tCode := fmt.Sprintf("TWA-%s-%04d", time.Now().Format("20060102"), rand.Intn(9000)+1000)
-					totpKey := fmt.Sprintf("TOTP%s%04d", tx.ID.String()[:8], i)
-					visName := "Wisatawan Terverifikasi"
-					newTkt := &models.Ticket{
-						BaseModel: models.BaseModel{
-							ID: uuid.New(),
-						},
-						TenantID:      tx.TenantID,
-						TransactionID: tx.ID,
-						CategoryID:    cat.ID,
-						DestinationID: tx.DestinationID,
-						TicketCode:    tCode,
-						VisitDate:     tx.VisitDate,
-						TimeSlotID:    tx.TimeSlotID,
-						VisitorName:   &visName,
-						UnitPrice:     cat.BasePrice,
-						TOTPSecretKey: totpKey,
-						Status:        "active",
+		// If transaction is a wallet top-up, credit the wallet
+		if err := creditWalletForTopup(txDB, tx); err != nil {
+			return fmt.Errorf("failed to credit wallet for topup: %w", err)
+		}
+
+		// Activate any tickets linked to this transaction (only for regular ticket bookings)
+		if !strings.HasPrefix(tx.OrderNumber, "TOPUP-") {
+			res := txDB.Model(&models.Ticket{}).Where("transaction_id = ?", tx.ID).Update("status", "active")
+			if res.RowsAffected == 0 && tx.DestinationID != uuid.Nil {
+				var cat models.TicketCategory
+				if err := txDB.Where("destination_id = ?", tx.DestinationID).First(&cat).Error; err == nil {
+					vCount := tx.VisitorCount
+					if vCount <= 0 {
+						vCount = 1
 					}
-					_ = txDB.Create(newTkt)
+					for i := 0; i < vCount; i++ {
+						tCode := fmt.Sprintf("TWA-%s-%04d", time.Now().Format("20060102"), rand.Intn(9000)+1000)
+						totpKey := fmt.Sprintf("TOTP%s%04d", tx.ID.String()[:8], i)
+						visName := "Wisatawan Terverifikasi"
+						newTkt := &models.Ticket{
+							BaseModel: models.BaseModel{
+								ID: uuid.New(),
+							},
+							TenantID:      tx.TenantID,
+							TransactionID: tx.ID,
+							CategoryID:    cat.ID,
+							DestinationID: tx.DestinationID,
+							TicketCode:    tCode,
+							VisitDate:     tx.VisitDate,
+							TimeSlotID:    tx.TimeSlotID,
+							VisitorName:   &visName,
+							UnitPrice:     cat.BasePrice,
+							TOTPSecretKey: totpKey,
+							Status:        "active",
+						}
+						_ = txDB.Create(newTkt)
+					}
 				}
 			}
 		}

@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Mountain } from 'lucide-react';
-import LegalModal from './common/LegalModal';
+import LegalModal from '../common/LegalModal';
 
 export default function Footer() {
   const [legalModal, setLegalModal] = useState({ open: false, type: 'privacy' });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertCircle, ArrowRight, Home } from 'lucide-react';
-import { useTenant } from '../contexts/TenantContext';
+import { useTenant } from '../../contexts/TenantContext';
 
 export default function ErrorScreen({ error }) {
   const { refetch } = useTenant();

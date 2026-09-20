@@ -220,7 +220,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
         children: [
           // Search Box
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 8),
             color: Colors.transparent,
             child: TextField(
               controller: _searchController,
@@ -260,7 +260,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
 
           // Count info
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -308,7 +308,7 @@ class _OfflineManifestScreenState extends State<OfflineManifestScreen> {
                         ),
                       )
                     : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                        padding: const EdgeInsets.fromLTRB(18, 0, 18, 28),
                         itemCount: _tickets.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (ctx, idx) {

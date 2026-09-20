@@ -24,8 +24,8 @@ import {
   Leaf,
   Wallet
 } from 'lucide-react';
-import ETicketModal from '../components/ETicketModal';
-import WalletModal from '../components/WalletModal';
+import ETicketModal from '../components/modals/ETicketModal';
+import WalletModal from '../components/modals/WalletModal';
 import { useToast } from '../contexts/ToastContext';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
@@ -167,6 +167,7 @@ export default function BookingHistoryPage() {
               return match ? { ...t, ...match } : t;
             });
             localStorage.setItem('passify_my_tickets', JSON.stringify(merged));
+            window.dispatchEvent(new Event('storage'));
           }
         } catch (_) {}
       }

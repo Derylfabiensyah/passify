@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
-  Trees, 
   ArrowRight, 
   ArrowLeft, 
   CheckCircle2, 
@@ -15,10 +14,13 @@ import {
   Phone, 
   Globe, 
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Trees,
+  MapPin
 } from 'lucide-react';
 
 import { validateSubdomainInput } from '../utils/subdomainValidation';
+import LocationPickerMap from '../components/common/LocationPickerMap';
 
 const GOOGLE_CLIENT_ID =
   import.meta.env.VITE_GOOGLE_CLIENT_ID ||
@@ -37,7 +39,12 @@ export default function RegisterTenantPage() {
     password: '',
     confirm_password: '',
     tenant_name: '',
-    subdomain: ''
+    subdomain: '',
+    address: '',
+    city: '',
+    province: '',
+    latitude: -7.1738,
+    longitude: 106.5292,
   });
 
   const [errors, setErrors] = useState({});
@@ -149,6 +156,9 @@ export default function RegisterTenantPage() {
     } else if (subdomainStatus.available === false) {
       errs.subdomain = 'Subdomain sudah digunakan';
     }
+    if (!formData.address.trim()) {
+      errs.address = 'Alamat lokasi wisata wajib diisi';
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -170,23 +180,68 @@ export default function RegisterTenantPage() {
     setSubmitError('');
 
     try {
+      const payload = {
+        full_name: formData.full_name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        password: formData.password,
+        tenant_name: formData.tenant_name,
+        subdomain: formData.subdomain.trim().toLowerCase(),
+        address: formData.address.trim() || undefined,
+        city: formData.city.trim() || undefined,
+        province: formData.province.trim() || undefined,
+        latitude: formData.latitude != null ? Number(formData.latitude) : undefined,
+        longitude: formData.longitude != null ? Number(formData.longitude) : undefined,
+      };
+
       const res = await fetch('http://localhost:8081/api/v1/auth/register-tenant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          full_name: formData.full_name,
-          email: formData.email,
-          phone: formData.phone || undefined,
-          password: formData.password,
-          tenant_name: formData.tenant_name,
-          subdomain: formData.subdomain.trim().toLowerCase()
-        })
+        body: JSON.stringify(payload)
       });
 
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.message || data.error?.details || 'Gagal mendaftarkan wisata');
       }
+
+      // Seed local destination cache so preview and admin have this location right away
+      const tenantData = data.data?.tenant;
+      const initialDest = {
+        id: tenantData?.id || `dest-${Date.now()}`,
+        tenant_id: tenantData?.id,
+        name: formData.tenant_name,
+        slug: formData.subdomain.trim().toLowerCase(),
+        address: formData.address,
+        city: formData.city,
+        province: formData.province,
+        location: [formData.address, formData.city, formData.province].filter(Boolean).join(', '),
+        latitude: formData.latitude,
+        longitude: formData.longitude,
+        description: `Portal tiket resmi ${formData.tenant_name}.`,
+        max_daily_capacity: 1000,
+        booked_today: 0,
+        ticket_categories: [],
+        facilities: ['Area Parkir', 'Toilet Bersih', 'Pusat Informasi'],
+      };
+      try {
+        localStorage.setItem('passify_admin_destinations', JSON.stringify([initialDest]));
+        localStorage.setItem('passify_current_tenant', initialDest.slug);
+        localStorage.setItem('passify_last_active_tenant', initialDest.slug);
+
+        const initialUser = {
+          id: data.data?.user?.id || `usr-${Date.now()}`,
+          email: formData.email,
+          full_name: formData.full_name,
+          role: 'tenant_admin',
+          tenant_id: tenantData?.id,
+          tenant_slug: initialDest.slug,
+          tenant_name: formData.tenant_name,
+          tenant: tenantData,
+        };
+        localStorage.setItem('passify_user', JSON.stringify(initialUser));
+        localStorage.setItem('passify_token', 'demo-jwt-token');
+      } catch (_) {}
 
       setRegisteredData(data.data || {});
       setStep(3); // Move to success step
@@ -282,12 +337,8 @@ export default function RegisterTenantPage() {
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[rgba(23,59,50,0.1)] bg-white/90 backdrop-blur-md">
         <div className="mx-auto flex min-h-[64px] max-w-6xl items-center justify-between px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2 font-black text-2xl tracking-tight text-[var(--forest-deep)] no-underline">
-            <Trees className="h-6 w-6 text-[var(--forest)]" />
+          <Link to="/" className="flex items-center font-black text-2xl tracking-tight text-[var(--forest-deep)] no-underline">
             <span>passify</span>
-            <span className="text-[10px] font-extrabold uppercase tracking-widest bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-              Partner
-            </span>
           </Link>
           <div className="flex items-center gap-4 text-xs font-bold">
             <span className="hidden sm:inline text-[var(--ink-soft)]">Sudah menjadi mitra?</span>
@@ -598,6 +649,121 @@ export default function RegisterTenantPage() {
                   )}
                 </div>
                 {errors.subdomain && <p className="mt-1 text-xs text-red-500">{errors.subdomain}</p>}
+              </div>
+
+              {/* Alamat Lengkap Kawasan Wisata */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink)] mb-1.5">
+                  Alamat Lengkap Wisata <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3.5 top-3 h-4 w-4 text-[var(--forest)]" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Jl. Raya Puncak Km. 80, Cisarua"
+                    value={formData.address}
+                    onChange={(e) => {
+                      setFormData({ ...formData, address: e.target.value });
+                      if (errors.address) setErrors((prev) => ({ ...prev, address: '' }));
+                    }}
+                    className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white pl-10 pr-4 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none font-medium"
+                  />
+                </div>
+                {errors.address && <p className="mt-1 text-xs text-red-500">{errors.address}</p>}
+              </div>
+
+              {/* Kota & Provinsi */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink)] mb-1.5">
+                    Kota / Kabupaten
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Sukabumi / Bogor"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white px-4 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink)] mb-1.5">
+                    Provinsi
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Jawa Barat"
+                    value={formData.province}
+                    onChange={(e) => setFormData({ ...formData, province: e.target.value })}
+                    className="w-full rounded-xl border border-[rgba(23,59,50,0.18)] bg-white px-4 py-2.5 text-sm focus:border-[var(--forest)] focus:ring-1 focus:ring-[var(--forest)] outline-none font-medium"
+                  />
+                </div>
+              </div>
+
+              {/* Peta Interaktif Leaflet & Titik Koordinat */}
+              <div className="space-y-2 pt-1">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--ink)]">
+                    Titik Lokasi &amp; Peta (Leaflet)
+                  </label>
+                  <span className="text-[10px] text-gray-500 font-medium">
+                    Geser atau klik pin pada peta
+                  </span>
+                </div>
+                
+                <LocationPickerMap
+                  latitude={formData.latitude}
+                  longitude={formData.longitude}
+                  address={formData.address}
+                  height="260px"
+                  onChange={({ latitude, longitude, suggestedAddress }) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      latitude,
+                      longitude,
+                      address: prev.address || suggestedAddress || prev.address,
+                    }));
+                    if (errors.address) setErrors((prev) => ({ ...prev, address: '' }));
+                  }}
+                />
+
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[var(--ink-soft)] mb-1">
+                      Latitude
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={formData.latitude ?? ''}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          latitude: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                        })
+                      }
+                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-mono font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase text-[var(--ink-soft)] mb-1">
+                      Longitude
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={formData.longitude ?? ''}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          longitude: e.target.value !== '' ? parseFloat(e.target.value) : null,
+                        })
+                      }
+                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-mono font-bold"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Preview Card */}

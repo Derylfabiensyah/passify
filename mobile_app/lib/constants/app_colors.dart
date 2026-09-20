@@ -37,10 +37,10 @@ class AppColors {
   static const Color glassShadow = Color(0x12000000); // Ambient soft shadow
 
   // Gradient Orb Colors for Atmospheric Light Glass Refraction
-  static const Color orbEmerald = Color(0x5510B981); // Vibrant Emerald (33% opacity)
-  static const Color orbMint = Color(0x4D06B6D4); // Vibrant Cyan/Mint
-  static const Color orbGold = Color(0x44F59E0B); // Warm Amber/Gold
-  static const Color orbLime = Color(0x3D84CC16); // Soft Forest Lime
+  static const Color orbEmerald = Color(0x7310B981); // Vibrant Emerald (45% opacity)
+  static const Color orbMint = Color(0x6606B6D4); // Vibrant Cyan/Mint (40% opacity)
+  static const Color orbGold = Color(0x59F59E0B); // Warm Amber/Gold (35% opacity)
+  static const Color orbLime = Color(0x5984CC16); // Soft Forest Lime (35% opacity)
 
   // Status & Feedback
   static const Color success = Color(0xFF257335);
@@ -53,17 +53,19 @@ class AppColors {
   static const Color infoBg = Color(0xFFE3F2FD);
 }
 
-/// 4-Tier Standardized Border Radius System (8, 12, 16, 24px)
+/// Standardized Border Radius System (8, 12, 16, 24, 999px)
 class AppRadius {
   static const double sm = 8.0;   // Chips, badges, small buttons, tags
   static const double md = 12.0;  // Input fields, standard buttons, list items
   static const double lg = 16.0;  // Cards, standard sheets, dialogs
   static const double xl = 24.0;  // Modal tops, large hero cards, floating containers
+  static const double pill = 999.0; // Floating pills, capsule badges, status pills
 
   static const BorderRadius radiusSm = BorderRadius.all(Radius.circular(sm));
   static const BorderRadius radiusMd = BorderRadius.all(Radius.circular(md));
   static const BorderRadius radiusLg = BorderRadius.all(Radius.circular(lg));
   static const BorderRadius radiusXl = BorderRadius.all(Radius.circular(xl));
+  static const BorderRadius radiusPill = BorderRadius.all(Radius.circular(pill));
 }
 
 class AppFormatters {

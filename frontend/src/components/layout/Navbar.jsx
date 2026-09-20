@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Mountain,
   ArrowRight,
@@ -188,21 +189,30 @@ export default function Navbar({
           </button>
         </div>
       </div>
+    </header>
 
-      {/* Mobile Slide-Over Navigation Drawer */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu Navigasi Mobile">
+      {/* Mobile Slide-Over Navigation Drawer rendered via createPortal so backdrop-blur on header doesn't trap fixed positioning */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu Navigasi Mobile">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in"
+            className="fixed inset-0 bg-[#0a140d]/40 transition-opacity duration-300 animate-in fade-in"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
-          {/* Drawer Panel */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-white/80 dark:bg-black/80 backdrop-blur-2xl border-l border-white/20 shadow-2xl flex flex-col z-10 animate-in slide-in-from-right duration-300">
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white/10 dark:bg-black/10">
+          {/* Frosted Glass Drawer Panel - Consistent with Passify Brand Glassmorphism */}
+          <div
+            className="fixed inset-y-0 right-0 w-[85%] max-w-sm flex flex-col z-[10000] animate-in slide-in-from-right duration-300 border-l border-white/80 shadow-[-20px_0_50px_-10px_rgba(16,40,24,0.22)]"
+            style={{
+              background: 'linear-gradient(165deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 50%, rgba(255, 255, 255, 0.84) 100%)',
+              backdropFilter: 'blur(32px) saturate(190%)',
+              WebkitBackdropFilter: 'blur(32px) saturate(190%)',
+              boxShadow: '-20px 0 50px -10px rgba(16, 40, 24, 0.22), inset 1px 0 0 0 rgba(255, 255, 255, 0.95), inset 0 1px 0 0 rgba(255, 255, 255, 0.8)',
+            }}
+          >
+            {/* Seamless Frosted Drawer Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/60">
               <Link
                 to="/"
                 onClick={() => setMobileMenuOpen(false)}
@@ -219,76 +229,86 @@ export default function Navbar({
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/70 hover:bg-white border border-white/80 shadow-2xs text-[#14281a] transition-all active:scale-95 cursor-pointer"
                 aria-label="Tutup menu"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4.5 h-4.5" />
               </button>
             </div>
 
             {/* Drawer Navigation Links */}
-            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 mb-2">
-                Solusi Kawasan Wisata
-              </div>
-              {navItems.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleScrollTo(item.target)}
-                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-emerald-50/60 transition-colors text-left"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <item.icon className="w-4 h-4 text-emerald-600" />
-                    <span>{item.label}</span>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
-                </button>
-              ))}
-
-              <div className="pt-4 mt-4 border-t border-gray-100">
-                <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 mb-2">
-                  Portal & Akses Cepat
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#4d5c48] px-1 mb-2.5">
+                  Solusi Kawasan Wisata
+                </p>
+                <div className="space-y-1.5">
+                  {navItems.map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleScrollTo(item.target)}
+                      className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#2a3426] hover:text-[#14281a] hover:bg-white/80 bg-white/40 border border-white/65 hover:border-white/90 shadow-2xs transition-all text-left cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <item.icon className="w-4 h-4 text-emerald-700" />
+                        <span>{item.label}</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-[#4d5c48]" />
+                    </button>
+                  ))}
                 </div>
-                <Link
-                  to="/jelajah"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-teal-50/60 transition-colors"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Compass className="w-4 h-4 text-teal-600" />
-                    <span>Jelajah Destinasi Wisata</span>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
-                </Link>
-                <Link
-                  to="/daftar-wisata"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-gray-700 hover:text-gray-900 hover:bg-emerald-50/60 transition-colors"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <Building2 className="w-4 h-4 text-emerald-600" />
-                    <span>Registrasi Kawasan Baru</span>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
-                </Link>
-                {user && (user.role === 'pengelola' || user.role === 'admin') && (
+              </div>
+
+              <div>
+                <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#4d5c48] px-1 mb-2.5">
+                  Portal & Akses Cepat
+                </p>
+                <div className="p-2 rounded-2xl bg-white/50 backdrop-blur-md border border-white/80 shadow-xs space-y-1">
                   <Link
-                    to="/admin"
+                    to="/jelajah"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors mt-1"
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-[#14281a] hover:bg-emerald-800/10 transition-colors no-underline"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Shield className="w-4 h-4 text-emerald-700" />
-                      <span>Console Pengelola</span>
+                      <div className="w-7 h-7 rounded-lg bg-teal-100/90 border border-teal-200/60 flex items-center justify-center text-teal-800 shadow-2xs">
+                        <Compass className="w-4 h-4 text-teal-700" />
+                      </div>
+                      <span>Jelajah Destinasi Wisata</span>
                     </div>
-                    <ChevronRight className="w-3.5 h-3.5 text-emerald-600" />
+                    <ChevronRight className="w-3.5 h-3.5 text-[#4d5c48]" />
                   </Link>
-                )}
+                  <Link
+                    to="/daftar-wisata"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-[#14281a] hover:bg-emerald-800/10 transition-colors no-underline"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100/90 border border-emerald-200/60 flex items-center justify-center text-emerald-800 shadow-2xs">
+                        <Building2 className="w-4 h-4 text-emerald-700" />
+                      </div>
+                      <span>Registrasi Kawasan Baru</span>
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-[#4d5c48]" />
+                  </Link>
+                  {user && (user.role === 'pengelola' || user.role === 'admin') && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-emerald-900 bg-emerald-100/80 hover:bg-emerald-100 border border-emerald-200/70 transition-colors no-underline rounded-xl"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Shield className="w-4 h-4 text-emerald-700" />
+                        <span>Console Pengelola</span>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-emerald-700" />
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Drawer Footer Actions */}
-            <div className="p-4 border-t border-gray-100 bg-white/10 dark:bg-black/10 space-y-2.5">
+            <div className="p-4 border-t border-white/60 bg-white/40 backdrop-blur-md space-y-2.5 pb-8">
               <button
                 onClick={() => handleScrollTo('tourist-demo-banner')}
                 className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs border border-emerald-200 transition-colors shadow-2xs"
@@ -340,9 +360,10 @@ export default function Navbar({
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-    </header>
+    </>
   );
 }
 

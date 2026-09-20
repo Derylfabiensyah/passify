@@ -1,12 +1,14 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_colors.dart';
 import '../providers/auth_provider.dart';
 import '../providers/sync_provider.dart';
 import '../widgets/glass_container.dart';
+import '../widgets/mesh_gradient_background.dart';
 import 'booth/booth_pos_screen.dart';
 import 'gate/gate_scanner_screen.dart';
 import 'gate/gate_stats_screen.dart';
@@ -157,47 +159,26 @@ class _HomeScreenState extends State<HomeScreen> {
         preferredSize: const Size.fromHeight(kToolbarHeight + 1),
         child: ClipRect(
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.72),
+                color: Colors.white.withValues(alpha: 0.65),
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.6),
-                    width: 1,
+                    color: Colors.white.withValues(alpha: 0.75),
+                    width: 1.2,
                   ),
                 ),
               ),
               child: AppBar(
-                title: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: AppColors.success.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(AppRadius.sm),
-                        border: Border.all(
-                          color: AppColors.success.withValues(alpha: 0.2),
-                          width: 1,
-                        ),
-                      ),
-                      child: const Icon(Icons.forest_rounded, color: Color(0xFF34D399), size: 19),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Passify Field Ops',
-                          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: AppColors.forestDeep),
-                        ),
-                        Text(
-                          user?.role == 'tenant_admin' ? 'Pengelola Destinasi' : 'Operasional Gerbang & Kasir',
-                          style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  ],
+                title: Text(
+                  'passify',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22,
+                    color: AppColors.forestDeep,
+                    letterSpacing: -0.6,
+                  ),
                 ),
                 backgroundColor: Colors.transparent,
                 elevation: 0,
@@ -222,218 +203,145 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          // 1. Subtle canvas atmosphere gradient
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFFF7F8F5),
-                  Color(0xFFEFF3EB),
-                ],
-              ),
-            ),
-          ),
-
-          // 2. Ambient Glowing Atmospheric Orbs for Visible Frosted Glass Refraction
-          Positioned(
-            top: -50,
-            right: -40,
-            child: Container(
-              width: 330,
-              height: 330,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.orbEmerald,
-                    AppColors.orbEmerald.withValues(alpha: 0.0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 240,
-            left: -80,
-            child: Container(
-              width: 340,
-              height: 340,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.orbMint,
-                    AppColors.orbMint.withValues(alpha: 0.0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            top: 480,
-            right: -60,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.orbGold,
-                    AppColors.orbGold.withValues(alpha: 0.0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -30,
-            left: -40,
-            child: Container(
-              width: 310,
-              height: 310,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.orbLime,
-                    AppColors.orbLime.withValues(alpha: 0.0),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // 3. Scrollable Content
-          SafeArea(
+      body: MeshGradientBackground(
+        child: SafeArea(
             child: RefreshIndicator(
               onRefresh: () => sync.refreshDatabaseCounts(),
               color: AppColors.success,
               backgroundColor: const Color(0xFF162315),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(18, kToolbarHeight + 14, 18, 28),
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Officer & Device Info Glass Capsule
-                    GlassContainer.light(
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 38,
-                            height: 38,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  const Color(0xFF10B981).withValues(alpha: 0.28),
-                                  const Color(0xFF10B981).withValues(alpha: 0.12),
-                                ],
-                              ),
-                              border: Border.all(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.4),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                (user?.fullName.isNotEmpty == true ? user!.fullName[0] : 'P').toUpperCase(),
-                                style: const TextStyle(
-                                  color: Color(0xFF047857),
-                                  fontWeight: FontWeight.w900,
-                                  fontSize: 15,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  user?.fullName ?? 'Petugas Lapangan',
-                                  style: const TextStyle(
-                                    color: AppColors.forestDeep,
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 14,
+                    Builder(
+                      builder: (context) {
+                        final officerName = (user?.fullName.isNotEmpty == true && user!.fullName.toLowerCase() != 'petugas lapangan')
+                            ? user.fullName
+                            : (auth.selectedDeviceName.isNotEmpty ? auth.selectedDeviceName : 'Petugas Lapangan');
+                        final roleSubtitle = user?.role == 'tenant_admin'
+                            ? 'Pengelola Destinasi'
+                            : (user?.role == 'vendor' ? 'Petugas Vendor' : 'Petugas Lapangan');
+
+                        return GlassContainer.light(
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      const Color(0xFF10B981).withValues(alpha: 0.28),
+                                      const Color(0xFF10B981).withValues(alpha: 0.12),
+                                    ],
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 1),
-                                Text(
-                                  auth.selectedDeviceName.isNotEmpty ? auth.selectedDeviceName : 'Gerbang Utama',
-                                  style: const TextStyle(
-                                    color: Color(0xFF6B7280),
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w600,
+                                  border: Border.all(
+                                    color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                                    width: 1.5,
                                   ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ],
-                            ),
-                          ),
-                          // Pairing Chip
-                          GestureDetector(
-                            onTap: () async {
-                              HapticFeedback.selectionClick();
-                              final paired = await Navigator.of(context).push<bool>(
-                                MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
-                              );
-                              if (paired == true && mounted) {
-                                if (context.mounted) {
-                                  Provider.of<SyncProvider>(context, listen: false).refreshDatabaseCounts();
-                                }
-                              }
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: AppColors.success.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(AppRadius.sm),
-                                border: Border.all(
-                                  color: AppColors.success.withValues(alpha: 0.25),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF10B981),
-                                      shape: BoxShape.circle,
+                                child: Center(
+                                  child: Text(
+                                    (officerName.isNotEmpty ? officerName[0] : 'P').toUpperCase(),
+                                    style: GoogleFonts.plusJakartaSans(
+                                      color: const Color(0xFF047857),
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 15,
                                     ),
                                   ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    auth.selectedDeviceCode,
-                                    style: const TextStyle(
-                                      color: AppColors.forestDeep,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 0.5,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      officerName,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        color: AppColors.forestDeep,
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                        letterSpacing: -0.2,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 1),
+                                    Text(
+                                      roleSubtitle,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        color: const Color(0xFF6B7280),
+                                        fontSize: 11.5,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              // Pairing Chip
+                              GestureDetector(
+                                onTap: () async {
+                                  HapticFeedback.selectionClick();
+                                  final paired = await Navigator.of(context).push<bool>(
+                                    MaterialPageRoute(builder: (_) => const PairingScannerScreen()),
+                                  );
+                                  if (paired == true && mounted) {
+                                    if (context.mounted) {
+                                      Provider.of<SyncProvider>(context, listen: false).refreshDatabaseCounts();
+                                    }
+                                  }
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.5),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF10B981).withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: const Color(0xFF10B981).withValues(alpha: 0.28),
+                                      width: 1,
                                     ),
                                   ),
-                                ],
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 6.5,
+                                        height: 6.5,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFF10B981),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        auth.selectedDeviceCode,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          color: AppColors.forestDeep,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 16),
@@ -441,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     // PRIMARY HERO SCANNER CARD (True Frosted Glassmorphism)
                     GlassContainer.light(
                       borderRadius: BorderRadius.circular(AppRadius.xl),
-                      blur: 22,
+                      blur: 28,
                       boxShadow: [
                         BoxShadow(
                           color: const Color(0xFF10B981).withValues(alpha: 0.14),
@@ -692,9 +600,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-        ],
-      ),
-    );
+        ),
+      );
   }
 
   Widget _buildLightSyncMetric(String value, String label, {bool isWarning = false}) {

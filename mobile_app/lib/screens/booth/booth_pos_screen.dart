@@ -1,10 +1,14 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../models/booth_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/booth_pos_provider.dart';
+import '../../widgets/glass_container.dart';
+import '../../widgets/mesh_gradient_background.dart';
 import 'receipt_screen.dart';
 import 'wallet_scanner_screen.dart';
 
@@ -269,132 +273,160 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
     final pos = Provider.of<BoothPosProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Kasir Booth Cashless',
-              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.forestDeep),
-            ),
-            if (pos.selectedBooth != null)
-              Text(
-                pos.selectedBooth!.name,
-                style: const TextStyle(fontSize: 12, color: AppColors.forestSoft, fontWeight: FontWeight.w600),
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFF9F9F8),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight + kTextTabBarHeight + 1),
+        child: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.65),
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    width: 1.2,
+                  ),
+                ),
               ),
-          ],
-        ),
-        backgroundColor: AppColors.surface,
-        foregroundColor: AppColors.ink,
-        elevation: 0,
-        actions: [
-          // Select Booth Button
-          if (pos.booths.isNotEmpty)
-            PopupMenuButton<VendorBoothModel>(
-              icon: const Icon(Icons.storefront_rounded, color: AppColors.forest),
-              tooltip: 'Pilih Booth Vendor',
-              onSelected: (booth) => pos.selectBooth(booth),
-              itemBuilder: (ctx) => pos.booths
-                  .map(
-                    (b) => PopupMenuItem(
-                      value: b,
-                      child: Text(
-                        b.name,
-                        style: TextStyle(
-                          fontWeight: b.id == pos.selectedBooth?.id ? FontWeight.w800 : FontWeight.normal,
-                          color: b.id == pos.selectedBooth?.id ? AppColors.forestDeep : AppColors.ink,
+              child: AppBar(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kasir Booth Cashless',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                        color: AppColors.forestDeep,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    if (pos.selectedBooth != null)
+                      Text(
+                        pos.selectedBooth!.name,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11.5,
+                          color: AppColors.forestSoft,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
-                  )
-                  .toList(),
-            ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: AppColors.forestDeep,
-          unselectedLabelColor: AppColors.inkSoft,
-          indicatorColor: AppColors.forest,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-          tabs: const [
-            Tab(icon: Icon(Icons.dialpad_rounded, size: 18), text: 'Keypad Nominal'),
-            Tab(icon: Icon(Icons.restaurant_menu_rounded, size: 18), text: 'Katalog Menu'),
-          ],
-        ),
-      ),
-      body: Column(
-        children: [
-          // Tab Content
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildKeypadTab(pos),
-                _buildProductsTab(pos),
-              ],
-            ),
-          ),
-
-          // Bottom Checkout Bar
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              border: const Border(top: BorderSide(color: AppColors.border)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, -3),
+                  ],
                 ),
-              ],
-            ),
-            child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'Total Transaksi:',
-                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
-                      ),
-                      Text(
-                        AppFormatters.formatRupiah(pos.totalPayable),
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.forestDeep),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: pos.isLoading ? null : _handleCheckout,
-                    icon: pos.isLoading
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                backgroundColor: Colors.transparent,
+                foregroundColor: AppColors.ink,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+                actions: [
+                  // Select Booth Button
+                  if (pos.booths.isNotEmpty)
+                    PopupMenuButton<VendorBoothModel>(
+                      icon: const Icon(Icons.storefront_rounded, color: AppColors.forest),
+                      tooltip: 'Pilih Booth Vendor',
+                      onSelected: (booth) => pos.selectBooth(booth),
+                      itemBuilder: (ctx) => pos.booths
+                          .map(
+                            (b) => PopupMenuItem(
+                              value: b,
+                              child: Text(
+                                b.name,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontWeight: b.id == pos.selectedBooth?.id ? FontWeight.w800 : FontWeight.normal,
+                                  color: b.id == pos.selectedBooth?.id ? AppColors.forestDeep : AppColors.ink,
+                                ),
+                              ),
+                            ),
                           )
-                        : const Icon(Icons.qr_code_scanner_rounded, size: 20),
-                    label: Text(
-                      pos.isLoading ? 'Memproses...' : 'Scan QR Wallet Pengunjung',
-                      style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800),
+                          .toList(),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.forest,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size.fromHeight(48),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                      elevation: 0,
-                    ),
-                  ),
                 ],
+                bottom: TabBar(
+                  controller: _tabController,
+                  labelColor: const Color(0xFF047857),
+                  unselectedLabelColor: const Color(0xFF6B7280),
+                  indicatorColor: const Color(0xFF10B981),
+                  indicatorWeight: 3,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  dividerColor: Colors.transparent,
+                  labelStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 13),
+                  unselectedLabelStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 13),
+                  tabs: const [
+                    Tab(icon: Icon(Icons.dialpad_rounded, size: 18), text: 'Keypad Nominal'),
+                    Tab(icon: Icon(Icons.restaurant_menu_rounded, size: 18), text: 'Katalog Menu'),
+                  ],
+                ),
               ),
             ),
           ),
-        ],
+        ),
+      ),
+      body: MeshGradientBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Tab Content
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildKeypadTab(pos),
+                    _buildProductsTab(pos),
+                  ],
+                ),
+              ),
+
+            // Bottom Checkout Bar
+            GlassContainer.light(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              child: SafeArea(
+                top: false,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Total Transaksi:',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
+                        ),
+                        Text(
+                          AppFormatters.formatRupiah(pos.totalPayable),
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.forestDeep),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      onPressed: pos.isLoading ? null : _handleCheckout,
+                      icon: pos.isLoading
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : const Icon(Icons.qr_code_scanner_rounded, size: 20),
+                      label: Text(
+                        pos.isLoading ? 'Memproses...' : 'Scan QR Wallet Pengunjung',
+                        style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.forest,
+                        foregroundColor: Colors.white,
+                        minimumSize: const Size.fromHeight(48),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                        elevation: 0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        ),
       ),
     );
   }
@@ -403,18 +435,14 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
     final presets = [10000.0, 25000.0, 50000.0, 100000.0];
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 24),
       child: Column(
         children: [
           // Amount Display
-          Container(
+          GlassContainer.light(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: AppColors.border),
-            ),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
             child: Column(
               children: [
                 const Text(
@@ -476,10 +504,10 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
                   AppFormatters.formatRupiah(val),
                   style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.forestDeep),
                 ),
-                backgroundColor: AppColors.surface,
+                backgroundColor: Colors.white.withValues(alpha: 0.72),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppRadius.sm),
-                  side: const BorderSide(color: AppColors.border),
+                  side: const BorderSide(color: AppColors.glassBorder),
                 ),
                 onPressed: () {
                   HapticFeedback.selectionClick();
@@ -539,29 +567,22 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
   }
 
   Widget _buildKeypadButton({String? label, IconData? icon, Color? color, Color? textColor, required VoidCallback onTap}) {
-    return Material(
-      color: color ?? AppColors.surface,
+    return GlassContainer.light(
       borderRadius: BorderRadius.circular(AppRadius.md),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: AppColors.border),
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          alignment: Alignment.center,
-          child: label != null
-              ? Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    color: textColor ?? AppColors.ink,
-                  ),
-                )
-              : Icon(icon, color: AppColors.inkSoft, size: 22),
-        ),
+      fillColor: color ?? Colors.white.withValues(alpha: 0.72),
+      padding: EdgeInsets.zero,
+      onTap: onTap,
+      child: Center(
+        child: label != null
+            ? Text(
+                label,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: textColor ?? AppColors.ink,
+                ),
+              )
+            : Icon(icon, color: AppColors.inkSoft, size: 22),
       ),
     );
   }
@@ -596,7 +617,7 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
     }
 
     return ListView.separated(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 24),
       itemCount: pos.products.length,
       separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (ctx, idx) {
@@ -606,83 +627,76 @@ class _BoothPosScreenState extends State<BoothPosScreen> with SingleTickerProvid
           orElse: () => CartItem(product: product, quantity: 0),
         );
 
-        return Card(
-          elevation: 0,
-          color: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            side: const BorderSide(color: AppColors.border),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: AppColors.leafPale,
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                  ),
-                  child: const Icon(Icons.restaurant_menu_rounded, color: AppColors.forest),
+        return GlassContainer.light(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: AppColors.leafPale,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product.name,
-                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.forestDeep),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        AppFormatters.formatRupiah(product.price),
-                        style: const TextStyle(fontSize: 13, color: AppColors.forestSoft, fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                ),
-                if (inCartItem.quantity > 0)
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.remove_circle_outline_rounded, color: AppColors.error, size: 24),
-                        onPressed: () {
-                          HapticFeedback.selectionClick();
-                          pos.removeFromCart(product.id);
-                        },
-                      ),
-                      Text(
-                        '${inCartItem.quantity}',
-                        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.forestDeep),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add_circle_rounded, color: AppColors.forest, size: 24),
-                        onPressed: () {
-                          HapticFeedback.selectionClick();
-                          pos.addToCart(product);
-                        },
-                      ),
-                    ],
-                  )
-                else
-                  ElevatedButton(
-                    onPressed: () {
-                      HapticFeedback.selectionClick();
-                      pos.addToCart(product);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.forest,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      minimumSize: Size.zero,
+                child: const Icon(Icons.restaurant_menu_rounded, color: AppColors.forest),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.forestDeep),
                     ),
-                    child: const Text('+ Tambah', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 3),
+                    Text(
+                      AppFormatters.formatRupiah(product.price),
+                      style: const TextStyle(fontSize: 13, color: AppColors.forestSoft, fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              ),
+              if (inCartItem.quantity > 0)
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove_circle_outline_rounded, color: AppColors.error, size: 24),
+                      onPressed: () {
+                        HapticFeedback.selectionClick();
+                        pos.removeFromCart(product.id);
+                      },
+                    ),
+                    Text(
+                      '${inCartItem.quantity}',
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: AppColors.forestDeep),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_rounded, color: AppColors.forest, size: 24),
+                      onPressed: () {
+                        HapticFeedback.selectionClick();
+                        pos.addToCart(product);
+                      },
+                    ),
+                  ],
+                )
+              else
+                ElevatedButton(
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    pos.addToCart(product);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.forest,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    minimumSize: Size.zero,
                   ),
-              ],
-            ),
+                  child: const Text('+ Tambah', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+                ),
+            ],
           ),
         );
       },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../constants/app_colors.dart';
+import '../../widgets/glass_container.dart';
+import '../../widgets/mesh_gradient_background.dart';
 
 class ReceiptScreen extends StatelessWidget {
   final Map<String, dynamic> receipt;
@@ -22,15 +24,17 @@ class ReceiptScreen extends StatelessWidget {
     final txId = tx['id'] ?? tx['reference_id'] ?? 'TX-${DateTime.now().millisecondsSinceEpoch}';
 
     return Scaffold(
-      backgroundColor: AppColors.canvas,
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFFF9F9F8),
       appBar: AppBar(
         title: const Text(
           'Bukti Transaksi',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.ink),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: AppColors.forestDeep),
         ),
-        backgroundColor: AppColors.surface,
+        backgroundColor: Colors.transparent,
         foregroundColor: AppColors.ink,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
         automaticallyImplyLeading: false,
         actions: [
@@ -40,59 +44,48 @@ class ReceiptScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 12),
-                      // Success Badge
-                      Container(
-                        width: 76,
-                        height: 76,
-                        decoration: BoxDecoration(
-                          color: AppColors.leafPale,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.border, width: 2),
+      body: MeshGradientBackground(
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Success Badge
+                        Container(
+                          width: 76,
+                          height: 76,
+                          decoration: BoxDecoration(
+                            color: AppColors.leafPale,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.border, width: 2),
+                          ),
+                          child: const Icon(Icons.check_circle_rounded, color: AppColors.forestSoft, size: 48),
                         ),
-                        child: const Icon(Icons.check_circle_rounded, color: AppColors.forestSoft, size: 48),
-                      ),
-                      const SizedBox(height: 14),
+                        const SizedBox(height: 14),
 
-                      const Text(
-                        'Pembayaran Berhasil',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.forestDeep),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        boothName,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
-                      ),
-                      const SizedBox(height: 20),
+                        const Text(
+                          'Pembayaran Berhasil',
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.forestDeep),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          boothName,
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.inkSoft),
+                        ),
+                        const SizedBox(height: 20),
 
-                      // Structured Receipt Paper Card
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
+                        // Structured Receipt Paper Card
+                        GlassContainer.light(
                           borderRadius: BorderRadius.circular(AppRadius.lg),
-                          border: Border.all(color: AppColors.border),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            const Text(
-                              'TOTAL PEMBAYARAN',
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            children: [
+                              const Text(
+                                'TOTAL PEMBAYARAN',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
@@ -146,8 +139,9 @@ class ReceiptScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildReceiptRow(String label, String value, {bool isHighlight = false}) {
     return Row(

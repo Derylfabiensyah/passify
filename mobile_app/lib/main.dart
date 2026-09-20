@@ -45,7 +45,11 @@ class _PassifyAppState extends State<PassifyApp> {
   @override
   void initState() {
     super.initState();
-    _initApp();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _initApp();
+      }
+    });
   }
 
   Future<void> _initApp() async {
@@ -61,10 +65,14 @@ class _PassifyAppState extends State<PassifyApp> {
     final auth = Provider.of<AuthProvider>(context);
     final theme = Provider.of<ThemeProvider>(context);
 
+    final lightBase = ThemeData.light();
+    final lightTextTheme = GoogleFonts.plusJakartaSansTextTheme(lightBase.textTheme);
     final lightTheme = ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.light().textTheme),
+      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+      textTheme: lightTextTheme,
+      primaryTextTheme: GoogleFonts.plusJakartaSansTextTheme(lightBase.primaryTextTheme),
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.forest,
         brightness: Brightness.light,
@@ -73,17 +81,26 @@ class _PassifyAppState extends State<PassifyApp> {
         surface: AppColors.surface,
       ),
       scaffoldBackgroundColor: AppColors.canvas,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink,
         elevation: 0,
+        titleTextStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
+          color: AppColors.ink,
+        ),
       ),
     );
 
+    final darkBase = ThemeData.dark();
+    final darkTextTheme = GoogleFonts.plusJakartaSansTextTheme(darkBase.textTheme);
     final darkTheme = ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      textTheme: GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme),
+      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
+      textTheme: darkTextTheme,
+      primaryTextTheme: GoogleFonts.plusJakartaSansTextTheme(darkBase.primaryTextTheme),
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.forestSoft,
         brightness: Brightness.dark,
@@ -92,10 +109,15 @@ class _PassifyAppState extends State<PassifyApp> {
         surface: AppColors.darkSurface,
       ),
       scaffoldBackgroundColor: AppColors.darkCanvas,
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkInk,
         elevation: 0,
+        titleTextStyle: GoogleFonts.plusJakartaSans(
+          fontSize: 18,
+          fontWeight: FontWeight.w800,
+          color: AppColors.darkInk,
+        ),
       ),
     );
 

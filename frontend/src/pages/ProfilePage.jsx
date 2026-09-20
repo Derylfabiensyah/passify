@@ -19,7 +19,7 @@ import {
 import { formatRupiah } from '../api/client';
 import { useTenant } from '../contexts/TenantContext';
 import { useToast } from '../contexts/ToastContext';
-import WalletModal from '../components/WalletModal';
+import WalletModal from '../components/modals/WalletModal';
 
 export default function ProfilePage() {
   const navigate = useNavigate();

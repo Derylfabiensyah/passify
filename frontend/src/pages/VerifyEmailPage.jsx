@@ -28,6 +28,19 @@ export default function VerifyEmailPage() {
         if (res.ok && json.success) {
           setStatus('success');
           setMessage(json.message || 'Email Anda telah berhasil diverifikasi! Akun pengelola wisata Anda telah aktif.');
+          if (json.data?.access_token) {
+            localStorage.setItem('passify_token', json.data.access_token);
+          } else {
+            localStorage.setItem('passify_token', 'demo-jwt-token');
+          }
+          if (json.data?.user) {
+            localStorage.setItem('passify_user', JSON.stringify(json.data.user));
+          }
+          const userTenantSlug = json.data?.tenant?.slug || json.data?.user?.tenant?.slug || json.data?.user?.tenant_slug;
+          if (userTenantSlug) {
+            localStorage.setItem('passify_current_tenant', userTenantSlug);
+            localStorage.setItem('passify_last_active_tenant', userTenantSlug);
+          }
         } else {
           setStatus('error');
           setMessage(json.message || json.error?.details || 'Tautan verifikasi tidak valid atau telah kedaluwarsa.');

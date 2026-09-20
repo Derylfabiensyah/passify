@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
 
 class ScannerOverlay extends StatelessWidget {
   final Rect scanWindow;
   final double borderRadius;
+  final Color? bracketColor;
 
   const ScannerOverlay({
     super.key,
     required this.scanWindow,
     this.borderRadius = 24,
+    this.bracketColor,
   });
 
   @override
@@ -56,14 +57,14 @@ class ScannerOverlay extends StatelessWidget {
           ),
         ),
 
-        // 3. High-Tech Precision Corner Brackets
+        // 3. High-Tech Precision Curved Corner Brackets
         CustomPaint(
           painter: _CornerBracketsPainter(
             rect: scanWindow,
             cornerRadius: borderRadius,
-            bracketLength: 28,
-            strokeWidth: 4,
-            color: AppColors.leafPale,
+            bracketLength: 20,
+            strokeWidth: 3.5,
+            color: bracketColor ?? const Color(0xFF10B981),
           ),
         ),
       ],
@@ -95,35 +96,65 @@ class _CornerBracketsPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final glowPaint = Paint()
-      ..color = color.withValues(alpha: 0.35)
-      ..strokeWidth = strokeWidth + 4
+      ..color = color.withValues(alpha: 0.28)
+      ..strokeWidth = strokeWidth + 3
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
-    void drawCorner(double startX, double startY, double hX, double vY) {
-      final path = Path();
-      // Horizontal segment
-      path.moveTo(hX, startY);
-      path.lineTo(startX, startY);
-      // Vertical segment
-      path.lineTo(startX, vY);
+    // Top-Left: horizontal line, curve, vertical line
+    final tlPath = Path()
+      ..moveTo(rect.left + cornerRadius + bracketLength, rect.top)
+      ..lineTo(rect.left + cornerRadius, rect.top)
+      ..arcToPoint(
+        Offset(rect.left, rect.top + cornerRadius),
+        radius: Radius.circular(cornerRadius),
+        clockwise: false,
+      )
+      ..lineTo(rect.left, rect.top + cornerRadius + bracketLength);
 
+    // Top-Right: horizontal line, curve, vertical line
+    final trPath = Path()
+      ..moveTo(rect.right - cornerRadius - bracketLength, rect.top)
+      ..lineTo(rect.right - cornerRadius, rect.top)
+      ..arcToPoint(
+        Offset(rect.right, rect.top + cornerRadius),
+        radius: Radius.circular(cornerRadius),
+        clockwise: true,
+      )
+      ..lineTo(rect.right, rect.top + cornerRadius + bracketLength);
+
+    // Bottom-Right: vertical line, curve, horizontal line
+    final brPath = Path()
+      ..moveTo(rect.right, rect.bottom - cornerRadius - bracketLength)
+      ..lineTo(rect.right, rect.bottom - cornerRadius)
+      ..arcToPoint(
+        Offset(rect.right - cornerRadius, rect.bottom),
+        radius: Radius.circular(cornerRadius),
+        clockwise: true,
+      )
+      ..lineTo(rect.right - cornerRadius - bracketLength, rect.bottom);
+
+    // Bottom-Left: vertical line, curve, horizontal line
+    final blPath = Path()
+      ..moveTo(rect.left, rect.bottom - cornerRadius - bracketLength)
+      ..lineTo(rect.left, rect.bottom - cornerRadius)
+      ..arcToPoint(
+        Offset(rect.left + cornerRadius, rect.bottom),
+        radius: Radius.circular(cornerRadius),
+        clockwise: false,
+      )
+      ..lineTo(rect.left + cornerRadius + bracketLength, rect.bottom);
+
+    for (final path in [tlPath, trPath, brPath, blPath]) {
       canvas.drawPath(path, glowPaint);
       canvas.drawPath(path, paint);
     }
-
-    // Top-Left
-    drawCorner(rect.left, rect.top, rect.left + bracketLength, rect.top + bracketLength);
-    // Top-Right
-    drawCorner(rect.right, rect.top, rect.right - bracketLength, rect.top + bracketLength);
-    // Bottom-Left
-    drawCorner(rect.left, rect.bottom, rect.left + bracketLength, rect.bottom - bracketLength);
-    // Bottom-Right
-    drawCorner(rect.right, rect.bottom, rect.right - bracketLength, rect.bottom - bracketLength);
   }
 
   @override
   bool shouldRepaint(covariant _CornerBracketsPainter oldDelegate) {
-    return oldDelegate.rect != rect || oldDelegate.color != color;
+    return oldDelegate.rect != rect ||
+        oldDelegate.color != color ||
+        oldDelegate.cornerRadius != cornerRadius;
   }
 }

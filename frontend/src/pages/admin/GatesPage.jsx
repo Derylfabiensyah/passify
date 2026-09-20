@@ -369,6 +369,7 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
               return t;
             });
             localStorage.setItem('passify_my_tickets', JSON.stringify(updated));
+            window.dispatchEvent(new Event('storage'));
           }
 
           // Record scan in local telemetry cache
