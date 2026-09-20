@@ -113,9 +113,9 @@ export default function LandingPage() {
             <Link to="/jelajah" className="hidden text-xs font-bold text-[#14281a] transition-colors hover:text-emerald-700 sm:inline">
               Jelajah Wisata
             </Link>
-            <Link to="/daftar-wisata" className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px] font-bold shadow-xs">
+            <a href="#harga" onClick={(e) => handleNavClick(e, 'harga')} className="btn-primary whitespace-nowrap rounded-xl px-3 text-[11px] sm:px-4 sm:text-[13px] font-bold shadow-xs no-underline">
               Daftarkan wisata <ArrowUpRight className="h-3.5 w-3.5" />
-            </Link>
+            </a>
 
             {/* Hamburger Button for Mobile */}
             <button
@@ -223,9 +223,9 @@ export default function LandingPage() {
                     <ChevronRight className="h-4 w-4 text-[#4d5c48]" />
                   </Link>
 
-                  <Link
-                    to="/daftar-wisata"
-                    onClick={() => setMobileMenuOpen(false)}
+                  <a
+                    href="#harga"
+                    onClick={(e) => handleNavClick(e, 'harga')}
                     className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#14281a] hover:bg-emerald-800/10 transition-colors no-underline"
                   >
                     <div className="flex items-center gap-2.5">
@@ -235,7 +235,7 @@ export default function LandingPage() {
                       <span>Daftarkan Wisata Anda</span>
                     </div>
                     <ChevronRight className="h-4 w-4 text-[#4d5c48]" />
-                  </Link>
+                  </a>
 
                   <Link
                     to="/masuk"
@@ -256,14 +256,14 @@ export default function LandingPage() {
 
             {/* Seamless Frosted Bottom Actions */}
             <div className="p-4 border-t border-white/60 bg-white/40 backdrop-blur-md space-y-2.5 pb-8">
-              <Link
-                to="/daftar-wisata"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-3.5 flex items-center justify-center gap-2 rounded-xl bg-[var(--forest-deep)] hover:bg-[var(--forest)] text-white text-xs font-bold shadow-md shadow-emerald-950/20 active:scale-98 transition-all"
+              <a
+                href="#harga"
+                onClick={(e) => handleNavClick(e, 'harga')}
+                className="w-full py-3.5 flex items-center justify-center gap-2 rounded-xl bg-[var(--forest-deep)] hover:bg-[var(--forest)] text-white text-xs font-bold shadow-md shadow-emerald-950/20 active:scale-98 transition-all no-underline"
               >
                 <span>Daftarkan Wisata Anda</span>
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </a>
 
               <Link
                 to="/jelajah"
@@ -301,9 +301,9 @@ export default function LandingPage() {
                 Alam memberi batas.<br />Operasi memberi kepastian.
               </h1>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
+                <a href="#harga" onClick={(e) => handleNavClick(e, 'harga')} className="btn-clay px-6 py-3.5 text-sm rounded-xl no-underline">
                   Daftarkan wisata Anda <ArrowRight className="h-4 w-4" />
-                </Link>
+                </a>
                 <Link
                   to="/jelajah"
                   className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/15 text-white hover:bg-white/25 backdrop-blur-md border border-white/25"
@@ -687,9 +687,9 @@ export default function LandingPage() {
                 <h2 className="mt-4 text-4xl font-bold leading-[.96] text-white sm:text-5xl">Biarkan alam tetap menjadi alasan orang datang.</h2>
                 <p className="mt-5 text-sm leading-6 text-white/80 sm:text-[15px] sm:leading-7">Ceritakan cara tiket, kuota, dan gerbang bekerja hari ini. Mulai dari portal yang terasa milik kawasan Anda sendiri.</p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                  <Link to="/daftar-wisata" className="btn-clay px-6 py-3.5 text-sm rounded-xl">
+                  <a href="#harga" onClick={(e) => handleNavClick(e, 'harga')} className="btn-clay px-6 py-3.5 text-sm rounded-xl no-underline">
                     Daftarkan wisata <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  </a>
                   <a href="mailto:hello@passify.id" className="btn-secondary px-6 py-3.5 text-sm rounded-xl bg-white/15 text-white hover:bg-white/25 backdrop-blur-md border border-white/25">
                     Bicarakan kebutuhan <ArrowUpRight className="h-4 w-4" />
                   </a>
@@ -736,7 +736,7 @@ export default function LandingPage() {
               </h4>
               <ul className="space-y-2.5 text-sm font-semibold text-[#3b4836]">
                 <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">Portal Wisatawan</Link></li>
-                <li><Link to="/daftar-wisata" className="hover:text-emerald-800 transition-colors">Daftarkan Wisata Baru</Link></li>
+                <li><a href="#harga" onClick={(e) => handleNavClick(e, 'harga')} className="hover:text-emerald-800 transition-colors cursor-pointer">Daftarkan Wisata Baru</a></li>
                 <li><Link to="/masuk" className="hover:text-emerald-800 transition-colors">Masuk Petugas / Admin</Link></li>
                 <li><Link to="/verifikasi-email" className="hover:text-emerald-800 transition-colors">Aktivasi Akun Pengelola</Link></li>
               </ul>

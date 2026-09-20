@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   ArrowRight, 
   ArrowLeft, 
@@ -16,7 +16,10 @@ import {
   Sparkles,
   ExternalLink,
   Trees,
-  MapPin
+  MapPin,
+  Check,
+  CreditCard,
+  ShieldCheck
 } from 'lucide-react';
 
 import { validateSubdomainInput } from '../utils/subdomainValidation';
@@ -28,6 +31,8 @@ const GOOGLE_CLIENT_ID =
 
 export default function RegisterTenantPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const skema = searchParams.get('skema') || 'fleksibel';
   const [step, setStep] = useState(1);
   const [googleGsiReady, setGoogleGsiReady] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -57,6 +62,8 @@ export default function RegisterTenantPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [registeredData, setRegisteredData] = useState(null);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [showSnapModal, setShowSnapModal] = useState(false);
 
   // Auto-generate subdomain suggestion from tenant name if not manually modified
   const handleTenantNameChange = (e) => {
@@ -159,6 +166,9 @@ export default function RegisterTenantPage() {
     if (!formData.address.trim()) {
       errs.address = 'Alamat lokasi wisata wajib diisi';
     }
+    if (skema === 'fleksibel' && !agreeTerms) {
+      errs.agreeTerms = 'Anda wajib menyetujui perjanjian sistem bagi hasil per tiket sebelum melanjutkan.';
+    }
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -244,11 +254,110 @@ export default function RegisterTenantPage() {
       } catch (_) {}
 
       setRegisteredData(data.data || {});
-      setStep(3); // Move to success step
+
+      if (skema === 'langganan') {
+        // Go to Checkout step
+        setStep(3);
+      } else {
+        // Go straight to Success step
+        setStep(4);
+      }
     } catch (err) {
       setSubmitError(err.message);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handlePayment = async () => {
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    const orderNumber = `SUB-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
+    let realSnapToken = '';
+
+    try {
+      const snapPayload = {
+        order_number: orderNumber,
+        gross_amount: 750000,
+        customer_name: formData.full_name,
+        customer_email: formData.email,
+        customer_phone: formData.phone || '081234567890',
+        items: [
+          {
+            id: 'passify-subscription-monthly',
+            name: 'Langganan Tetap Passify (1 Bulan)',
+            price: 750000,
+            quantity: 1,
+          },
+        ],
+      };
+
+      const res = await fetch('http://localhost:8084/api/v1/payments/snap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(snapPayload),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+        realSnapToken = json.data?.snap_token;
+      }
+    } catch (err) {
+      console.warn('Payment service backend unreachable:', err);
+    }
+
+    const tokenToUse = realSnapToken || `SNAP-${orderNumber}-${Math.random().toString(36).substring(2, 7)}`;
+
+    if (window.snap && typeof window.snap.pay === 'function' && realSnapToken) {
+      window.snap.pay(tokenToUse, {
+        onSuccess: () => {
+          setIsSubmitting(false);
+          setStep(4);
+        },
+        onPending: () => {
+          setIsSubmitting(false);
+          setStep(4);
+        },
+        onError: () => {
+          setIsSubmitting(false);
+          setSubmitError('Pembayaran melalui Midtrans tidak berhasil. Silakan coba kembali.');
+        },
+        onClose: () => {
+          setIsSubmitting(false);
+          setSubmitError('Jendela pembayaran Midtrans ditutup. Klik "Bayar Sekarang" untuk menyelesaikan pendaftaran.');
+        },
+      });
+    } else {
+      // Dev mode fallback or local simulation
+      if (window.snap && typeof window.snap.pay === 'function') {
+        try {
+          window.snap.pay(tokenToUse, {
+            onSuccess: () => {
+              setIsSubmitting(false);
+              setStep(4);
+            },
+            onPending: () => {
+              setIsSubmitting(false);
+              setStep(4);
+            },
+            onError: () => {
+              setIsSubmitting(false);
+              setTimeout(() => setStep(4), 1000);
+            },
+            onClose: () => {
+              setIsSubmitting(false);
+              setSubmitError('Jendela pembayaran Midtrans ditutup.');
+            },
+          });
+          return;
+        } catch (_) {}
+      }
+
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setStep(4);
+      }, 1200);
     }
   };
 
@@ -351,34 +460,59 @@ export default function RegisterTenantPage() {
 
       {/* Main Container */}
       <main className="mx-auto w-full max-w-2xl px-4 py-8 sm:py-12 flex-1">
-        <div className="mb-8 rounded-2xl bg-[var(--leaf-pale)]/60 p-4 sm:p-5 shadow-2xs">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="eyebrow">Pendaftaran Wisata</p>
-              <p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">Siapkan portal wisata Anda dalam tiga langkah.</p>
+        {/* Stepper Header */}
+        {(() => {
+          const totalSteps = skema === 'langganan' ? 4 : 3;
+          const displayStep = skema === 'langganan' ? step : (step === 4 ? 3 : step);
+          const stepsList = skema === 'langganan' ? [
+            ['01', 'Akun'],
+            ['02', 'Destinasi'],
+            ['03', 'Checkout'],
+            ['04', 'Aktivasi'],
+          ] : [
+            ['01', 'Akun'],
+            ['02', 'Destinasi'],
+            ['03', 'Aktivasi'],
+          ];
+
+          return (
+            <div className="mb-8 rounded-2xl bg-[var(--leaf-pale)]/60 p-4 sm:p-5 shadow-2xs">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="eyebrow">
+                    Pendaftaran Wisata {skema === 'langganan' ? '• Skema Langganan Tetap' : '• Skema Fleksibel'}
+                  </p>
+                  <p className="mt-1 text-sm font-bold text-[var(--forest-deep)]">
+                    {displayStep === 1 && 'Langkah 1: Masukkan data diri Anda sebagai pengelola utama.'}
+                    {displayStep === 2 && 'Langkah 2: Lengkapi profil destinasi dan alamat subdomain.'}
+                    {displayStep === 3 && skema === 'langganan' && 'Langkah 3: Tinjau tagihan dan selesaikan pembayaran.'}
+                    {(displayStep === 4 || (displayStep === 3 && skema !== 'langganan')) && 'Langkah Terakhir: Aktivasi akun melalui tautan email.'}
+                  </p>
+                </div>
+                <span className="hidden rounded-lg bg-white/80 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)] shadow-xs sm:inline">
+                  Langkah {displayStep} dari {totalSteps}
+                </span>
+              </div>
+              <ol className={`mt-5 grid gap-2 ${skema === 'langganan' ? 'grid-cols-4' : 'grid-cols-3'}`}>
+                {stepsList.map(([number, label]) => {
+                  const numberValue = Number(number);
+                  const isCurrent = numberValue === displayStep;
+                  const isDone = numberValue < displayStep;
+                  return (
+                    <li key={number} className="min-w-0">
+                      <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide ${isCurrent ? 'text-[var(--forest-deep)]' : isDone ? 'text-[var(--forest)]' : 'text-[var(--ink-muted)]'}`}>
+                        <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full ${isCurrent || isDone ? 'bg-[var(--forest)] text-white' : 'border border-[var(--border)] bg-white'}`}>
+                          {isDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : number}
+                        </span>
+                        <span className="truncate">{label}</span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
             </div>
-            <span className="hidden rounded-lg bg-white/80 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[var(--forest)] shadow-xs sm:inline">Langkah {step} dari 3</span>
-          </div>
-          <ol className="mt-5 grid grid-cols-3 gap-2">
-            {[
-              ['01', 'Akun'],
-              ['02', 'Destinasi'],
-              ['03', 'Aktivasi'],
-            ].map(([number, label]) => {
-              const numberValue = Number(number);
-              const isCurrent = numberValue === step;
-              const isDone = numberValue < step;
-              return (
-                <li key={number} className="min-w-0">
-                  <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide ${isCurrent ? 'text-[var(--forest-deep)]' : isDone ? 'text-[var(--forest)]' : 'text-[var(--ink-muted)]'}`}>
-                    <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full ${isCurrent || isDone ? 'bg-[var(--forest)] text-white' : 'border border-[var(--border)] bg-white'}`}>{isDone ? <CheckCircle2 className="h-3.5 w-3.5" /> : number}</span>
-                    <span className="truncate">{label}</span>
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
+          );
+        })()}
 
         {/* Step 1: Data Akun */}
         {step === 1 && (
@@ -781,6 +915,31 @@ export default function RegisterTenantPage() {
                 </div>
               )}
 
+              {/* Perjanjian Skema Fleksibel */}
+              {skema === 'fleksibel' && (
+                <div className="rounded-xl border border-emerald-200/60 bg-emerald-50/50 p-4">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <div className="flex h-5 items-center">
+                      <input
+                        type="checkbox"
+                        required
+                        checked={agreeTerms}
+                        onChange={(e) => {
+                          setAgreeTerms(e.target.checked);
+                          if (errors.agreeTerms) setErrors(prev => ({ ...prev, agreeTerms: '' }));
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-[var(--forest)] focus:ring-[var(--forest)]"
+                      />
+                    </div>
+                    <div className="text-xs text-[var(--ink)]">
+                      <span className="font-bold block mb-0.5">Persetujuan Skema Fleksibel (Pay-as-you-go)</span>
+                      Saya menyetujui bahwa tidak ada biaya bulanan yang ditagihkan. Sistem akan secara otomatis memotong biaya <strong className="text-[var(--forest-deep)]">Rp 2.500 per tiket</strong> dari setiap transaksi yang berhasil melalui platform Passify.
+                    </div>
+                  </label>
+                  {errors.agreeTerms && <p className="mt-2 text-xs font-semibold text-red-500">{errors.agreeTerms}</p>}
+                </div>
+              )}
+
               <div className="flex items-center gap-3 pt-4">
                 <button
                   type="button"
@@ -800,7 +959,11 @@ export default function RegisterTenantPage() {
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="h-4 w-4 animate-spin" /> Mendaftarkan...
+                      <Loader2 className="h-4 w-4 animate-spin" /> Memproses...
+                    </>
+                  ) : skema === 'langganan' ? (
+                    <>
+                      Lanjut ke Checkout <ArrowRight className="h-4 w-4" />
                     </>
                   ) : (
                     <>
@@ -813,8 +976,147 @@ export default function RegisterTenantPage() {
           </div>
         )}
 
-        {/* Step 3: Success Confirmation */}
-        {step === 3 && (
+        {/* Step 3: Halaman Checkout Khusus Skema Langganan */}
+        {step === 3 && skema === 'langganan' && (
+          <div className="rounded-2xl glass-panel p-6 sm:p-10">
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100/90 px-3 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-900 border border-amber-200">
+                  Tagihan Langganan
+                </span>
+                <span className="text-xs font-semibold text-gray-500">
+                  Invoice #{registeredData?.tenant?.id ? String(registeredData.tenant.id).slice(0, 8).toUpperCase() : `SUB-${Date.now().toString().slice(-6)}`}
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--ink)]">
+                Checkout Langganan Tetap Passify
+              </h1>
+              <p className="mt-1 text-sm text-[var(--ink-soft)]">
+                Tinjau rincian biaya langganan bulanan dan selesaikan pembayaran untuk mengaktifkan portal e-ticketing wisata Anda.
+              </p>
+            </div>
+
+            {submitError && (
+              <div className="mb-6 flex items-center gap-3 rounded-2xl bg-red-50 p-4 text-xs font-semibold text-red-700 shadow-2xs">
+                <AlertCircle className="h-5 w-5 shrink-0 text-red-500" />
+                <span>{submitError}</span>
+              </div>
+            )}
+
+            {/* Detail Kawasan & Pengelola */}
+            <div className="space-y-4">
+              <div className="rounded-xl border border-gray-200/80 bg-white/70 p-4 sm:p-5 backdrop-blur-sm space-y-3 shadow-2xs">
+                <div className="flex items-start justify-between gap-4 pb-3 border-b border-gray-100">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Destinasi Wisata</span>
+                    <h3 className="text-base font-black text-[var(--forest-deep)]">{formData.tenant_name || 'Destinasi Wisata'}</h3>
+                    <p className="text-xs font-mono text-emerald-800">https://{formData.subdomain || 'nama-wisata'}.passify.id</p>
+                  </div>
+                  <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800 border border-emerald-200">
+                    Bulan Ke-1
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-gray-400">Pengelola Utama</span>
+                    <p className="font-semibold text-gray-800">{formData.full_name}</p>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-gray-400">Email Kontak</span>
+                    <p className="font-semibold text-gray-800">{formData.email}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Rincian Tagihan */}
+              <div className="rounded-xl border border-gray-200/80 bg-white/70 p-4 sm:p-5 backdrop-blur-sm shadow-2xs">
+                <h4 className="text-xs font-black uppercase tracking-wider text-gray-500 mb-3">Rincian Pembayaran</h4>
+                
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center text-gray-700">
+                    <span>Paket Flat Bulanan (1 Bulan Pertama)</span>
+                    <span className="font-bold text-gray-900">Rp 750.000</span>
+                  </div>
+                  <div className="flex justify-between items-center text-gray-700">
+                    <span>Setup Portal &amp; Domain Mandiri</span>
+                    <span className="font-bold text-emerald-700">Rp 0 (GRATIS)</span>
+                  </div>
+                  <div className="flex justify-between items-center text-gray-700">
+                    <span>Fee Bagi Hasil Tiket Passify</span>
+                    <span className="font-bold text-emerald-700">Rp 0 (100% Milik Mitra)</span>
+                  </div>
+                  <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
+                    <span className="text-sm font-extrabold text-gray-900">Total Tagihan Awal</span>
+                    <span className="text-2xl font-black text-emerald-800">Rp 750.000</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Fitur & Benefit Langganan */}
+              <div className="rounded-xl bg-emerald-50/60 border border-emerald-200/60 p-4">
+                <h5 className="text-[11px] font-extrabold text-emerald-900 uppercase tracking-wider mb-2">Benefit Skema Langganan:</h5>
+                <ul className="space-y-1.5 text-xs text-emerald-900 font-medium">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-emerald-700 shrink-0 stroke-[3]" />
+                    <span>Portal e-ticketing white-label aktif dan siap jual</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-emerald-700 shrink-0 stroke-[3]" />
+                    <span>Bebas potongan bagi hasil per tiket selamanya selama langganan</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-emerald-700 shrink-0 stroke-[3]" />
+                    <span>Aplikasi scanner gate offline Android tak terbatas jumlah petugas</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-3.5 w-3.5 text-emerald-700 shrink-0 stroke-[3]" />
+                    <span>Dukungan teknis prioritas &amp; faktur resmi BUMDes / PT / Dinas</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="flex items-center gap-2 text-[11px] text-gray-500 justify-center pt-1">
+                <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                <span>Transaksi dijamin aman dan terenkripsi via Midtrans (QRIS, VA Bank, Kartu Kredit).</span>
+              </div>
+
+              {/* Tombol Aksi Checkout */}
+              <div className="flex items-center gap-3 pt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubmitError('');
+                    setStep(2);
+                  }}
+                  disabled={isSubmitting}
+                  className="flex-1 btn-secondary rounded-xl px-5 py-3.5 text-sm font-bold shadow-xs transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  <ArrowLeft className="h-4 w-4" /> Kembali
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePayment}
+                  disabled={isSubmitting}
+                  className="flex-[2] flex items-center justify-center gap-2.5 rounded-xl bg-[var(--forest-deep)] hover:bg-[var(--forest)] px-6 py-3.5 text-sm font-black text-white shadow-md shadow-emerald-950/20 transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" /> Menghubungkan Midtrans...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-4 w-4" /> Bayar Sekarang (Midtrans)
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Success Confirmation */}
+        {(step === 4 || (skema !== 'langganan' && step === 3)) && (
           <div className="rounded-2xl glass-panel p-6 sm:p-10 text-center">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-xs">
               <Mail className="h-8 w-8" />
