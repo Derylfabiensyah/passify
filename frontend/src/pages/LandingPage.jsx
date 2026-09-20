@@ -16,7 +16,6 @@ import {
   Compass,
   Building2,
   Sparkles,
-  Star,
   PhoneCall,
   Layers,
   LogIn
@@ -594,8 +593,8 @@ export default function LandingPage() {
             <div className="glass-panel relative flex flex-col justify-between p-7 sm:p-9 !border-emerald-700/50 ring-2 ring-emerald-700/25 transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl">
               {/* Highlight Badge */}
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-900 px-4 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-md border border-white/20">
-                  <Star className="h-3.5 w-3.5 fill-amber-300 text-amber-300 shrink-0" /> Paling Hemat untuk Kawasan Ramai
+                <span className="inline-flex items-center rounded-full bg-emerald-900 px-4 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-md border border-white/20 whitespace-nowrap">
+                  Paling Hemat untuk Kawasan Ramai
                 </span>
               </div>
 
