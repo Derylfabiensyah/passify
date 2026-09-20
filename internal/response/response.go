@@ -29,28 +29,14 @@ type Meta struct {
 	TotalPages int   `json:"total_pages"`
 }
 
-// Success sends a successful response with data
+// Success sends a standard response with status code, message, and data
 func Success(c *gin.Context, statusCode int, message string, data interface{}) {
-	c.JSON(statusCode, APIResponse{
-		Success: true,
-		Message: message,
-		Data:    data,
-	})
+	c.JSON(statusCode, APIResponse{Success: true, Message: message, Data: data})
 }
 
-// SuccessWithMeta sends a successful response with data and pagination metadata
+// SuccessWithMeta sends a 200 OK response with data and pagination metadata
 func SuccessWithMeta(c *gin.Context, message string, data interface{}, meta *Meta) {
-	c.JSON(http.StatusOK, APIResponse{
-		Success: true,
-		Message: message,
-		Data:    data,
-		Meta:    meta,
-	})
-}
-
-// Created sends a 201 Created response
-func Created(c *gin.Context, message string, data interface{}) {
-	Success(c, http.StatusCreated, message, data)
+	c.JSON(http.StatusOK, APIResponse{Success: true, Message: message, Data: data, Meta: meta})
 }
 
 // OK sends a 200 OK response
@@ -58,15 +44,17 @@ func OK(c *gin.Context, message string, data interface{}) {
 	Success(c, http.StatusOK, message, data)
 }
 
-// Error sends an error response
+// Created sends a 201 Created response
+func Created(c *gin.Context, message string, data interface{}) {
+	Success(c, http.StatusCreated, message, data)
+}
+
+// Error sends a structured error response
 func Error(c *gin.Context, statusCode int, code string, message string, details interface{}) {
 	c.JSON(statusCode, APIResponse{
 		Success: false,
 		Message: message,
-		Error: &ErrorInfo{
-			Code:    code,
-			Details: details,
-		},
+		Error:   &ErrorInfo{Code: code, Details: details},
 	})
 }
 
@@ -95,17 +83,7 @@ func Conflict(c *gin.Context, message string) {
 	Error(c, http.StatusConflict, "CONFLICT", message, nil)
 }
 
-// UnprocessableEntity sends a 422 Unprocessable Entity response
-func UnprocessableEntity(c *gin.Context, message string, details interface{}) {
-	Error(c, http.StatusUnprocessableEntity, "VALIDATION_ERROR", message, details)
-}
-
 // InternalServerError sends a 500 Internal Server Error response
 func InternalServerError(c *gin.Context, message string) {
 	Error(c, http.StatusInternalServerError, "INTERNAL_ERROR", message, nil)
-}
-
-// ServiceUnavailable sends a 503 Service Unavailable response
-func ServiceUnavailable(c *gin.Context, message string) {
-	Error(c, http.StatusServiceUnavailable, "SERVICE_UNAVAILABLE", message, nil)
 }
