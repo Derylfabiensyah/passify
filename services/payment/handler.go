@@ -75,14 +75,6 @@ func (h *PaymentHandler) HandleMidtransWebhook(c *gin.Context) {
 
 // HandlePaymentWebhook handles POST /webhooks/payment
 func (h *PaymentHandler) HandlePaymentWebhook(c *gin.Context) {
-	if h.cfg.XenditWebhookToken != "" {
-		token := c.GetHeader("X-Webhook-Token")
-		if token != h.cfg.XenditWebhookToken {
-			response.Unauthorized(c, "Token webhook tidak valid")
-			return
-		}
-	}
-
 	var req WebhookRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Format data webhook tidak valid", err.Error())
@@ -265,14 +257,6 @@ func (h *PaymentHandler) HandleListPayouts(c *gin.Context) {
 
 // HandlePayoutWebhook handles POST /webhooks/payout
 func (h *PaymentHandler) HandlePayoutWebhook(c *gin.Context) {
-	if h.cfg.XenditWebhookToken != "" {
-		token := c.GetHeader("X-Webhook-Token")
-		if token != h.cfg.XenditWebhookToken {
-			response.Unauthorized(c, "Token webhook tidak valid")
-			return
-		}
-	}
-
 	var req PayoutWebhookRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		response.BadRequest(c, "Format data webhook payout tidak valid", err.Error())

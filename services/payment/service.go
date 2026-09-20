@@ -59,7 +59,7 @@ type PaymentInvoiceResponse struct {
 	ExpiresAt     *time.Time `json:"expires_at,omitempty"`
 }
 
-// WebhookRequest contains payment gateway callback payload (Generic/Xendit)
+// WebhookRequest contains payment gateway callback payload
 type WebhookRequest struct {
 	ExternalID    string     `json:"external_id"`
 	Status        string     `json:"status"`

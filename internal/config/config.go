@@ -31,8 +31,6 @@ type Config struct {
 	GateServicePort    string
 
 	// Payment Gateway (Midtrans)
-	XenditSecretKey     string
-	XenditWebhookToken  string
 	MidtransServerKey   string
 	MidtransClientKey   string
 	MidtransIsProduction bool
@@ -121,8 +119,6 @@ func Load() (*Config, error) {
 		CashlessServicePort: getEnv("CASHLESS_SERVICE_PORT", "8085"),
 		GateServicePort:    getEnv("GATE_SERVICE_PORT", "8086"),
 
-		XenditSecretKey:    getEnv("XENDIT_SECRET_KEY", ""),
-		XenditWebhookToken: getEnv("XENDIT_WEBHOOK_TOKEN", ""),
 		MidtransServerKey:    getEnv("MIDTRANS_SERVER_KEY", ""),
 		MidtransClientKey:    getEnv("MIDTRANS_CLIENT_KEY", ""),
 		MidtransIsProduction: getEnvBool("MIDTRANS_IS_PRODUCTION", false),
