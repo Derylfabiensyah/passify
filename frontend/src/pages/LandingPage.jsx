@@ -82,6 +82,7 @@ export default function LandingPage() {
     { label: 'Kawasan', href: '#masalah', id: 'masalah' },
     { label: 'Cara kerja', href: '#alur', id: 'alur' },
     { label: 'White-label', href: '#white-label', id: 'white-label' },
+    { label: 'Skema Biaya', href: '#harga', id: 'harga' },
     { label: 'Kontak', href: '#contact', id: 'contact' },
   ];
 
@@ -499,6 +500,206 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Section Skema Biaya / Pricing */}
+        <section id="harga" className="scroll-mt-24 mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:px-8">
+          <SectionHeading
+            eyebrow="Skema Biaya Transparan"
+            title="Dua pilihan fleksibel, dirancang untuk skala destinasi Anda."
+            className="text-center mx-auto flex flex-col items-center"
+          >
+            Mulai tanpa risiko komitmen bulanan, atau hemat maksimal dengan biaya tetap. Tanpa kewajiban perangkat keras mahal—cukup gunakan smartphone yang sudah ada di gerbang.
+          </SectionHeading>
+
+          <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:items-stretch">
+            {/* Opsi 1: Fleksibel / Per Tiket */}
+            <div className="card relative flex flex-col justify-between p-7 sm:p-9 transition-all duration-300 hover:translate-y-[-2px]">
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100/90 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-emerald-800 border border-emerald-200/80">
+                    BUMDes & Wisata Rintisan
+                  </span>
+                  <span className="text-xs font-bold text-[#6e7a63]">Pay as you go</span>
+                </div>
+
+                <h3 className="mt-5 text-2xl font-black tracking-tight text-[#14281a]">
+                  Skema Fleksibel
+                </h3>
+                <p className="mt-2 text-xs font-medium leading-relaxed text-[#2d3728]">
+                  Sangat cocok untuk destinasi alam yang baru bertumbuh atau kunjungan yang fluktuatif mengikuti musim dan akhir pekan.
+                </p>
+
+                <div className="mt-6 flex items-baseline gap-2 pb-6 border-b border-black/[0.08] dark:border-white/10">
+                  <span className="text-4xl font-black tracking-tight text-[#14281a]">Rp 0</span>
+                  <span className="text-xs font-bold text-[#6e7a63]">/ bulan</span>
+                  <span className="ml-auto inline-block rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-800 border border-emerald-200">
+                    + Rp 2.500 <span className="font-semibold text-[11px]">/ tiket terjual</span>
+                  </span>
+                </div>
+
+                <ul className="mt-6 space-y-3.5 text-xs font-semibold text-[#2d3728]">
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span><strong>Nol rupiah</strong> biaya pendaftaran dan setup awal sistem.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span><strong>Bebas risiko sepi:</strong> saat tidak ada pengunjung, tidak ada tagihan sama sekali.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Aplikasi scanner tiket QR dinamis offline untuk HP Android petugas.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Portal e-ticketing online & loket on-the-spot atas nama destinasi Anda.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Pengendalian daya dukung & alokasi kuota per sesi kunjungan.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Rekonsiliasi kas otomatis dengan integrasi QRIS & Virtual Account.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-black/[0.08] dark:border-white/10">
+                <Link
+                  to="/daftar-wisata?skema=fleksibel"
+                  className="btn-secondary w-full justify-center rounded-xl py-3 text-xs font-bold shadow-xs hover:border-emerald-700"
+                >
+                  Mulai Skema Fleksibel <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+                <p className="mt-2 text-center text-[10px] font-medium text-[#6e7a63]">
+                  Bisa beralih ke paket langganan kapan saja dari dashboard pengelola.
+                </p>
+              </div>
+            </div>
+
+            {/* Opsi 2: Langganan Flat Bulanan (Featured Glass Card) */}
+            <div className="card relative flex flex-col justify-between p-7 sm:p-9 !border-emerald-600/40 !bg-white/80 dark:!bg-[#14261b]/80 ring-2 ring-emerald-700/25 transition-all duration-300 hover:translate-y-[-2px]">
+              {/* Highlight Badge */}
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-800 px-4 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-md">
+                  <Sparkles className="h-3 w-3 text-emerald-300" /> Paling Hemat untuk Kawasan Ramai
+                </span>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100/90 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-amber-900 border border-amber-200/80">
+                    Destinasi Mapan & Populer
+                  </span>
+                  <span className="text-xs font-bold text-emerald-800">Flat Subscription</span>
+                </div>
+
+                <h3 className="mt-5 text-2xl font-black tracking-tight text-[#14281a]">
+                  Skema Langganan Tetap
+                </h3>
+                <p className="mt-2 text-xs font-medium leading-relaxed text-[#2d3728]">
+                  Biaya bulanan pasti tanpa bagi hasil. Seluruh hasil penjualan tiket 100% milik pengelola kawasan tanpa potongan Passify.
+                </p>
+
+                <div className="mt-6 flex items-baseline gap-2 pb-6 border-b border-black/[0.08] dark:border-white/10">
+                  <span className="text-4xl font-black tracking-tight text-[#14281a]">Rp 750.000</span>
+                  <span className="text-xs font-bold text-[#6e7a63]">/ bulan</span>
+                  <span className="ml-auto inline-block rounded-xl bg-emerald-800 text-white px-3 py-1.5 text-xs font-black shadow-xs">
+                    Rp 0 <span className="font-semibold text-[11px]">Fee Tiket Passify</span>
+                  </span>
+                </div>
+
+                <ul className="mt-6 space-y-3.5 text-xs font-semibold text-[#2d3728]">
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span><strong>100% Bebas biaya per tiket Passify:</strong> hemat jutaan rupiah per bulan.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span><strong>Volume tiket tanpa batas:</strong> kelola 5.000 hingga 100.000+ pengunjung tetap flat.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Multi-pintu gerbang & staf scanner offline tak terbatas.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Dukungan domain kustom (misal: <em>tiket.namawisata.id</em>) & branding penuh.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Laporan analitik tren asal wisatawan, jam puncak, dan rekap keuangan lengkap.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full bg-emerald-800 text-white">
+                      <Check className="h-2.5 w-2.5 stroke-[3]" />
+                    </span>
+                    <span>Dukungan teknis prioritas langsung dari tim engineer Passify.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-black/[0.08] dark:border-white/10">
+                <Link
+                  to="/daftar-wisata?skema=langganan"
+                  className="btn-primary w-full justify-center rounded-xl py-3 text-xs font-bold shadow-md hover:bg-emerald-950"
+                >
+                  Pilih Langganan Tetap <ArrowUpRight className="h-3.5 w-3.5" />
+                </Link>
+                <p className="mt-2 text-center text-[10px] font-medium text-[#6e7a63]">
+                  Faktur resmi tersedia untuk pertanggungjawaban BUMDes / Dinas / PT.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Simulation / Break-even Tip Box */}
+          <div className="mt-10 overflow-hidden rounded-2xl border border-white/80 bg-white/60 backdrop-blur-xl p-6 sm:p-7 shadow-xs">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">
+                  💡 Tips Pemilihan Skema
+                </span>
+                <p className="text-sm font-bold text-[#14281a]">
+                  Kapan saat yang tepat beralih dari Skema Fleksibel ke Langganan Tetap?
+                </p>
+                <p className="text-xs font-medium text-[#2d3728] max-w-2xl leading-relaxed">
+                  Titik impas berada pada <strong>300 tiket per bulan</strong> (300 × Rp2.500 = Rp750.000). Jika destinasi Anda menerima lebih dari 300 tiket setiap bulannya, Skema Langganan Tetap otomatis memberikan efisiensi biaya operasional yang jauh lebih besar.
+                </p>
+              </div>
+              <a
+                href="#contact"
+                onClick={(e) => handleNavClick(e, 'contact')}
+                className="shrink-0 inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-800 hover:text-emerald-950 transition-colors"
+              >
+                Konsultasikan kebutuhan kawasan Anda <ChevronRight className="h-3.5 w-3.5" />
+              </a>
+            </div>
+          </div>
+        </section>
+
         <section id="contact" className="scroll-mt-24 mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
           <div className="relative isolate overflow-hidden rounded-2xl bg-[var(--forest-deep)] text-white shadow-[var(--shadow-lift)]">
             <img src={trailImage} alt="Jalur hutan yang tenang" className="absolute inset-0 -z-20 h-full w-full object-cover opacity-60 saturate-[.85]" />
@@ -545,6 +746,7 @@ export default function LandingPage() {
                 <li><a href="#masalah" className="hover:text-emerald-800 transition-colors">Daya Dukung & Kuota</a></li>
                 <li><a href="#alur" className="hover:text-emerald-800 transition-colors">Validasi Gate Offline</a></li>
                 <li><a href="#white-label" className="hover:text-emerald-800 transition-colors">Portal White-Label</a></li>
+                <li><a href="#harga" className="hover:text-emerald-800 transition-colors">Skema Biaya</a></li>
                 <li><Link to="/jelajah" className="hover:text-emerald-800 transition-colors">E-Ticket QR Dinamis</Link></li>
                 <li><span className="text-[#6e7a63]">Rekonsiliasi Kas Otomatis</span></li>
               </ul>
