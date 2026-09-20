@@ -674,30 +674,6 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-
-          {/* Quick Simulation / Break-even Tip Box */}
-          <div className="mt-10 overflow-hidden rounded-2xl border border-white/80 bg-white/60 backdrop-blur-xl p-6 sm:p-7 shadow-xs">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
-                <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">
-                  💡 Tips Pemilihan Skema
-                </span>
-                <p className="text-sm font-bold text-[#14281a]">
-                  Kapan saat yang tepat beralih dari Skema Fleksibel ke Langganan Tetap?
-                </p>
-                <p className="text-xs font-medium text-[#2d3728] max-w-2xl leading-relaxed">
-                  Titik impas berada pada <strong>300 tiket per bulan</strong> (300 × Rp2.500 = Rp750.000). Jika destinasi Anda menerima lebih dari 300 tiket setiap bulannya, Skema Langganan Tetap otomatis memberikan efisiensi biaya operasional yang jauh lebih besar.
-                </p>
-              </div>
-              <a
-                href="#contact"
-                onClick={(e) => handleNavClick(e, 'contact')}
-                className="shrink-0 inline-flex items-center gap-1.5 text-xs font-extrabold text-emerald-800 hover:text-emerald-950 transition-colors"
-              >
-                Konsultasikan kebutuhan kawasan Anda <ChevronRight className="h-3.5 w-3.5" />
-              </a>
-            </div>
-          </div>
         </section>
 
         <section id="contact" className="scroll-mt-24 mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8">
