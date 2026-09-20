@@ -7,7 +7,6 @@ import 'providers/auth_provider.dart';
 import 'providers/booth_pos_provider.dart';
 import 'providers/gate_scanner_provider.dart';
 import 'providers/sync_provider.dart';
-import 'providers/theme_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 
@@ -21,7 +20,6 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => GateScannerProvider()),
         ChangeNotifierProvider(create: (_) => BoothPosProvider()),
@@ -63,7 +61,6 @@ class _PassifyAppState extends State<PassifyApp> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<AuthProvider>(context);
-    final theme = Provider.of<ThemeProvider>(context);
 
     final lightBase = ThemeData.light();
     final lightTextTheme = GoogleFonts.plusJakartaSansTextTheme(lightBase.textTheme);
@@ -93,40 +90,10 @@ class _PassifyAppState extends State<PassifyApp> {
       ),
     );
 
-    final darkBase = ThemeData.dark();
-    final darkTextTheme = GoogleFonts.plusJakartaSansTextTheme(darkBase.textTheme);
-    final darkTheme = ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      fontFamily: GoogleFonts.plusJakartaSans().fontFamily,
-      textTheme: darkTextTheme,
-      primaryTextTheme: GoogleFonts.plusJakartaSansTextTheme(darkBase.primaryTextTheme),
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.forestSoft,
-        brightness: Brightness.dark,
-        primary: AppColors.forestSoft,
-        secondary: AppColors.gold,
-        surface: AppColors.darkSurface,
-      ),
-      scaffoldBackgroundColor: AppColors.darkCanvas,
-      appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.darkSurface,
-        foregroundColor: AppColors.darkInk,
-        elevation: 0,
-        titleTextStyle: GoogleFonts.plusJakartaSans(
-          fontSize: 18,
-          fontWeight: FontWeight.w800,
-          color: AppColors.darkInk,
-        ),
-      ),
-    );
-
     return MaterialApp(
       title: 'Passify Field Ops',
       debugShowCheckedModeBanner: false,
       theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: theme.themeMode,
       home: _isChecking
           ? const Scaffold(
               backgroundColor: AppColors.canvas,
