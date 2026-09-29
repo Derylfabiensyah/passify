@@ -1106,7 +1106,7 @@ export default function RegisterTenantPage() {
                     </>
                   ) : (
                     <>
-                      <CreditCard className="h-4 w-4" /> Bayar Sekarang (Midtrans)
+                      <CreditCard className="h-4 w-4" /> Bayar Sekarang
                     </>
                   )}
                 </button>
