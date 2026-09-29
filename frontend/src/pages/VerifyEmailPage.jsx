@@ -74,9 +74,7 @@ export default function VerifyEmailPage() {
           {/* Loading State */}
           {status === 'loading' && (
             <div>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--leaf-pale)] text-[var(--forest)] shadow-xs">
-                <Loader2 className="h-8 w-8 animate-spin" />
-              </div>
+              <Loader2 className="mx-auto mb-6 h-12 w-12 animate-spin text-emerald-700" />
               <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
                 Memverifikasi Email...
               </h1>
@@ -89,9 +87,7 @@ export default function VerifyEmailPage() {
           {/* Success State */}
           {status === 'success' && (
             <div>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-xs">
-                <CheckCircle2 className="h-8 w-8" />
-              </div>
+              <CheckCircle2 className="mx-auto mb-6 h-14 w-14 text-emerald-600 stroke-[1.75]" />
               <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
                 Verifikasi Berhasil!
               </h1>
@@ -118,9 +114,7 @@ export default function VerifyEmailPage() {
           {/* Error State */}
           {status === 'error' && (
             <div>
-              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600 shadow-xs">
-                <AlertCircle className="h-8 w-8" />
-              </div>
+              <AlertCircle className="mx-auto mb-6 h-14 w-14 text-red-500 stroke-[1.75]" />
               <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
                 Verifikasi Gagal
               </h1>

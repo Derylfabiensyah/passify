@@ -1437,13 +1437,9 @@ export default function CheckoutPage() {
             <div className="rounded-2xl glass-panel p-8 sm:p-10 shadow-sm text-center space-y-6">
               {/* Success Badge Icon */}
               {completedOrder.status === 'used' ? (
-                <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-blue-50 text-blue-600 shadow-sm animate-bounce-short">
-                  <CheckCircle2 className="h-10 w-10" />
-                </div>
+                <CheckCircle2 className="mx-auto h-16 w-16 text-blue-600 stroke-[1.75]" />
               ) : (
-                <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-emerald-50 text-emerald-600 shadow-sm animate-bounce-short">
-                  <CheckCircle2 className="h-10 w-10" />
-                </div>
+                <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-600 stroke-[1.75]" />
               )}
 
               <div className="space-y-2">
