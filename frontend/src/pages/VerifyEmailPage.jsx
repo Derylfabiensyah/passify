@@ -93,7 +93,7 @@ export default function VerifyEmailPage() {
                 <CheckCircle2 className="h-8 w-8" />
               </div>
               <h1 className="text-2xl font-bold tracking-tight text-[var(--ink)]">
-                Verifikasi Berhasil! ðŸŽ‰
+                Verifikasi Berhasil!
               </h1>
               <p className="mt-3 text-sm leading-relaxed text-[var(--ink-soft)]">
                 {message}

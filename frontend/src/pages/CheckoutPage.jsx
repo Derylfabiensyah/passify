@@ -1417,8 +1417,8 @@ export default function CheckoutPage() {
                   <ArrowLeft className="h-3.5 w-3.5" /> Kembali / Ubah Data Pemesanan
                 </button>
 
-                <p className="text-center text-[10px] text-emerald-800 font-medium bg-emerald-50/80 py-1.5 px-3 rounded-xl border border-emerald-200/50">
-                  ðŸ”’ Kuota terkunci via Redis Distributed Lock (5 Menit). Selesaikan transaksi sebelum waktu habis.
+                <p className="text-center text-[10px] text-emerald-800 font-medium bg-emerald-50/80 py-1.5 px-3 rounded-xl border border-emerald-200/50 flex items-center justify-center gap-1.5">
+                  <Lock className="h-3 w-3 shrink-0" /> Kuota terkunci via Redis Distributed Lock (5 Menit). Selesaikan transaksi sebelum waktu habis.
                 </p>
 
                 <p className="text-center text-[10px] text-[var(--ink-soft)]">
