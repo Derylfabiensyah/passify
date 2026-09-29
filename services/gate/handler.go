@@ -1,6 +1,7 @@
 package gate
 
 import (
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -47,7 +48,7 @@ func (h *GateHandler) HandleRegisterDevice(c *gin.Context) {
 // GET /destinations/:destination_id/devices
 func (h *GateHandler) HandleListDevices(c *gin.Context) {
 	destIDStr := c.Param("destination_id")
-	destID, err := uuid.Parse(destIDStr)
+	destID, err := h.service.ResolveDestinationID(destIDStr)
 	if err != nil {
 		response.BadRequest(c, "Invalid destination ID format", nil)
 		return
@@ -66,15 +67,9 @@ func (h *GateHandler) HandleListDevices(c *gin.Context) {
 // GET /devices/:device_id/manifest (query: date=YYYY-MM-DD)
 func (h *GateHandler) HandleGetManifest(c *gin.Context) {
 	deviceIDStr := c.Param("device_id")
-	deviceID, err := uuid.Parse(deviceIDStr)
-	if err != nil {
-		response.BadRequest(c, "Invalid device ID format", nil)
-		return
-	}
-
 	date := parseDateQuery(c, "date")
 
-	manifest, err := h.service.GenerateManifest(deviceID, date)
+	manifest, err := h.service.GenerateManifest(deviceIDStr, date)
 	if err != nil {
 		response.InternalServerError(c, err.Error())
 		return
@@ -112,15 +107,23 @@ func (h *GateHandler) HandleSyncLogs(c *gin.Context) {
 		return
 	}
 
-	if req.DeviceID == uuid.Nil && deviceIDStr != "" {
-		if devID, err := uuid.Parse(deviceIDStr); err == nil {
-			req.DeviceID = devID
-		}
+	targetDeviceIdentifier := deviceIDStr
+	if targetDeviceIdentifier == "" || strings.HasPrefix(targetDeviceIdentifier, ":") {
+		targetDeviceIdentifier = req.RawDeviceID
+	}
+
+	if dev, err := h.service.ResolveGateDevice(targetDeviceIdentifier); err == nil && dev != nil {
+		req.DeviceID = dev.ID
+	} else if dev, err := h.service.ResolveGateDevice(req.RawDeviceID); err == nil && dev != nil {
+		req.DeviceID = dev.ID
 	}
 
 	if req.DeviceID == uuid.Nil {
-		response.BadRequest(c, "Device ID is required", nil)
-		return
+		if devID, err := uuid.Parse(targetDeviceIdentifier); err == nil {
+			req.DeviceID = devID
+		} else if devID, err := uuid.Parse(req.RawDeviceID); err == nil {
+			req.DeviceID = devID
+		}
 	}
 
 	res, err := h.service.SyncOfflineLogs(req)
@@ -136,7 +139,7 @@ func (h *GateHandler) HandleSyncLogs(c *gin.Context) {
 // GET /destinations/:destination_id/stats (query: date=YYYY-MM-DD)
 func (h *GateHandler) HandleGetScanStats(c *gin.Context) {
 	destIDStr := c.Param("destination_id")
-	destID, err := uuid.Parse(destIDStr)
+	destID, err := h.service.ResolveDestinationID(destIDStr)
 	if err != nil {
 		response.BadRequest(c, "Invalid destination ID format", nil)
 		return

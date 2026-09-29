@@ -37,13 +37,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final sync = Provider.of<SyncProvider>(context, listen: false);
 
-    await sync.syncAll(auth.selectedDeviceId);
+    final deviceIdentifier = auth.selectedDeviceId.trim().isNotEmpty
+        ? auth.selectedDeviceId.trim()
+        : auth.selectedDeviceCode.trim();
+
+    await sync.syncAll(deviceIdentifier);
 
     if (mounted && sync.syncMessage != null) {
+      final isSuccess = sync.syncMessage!.contains('Sukses');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(sync.syncMessage!),
-          backgroundColor: AppColors.forest,
+          backgroundColor: isSuccess ? AppColors.forest : AppColors.error,
           duration: const Duration(seconds: 4),
         ),
       );

@@ -523,7 +523,7 @@ function AddEditGateModal({ device, destinations, onClose, onSave }) {
     onSave({
       ...device,
       ...formData,
-      id: device?.id || `gd-${Date.now()}`,
+      id: device?.id || (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'c8b9d319-36e1-4288-b9cf-fe79eaff0001'),
       total_scans_today: device?.total_scans_today || 0,
       last_manifest_sync: device?.last_manifest_sync || new Date().toISOString(),
       last_log_sync: device?.last_log_sync || new Date().toISOString()
@@ -703,7 +703,7 @@ export default function GatesPage() {
             // Default initial gate device for new tenant
             setDevices([
               {
-                id: `dev-${dests[0].id}`,
+                id: dests[0].id || 'c8b9d319-36e1-4288-b9cf-fe79eaff0001',
                 device_code: `GATE-${(dests[0].slug || '01').toUpperCase().substring(0, 8)}-IN01`,
                 device_name: 'Pintu Masuk Utama 01',
                 destination: dests[0].name,

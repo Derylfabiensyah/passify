@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../services/database_helper.dart';
 import '../services/sync_service.dart';
@@ -44,7 +45,20 @@ class SyncProvider with ChangeNotifier {
 
       await refreshDatabaseCounts();
     } catch (e) {
-      _syncMessage = 'Gagal sinkronisasi: ${e.toString().replaceAll('Exception: ', '')}';
+      if (e is DioException) {
+        final serverMsg = e.response?.data?['message'];
+        if (serverMsg != null && serverMsg.toString().isNotEmpty) {
+          _syncMessage = 'Gagal sinkronisasi: $serverMsg';
+        } else if (e.response?.statusCode == 404) {
+          _syncMessage = 'Gagal sinkronisasi: Perangkat gerbang belum terdaftar di server.';
+        } else if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.connectionError) {
+          _syncMessage = 'Gagal sinkronisasi: Tidak dapat terhubung ke server gate.';
+        } else {
+          _syncMessage = 'Gagal sinkronisasi: Kendala server (Kode ${e.response?.statusCode ?? 500})';
+        }
+      } else {
+        _syncMessage = 'Gagal sinkronisasi: ${e.toString().replaceAll('Exception: ', '')}';
+      }
     } finally {
       _isSyncing = false;
       notifyListeners();
