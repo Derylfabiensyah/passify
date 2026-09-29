@@ -9,7 +9,6 @@ import '../providers/auth_provider.dart';
 import '../providers/sync_provider.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/mesh_gradient_background.dart';
-import 'booth/booth_pos_screen.dart';
 import 'gate/gate_scanner_screen.dart';
 import 'gate/gate_stats_screen.dart';
 import 'gate/offline_manifest_screen.dart';
@@ -171,30 +170,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               child: AppBar(
-                title: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(6),
-                      child: Image.asset(
-                        'assets/logo-passify.png',
-                        width: 26,
-                        height: 26,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'passify',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.w900,
-                        fontSize: 22,
-                        color: AppColors.forestDeep,
-                        letterSpacing: -0.6,
-                      ),
-                    ),
-                  ],
+                title: Text(
+                  'passify',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 24,
+                    color: AppColors.forestDeep,
+                    letterSpacing: -0.8,
+                  ),
                 ),
                 backgroundColor: Colors.transparent,
                 elevation: 0,
@@ -564,28 +547,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 10),
 
-                    // Secondary Tools (3 Clean Frosted Tiles)
+                    // Secondary Tools (2 Symmetrical Clean Frosted Tiles)
                     Row(
                       children: [
                         Expanded(
                           child: _buildLightToolCard(
-                            title: 'Kasir POS',
-                            icon: Icons.point_of_sale_rounded,
-                            color: const Color(0xFFF59E0B),
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              Navigator.of(context).push(
-                                MaterialPageRoute(builder: (_) => const BoothPosScreen()),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _buildLightToolCard(
-                            title: 'Manifest',
+                            title: 'Manifest Tiket',
                             icon: Icons.storage_rounded,
-                            color: const Color(0xFF38BDF8),
+                            color: const Color(0xFF0284C7),
                             onTap: () {
                               HapticFeedback.selectionClick();
                               Navigator.of(context).push(
@@ -594,12 +563,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: _buildLightToolCard(
-                            title: 'Statistik',
+                            title: 'Statistik Gate',
                             icon: Icons.bar_chart_rounded,
-                            color: Color(0xFF7E22CE),
+                            color: const Color(0xFF7E22CE),
                             onTap: () {
                               HapticFeedback.selectionClick();
                               Navigator.of(context).push(
@@ -649,28 +618,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return GlassContainer.light(
       borderRadius: BorderRadius.circular(AppRadius.md),
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(AppRadius.sm),
-              border: Border.all(
-                color: color.withValues(alpha: 0.35),
-                width: 1,
-              ),
-            ),
-            child: Icon(icon, color: color, size: 20),
-          ),
-          const SizedBox(height: 8),
+          Icon(icon, color: color, size: 28),
+          const SizedBox(height: 10),
           Text(
             title,
-            style: const TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontWeight: FontWeight.w800,
-              fontSize: 11.5,
+              fontSize: 12,
               color: AppColors.forestDeep,
             ),
             maxLines: 1,

@@ -4,7 +4,7 @@ import {
   Ticket,
   Users,
   DollarSign,
-  Wallet,
+  ScanLine,
   Activity,
   AlertTriangle,
   RefreshCw,
@@ -434,11 +434,11 @@ function TenantAdminDashboard() {
           isLoading={isRefreshing}
         />
         <AdminStatCard
-          icon={Wallet}
-          label="Transaksi Cashless (NFC/QR)"
-          value={`Rp ${Number(today.wallet_topups || 0).toLocaleString('id-ID')}`}
-          subValue={`${Number(today.vendor_transactions || 0).toLocaleString('id-ID')} transaksi merchant`}
-          badgeText="TENANT"
+          icon={ScanLine}
+          label="Performa Pemindaian Gate"
+          value="100% Valid"
+          subValue="Validasi real-time & offline aktif"
+          badgeText="GATE SCAN"
           isLoading={isRefreshing}
         />
       </div>
@@ -578,10 +578,10 @@ function TenantAdminDashboard() {
           </div>
           <div>
             <div className="text-xs font-bold text-gray-900">
-              Sinkronisasi Merchant NFC & QR Aktif
+              Sinkronisasi Perangkat Scanner Gate Aktif
             </div>
             <p className="text-[11px] text-gray-500 mt-0.5">
-              Seluruh booth tenant F&B & merchandise di posko pengawasan melaporkan latensi transaksi di bawah 250 milidetik.
+              Seluruh unit scanner lapangan dan terminal gate terhubung dengan sinkronisasi data offline-first secara optimal.
             </p>
           </div>
         </div>

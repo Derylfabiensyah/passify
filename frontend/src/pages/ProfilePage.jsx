@@ -13,13 +13,11 @@ import {
   Sparkles,
   Ticket,
   User as UserIcon,
-  Wallet,
   X
 } from 'lucide-react';
 import { formatRupiah } from '../api/client';
 import { useTenant } from '../contexts/TenantContext';
 import { useToast } from '../contexts/ToastContext';
-import WalletModal from '../components/modals/WalletModal';
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -35,26 +33,10 @@ export default function ProfilePage() {
     }
   });
 
-  const [walletBalance, setWalletBalance] = useState(() => {
-    const saved = localStorage.getItem('passify_wallet_balance');
-    return saved !== null ? Number(saved) : 150000;
-  });
-
-  const [showWalletModal, setShowWalletModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.name || user?.full_name || '');
   const [editPhone, setEditPhone] = useState(user?.phone || '081234567890');
   const [activeTicketsCount, setActiveTicketsCount] = useState(0);
-
-  // Sync wallet balance
-  useEffect(() => {
-    const syncWallet = () => {
-      const saved = localStorage.getItem('passify_wallet_balance');
-      if (saved !== null) setWalletBalance(Number(saved));
-    };
-    window.addEventListener('storage', syncWallet);
-    return () => window.removeEventListener('storage', syncWallet);
-  }, []);
 
   // Calculate active tickets
   useEffect(() => {
@@ -295,38 +277,6 @@ export default function ProfilePage() {
           )}
         </section>
 
-        {/* Passify Cashless Wallet Card */}
-        <section className="relative isolate overflow-hidden rounded-2xl bg-gradient-to-br from-[#102d20] via-[#143a29] to-[#0d2218] p-6 sm:p-8 text-white shadow-lg">
-          <div className="absolute right-0 top-0 -z-10 translate-x-12 -translate-y-8 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-          
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-emerald-300 backdrop-blur-md">
-                <Wallet className="h-3.5 w-3.5" />
-                Dompet Digital Cashless & NFC
-              </div>
-              <div>
-                <span className="block text-xs font-medium text-emerald-100/75">Saldo Tersedia</span>
-                <strong className="text-3xl sm:text-4xl font-black tracking-tight text-white mt-1 block">
-                  {formatRupiah(walletBalance)}
-                </strong>
-              </div>
-              <p className="text-xs text-white/80 max-w-lg leading-relaxed pt-1">
-                Dapat digunakan untuk tap gerbang masuk wisata serta transaksi merchant F&B / suvenir di kawasan secara instan tanpa sinyal.
-              </p>
-            </div>
-
-            <div className="flex sm:flex-col gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={() => setShowWalletModal(true)}
-                className="btn-clay py-3 px-5 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Sparkles className="h-4 w-4" /> Kelola Saldo / Top Up
-              </button>
-            </div>
-          </div>
-        </section>
 
         {/* Riwayat Pemesanan & E-Tiket */}
         <section>
@@ -363,21 +313,6 @@ export default function ProfilePage() {
         </section>
       </main>
 
-      {/* Cashless Wallet Modal */}
-      {showWalletModal && (
-        <WalletModal
-          walletBalance={walletBalance}
-          onTopUp={(delta) => {
-            const next = Math.max(0, walletBalance + delta);
-            setWalletBalance(next);
-            try {
-              localStorage.setItem('passify_wallet_balance', String(next));
-              window.dispatchEvent(new Event('storage'));
-            } catch (_) {}
-          }}
-          onClose={() => setShowWalletModal(false)}
-        />
-      )}
 
       {/* Grounded Card Footer */}
       <footer className="mt-12 w-full bg-white/85 backdrop-blur-2xl rounded-t-[2rem] sm:rounded-t-[2.5rem] rounded-b-none border-t border-white/80 border-x-0 border-b-0 shadow-lg py-7 text-center text-xs text-[#3b4836]">

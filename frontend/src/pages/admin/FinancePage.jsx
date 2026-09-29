@@ -10,7 +10,6 @@ import {
   Clock,
   AlertCircle,
   BarChart3,
-  Wallet,
   CreditCard,
   Banknote,
   FileText
@@ -351,7 +350,7 @@ export default function FinancePage() {
           icon={DollarSign}
           label="Total Pendapatan Kotor"
           value={`Rp ${(totalGross / 1000000).toFixed(1)}jt`}
-          subValue="Tiket + Topup Cashless Venue"
+          subValue="Pendapatan E-Tiket & Reservasi"
           badgeText="GROSS"
         />
         <AdminStatCard
@@ -362,7 +361,7 @@ export default function FinancePage() {
           badgeText="SETTLED"
         />
         <AdminStatCard
-          icon={Wallet}
+          icon={Clock}
           label="Saldo Tertunda (Pending)"
           value={`Rp ${(totalPending / 1000000).toFixed(1)}jt`}
           subValue="Settlement pukul 06:00 besok"
@@ -414,7 +413,7 @@ export default function FinancePage() {
         </div>
         <div className="text-xs text-[var(--ink-soft)] leading-relaxed">
           <strong className="text-[var(--forest-deep)]">Kebijakan Automated Settlement (H+1):</strong>{' '}
-          Semua pendapatan tiket masuk dan transaksi Cashless Venue (NFC & QR) direkonsiliasi setiap pukul 23:59 WIB dan dicairkan secara otomatis ke rekening bank terdaftar klien pada pukul 06:00 WIB hari berikutnya tanpa potongan biaya antarbank.
+          Semua pendapatan tiket masuk dan reservasi direkonsiliasi setiap pukul 23:59 WIB dan dicairkan secara otomatis ke rekening bank terdaftar klien pada pukul 06:00 WIB hari berikutnya tanpa potongan biaya antarbank.
         </div>
       </div>
     </div>

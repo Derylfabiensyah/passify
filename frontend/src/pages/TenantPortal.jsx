@@ -10,8 +10,7 @@ import {
   MapPin,
   ShieldCheck,
   Ticket,
-  History,
-  Wallet
+  History
 } from 'lucide-react';
 import { useTenant } from '../contexts/TenantContext';
 import { PortalPageSkeleton } from '../components/common/Skeleton';

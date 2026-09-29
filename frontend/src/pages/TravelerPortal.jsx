@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, CalendarDays, CheckCircle2, ChevronRight, Clock, Compass,
-  Info, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Sparkles, Ticket, Users, Wallet,
+  Info, Leaf, LogIn, LogOut, MapPin, ShieldCheck, Sparkles, Ticket, Users,
 } from 'lucide-react';
 import { formatRupiah } from '../api/client';
 import { DESTINATIONS } from '../data/destinations';

@@ -154,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 6),
                       const Text(
-                        'Sistem Validasi Tiket & Kasir Wisata Alam',
+                        'Sistem Validasi Tiket & Gate Wisata Alam',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 14,
@@ -327,6 +327,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   icon: Image.network(
                                     'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
                                     height: 18,
+                                    errorBuilder: (context, error, stackTrace) => const Icon(
+                                      Icons.account_circle_outlined,
+                                      size: 18,
+                                      color: AppColors.inkSoft,
+                                    ),
                                   ),
                                   label: const Text(
                                     'Masuk dengan Google',

@@ -16,7 +16,6 @@ import {
   Ticket,
   User,
   Users,
-  Wallet,
   Building2,
   ChevronRight,
   Sparkles,
@@ -27,7 +26,6 @@ import { fetchDestinationBySlug } from '../api/tenant';
 import { fetchAdminQuotas } from '../api/admin';
 import { useTenant } from '../contexts/TenantContext';
 import { formatRupiah } from '../api/client';
-import WalletModal from '../components/modals/WalletModal';
 import ETicketModal from '../components/modals/ETicketModal';
 import { useToast } from '../contexts/ToastContext';
 
@@ -86,12 +84,7 @@ export default function CheckoutPage() {
   const [formError, setFormError] = useState('');
 
   // Step 2 Payment States (PDF Spec Hal. 4 Poin 7.A: 5-Minute Redis Distributed Lock)
-  const [paymentMethod, setPaymentMethod] = useState('midtrans'); // 'midtrans' | 'wallet'
-  const [walletBalance, setWalletBalance] = useState(() => {
-    const saved = localStorage.getItem('passify_wallet_balance');
-    return saved !== null ? Number(saved) : 150000;
-  });
-  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('midtrans');
   const [timeLeftSeconds, setTimeLeftSeconds] = useState(() => {
     const saved = getPaymentDeadline();
     const diff = Math.floor((saved - Date.now()) / 1000);
@@ -101,15 +94,6 @@ export default function CheckoutPage() {
   const [showSnapModal, setShowSnapModal] = useState(false);
   const [showETicketModal, setShowETicketModal] = useState(false);
   const [snapData, setSnapData] = useState(null);
-
-  useEffect(() => {
-    const syncWallet = () => {
-      const saved = localStorage.getItem('passify_wallet_balance');
-      if (saved !== null) setWalletBalance(Number(saved));
-    };
-    window.addEventListener('storage', syncWallet);
-    return () => window.removeEventListener('storage', syncWallet);
-  }, []);
 
   // PDF Spec Hal. 4 Poin 7.A: Virtual Waiting Room & Queue Management States
   const [inWaitingRoom, setInWaitingRoom] = useState(false);
@@ -605,10 +589,6 @@ export default function CheckoutPage() {
     setFormError('');
 
     try {
-      if (paymentMethod === 'wallet' && walletBalance < totals.grandTotal) {
-        throw new Error('Saldo Passify Wallet tidak mencukupi untuk menyelesaikan pembayaran ini.');
-      }
-
       const orderNumber = `TWA-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(1000 + Math.random() * 9000)}`;
       const savedUser = (() => {
         try {
@@ -634,7 +614,7 @@ export default function CheckoutPage() {
         timeSlotLabel: selectedSlot?.label || selectedSlot?.slot_label || 'Sesi Kunjungan Pagi',
         totalQty: totals.quantity,
         grandTotal: totals.grandTotal,
-        paymentMethod: paymentMethod === 'midtrans' ? 'MIDTRANS_SNAP' : 'PASSIFY_WALLET',
+        paymentMethod: 'MIDTRANS_SNAP',
         userId,
         userEmail,
         contact,
@@ -657,28 +637,6 @@ export default function CheckoutPage() {
           paymentRef: `SIM-${orderNumber}`,
           paymentType: 'SIMULASI_INSTAN',
         });
-        return;
-      }
-
-      if (paymentMethod === 'wallet') {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        const newBal = Math.max(0, walletBalance - totals.grandTotal);
-        setWalletBalance(newBal);
-        try {
-          localStorage.setItem('passify_wallet_balance', String(newBal));
-          const txRaw = localStorage.getItem('passify_wallet_txs');
-          const txList = txRaw ? JSON.parse(txRaw) : [];
-          txList.unshift({
-            id: `TX-${Date.now()}`,
-            title: `Tiket Masuk ${destination.name || 'Wisata'} (${totals.quantity} Tiket)`,
-            amount: -totals.grandTotal,
-            type: 'ticket',
-            time: 'Baru saja'
-          });
-          localStorage.setItem('passify_wallet_txs', JSON.stringify(txList));
-          window.dispatchEvent(new Event('storage'));
-        } catch (_) {}
-        finalizeBookingSuccess(orderData);
         return;
       }
 
@@ -1305,44 +1263,6 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
-                {/* Option 2: Passify Cashless Wallet */}
-                <div
-                  onClick={() => setPaymentMethod('wallet')}
-                  className={`cursor-pointer rounded-2xl p-5 transition-all ${
-                    paymentMethod === 'wallet'
-                      ? 'bg-[var(--leaf-pale)]/60 shadow-[0_8px_24px_rgba(16,45,32,.08)]'
-                      : 'bg-[var(--fog)] hover:bg-[var(--sand)]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3.5">
-                      <div className="h-11 w-11 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[var(--forest)] shrink-0">
-                        <Wallet className="h-6 w-6" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-[var(--forest-deep)]">Passify Cashless Wallet</h4>
-                        <p className="text-[11px] text-[var(--ink-soft)] mt-0.5">
-                          Saldo Tersedia: <strong className="text-[var(--forest)]">{formatRupiah(walletBalance)}</strong>
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setShowWalletModal(true);
-                        }}
-                        className="px-2.5 py-1 rounded-lg bg-white border border-[var(--forest)]/30 text-[10px] font-bold text-[var(--forest)] hover:bg-[var(--leaf-pale)] transition-colors shadow-2xs"
-                      >
-                        + Top Up / Kelola
-                      </button>
-                      <div className={`h-4 w-4 rounded-full flex items-center justify-center shrink-0 ${paymentMethod === 'wallet' ? 'bg-[var(--forest)]' : 'bg-gray-300'}`}>
-                        {paymentMethod === 'wallet' && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Navigation Actions */}
@@ -1720,21 +1640,6 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        {/* Passify Cashless Wallet Modal */}
-        {showWalletModal && (
-          <WalletModal
-            walletBalance={walletBalance}
-            onTopUp={(delta) => {
-              const next = Math.max(0, walletBalance + delta);
-              setWalletBalance(next);
-              try {
-                localStorage.setItem('passify_wallet_balance', String(next));
-                window.dispatchEvent(new Event('storage'));
-              } catch (_) {}
-            }}
-            onClose={() => setShowWalletModal(false)}
-          />
-        )}
       </main>
 
       {/* Footer */}

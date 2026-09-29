@@ -4,8 +4,6 @@ import '../constants/api_endpoints.dart';
 import '../models/manifest_model.dart';
 import '../models/scan_log_model.dart';
 import '../models/user_model.dart';
-import '../models/booth_model.dart';
-import '../models/wallet_model.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -160,68 +158,5 @@ class ApiService {
       return response.data['data'];
     }
     return {};
-  }
-
-  // --- Cashless Service (:8085) ---
-
-  Future<List<VendorBoothModel>> getBoothsByDestination(String destinationId) async {
-    final baseUrl = await ApiEndpoints.getCashlessBaseUrl();
-    final response = await _dio.get('$baseUrl/destinations/$destinationId/booths');
-
-    if (response.statusCode == 200 && response.data['success'] == true) {
-      var list = response.data['data'] as List? ?? [];
-      return list.map((e) => VendorBoothModel.fromJson(e)).toList();
-    }
-    return [];
-  }
-
-  Future<List<VendorProductModel>> getProductsByBooth(String boothId) async {
-    final baseUrl = await ApiEndpoints.getCashlessBaseUrl();
-    final response = await _dio.get('$baseUrl/booths/$boothId/products');
-
-    if (response.statusCode == 200 && response.data['success'] == true) {
-      var list = response.data['data'] as List? ?? [];
-      return list.map((e) => VendorProductModel.fromJson(e)).toList();
-    }
-    return [];
-  }
-
-  Future<Map<String, dynamic>> payBooth({
-    required String boothId,
-    required double amount,
-    String? productId,
-    int quantity = 1,
-    String? qrScanRef,
-    String? customerUserId,
-  }) async {
-    final baseUrl = await ApiEndpoints.getCashlessBaseUrl();
-    final response = await _dio.post(
-      '$baseUrl/wallet/pay',
-      data: {
-        'booth_id': boothId,
-        'amount': amount,
-        if (productId != null && productId.isNotEmpty) 'product_id': productId,
-        'quantity': quantity,
-        if (qrScanRef != null && qrScanRef.isNotEmpty) 'qr_scan_ref': qrScanRef,
-        if (customerUserId != null && customerUserId.isNotEmpty) 'customer_user_id': customerUserId,
-      },
-    );
-
-    if (response.statusCode == 200 && response.data['success'] == true) {
-      return response.data['data'];
-    } else {
-      throw Exception(response.data['message'] ?? 'Pembayaran gagal');
-    }
-  }
-
-  Future<WalletModel?> getWalletBalance() async {
-    try {
-      final baseUrl = await ApiEndpoints.getCashlessBaseUrl();
-      final response = await _dio.get('$baseUrl/wallet');
-      if (response.statusCode == 200 && response.data['success'] == true) {
-        return WalletModel.fromJson(response.data['data']);
-      }
-    } catch (_) {}
-    return null;
   }
 }

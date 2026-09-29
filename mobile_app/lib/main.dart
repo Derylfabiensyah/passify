@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'constants/app_colors.dart';
 import 'providers/auth_provider.dart';
-import 'providers/booth_pos_provider.dart';
 import 'providers/gate_scanner_provider.dart';
 import 'providers/sync_provider.dart';
 import 'screens/home_screen.dart';
@@ -22,7 +21,6 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => GateScannerProvider()),
-        ChangeNotifierProvider(create: (_) => BoothPosProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
       ],
       child: const PassifyApp(),
