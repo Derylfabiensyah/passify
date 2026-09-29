@@ -377,37 +377,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 26),
                       child: Column(
                         children: [
-                          // Big Glowing Scanner Reticle Icon Badge with Radial Aura
-                          Container(
-                            width: 76,
-                            height: 76,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  Colors.white,
-                                  Color(0xFFD1FAE5),
-                                ],
-                              ),
-                              border: Border.all(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.45),
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF10B981).withValues(alpha: 0.28),
-                                  blurRadius: 24,
-                                  spreadRadius: 2,
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.qr_code_scanner_rounded,
-                              color: Color(0xFF059669),
-                              size: 40,
-                            ),
+                          // Clean Unboxed Scanner Reticle Icon
+                          const Icon(
+                            Icons.qr_code_scanner_rounded,
+                            color: Color(0xFF059669),
+                            size: 46,
                           ),
                           const SizedBox(height: 16),
                           const Text(
