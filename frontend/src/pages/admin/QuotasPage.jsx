@@ -182,15 +182,16 @@ function TimeSlotCard({ slot, onEdit, onDelete }) {
 }
 
 function EditQuotaModal({ day, onClose, onSave }) {
-  const [capacity, setCapacity] = useState(day.max_capacity);
+  const [capacity, setCapacity] = useState(day.max_capacity ?? 1000);
   const [error, setError] = useState('');
 
   const handleSave = () => {
-    if (capacity < day.booked) {
-      setError(`Kapasitas (${capacity}) tidak boleh lebih kecil dari jumlah tiket yang sudah terpesan (${day.booked}).`);
+    const num = Number(capacity);
+    if (capacity === '' || isNaN(num) || num < day.booked) {
+      setError(`Kapasitas (${num || 0}) tidak boleh lebih kecil dari jumlah tiket yang sudah terpesan (${day.booked}).`);
       return;
     }
-    onSave(day.date, capacity);
+    onSave(day.date, num);
     onClose();
   };
 
@@ -219,9 +220,16 @@ function EditQuotaModal({ day, onClose, onSave }) {
             <input
               type="number"
               min={day.booked}
-              value={capacity}
+              placeholder="Contoh: 1000"
+              value={capacity ?? ''}
               onChange={(e) => {
-                setCapacity(Number(e.target.value));
+                const val = e.target.value;
+                if (val === '') {
+                  setCapacity('');
+                } else {
+                  const parsed = parseInt(val, 10);
+                  setCapacity(isNaN(parsed) ? '' : parsed);
+                }
                 setError('');
               }}
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
@@ -290,13 +298,15 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
       setError('Nama sesi wajib diisi.');
       return;
     }
-    if (formData.max_capacity <= 0) {
+    const finalCapacity = Number(formData.max_capacity);
+    if (!formData.max_capacity || isNaN(finalCapacity) || finalCapacity <= 0) {
       setError('Kapasitas harus lebih besar dari 0.');
       return;
     }
     onSave({
       ...slot,
       ...formData,
+      max_capacity: finalCapacity,
       label: finalLabel,
       slot_label: finalLabel,
       id: slot?.id || `ts-${Date.now()}`,
@@ -361,9 +371,19 @@ function EditTimeSlotModal({ slot, onClose, onSave }) {
                 type="number"
                 min="1"
                 required
-                value={formData.max_capacity}
+                placeholder="Contoh: 500"
+                value={formData.max_capacity ?? ''}
                 onChange={(e) => {
-                  setFormData({ ...formData, max_capacity: Number(e.target.value) });
+                  const val = e.target.value;
+                  if (val === '') {
+                    setFormData({ ...formData, max_capacity: '' });
+                  } else {
+                    const parsed = parseInt(val, 10);
+                    setFormData({
+                      ...formData,
+                      max_capacity: isNaN(parsed) ? '' : parsed,
+                    });
+                  }
                   setError('');
                 }}
                 className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"

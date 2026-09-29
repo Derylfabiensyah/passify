@@ -588,8 +588,16 @@ export default function WalletModal({ walletBalance: propBalance, onTopUp, onClo
                 <input
                   id="topup-amount-input"
                   type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                  value={amount ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === '') {
+                      setAmount('');
+                    } else {
+                      const num = parseInt(val, 10);
+                      setAmount(isNaN(num) ? '' : num);
+                    }
+                  }}
                   placeholder="Nominal lainnya"
                   min="10000"
                   step="5000"
