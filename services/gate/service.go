@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -536,19 +535,44 @@ func (s *GateService) ValidateTicketOnline(req OnlineValidateRequest) (*Validate
 	}
 
 	if ticket != nil {
-		// Multi-tenant destination verification: if device belongs to different destination, align or verify
-		if ticket.DestinationID != device.DestinationID {
-			var destDevice models.GateDevice
-			if s.db.Where("destination_id = ? AND is_active = ?", ticket.DestinationID, true).First(&destDevice).Error == nil {
-				device = &destDevice
-			} else if req.DeviceID != "" && devUUID != uuid.Nil && os.Getenv("APP_ENV") != "development" {
-				return &ValidateResponse{
-					Valid:        false,
-					ScanResult:   "wrong_destination",
-					TicketCode:   ticket.TicketCode,
-					Message:      "Tiket tidak berlaku di destinasi ini",
-				}, nil
+		// Multi-tenant security: ALWAYS reject tickets that belong to a different tenant or destination.
+		// The gate device is paired to a specific destination — only tickets for that destination are valid.
+		if ticket.DestinationID != device.DestinationID || ticket.TenantID != device.TenantID {
+			// Log the rejected cross-tenant/cross-destination scan attempt
+			now := time.Now()
+			rejectCode := ticket.TicketCode
+			rejectResult := "wrong_destination"
+			rejectMsg := "Tiket tidak berlaku di destinasi ini"
+			if ticket.TenantID != device.TenantID {
+				rejectResult = "wrong_tenant"
+				rejectMsg = "Tiket milik wisata lain, tidak berlaku di gerbang ini"
 			}
+			rejectLog := &models.ScanLog{
+				ID:            uuid.New(),
+				TenantID:      device.TenantID,
+				GateDeviceID:  device.ID,
+				TicketID:      &ticket.ID,
+				TicketCode:    &rejectCode,
+				ScannedAt:     parseFlexibleTime(req.ScannedAt),
+				ScanResult:    rejectResult,
+				IsOfflineScan: false,
+				SyncedAt:      &now,
+				CreatedAt:     now,
+			}
+			_ = s.repo.CreateScanLog(rejectLog)
+
+			visitorName := ""
+			if ticket.VisitorName != nil {
+				visitorName = *ticket.VisitorName
+			}
+
+			return &ValidateResponse{
+				Valid:        false,
+				ScanResult:   rejectResult,
+				TicketCode:   ticket.TicketCode,
+				VisitorName:  visitorName,
+				Message:      rejectMsg,
+			}, nil
 		}
 
 		// Ticket is active and valid for today

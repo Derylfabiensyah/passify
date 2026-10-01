@@ -812,7 +812,31 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
 
   Widget _buildHudToast(ValidateResultModel result, double topPadding) {
     final isValid = result.valid;
-    final statusColor = isValid ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final isWrongLocation = result.scanResult == 'wrong_tenant' || result.scanResult == 'wrong_destination';
+
+    final Color statusColor;
+    final Color bgColor;
+    final IconData statusIcon;
+    final String statusTitle;
+
+    if (isValid) {
+      statusColor = const Color(0xFF10B981);
+      bgColor = const Color(0xFF0F2417).withValues(alpha: 0.85);
+      statusIcon = Icons.check_circle_rounded;
+      statusTitle = result.isOffline
+          ? 'TIKET VALID (OFFLINE CACHE)'
+          : 'TIKET VALID • DIPERBOLEHKAN MASUK';
+    } else if (isWrongLocation) {
+      statusColor = const Color(0xFFF59E0B);
+      bgColor = const Color(0xFF2E2508).withValues(alpha: 0.85);
+      statusIcon = Icons.location_off_rounded;
+      statusTitle = 'DESTINASI SALAH • DITOLAK';
+    } else {
+      statusColor = const Color(0xFFEF4444);
+      bgColor = const Color(0xFF2E0F0F).withValues(alpha: 0.85);
+      statusIcon = Icons.cancel_rounded;
+      statusTitle = 'TIKET DITOLAK';
+    }
 
     return Positioned(
       top: topPadding + 58,
@@ -828,7 +852,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                color: (isValid ? const Color(0xFF0F2417) : const Color(0xFF2E0F0F)).withValues(alpha: 0.85),
+                color: bgColor,
                 border: Border.all(
                   color: statusColor.withValues(alpha: 0.60),
                   width: 1.2,
@@ -852,7 +876,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                       border: Border.all(color: statusColor, width: 1.8),
                     ),
                     child: Icon(
-                      isValid ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                      statusIcon,
                       color: statusColor,
                       size: 24,
                     ),
@@ -864,11 +888,7 @@ class _GateScannerScreenState extends State<GateScannerScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          isValid
-                              ? (result.isOffline
-                                  ? 'TIKET VALID (OFFLINE CACHE)'
-                                  : 'TIKET VALID • DIPERBOLEHKAN MASUK')
-                              : 'TIKET DITOLAK',
+                          statusTitle,
                           style: GoogleFonts.plusJakartaSans(
                             color: result.isOffline ? const Color(0xFFFBBF24) : statusColor,
                             fontSize: 12,

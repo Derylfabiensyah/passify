@@ -17,9 +17,32 @@ class ScanResultSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isValid = result.valid;
-    final color = isValid ? AppColors.forest : AppColors.error;
-    final statusColor = isValid ? const Color(0xFF10B981) : const Color(0xFFEF4444);
-    final bgColor = isValid ? AppColors.leafPale : AppColors.errorBg;
+    final isWrongLocation = result.scanResult == 'wrong_tenant' || result.scanResult == 'wrong_destination';
+    final Color color;
+    final Color statusColor;
+    final Color bgColor;
+    final IconData statusIcon;
+    final String statusTitle;
+
+    if (isValid) {
+      color = AppColors.forest;
+      statusColor = const Color(0xFF10B981);
+      bgColor = AppColors.leafPale;
+      statusIcon = Icons.check_circle_rounded;
+      statusTitle = 'TIKET VALID';
+    } else if (isWrongLocation) {
+      color = const Color(0xFFF59E0B);
+      statusColor = const Color(0xFFF59E0B);
+      bgColor = const Color(0xFFFEF3C7);
+      statusIcon = Icons.location_off_rounded;
+      statusTitle = 'DESTINASI SALAH';
+    } else {
+      color = AppColors.error;
+      statusColor = const Color(0xFFEF4444);
+      bgColor = AppColors.errorBg;
+      statusIcon = Icons.cancel_rounded;
+      statusTitle = 'TIKET TIDAK VALID';
+    }
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -77,7 +100,7 @@ class ScanResultSheet extends StatelessWidget {
                     ],
                   ),
                   child: Icon(
-                    isValid ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                    statusIcon,
                     color: statusColor,
                     size: 42,
                   ),
@@ -87,7 +110,7 @@ class ScanResultSheet extends StatelessWidget {
 
               // Title & Message
               Text(
-                isValid ? 'TIKET VALID' : 'TIKET TIDAK VALID',
+                statusTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 21,
