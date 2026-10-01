@@ -208,8 +208,8 @@ function DevicePairingModal({ device, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1b251d] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-gray-100 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200 flex flex-col items-center">
+    <div className="fixed inset-0 bg-slate-950/45 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white/92 dark:bg-[#1b251d]/92 backdrop-blur-2xl rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-[0_25px_60px_-15px_rgba(24,45,28,0.22)] border border-white/90 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200 flex flex-col items-center">
         {/* Header */}
         <div className="w-full flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-white/10 mb-4">
           <div className="flex items-center gap-2.5">
@@ -338,8 +338,8 @@ function ConfirmDialogModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1b251d] rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-gray-100 dark:border-white/10 ring-1 ring-black/5 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-slate-950/45 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white/92 dark:bg-[#1b251d]/92 backdrop-blur-2xl rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-[0_25px_60px_-15px_rgba(24,45,28,0.22)] border border-white/90 dark:border-white/10 ring-1 ring-black/5 flex flex-col items-center text-center animate-in zoom-in-95 duration-200">
         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center border shadow-xs mb-4 ${variantStyles.iconBg}`}>
           <Icon className="w-7 h-7" />
         </div>
@@ -352,7 +352,7 @@ function ConfirmDialogModal({
             type="button"
             disabled={isLoading}
             onClick={onCancel}
-            className="flex-1 py-2.5 px-4 rounded-2xl text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 border border-gray-200/80 dark:border-white/10 transition-all active:scale-98"
+            className="flex-1 py-2.5 px-4 rounded-2xl text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 bg-white/90 hover:bg-white dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200/90 dark:border-white/10 shadow-2xs transition-all active:scale-98"
           >
             {cancelText}
           </button>
@@ -405,8 +405,8 @@ function AddOfficerModal({ onClose, onSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1b251d] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-gray-100 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 bg-slate-950/45 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white/92 dark:bg-[#1b251d]/92 backdrop-blur-2xl rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-[0_25px_60px_-15px_rgba(24,45,28,0.22)] border border-white/90 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-white/10 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
@@ -519,8 +519,8 @@ function OfficerCredentialModal({ officer, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1b251d] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-gray-100 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200 flex flex-col items-center">
+    <div className="fixed inset-0 bg-slate-950/45 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white/92 dark:bg-[#1b251d]/92 backdrop-blur-2xl rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-[0_25px_60px_-15px_rgba(24,45,28,0.22)] border border-white/90 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200 flex flex-col items-center">
         {/* Header */}
         <div className="w-full flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-white/10 mb-3.5">
           <div className="flex items-center gap-2.5">
@@ -785,8 +785,8 @@ function SimulateScanModal({ devices, destinationId, onClose, onScanSuccess }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#1b251d] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-gray-100 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200 flex flex-col">
+    <div className="fixed inset-0 bg-slate-950/45 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="bg-white/92 dark:bg-[#1b251d]/92 backdrop-blur-2xl rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-[0_25px_60px_-15px_rgba(24,45,28,0.22)] border border-white/90 dark:border-white/10 ring-1 ring-black/5 animate-in zoom-in-95 duration-200 flex flex-col">
         <div className="w-full flex items-center justify-between pb-3.5 border-b border-gray-100 dark:border-white/10 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
