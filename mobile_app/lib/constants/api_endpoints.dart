@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiEndpoints {
-  // Default host for development (current Wi-Fi IP: 192.168.2.193)
-  static const String defaultHost = '192.168.2.193';
+  // Default host for development (127.0.0.1 for USB/ADB reverse, 192.168.2.193 for Wi-Fi)
+  static const String defaultHost = '127.0.0.1';
 
   static const String prefHostKey = 'passify_server_host';
 

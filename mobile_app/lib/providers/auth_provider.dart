@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../constants/api_endpoints.dart';
 import '../models/user_model.dart';
 import '../services/api_service.dart';
 
@@ -112,10 +113,34 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        _errorMessage = 'Email atau kata sandi tidak sesuai. Pastikan akun petugas telah terdaftar.';
-      } else if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.connectionError) {
-        _errorMessage = 'Gagal terhubung ke server. Periksa koneksi Wi-Fi atau IP server di menu Pengaturan.';
+      if (e.type == DioExceptionType.connectionTimeout || e.type == DioExceptionType.connectionError) {
+        // Otomatis coba fallback host (misal: jika Wi-Fi gagal, coba USB 127.0.0.1, atau sebaliknya)
+        final currentHost = await ApiEndpoints.getHost();
+        final alternateHost = (currentHost == '127.0.0.1' || currentHost == 'localhost')
+            ? '192.168.2.193'
+            : '127.0.0.1';
+
+        try {
+          await ApiEndpoints.setHost(alternateHost);
+          final res = await _apiService.login(email, password);
+          _token = res['token'];
+          _currentUser = res['user'];
+
+          if (_currentUser?.destinationId != null) {
+            _selectedDestinationId = _currentUser!.destinationId!;
+          }
+
+          _isLoading = false;
+          notifyListeners();
+          return true;
+        } catch (_) {
+          // Jika jalur alternatif juga gagal, kembalikan ke host awal dan tampilkan pesan jelas
+          await ApiEndpoints.setHost(currentHost);
+          _errorMessage =
+              'Gagal terhubung ke server ($currentHost). Pastikan kabel USB (adb reverse) aktif atau HP terhubung ke Wi-Fi laptop.';
+        }
+      } else if (e.response?.statusCode == 401) {
+        _errorMessage = 'Username atau kata sandi tidak sesuai. Pastikan akun petugas telah terdaftar.';
       } else {
         _errorMessage = e.response?.data?['message'] ?? 'Terjadi kendala saat menghubungi server.';
       }

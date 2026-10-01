@@ -498,10 +498,8 @@ function OfficerCredentialModal({ officer, onClose }) {
   const [copied, setCopied] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
 
-  const defaultHost =
-    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? '192.168.2.193'
-      : window.location.hostname;
+  // Default to 127.0.0.1 for seamless USB/ADB debugging, or 192.168.2.193 for Wi-Fi LAN
+  const defaultHost = '127.0.0.1';
   const [serverHost, setServerHost] = useState(defaultHost);
 
   const loginPayload = useMemo(() => {
@@ -552,9 +550,14 @@ function OfficerCredentialModal({ officer, onClose }) {
               level="M"
               includeMargin={true}
             />
-            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 mt-2">
-              Scan untuk Login Instan di HP
-            </span>
+            <div className="flex items-center gap-1.5 mt-2">
+              <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Scan untuk Login Instan di HP
+              </span>
+              <span className="text-[10px] font-mono text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200">
+                Host: {serverHost}
+              </span>
+            </div>
           </div>
         ) : (
           <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-center mb-3 w-full">
@@ -568,16 +571,51 @@ function OfficerCredentialModal({ officer, onClose }) {
         <div className="w-full mb-3">
           <div className="flex items-center justify-between mb-1">
             <label className="text-[11px] font-bold text-gray-700">
-              IP Host Server (Wi-Fi Laptop)
+              Jalur Koneksi Server HP
             </label>
-            <span className="text-[10px] text-gray-500">Otomatis terhubung ke HP</span>
+            <span className="text-[10px] text-gray-500">Pilih sesuai koneksi HP</span>
           </div>
+
+          {/* Quick preset buttons */}
+          <div className="grid grid-cols-2 gap-1.5 mb-2">
+            <button
+              type="button"
+              onClick={() => setServerHost('127.0.0.1')}
+              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-left border transition-all ${
+                serverHost === '127.0.0.1'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-2xs'
+                  : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-1">
+                <span>🔌 Kabel USB (ADB)</span>
+                {serverHost === '127.0.0.1' && <span className="text-[9px] bg-emerald-600 text-white px-1 rounded">Aktif</span>}
+              </div>
+              <div className="text-[10px] text-gray-400 font-normal mt-0.5">127.0.0.1 (Bebas Firewall)</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setServerHost('192.168.2.193')}
+              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold text-left border transition-all ${
+                serverHost === '192.168.2.193'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-2xs'
+                  : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+              }`}
+            >
+              <div className="flex items-center gap-1">
+                <span>📶 Wi-Fi Laptop</span>
+                {serverHost === '192.168.2.193' && <span className="text-[9px] bg-emerald-600 text-white px-1 rounded">Aktif</span>}
+              </div>
+              <div className="text-[10px] text-gray-400 font-normal mt-0.5">192.168.2.193 (ePePZ3)</div>
+            </button>
+          </div>
+
           <input
             type="text"
             value={serverHost}
             onChange={(e) => setServerHost(e.target.value)}
             className="w-full bg-white border border-gray-300 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-gray-800 focus:outline-none focus:border-emerald-600 shadow-2xs"
-            placeholder="192.168.2.193"
+            placeholder="Contoh: 127.0.0.1 atau 192.168.2.193"
           />
         </div>
 

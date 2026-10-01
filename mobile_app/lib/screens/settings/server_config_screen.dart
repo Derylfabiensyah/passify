@@ -239,21 +239,21 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
             const SizedBox(height: 12),
 
             _buildPresetTile(
-              title: 'Wi-Fi Lokal Host (192.168.2.193)',
-              subtitle: 'Untuk HP Fisik terhubung ke Wi-Fi yang sama',
+              title: '🔌 Kabel USB / ADB (127.0.0.1)',
+              subtitle: 'Direkomendasikan! Super cepat & bebas firewall',
+              host: '127.0.0.1',
+            ),
+            const SizedBox(height: 8),
+            _buildPresetTile(
+              title: '📶 Wi-Fi Laptop (192.168.2.193)',
+              subtitle: 'Wajib terhubung ke Wi-Fi yang sama (ePePZ3)',
               host: '192.168.2.193',
             ),
             const SizedBox(height: 8),
             _buildPresetTile(
-              title: 'Android Emulator (10.0.2.2)',
-              subtitle: 'Untuk Android Studio / VS Code Emulator',
+              title: '📱 Android Emulator (10.0.2.2)',
+              subtitle: 'Untuk emulator Android Studio di laptop',
               host: '10.0.2.2',
-            ),
-            const SizedBox(height: 8),
-            _buildPresetTile(
-              title: 'Localhost (127.0.0.1)',
-              subtitle: 'Untuk iOS Simulator / Desktop App',
-              host: '127.0.0.1',
             ),
             const SizedBox(height: 24),
             Container(
@@ -266,22 +266,21 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
               child: const Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.wifi_tethering_rounded, color: AppColors.forest, size: 22),
+                  Icon(Icons.usb_rounded, color: AppColors.forest, size: 22),
                   SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Cara Pakai Hotspot HP Scanner:',
+                          'Tips Koneksi Terbaik (Kabel USB):',
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.forestDeep),
                         ),
                         SizedBox(height: 4),
                         Text(
-                          '1. Aktifkan Hotspot di HP ini dan sambungkan laptop Anda ke hotspot ini.\n'
-                          '2. Di laptop buka CMD/PowerShell, ketik "ipconfig".\n'
-                          '3. Masukkan alamat IPv4 laptop (misal: 192.168.43.xxx) ke kolom Host di atas.\n'
-                          '4. Klik "Uji Koneksi" lalu "Simpan Host".',
+                          '1. Sambungkan HP ke laptop dengan kabel USB (aktifkan USB Debugging).\n'
+                          '2. Pilih preset "Kabel USB (127.0.0.1)" di atas.\n'
+                          '3. Klik "Uji Koneksi" lalu "Simpan Host". Koneksi akan langsung lancar tanpa butuh Wi-Fi!',
                           style: TextStyle(fontSize: 11.5, color: AppColors.inkSoft, height: 1.4),
                         ),
                       ],
