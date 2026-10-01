@@ -468,16 +468,10 @@ export async function fetchDashboardOverviewTelemetry(slug) {
   const ticketsSold = Math.max(
     bookedToday,
     trxVisitors,
-    Array.isArray(financeData.transactions) ? financeData.transactions.length : 0,
-    visitorsEntered
+    Array.isArray(financeData.transactions) ? financeData.transactions.length : 0
   );
 
-  // Fallback revenue if transactions API returned 0 but visitors/tickets exist
-  let finalRevenue = calculatedRevenue;
-  if (finalRevenue === 0 && ticketsSold > 0) {
-    const basePrice = Number(primaryDest.ticket_categories?.[0]?.price ?? primaryDest.ticket_categories?.[0]?.base_price ?? 35000);
-    finalRevenue = ticketsSold * basePrice;
-  }
+  const finalRevenue = calculatedRevenue;
 
   const remainingQuota = Math.max(0, totalCapacity - ticketsSold);
 

@@ -150,8 +150,10 @@ export function getLocalBookedCount(destinationId, destinationSlug, destinationN
       const matchId = destinationId && t.destinationId && t.destinationId === destinationId;
       const matchName = destinationName && t.destinationName && norm(t.destinationName) === norm(destinationName);
 
-      // Match destination by slug, id, or name; fallback if no destination fields exist
-      const isMatch = matchSlug || matchId || matchName || (!t.destinationSlug && !t.destinationId && !t.destinationName);
+      // Match destination: destinationId must strictly match if present
+      const isMatch = (destinationId && t.destinationId)
+        ? t.destinationId === destinationId
+        : (!t.destinationId && (matchSlug || matchName));
       if (isMatch) {
         const qty = Number(t.totalQty || t.quantity || 1);
         total += qty;
