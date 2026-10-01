@@ -151,7 +151,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
           <button
             type="button"
             onClick={() => onDownloadManifest(device)}
-            className="btn-secondary btn-sm flex-1 justify-center shadow-2xs text-xs py-1.5"
+            className="btn-secondary btn-sm flex-1 justify-center shadow-2xs text-xs py-1.5 rounded-xl"
             title="Unduh file manifest offline untuk cadangan manual"
           >
             <Download className="w-3.5 h-3.5" />
@@ -160,7 +160,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
           <button
             type="button"
             onClick={() => onEdit(device)}
-            className="p-1.5 rounded-lg bg-white/60 text-gray-600 hover:text-gray-900 border border-white/80 transition-colors shadow-xs"
+            className="h-8 w-8 flex items-center justify-center rounded-xl bg-white/60 text-gray-600 hover:text-gray-900 border border-white/80 transition-colors shadow-xs shrink-0"
             title="Ubah Konfigurasi"
           >
             <Pencil className="w-3.5 h-3.5" />
@@ -169,7 +169,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
             <button
               type="button"
               onClick={() => onDelete(device.id)}
-              className="p-1.5 rounded-lg bg-white/60 text-gray-600 hover:text-red-600 border border-white/80 transition-colors shadow-xs"
+              className="h-8 w-8 flex items-center justify-center rounded-xl bg-white/60 text-gray-600 hover:text-red-600 border border-white/80 transition-colors shadow-xs shrink-0"
               title="Hapus Perangkat"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -352,7 +352,7 @@ function ConfirmDialogModal({
             type="button"
             disabled={isLoading}
             onClick={onCancel}
-            className="flex-1 py-2.5 px-4 rounded-2xl text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 bg-white/90 hover:bg-white dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200/90 dark:border-white/10 shadow-2xs transition-all active:scale-98"
+            className="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200 bg-white/90 hover:bg-white dark:bg-white/10 dark:hover:bg-white/15 border border-gray-200/90 dark:border-white/10 shadow-2xs transition-all active:scale-98"
           >
             {cancelText}
           </button>
@@ -360,7 +360,7 @@ function ConfirmDialogModal({
             type="button"
             disabled={isLoading}
             onClick={onConfirm}
-            className={`flex-1 py-2.5 px-4 rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-98 ${variantStyles.btn}`}
+            className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 shadow-md transition-all active:scale-98 ${variantStyles.btn}`}
           >
             {isLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}
             <span>{confirmText}</span>
@@ -568,7 +568,7 @@ function OfficerCredentialModal({ officer, onClose }) {
         <div className="w-full bg-gray-50 rounded-xl p-3 border border-gray-200 space-y-2 text-xs mb-3">
           <div className="flex items-center justify-between">
             <span className="text-gray-500 font-medium">Username:</span>
-            <span className="font-mono font-bold text-gray-900 bg-white px-2 py-0.5 rounded border border-gray-200 select-all">
+            <span className="font-mono font-bold text-gray-900 bg-white px-2.5 py-0.5 rounded-lg border border-gray-200 select-all">
               {officer.username}
             </span>
           </div>
@@ -576,13 +576,13 @@ function OfficerCredentialModal({ officer, onClose }) {
             <div className="flex items-center justify-between">
               <span className="text-gray-500 font-medium">Kata Sandi:</span>
               <div className="flex items-center gap-1.5">
-                <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 select-all">
+                <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 select-all">
                   {showPassword ? officer.generated_password : '••••••••••••'}
                 </span>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="p-1 text-gray-400 hover:text-gray-700"
+                  className="p-1 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 </button>
@@ -1246,7 +1246,7 @@ export default function GatesPage() {
         accessorKey: 'gate_type',
         header: 'Tipe Gerbang',
         cell: (info) => (
-          <span className="uppercase text-[10px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+          <span className="uppercase text-[10px] font-bold text-gray-700 bg-gray-100 px-2.5 py-0.5 rounded-lg border border-gray-200">
             {info.getValue() === 'entrance' ? 'Pintu Masuk' : 'Pintu Keluar'}
           </span>
         )
@@ -1337,32 +1337,43 @@ export default function GatesPage() {
       </div>
 
       {/* Tab Switcher: Terminal Perangkat vs Akun Petugas */}
-      <div className="flex items-center gap-2 border-b border-gray-200/80 pb-0">
+      <div className="inline-flex p-1 rounded-2xl bg-white/60 backdrop-blur-md border border-white/80 shadow-2xs gap-1 self-start">
         <button
           type="button"
           onClick={() => setActiveTab('devices')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer ${
             activeTab === 'devices'
-              ? 'border-emerald-600 text-emerald-800 bg-emerald-50/40 rounded-t-xl'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
           }`}
         >
           <Smartphone className="w-4 h-4" />
-          <span>Perangkat Terminal Gerbang ({devices.length})</span>
+          <span>Perangkat Terminal Gerbang</span>
+          <span
+            className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors ${
+              activeTab === 'devices' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
+            }`}
+          >
+            {devices.length}
+          </span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('officers')}
-          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all cursor-pointer ${
             activeTab === 'officers'
-              ? 'border-emerald-600 text-emerald-800 bg-emerald-50/40 rounded-t-xl'
-              : 'border-transparent text-gray-500 hover:text-gray-900'
+              ? 'bg-emerald-600 text-white shadow-xs'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-white/50'
           }`}
         >
           <Users className="w-4 h-4" />
           <span>Akun Petugas Scanner</span>
-          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+          <span
+            className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full transition-colors ${
+              activeTab === 'officers' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'
+            }`}
+          >
             {officers.length}
           </span>
         </button>
@@ -1407,7 +1418,7 @@ export default function GatesPage() {
             <button
               type="button"
               onClick={() => setFilterDest('all')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                 filterDest === 'all'
                   ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
                   : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
@@ -1420,7 +1431,7 @@ export default function GatesPage() {
                 key={dest}
                 type="button"
                 onClick={() => setFilterDest(dest)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
                   filterDest === dest
                     ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
                     : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
@@ -1520,7 +1531,7 @@ export default function GatesPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <h4 className="text-sm font-bold text-gray-900">{officer.full_name || officer.username}</h4>
-                          <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full shrink-0 whitespace-nowrap">
                             @{officer.username}
                           </span>
                         </div>
@@ -1556,7 +1567,7 @@ export default function GatesPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedCredentialOfficer(officer)}
-                      className="btn-primary btn-sm w-full justify-center text-xs py-2 gap-1.5"
+                      className="btn-primary btn-sm w-full justify-center text-xs py-2 gap-1.5 rounded-xl"
                     >
                       <QrCode className="w-3.5 h-3.5" />
                       <span>Lihat QR & Kredensial</span>
@@ -1565,7 +1576,7 @@ export default function GatesPage() {
                       <button
                         type="button"
                         onClick={() => handleResetOfficerPassword(officer)}
-                        className="btn-secondary btn-sm flex-1 justify-center text-xs py-1.5 gap-1"
+                        className="btn-secondary btn-sm flex-1 justify-center text-xs py-1.5 gap-1 rounded-xl"
                         title="Generate kata sandi baru otomatis"
                       >
                         <RefreshCw className="w-3 h-3 text-amber-600" />
@@ -1574,7 +1585,7 @@ export default function GatesPage() {
                       <button
                         type="button"
                         onClick={() => handleDeleteOfficer(officer)}
-                        className="p-1.5 rounded-lg bg-white text-gray-500 hover:text-red-600 border border-gray-200 transition-colors shadow-2xs"
+                        className="h-8 w-8 flex items-center justify-center rounded-xl bg-white text-gray-500 hover:text-red-600 border border-gray-200 transition-colors shadow-2xs shrink-0"
                         title="Hapus Akun Petugas"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
