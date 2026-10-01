@@ -282,19 +282,17 @@ export async function fetchAdminFinanceData(tenantId) {
     let transactions = trxRes.status === 'fulfilled' && trxRes.value?.data ? trxRes.value.data : [];
     let payouts = payoutRes.status === 'fulfilled' && payoutRes.value?.data ? payoutRes.value.data : [];
 
-    // Read and merge local bookings from passify_my_tickets for offline/live resiliency
-    try {
-      const rawTickets = localStorage.getItem('passify_my_tickets');
-      if (rawTickets) {
-        const myTickets = JSON.parse(rawTickets);
-        if (Array.isArray(myTickets)) {
-          myTickets.forEach((t) => {
-            if (!t || t.status === 'cancelled') return;
-            const norm = (s) => (s || '').toString().toLowerCase().trim();
-            const matchSlug = currentSlug && t.destinationSlug && norm(t.destinationSlug) === norm(currentSlug);
-            const matchName = user.tenant_name && t.destinationName && norm(t.destinationName) === norm(user.tenant_name);
-            const isMatch = matchSlug || matchName || (!t.destinationSlug && !t.destinationName);
-            if (isMatch) {
+    // Read and merge local bookings only if backend is offline or matching current destination ID
+    if (trxRes.status !== 'fulfilled') {
+      try {
+        const rawTickets = localStorage.getItem('passify_my_tickets');
+        if (rawTickets) {
+          const myTickets = JSON.parse(rawTickets);
+          if (Array.isArray(myTickets)) {
+            myTickets.forEach((t) => {
+              if (!t || t.status === 'cancelled') return;
+              const isMatch = effectiveTenantId && t.tenantId && t.tenantId === effectiveTenantId;
+              if (isMatch) {
               const nominal = Number(t.grandTotal || t.total_amount || t.amount || 32500);
               const visitorName = t.visitors?.[0]?.name || t.contact?.fullName || t.contact?.name || 'Wisatawan Terverifikasi';
               const orderNum = t.orderNumber || t.ticketCode;
@@ -325,6 +323,7 @@ export async function fetchAdminFinanceData(tenantId) {
         }
       }
     } catch (_) {}
+  }
 
     // Generate weekly revenue breakdown from transactions
     const daysMap = { 0: 'Min', 1: 'Sen', 2: 'Sel', 3: 'Rab', 4: 'Kam', 5: 'Jum', 6: 'Sab' };
@@ -403,11 +402,7 @@ export async function fetchDashboardOverviewTelemetry(slug) {
       if (Array.isArray(myTickets)) {
         myTickets.forEach((t) => {
           if (t.status === 'cancelled') return;
-          const norm = (s) => (s || '').toString().toLowerCase().trim();
-          const matchSlug = primaryDest.slug && t.destinationSlug && norm(t.destinationSlug) === norm(primaryDest.slug);
-          const matchId = primaryDest.id && t.destinationId && t.destinationId === primaryDest.id;
-          const matchName = primaryDest.name && t.destinationName && norm(t.destinationName) === norm(primaryDest.name);
-          const isMatch = matchSlug || matchId || matchName || (!t.destinationSlug && !t.destinationId && !t.destinationName);
+          const isMatch = primaryDest.id && t.destinationId && t.destinationId === primaryDest.id;
           if (isMatch) {
             const qty = Number(t.totalQty || t.quantity || 1);
             localBookedTotal += qty;

@@ -277,7 +277,9 @@ export default function AdminLayout({ children }) {
                 }}
                 className="bg-transparent text-xs font-bold text-[#14281a] outline-none cursor-pointer pr-1"
               >
-                <option value="curug-cikanteh">Curug Cikanteh</option>
+                <option value={activeTenantSlug}>
+                  {activeTenant.name || adminUser.tenant_name || 'Destinasi Aktif'}
+                </option>
               </select>
             </div>
 
