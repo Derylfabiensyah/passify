@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -28,6 +29,46 @@ func (r *AuthRepository) GetUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *AuthRepository) GetUserByIdentifier(identifier string) (*models.User, error) {
+	var user models.User
+	clean := strings.TrimSpace(identifier)
+	if strings.Contains(clean, "@") {
+		if err := r.db.Preload("Tenant").Where("email ILIKE ?", clean).First(&user).Error; err == nil {
+			return &user, nil
+		}
+	}
+	// Also lookup by exact email, prefix (e.g. username@%), or full_name
+	err := r.db.Preload("Tenant").
+		Where("email ILIKE ? OR email ILIKE ? OR full_name ILIKE ?", clean, clean+"@%", clean).
+		First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *AuthRepository) ListGateOfficersByTenant(tenantID uuid.UUID) ([]models.User, error) {
+	var officers []models.User
+	err := r.db.Preload("Tenant").
+		Where("tenant_id = ? AND role = ?", tenantID, models.RoleGateOfficer).
+		Order("created_at DESC").
+		Find(&officers).Error
+	return officers, err
+}
+
+func (r *AuthRepository) DeleteGateOfficer(id uuid.UUID, tenantID uuid.UUID) error {
+	return r.db.Where("id = ? AND tenant_id = ? AND role = ?", id, tenantID, models.RoleGateOfficer).
+		Delete(&models.User{}).Error
+}
+
+func (r *AuthRepository) GetTenantByID(id uuid.UUID) (*models.Tenant, error) {
+	var tenant models.Tenant
+	if err := r.db.Where("id = ?", id).First(&tenant).Error; err != nil {
+		return nil, err
+	}
+	return &tenant, nil
 }
 
 func (r *AuthRepository) GetUserByID(id uuid.UUID) (*models.User, error) {

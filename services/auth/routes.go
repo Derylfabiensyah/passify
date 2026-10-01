@@ -23,5 +23,11 @@ func RegisterRoutes(router *gin.RouterGroup, handler *AuthHandler, jwtSecret str
 		protected.GET("/profile", handler.HandleGetProfile)
 		protected.PUT("/profile", handler.HandleUpdateProfile)
 		protected.POST("/logout", handler.HandleLogout)
+
+		// Gate Officers Management (for tenant_admin)
+		protected.GET("/officers", handler.HandleListGateOfficers)
+		protected.POST("/officers", handler.HandleCreateGateOfficer)
+		protected.POST("/officers/:id/reset-password", handler.HandleResetGateOfficerPassword)
+		protected.DELETE("/officers/:id", handler.HandleDeleteGateOfficer)
 	}
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
@@ -46,8 +47,26 @@ type RegisterTenantRequest struct {
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
+	Email    string `json:"email"`
+	Username string `json:"username"`
 	Password string `json:"password" binding:"required"`
+}
+
+type CreateOfficerRequest struct {
+	Username string `json:"username" binding:"required"`
+	FullName string `json:"full_name"`
+}
+
+type OfficerResponse struct {
+	ID                uuid.UUID  `json:"id"`
+	Username          string     `json:"username"`
+	Email             string     `json:"email"`
+	FullName          string     `json:"full_name"`
+	Role              string     `json:"role"`
+	GeneratedPassword string     `json:"generated_password,omitempty"`
+	IsActive          bool       `json:"is_active"`
+	LastLoginAt       *time.Time `json:"last_login_at,omitempty"`
+	CreatedAt         time.Time  `json:"created_at"`
 }
 
 type GoogleLoginRequest struct {
@@ -131,9 +150,17 @@ func (s *AuthService) Register(req RegisterRequest) (*models.User, error) {
 }
 
 func (s *AuthService) Login(req LoginRequest) (*LoginResponse, error) {
-	user, err := s.repo.GetUserByEmail(req.Email)
+	identifier := strings.TrimSpace(req.Email)
+	if identifier == "" {
+		identifier = strings.TrimSpace(req.Username)
+	}
+	if identifier == "" {
+		return nil, errors.New("username atau email wajib diisi")
+	}
+
+	user, err := s.repo.GetUserByIdentifier(identifier)
 	if err != nil {
-		return nil, errors.New("email atau kata sandi tidak valid")
+		return nil, errors.New("akun atau kata sandi tidak valid")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)); err != nil {
@@ -521,4 +548,166 @@ func (s *AuthService) VerifyEmail(token string) error {
 func hashToken(token string) string {
 	h := sha256.Sum256([]byte(token))
 	return hex.EncodeToString(h[:])
+}
+
+// GenerateSecurePassword creates a cryptographically secure, high-entropy password
+func GenerateSecurePassword() string {
+	const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+	const lower = "abcdefghijkmnpqrstuvwxyz"
+	const digits = "23456789"
+	const special = "#$@!&*"
+
+	b := make([]byte, 12)
+	_, _ = rand.Read(b)
+
+	res := make([]byte, 12)
+	res[0] = upper[int(b[0])%len(upper)]
+	res[1] = lower[int(b[1])%len(lower)]
+	res[2] = digits[int(b[2])%len(digits)]
+	res[3] = special[int(b[3])%len(special)]
+
+	const all = upper + lower + digits + special
+	for i := 4; i < 12; i++ {
+		res[i] = all[int(b[i])%len(all)]
+	}
+
+	for i := 11; i > 0; i-- {
+		j := int(b[i]) % (i + 1)
+		res[i], res[j] = res[j], res[i]
+	}
+
+	return string(res)
+}
+
+func (s *AuthService) CreateGateOfficer(tenantID uuid.UUID, req CreateOfficerRequest) (*OfficerResponse, error) {
+	username := strings.ToLower(strings.TrimSpace(req.Username))
+	if username == "" {
+		return nil, errors.New("username wajib diisi")
+	}
+
+	reg := regexp.MustCompile("[^a-z0-9_-]")
+	username = reg.ReplaceAllString(username, "")
+	if len(username) < 3 {
+		return nil, errors.New("username minimal 3 karakter (hanya huruf, angka, '-' atau '_')")
+	}
+
+	tenant, err := s.repo.GetTenantByID(tenantID)
+	if err != nil {
+		return nil, errors.New("tenant tidak ditemukan")
+	}
+
+	tenantSlug := tenant.Slug
+	if tenantSlug == "" {
+		tenantSlug = tenant.Subdomain
+	}
+	if tenantSlug == "" {
+		tenantSlug = "tenant"
+	}
+
+	email := fmt.Sprintf("%s@%s.passify.id", username, tenantSlug)
+
+	if existing, _ := s.repo.GetUserByIdentifier(email); existing != nil {
+		return nil, fmt.Errorf("username '%s' sudah terdaftar di sistem", username)
+	}
+
+	generatedPassword := GenerateSecurePassword()
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(generatedPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("gagal mengenkripsi kata sandi: %w", err)
+	}
+
+	fullName := strings.TrimSpace(req.FullName)
+	if fullName == "" {
+		fullName = "Petugas " + username
+	}
+
+	now := time.Now()
+	user := &models.User{
+		BaseModel: models.BaseModel{
+			ID: uuid.New(),
+		},
+		TenantID:        &tenantID,
+		Email:           email,
+		PasswordHash:    string(hashedPassword),
+		FullName:        fullName,
+		Role:            models.RoleGateOfficer,
+		IsActive:        true,
+		EmailVerifiedAt: &now,
+	}
+
+	if err := s.repo.CreateUser(user); err != nil {
+		return nil, fmt.Errorf("gagal membuat akun petugas: %w", err)
+	}
+
+	return &OfficerResponse{
+		ID:                user.ID,
+		Username:          username,
+		Email:             user.Email,
+		FullName:          user.FullName,
+		Role:              user.Role,
+		GeneratedPassword: generatedPassword,
+		IsActive:          user.IsActive,
+		CreatedAt:         user.CreatedAt,
+	}, nil
+}
+
+func (s *AuthService) ListGateOfficers(tenantID uuid.UUID) ([]OfficerResponse, error) {
+	users, err := s.repo.ListGateOfficersByTenant(tenantID)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]OfficerResponse, len(users))
+	for i, u := range users {
+		parts := strings.Split(u.Email, "@")
+		username := parts[0]
+		res[i] = OfficerResponse{
+			ID:          u.ID,
+			Username:    username,
+			Email:       u.Email,
+			FullName:    u.FullName,
+			Role:        u.Role,
+			IsActive:    u.IsActive,
+			LastLoginAt: u.LastLoginAt,
+			CreatedAt:   u.CreatedAt,
+		}
+	}
+	return res, nil
+}
+
+func (s *AuthService) ResetGateOfficerPassword(tenantID uuid.UUID, officerID uuid.UUID) (*OfficerResponse, error) {
+	user, err := s.repo.GetUserByID(officerID)
+	if err != nil || user == nil || user.TenantID == nil || *user.TenantID != tenantID {
+		return nil, errors.New("petugas tidak ditemukan")
+	}
+
+	newPassword := GenerateSecurePassword()
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("gagal mengenkripsi kata sandi baru: %w", err)
+	}
+
+	user.PasswordHash = string(hashedPassword)
+	if err := s.repo.UpdateUser(user); err != nil {
+		return nil, fmt.Errorf("gagal memperbarui kata sandi: %w", err)
+	}
+
+	parts := strings.Split(user.Email, "@")
+	username := parts[0]
+
+	return &OfficerResponse{
+		ID:                user.ID,
+		Username:          username,
+		Email:             user.Email,
+		FullName:          user.FullName,
+		Role:              user.Role,
+		GeneratedPassword: newPassword,
+		IsActive:          user.IsActive,
+		LastLoginAt:       user.LastLoginAt,
+		CreatedAt:         user.CreatedAt,
+	}, nil
+}
+
+func (s *AuthService) DeleteGateOfficer(tenantID uuid.UUID, officerID uuid.UUID) error {
+	return s.repo.DeleteGateOfficer(officerID, tenantID)
 }

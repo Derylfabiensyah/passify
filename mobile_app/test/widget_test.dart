@@ -18,7 +18,8 @@ void main() {
     );
 
     expect(find.text('passify'), findsOneWidget);
-    expect(find.text('Email Petugas'), findsOneWidget);
+    expect(find.text('Username atau Email Petugas'), findsOneWidget);
     expect(find.text('Kata Sandi'), findsOneWidget);
+    expect(find.text('Scan QR Login Petugas'), findsOneWidget);
   });
 }

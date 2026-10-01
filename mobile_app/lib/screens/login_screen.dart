@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/glass_container.dart';
 import '../widgets/mesh_gradient_background.dart';
 import 'home_screen.dart';
+import 'qr_login_scanner_screen.dart';
 import 'settings/server_config_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -196,23 +197,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                                // Email Field
+                                // Email or Username Field
                                 TextFormField(
                                   controller: _emailController,
-                                  keyboardType: TextInputType.emailAddress,
+                                  keyboardType: TextInputType.text,
                                   textInputAction: TextInputAction.next,
                                   style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.ink),
                                   validator: (value) {
                                     if (value == null || value.trim().isEmpty) {
-                                      return 'Email petugas wajib diisi';
+                                      return 'Username atau email wajib diisi';
                                     }
                                     return null;
                                   },
                                   decoration: InputDecoration(
-                                    labelText: 'Email Petugas',
+                                    labelText: 'Username atau Email Petugas',
                                     labelStyle: const TextStyle(fontSize: 13, color: AppColors.inkSoft),
-                                    hintText: 'budi@gmail.com',
-                                    prefixIcon: const Icon(Icons.email_outlined, color: AppColors.forestSoft, size: 20),
+                                    hintText: 'gate1 atau budi@gmail.com',
+                                    prefixIcon: const Icon(Icons.person_outline_rounded, color: AppColors.forestSoft, size: 20),
                                     filled: true,
                                     fillColor: AppColors.glassWhiteSoft,
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -279,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 const SizedBox(height: 24),
 
-                                // Submit Button
+                                // Submit Button (Manual Login)
                                 ElevatedButton(
                                   onPressed: auth.isLoading ? null : _handleLogin,
                                   style: ElevatedButton.styleFrom(
@@ -300,6 +301,29 @@ class _LoginScreenState extends State<LoginScreen> {
                                           'Masuk ke Sistem Lapangan',
                                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
                                         ),
+                                ),
+                                
+                                const SizedBox(height: 12),
+
+                                // QR Code Fast Login Button
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    HapticFeedback.selectionClick();
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (_) => const QrLoginScannerScreen()),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.qr_code_scanner_rounded, color: AppColors.forestDeep, size: 22),
+                                  label: const Text(
+                                    'Scan QR Login Petugas',
+                                    style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800, color: AppColors.forestDeep),
+                                  ),
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: AppColors.leafPale.withValues(alpha: 0.5),
+                                    minimumSize: const Size.fromHeight(50),
+                                    side: const BorderSide(color: AppColors.forestSoft, width: 1.5),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                                  ),
                                 ),
                                 
                                 const SizedBox(height: 20),

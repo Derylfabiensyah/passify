@@ -19,7 +19,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Copy,
-  QrCode
+  QrCode,
+  UserPlus,
+  Users,
+  Lock,
+  ShieldCheck
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTenant } from '../../contexts/TenantContext';
@@ -296,6 +300,281 @@ function DevicePairingModal({ device, onClose }) {
         >
           Selesai / Tutup
         </button>
+      </div>
+    </div>
+  );
+}
+
+function AddOfficerModal({ onClose, onSuccess }) {
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const cleanUser = username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+    if (!cleanUser || cleanUser.length < 3) {
+      setError('Username minimal 3 karakter (hanya huruf kecil, angka, "-" atau "_").');
+      return;
+    }
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      const res = await apiRequest('/api/v1/auth/officers', {
+        method: 'POST',
+        body: {
+          username: cleanUser,
+          full_name: fullName.trim() || `Petugas ${cleanUser}`,
+        },
+      });
+      if (res && res.data) {
+        onSuccess(res.data);
+      } else {
+        throw new Error(res?.message || 'Gagal membuat akun petugas');
+      }
+    } catch (err) {
+      setError(err.message || 'Terjadi kesalahan saat membuat akun petugas');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="glass-panel rounded-2xl max-w-md w-full p-6 shadow-2xl border border-white/80">
+        <div className="flex items-center justify-between pb-3 border-b border-gray-100 mb-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
+              <UserPlus className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-gray-900">Tambah Akun Petugas Gate</h3>
+              <p className="text-xs text-gray-500">Kata sandi aman dibuatkan otomatis oleh sistem</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              Username Petugas <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
+              placeholder="contoh: gate1, petugas-utara, budi"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 font-mono focus:outline-none focus:border-emerald-600 focus:bg-white"
+            />
+            <p className="text-[11px] text-gray-500 mt-1">
+              Petugas cukup mengetik username ini (atau scan QR) untuk login di HP scanner.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
+              Nama Lengkap / Pos Gerbang (Opsional)
+            </label>
+            <input
+              type="text"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="contoh: Petugas Gerbang Utama"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
+            />
+          </div>
+
+          <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs text-emerald-900 space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-emerald-800">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Sandi Otomatis Kebal Tebakan (Hack-Proof)</span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-emerald-700">
+              Sistem akan menghasilkan kata sandi acak berkeamanan tinggi dan menyiapkan <strong>QR Code Login Cepat</strong> agar petugas lapangan tidak perlu repot mengetik sandi manual.
+            </p>
+          </div>
+
+          <div className="pt-2 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary btn-sm"
+            >
+              Batal
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-primary btn-sm px-4"
+            >
+              {isSubmitting ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Membuat Akun...</span>
+                </>
+              ) : (
+                <>
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Buat Akun Petugas</span>
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function OfficerCredentialModal({ officer, onClose }) {
+  const [copied, setCopied] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
+
+  const defaultHost =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? '192.168.18.91'
+      : window.location.hostname;
+  const [serverHost, setServerHost] = useState(defaultHost);
+
+  const loginPayload = useMemo(() => {
+    return JSON.stringify({
+      type: 'passify_officer_login',
+      username: officer.username,
+      password: officer.generated_password || '',
+      host: serverHost.trim(),
+    });
+  }, [officer, serverHost]);
+
+  const handleCopyAll = () => {
+    const text = `Kredensial Petugas Passify:\nUsername: ${officer.username}\nKata Sandi: ${officer.generated_password || '(Tersimpan)'}\nHost Server: ${serverHost}`;
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="glass-panel rounded-2xl max-w-md w-full p-6 shadow-2xl border border-white/80 flex flex-col items-center">
+        {/* Header */}
+        <div className="w-full flex items-center justify-between pb-3 border-b border-gray-100 mb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center shadow-2xs">
+              <Key className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-gray-900">Kredensial & QR Login Petugas</h3>
+              <p className="text-xs text-gray-500">{officer.full_name || officer.username}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* QR Display */}
+        {officer.generated_password ? (
+          <div className="p-4 bg-white rounded-2xl border-2 border-dashed border-emerald-400 shadow-inner flex flex-col items-center mb-3">
+            <QRCodeSVG
+              value={loginPayload}
+              size={180}
+              level="M"
+              includeMargin={true}
+            />
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 mt-2">
+              Scan untuk Login Instan di HP
+            </span>
+          </div>
+        ) : (
+          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200 text-center mb-3 w-full">
+            <p className="text-xs text-amber-900 font-semibold">
+              Kata sandi tersimpan terenkripsi. Untuk melihat QR login baru atau menyalin sandi baru, gunakan tombol <strong>Reset Sandi</strong>.
+            </p>
+          </div>
+        )}
+
+        {/* Credentials Details */}
+        <div className="w-full bg-gray-50 rounded-xl p-3 border border-gray-200 space-y-2 text-xs mb-3">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500 font-medium">Username:</span>
+            <span className="font-mono font-bold text-gray-900 bg-white px-2 py-0.5 rounded border border-gray-200 select-all">
+              {officer.username}
+            </span>
+          </div>
+          {officer.generated_password && (
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500 font-medium">Kata Sandi:</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 select-all">
+                  {showPassword ? officer.generated_password : '••••••••••••'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="p-1 text-gray-400 hover:text-gray-700"
+                >
+                  {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500 font-medium">Email Sistem:</span>
+            <span className="font-mono text-[11px] text-gray-600 truncate max-w-[200px]">
+              {officer.email}
+            </span>
+          </div>
+        </div>
+
+        {/* Instructions */}
+        <div className="w-full bg-blue-50/70 border border-blue-200/80 rounded-xl p-3 text-[11px] text-blue-950 space-y-1 mb-4">
+          <span className="font-bold flex items-center gap-1 text-blue-900">
+            <Smartphone className="w-3.5 h-3.5" /> Cara Login di HP Petugas:
+          </span>
+          <p className="leading-relaxed text-blue-900">
+            1. Buka aplikasi Passify di HP petugas.<br />
+            2. Di halaman login, klik tombol <strong>"Scan QR Login Petugas"</strong>.<br />
+            3. Arahkan kamera ke QR Code di atas untuk masuk langsung tanpa ketik sandi.
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="w-full flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleCopyAll}
+            className="flex-1 btn-secondary btn-sm justify-center gap-1.5 py-2.5"
+          >
+            {copied ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+            <span>{copied ? 'Tersalin!' : 'Salin Kredensial'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-primary btn-sm px-5 py-2.5"
+          >
+            Selesai
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -678,6 +957,64 @@ export default function GatesPage() {
   const [showSimulateScanModal, setShowSimulateScanModal] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
+  // Tab & Gate Officer States
+  const [activeTab, setActiveTab] = useState('devices');
+  const [officers, setOfficers] = useState([]);
+  const [showAddOfficerModal, setShowAddOfficerModal] = useState(false);
+  const [selectedCredentialOfficer, setSelectedCredentialOfficer] = useState(null);
+  const [isLoadingOfficers, setIsLoadingOfficers] = useState(false);
+
+  const loadOfficers = async () => {
+    setIsLoadingOfficers(true);
+    try {
+      const res = await apiRequest('/api/v1/auth/officers');
+      if (res && res.data) {
+        setOfficers(res.data);
+      }
+    } catch (err) {
+      console.warn('Gagal memuat petugas:', err);
+    } finally {
+      setIsLoadingOfficers(false);
+    }
+  };
+
+  useEffect(() => {
+    loadOfficers();
+  }, [slug]);
+
+  const handleResetOfficerPassword = async (officer) => {
+    if (!window.confirm(`Yakin ingin mereset kata sandi untuk akun "${officer.username}"? Sandi baru akan otomatis digenerate.`)) {
+      return;
+    }
+    try {
+      const res = await apiRequest(`/api/v1/auth/officers/${officer.id}/reset-password`, {
+        method: 'POST',
+      });
+      if (res && res.data) {
+        showToast(`Kata sandi "${officer.username}" berhasil direset!`);
+        setSelectedCredentialOfficer(res.data);
+        loadOfficers();
+      }
+    } catch (err) {
+      showToast(`Gagal reset sandi: ${err.message}`);
+    }
+  };
+
+  const handleDeleteOfficer = async (officer) => {
+    if (!window.confirm(`Yakin ingin menghapus akun petugas "${officer.username}"?`)) {
+      return;
+    }
+    try {
+      await apiRequest(`/api/v1/auth/officers/${officer.id}`, {
+        method: 'DELETE',
+      });
+      showToast(`Akun petugas "${officer.username}" berhasil dihapus.`);
+      loadOfficers();
+    } catch (err) {
+      showToast(`Gagal menghapus petugas: ${err.message}`);
+    }
+  };
+
   // Load real gate telemetry from backend
   useEffect(() => {
     async function loadData() {
@@ -894,114 +1231,312 @@ export default function GatesPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowSimulateScanModal(true)}
-            className="btn-secondary btn-sm shadow-2xs gap-1.5"
-            title="Uji coba validasi scan tiket langsung"
-          >
-            <ScanLine className="w-4 h-4 text-emerald-600" />
-            <span>Simulasi Scan Tiket</span>
-          </button>
-          <button
-            id="add-gate-device-btn"
-            type="button"
-            onClick={() => setShowAddModal(true)}
-            className="btn-primary btn-sm shadow-2xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Registrasi Device Tenant</span>
-          </button>
+          {activeTab === 'devices' ? (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowSimulateScanModal(true)}
+                className="btn-secondary btn-sm shadow-2xs gap-1.5"
+                title="Uji coba validasi scan tiket langsung"
+              >
+                <ScanLine className="w-4 h-4 text-emerald-600" />
+                <span>Simulasi Scan Tiket</span>
+              </button>
+              <button
+                id="add-gate-device-btn"
+                type="button"
+                onClick={() => setShowAddModal(true)}
+                className="btn-primary btn-sm shadow-2xs"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Registrasi Device Tenant</span>
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowAddOfficerModal(true)}
+              className="btn-primary btn-sm shadow-2xs gap-1.5"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Tambah Petugas Gate</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* KPI Cards (Minimalist style) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AdminStatCard
-          icon={Smartphone}
-          label="Total Perangkat Gate"
-          value={devices.length.toString()}
-          subValue="Pemindai e-Ticket & gelang NFC"
-          badgeText="DEVICES"
-        />
-        <AdminStatCard
-          icon={Wifi}
-          label="Perangkat Online / Aktif"
-          value={devices.filter((d) => d.is_active).length.toString()}
-          subValue="Terhubung server telemetri real-time"
-          badgeText="ONLINE"
-        />
-        <AdminStatCard
-          icon={WifiOff}
-          label="Perangkat Offline"
-          value={devices.filter((d) => !d.is_active).length.toString()}
-          subValue="Sinkronisasi offline batch mode"
-          badgeText="OFFLINE"
-        />
-        <AdminStatCard
-          icon={ScanLine}
-          label="Total Pemindaian Hari Ini"
-          value={`${totalScans.toLocaleString('id-ID')} pax`}
-          subValue="Validasi tiket & akses gate pengunjung"
-          badgeText="SCANS"
-        />
-      </div>
-
-      {/* Destination Filter */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+      {/* Tab Switcher: Terminal Perangkat vs Akun Petugas */}
+      <div className="flex items-center gap-2 border-b border-gray-200/80 pb-0">
         <button
           type="button"
-          onClick={() => setFilterDest('all')}
-          className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
-            filterDest === 'all'
-              ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-              : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
+          onClick={() => setActiveTab('devices')}
+          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+            activeTab === 'devices'
+              ? 'border-emerald-600 text-emerald-800 bg-emerald-50/40 rounded-t-xl'
+              : 'border-transparent text-gray-500 hover:text-gray-900'
           }`}
         >
-          Semua Kawasan
+          <Smartphone className="w-4 h-4" />
+          <span>Perangkat Terminal Gerbang ({devices.length})</span>
         </button>
-        {uniqueDestinations.map((dest) => (
-          <button
-            key={dest}
-            type="button"
-            onClick={() => setFilterDest(dest)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
-              filterDest === dest
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
-            }`}
-          >
-            {dest}
-          </button>
-        ))}
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('officers')}
+          className={`flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-bold border-b-2 transition-all cursor-pointer ${
+            activeTab === 'officers'
+              ? 'border-emerald-600 text-emerald-800 bg-emerald-50/40 rounded-t-xl'
+              : 'border-transparent text-gray-500 hover:text-gray-900'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Akun Petugas Scanner</span>
+          <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+            {officers.length}
+          </span>
+        </button>
       </div>
 
-      {/* Device Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredDevices.map((device) => (
-          <DeviceCard
-            key={device.id}
-            device={device}
-            onPair={setPairingDevice}
-            onEdit={setEditingDevice}
-            onToggle={handleToggleDevice}
-            onDownloadManifest={handleDownloadManifest}
-            onDelete={handleDeleteDevice}
+      {activeTab === 'devices' ? (
+        <>
+          {/* KPI Cards (Minimalist style) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <AdminStatCard
+              icon={Smartphone}
+              label="Total Perangkat Gate"
+              value={devices.length.toString()}
+              subValue="Pemindai e-Ticket & gelang NFC"
+              badgeText="DEVICES"
+            />
+            <AdminStatCard
+              icon={Wifi}
+              label="Perangkat Online / Aktif"
+              value={devices.filter((d) => d.is_active).length.toString()}
+              subValue="Terhubung server telemetri real-time"
+              badgeText="ONLINE"
+            />
+            <AdminStatCard
+              icon={WifiOff}
+              label="Perangkat Offline"
+              value={devices.filter((d) => !d.is_active).length.toString()}
+              subValue="Sinkronisasi offline batch mode"
+              badgeText="OFFLINE"
+            />
+            <AdminStatCard
+              icon={ScanLine}
+              label="Total Pemindaian Hari Ini"
+              value={`${totalScans.toLocaleString('id-ID')} pax`}
+              subValue="Validasi tiket & akses gate pengunjung"
+              badgeText="SCANS"
+            />
+          </div>
+
+          {/* Destination Filter */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            <button
+              type="button"
+              onClick={() => setFilterDest('all')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                filterDest === 'all'
+                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                  : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
+              }`}
+            >
+              Semua Kawasan
+            </button>
+            {uniqueDestinations.map((dest) => (
+              <button
+                key={dest}
+                type="button"
+                onClick={() => setFilterDest(dest)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                  filterDest === dest
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                    : 'bg-white/60 border-white/80 text-gray-700 hover:text-gray-900 hover:bg-white/90 shadow-2xs'
+                }`}
+              >
+                {dest}
+              </button>
+            ))}
+          </div>
+
+          {/* Device Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredDevices.map((device) => (
+              <DeviceCard
+                key={device.id}
+                device={device}
+                onPair={setPairingDevice}
+                onEdit={setEditingDevice}
+                onToggle={handleToggleDevice}
+                onDownloadManifest={handleDownloadManifest}
+                onDelete={handleDeleteDevice}
+              />
+            ))}
+          </div>
+
+          {/* TanStack React Table: All Gate Scanner Devices */}
+          <DataTable
+            data={filteredDevices}
+            columns={deviceTableColumns}
+            title="Daftar Perangkat & Terminal Gerbang"
+            subtitle="Dukungan sorting, pencarian cepat, dan pagination oleh TanStack React Table v8"
+            defaultPageSize={5}
+            searchPlaceholder="Cari kode device, nama gerbang, atau lokasi..."
           />
-        ))}
-      </div>
+        </>
+      ) : (
+        /* ========================================================================= */
+        /* TAB 2: AKUN PETUGAS SCANNER (MANAJEMEN STAF LAPANGAN)                    */
+        /* ========================================================================= */
+        <div className="space-y-5">
+          {/* Informational Guidance Banner */}
+          <div className="glass-panel p-5 rounded-2xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50/70 via-white/80 to-emerald-50/40 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-sm font-bold text-gray-900">
+                  Manajemen Akun Petugas Lapangan & Scanner
+                </h3>
+                <p className="text-xs text-gray-600 leading-relaxed max-w-2xl">
+                  Admin cukup membuat <strong>Username</strong>. Sistem otomatis menghasilkan kata sandi terenkripsi tinggi (kebal hack). Petugas lapangan bisa langsung login di smartphone dengan scan <strong>QR Code Login</strong> tanpa perlu repot mengetik sandi.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowAddOfficerModal(true)}
+              className="btn-primary btn-sm px-4 py-2.5 shrink-0 justify-center shadow-sm"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Tambah Petugas Baru</span>
+            </button>
+          </div>
 
-      {/* TanStack React Table: All Gate Scanner Devices */}
-      <DataTable
-        data={filteredDevices}
-        columns={deviceTableColumns}
-        title="Daftar Perangkat & Terminal Gerbang"
-        subtitle="Dukungan sorting, pencarian cepat, dan pagination oleh TanStack React Table v8"
-        defaultPageSize={5}
-        searchPlaceholder="Cari kode device, nama gerbang, atau lokasi..."
-      />
+          {/* Officers List / Grid */}
+          {officers.length === 0 ? (
+            <div className="glass-panel p-12 rounded-2xl border border-dashed border-gray-300 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-gray-100 text-gray-400 flex items-center justify-center mx-auto">
+                <Users className="w-6 h-6" />
+              </div>
+              <h4 className="text-sm font-bold text-gray-800">Belum Ada Akun Petugas</h4>
+              <p className="text-xs text-gray-500 max-w-md mx-auto">
+                Buat akun pertama untuk staf pintu masuk gerbang Anda agar mereka dapat mulai memvalidasi tiket di aplikasi scanner.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowAddOfficerModal(true)}
+                className="btn-primary btn-sm mt-2"
+              >
+                <UserPlus className="w-4 h-4" />
+                <span>Buat Akun Petugas Pertama</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {officers.map((officer) => (
+                <div
+                  key={officer.id}
+                  className="glass-panel p-5 rounded-2xl shadow-sm border border-white/80 space-y-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-sm shadow-2xs">
+                        {officer.username.substring(0, 2).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm font-bold text-gray-900">{officer.full_name || officer.username}</h4>
+                          <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+                            @{officer.username}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-gray-500 mt-0.5 truncate max-w-[190px]">
+                          {officer.email}
+                        </p>
+                      </div>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border bg-emerald-50 text-emerald-800 border-emerald-200">
+                      <span className="status-dot" />
+                      <span>AKTIF</span>
+                    </span>
+                  </div>
+
+                  <div className="text-xs text-gray-600 bg-gray-50/60 rounded-xl p-3 border border-gray-100 space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Peran:</span>
+                      <span className="font-semibold text-gray-800">Petugas Gate Scanner</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Dibuat:</span>
+                      <span>
+                        {new Date(officer.created_at).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-gray-100 flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCredentialOfficer(officer)}
+                      className="btn-primary btn-sm w-full justify-center text-xs py-2 gap-1.5"
+                    >
+                      <QrCode className="w-3.5 h-3.5" />
+                      <span>Lihat QR & Kredensial</span>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleResetOfficerPassword(officer)}
+                        className="btn-secondary btn-sm flex-1 justify-center text-xs py-1.5 gap-1"
+                        title="Generate kata sandi baru otomatis"
+                      >
+                        <RefreshCw className="w-3 h-3 text-amber-600" />
+                        <span>Reset Sandi</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteOfficer(officer)}
+                        className="p-1.5 rounded-lg bg-white text-gray-500 hover:text-red-600 border border-gray-200 transition-colors shadow-2xs"
+                        title="Hapus Akun Petugas"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Modals */}
+      {showAddOfficerModal && (
+        <AddOfficerModal
+          onClose={() => setShowAddOfficerModal(false)}
+          onSuccess={(newOfficer) => {
+            setShowAddOfficerModal(false);
+            loadOfficers();
+            setSelectedCredentialOfficer(newOfficer);
+            showToast(`Akun petugas "${newOfficer.username}" berhasil dibuat!`);
+          }}
+        />
+      )}
+
+      {selectedCredentialOfficer && (
+        <OfficerCredentialModal
+          officer={selectedCredentialOfficer}
+          onClose={() => setSelectedCredentialOfficer(null)}
+        />
+      )}
+
       {pairingDevice && (
         <DevicePairingModal
           device={pairingDevice}
