@@ -305,6 +305,72 @@ function DevicePairingModal({ device, onClose }) {
   );
 }
 
+function ConfirmDialogModal({
+  isOpen,
+  title,
+  message,
+  confirmText = 'Konfirmasi',
+  cancelText = 'Batal',
+  confirmVariant = 'primary',
+  icon: Icon = AlertCircle,
+  onConfirm,
+  onCancel,
+  isLoading = false,
+}) {
+  if (!isOpen) return null;
+
+  const variantStyles = {
+    danger: {
+      btn: 'bg-red-600 hover:bg-red-700 text-white shadow-red-600/20',
+      iconBg: 'bg-red-50 text-red-600 border-red-200',
+    },
+    warning: {
+      btn: 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20',
+      iconBg: 'bg-amber-50 text-amber-600 border-amber-200',
+    },
+    primary: {
+      btn: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20',
+      iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+    },
+  }[confirmVariant] || {
+    btn: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20',
+    iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+      <div className="glass-panel rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-white/80 flex flex-col items-center text-center">
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-2xs mb-3.5 ${variantStyles.iconBg}`}>
+          <Icon className="w-6 h-6" />
+        </div>
+
+        <h3 className="text-base font-bold text-gray-900 mb-1.5">{title}</h3>
+        <p className="text-xs text-gray-600 leading-relaxed mb-6">{message}</p>
+
+        <div className="flex items-center gap-2.5 w-full">
+          <button
+            type="button"
+            disabled={isLoading}
+            onClick={onCancel}
+            className="flex-1 btn-secondary btn-sm justify-center py-2.5 rounded-xl text-xs font-bold"
+          >
+            {cancelText}
+          </button>
+          <button
+            type="button"
+            disabled={isLoading}
+            onClick={onConfirm}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-98 ${variantStyles.btn}`}
+          >
+            {isLoading ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : null}
+            <span>{confirmText}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function AddOfficerModal({ onClose, onSuccess }) {
   const [username, setUsername] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -966,6 +1032,7 @@ export default function GatesPage() {
   const [showAddOfficerModal, setShowAddOfficerModal] = useState(false);
   const [selectedCredentialOfficer, setSelectedCredentialOfficer] = useState(null);
   const [isLoadingOfficers, setIsLoadingOfficers] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   const loadOfficers = async () => {
     setIsLoadingOfficers(true);
@@ -985,37 +1052,55 @@ export default function GatesPage() {
     loadOfficers();
   }, [slug]);
 
-  const handleResetOfficerPassword = async (officer) => {
-    if (!window.confirm(`Yakin ingin mereset kata sandi untuk akun "${officer.username}"? Sandi baru akan otomatis digenerate.`)) {
-      return;
-    }
-    try {
-      const res = await apiRequest(`/api/v1/auth/officers/${officer.id}/reset-password`, {
-        method: 'POST',
-      });
-      if (res && res.data) {
-        showToast(`Kata sandi "${officer.username}" berhasil direset!`);
-        setSelectedCredentialOfficer(res.data);
-        loadOfficers();
-      }
-    } catch (err) {
-      showToast(`Gagal reset sandi: ${err.message}`);
-    }
+  const handleResetOfficerPassword = (officer) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Reset Kata Sandi Petugas?',
+      message: `Kata sandi baru untuk akun "${officer.username}" akan dibuatkan otomatis oleh sistem dan QR login instan akan langsung diperbarui.`,
+      confirmText: 'Ya, Reset Sandi',
+      confirmVariant: 'warning',
+      icon: RefreshCw,
+      onConfirm: async () => {
+        try {
+          const res = await apiRequest(`/api/v1/auth/officers/${officer.id}/reset-password`, {
+            method: 'POST',
+          });
+          if (res && res.data) {
+            showToast(`Kata sandi "${officer.username}" berhasil direset!`);
+            setSelectedCredentialOfficer(res.data);
+            loadOfficers();
+          }
+        } catch (err) {
+          showToast(`Gagal reset sandi: ${err.message}`);
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+    });
   };
 
-  const handleDeleteOfficer = async (officer) => {
-    if (!window.confirm(`Yakin ingin menghapus akun petugas "${officer.username}"?`)) {
-      return;
-    }
-    try {
-      await apiRequest(`/api/v1/auth/officers/${officer.id}`, {
-        method: 'DELETE',
-      });
-      showToast(`Akun petugas "${officer.username}" berhasil dihapus.`);
-      loadOfficers();
-    } catch (err) {
-      showToast(`Gagal menghapus petugas: ${err.message}`);
-    }
+  const handleDeleteOfficer = (officer) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: 'Hapus Akun Petugas?',
+      message: `Akun petugas "${officer.username}" akan dihapus permanen dari sistem gerbang dan tidak dapat digunakan untuk login lagi.`,
+      confirmText: 'Ya, Hapus Akun',
+      confirmVariant: 'danger',
+      icon: Trash2,
+      onConfirm: async () => {
+        try {
+          await apiRequest(`/api/v1/auth/officers/${officer.id}`, {
+            method: 'DELETE',
+          });
+          showToast(`Akun petugas "${officer.username}" berhasil dihapus.`);
+          loadOfficers();
+        } catch (err) {
+          showToast(`Gagal menghapus petugas: ${err.message}`);
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+    });
   };
 
   // Load real gate telemetry from backend
@@ -1569,6 +1654,13 @@ export default function GatesPage() {
           onScanSuccess={() => {
             showToast('Tiket berhasil tervalidasi via simulasi scan!');
           }}
+        />
+      )}
+
+      {confirmDialog && (
+        <ConfirmDialogModal
+          {...confirmDialog}
+          onCancel={() => setConfirmDialog(null)}
         />
       )}
     </div>
