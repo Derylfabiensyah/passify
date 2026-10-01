@@ -184,7 +184,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
 function DevicePairingModal({ device, onClose }) {
   const defaultHost =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? '192.168.18.87'
+      ? '192.168.2.193'
       : window.location.hostname;
   const [serverHost, setServerHost] = useState(defaultHost);
   const [copied, setCopied] = useState(false);
@@ -434,7 +434,7 @@ function OfficerCredentialModal({ officer, onClose }) {
 
   const defaultHost =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? '192.168.18.91'
+      ? '192.168.2.193'
       : window.location.hostname;
   const [serverHost, setServerHost] = useState(defaultHost);
 
@@ -497,6 +497,23 @@ function OfficerCredentialModal({ officer, onClose }) {
             </p>
           </div>
         )}
+
+        {/* Server IP Config */}
+        <div className="w-full mb-3">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] font-bold text-gray-700">
+              IP Host Server (Wi-Fi Laptop)
+            </label>
+            <span className="text-[10px] text-gray-500">Otomatis terhubung ke HP</span>
+          </div>
+          <input
+            type="text"
+            value={serverHost}
+            onChange={(e) => setServerHost(e.target.value)}
+            className="w-full bg-white border border-gray-300 rounded-xl px-3 py-1.5 text-xs font-mono font-bold text-gray-800 focus:outline-none focus:border-emerald-600 shadow-2xs"
+            placeholder="192.168.2.193"
+          />
+        </div>
 
         {/* Credentials Details */}
         <div className="w-full bg-gray-50 rounded-xl p-3 border border-gray-200 space-y-2 text-xs mb-3">

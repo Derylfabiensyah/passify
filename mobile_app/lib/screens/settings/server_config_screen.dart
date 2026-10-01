@@ -142,7 +142,7 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
                     controller: _hostController,
                     decoration: const InputDecoration(
                       labelText: 'Host IP / Domain',
-                      hintText: 'Contoh: 192.168.18.91 atau 10.0.2.2',
+                      hintText: 'Contoh: 192.168.2.193 atau 10.0.2.2',
                       filled: false,
                       prefixIcon: Icon(Icons.dns, color: AppColors.forestSoft),
                       border: InputBorder.none,
@@ -239,9 +239,9 @@ class _ServerConfigScreenState extends State<ServerConfigScreen> {
             const SizedBox(height: 12),
 
             _buildPresetTile(
-              title: 'Wi-Fi Lokal Host (192.168.18.91)',
+              title: 'Wi-Fi Lokal Host (192.168.2.193)',
               subtitle: 'Untuk HP Fisik terhubung ke Wi-Fi yang sama',
-              host: '192.168.18.91',
+              host: '192.168.2.193',
             ),
             const SizedBox(height: 8),
             _buildPresetTile(

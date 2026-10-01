@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiEndpoints {
-  // Default host for development (current Wi-Fi IP: 192.168.18.91)
-  static const String defaultHost = '192.168.18.91';
+  // Default host for development (current Wi-Fi IP: 192.168.2.193)
+  static const String defaultHost = '192.168.2.193';
 
   static const String prefHostKey = 'passify_server_host';
 
@@ -20,6 +20,7 @@ class ApiEndpoints {
     final saved = prefs.getString(prefHostKey);
     // Invalidate stale or previously hardcoded dev IPs
     if (saved == null ||
+        saved == '192.168.18.91' ||
         saved == '192.168.18.87' ||
         saved == '192.168.0.135' ||
         saved == '10.164.44.233' ||
