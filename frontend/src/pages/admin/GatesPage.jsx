@@ -184,7 +184,7 @@ function DeviceCard({ device, onPair, onEdit, onToggle, onDownloadManifest, onDe
 function DevicePairingModal({ device, onClose }) {
   const defaultHost =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? '192.168.2.193'
+      ? '127.0.0.1'
       : window.location.hostname;
   const [serverHost, setServerHost] = useState(defaultHost);
   const [copied, setCopied] = useState(false);
