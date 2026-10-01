@@ -4,9 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_endpoints.dart';
 import '../constants/app_colors.dart';
 import '../providers/auth_provider.dart';
+import '../services/api_service.dart';
+import '../services/database_helper.dart';
 import '../widgets/scanner_overlay.dart';
 import 'home_screen.dart';
 
@@ -77,7 +80,43 @@ class _QrLoginScannerScreenState extends State<QrLoginScannerScreen> {
       final success = await auth.login(username, password);
 
       if (success && mounted) {
+        // Otomatis pairing jika QR memuat data gerbang (QR Combo)
+        final gateDeviceId = (data['gate_device_id'] ?? data['device_id'] ?? '').toString().trim();
+        if (gateDeviceId.isNotEmpty) {
+          setState(() {
+            _statusMessage = 'Menghubungkan ke gerbang...';
+          });
+
+          final gateDeviceCode = (data['gate_device_code'] ?? data['device_code'] ?? 'GATE-01').toString();
+          final gateDeviceName = (data['gate_device_name'] ?? data['device_name'] ?? 'Gerbang Petugas').toString();
+          final gateDestinationId = (data['gate_destination_id'] ?? data['destination_id'] ?? '').toString();
+          final gateHmacKey = (data['gate_hmac_key'] ?? data['hmac_key'] ?? '').toString();
+
+          await auth.setSelectedDevice(
+            gateDeviceId,
+            destinationId: gateDestinationId.isNotEmpty ? gateDestinationId : null,
+            deviceName: gateDeviceName,
+            deviceCode: gateDeviceCode,
+          );
+
+          if (gateHmacKey.isNotEmpty) {
+            try {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('passify_gate_hmac_key', gateHmacKey);
+            } catch (_) {}
+          }
+
+          // Unduh manifest tiket offline hari ini di latar belakang
+          try {
+            final manifestRes = await ApiService().getTodayManifest(deviceId: gateDeviceId);
+            if (manifestRes.ticketManifest.isNotEmpty) {
+              await DatabaseHelper.instance.saveTicketManifest(manifestRes.ticketManifest);
+            }
+          } catch (_) {}
+        }
+
         HapticFeedback.heavyImpact();
+        if (!mounted) return;
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const HomeScreen()),
           (route) => false,

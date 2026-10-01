@@ -494,9 +494,10 @@ function AddOfficerModal({ onClose, onSuccess }) {
   );
 }
 
-function OfficerCredentialModal({ officer, onClose }) {
+function OfficerCredentialModal({ officer, devices = [], onClose }) {
   const [copied, setCopied] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
+  const [selectedGateId, setSelectedGateId] = useState('');
 
   // Server host is automatically resolved in background without cluttering the admin UI
   const serverHost =
@@ -504,14 +505,26 @@ function OfficerCredentialModal({ officer, onClose }) {
       ? '127.0.0.1'
       : window.location.hostname;
 
+  const selectedGate = useMemo(() => {
+    return devices.find((d) => d.id === selectedGateId);
+  }, [devices, selectedGateId]);
+
   const loginPayload = useMemo(() => {
-    return JSON.stringify({
+    const payload = {
       type: 'passify_officer_login',
       username: officer.username,
       password: officer.generated_password || '',
       host: serverHost,
-    });
-  }, [officer, serverHost]);
+    };
+    if (selectedGate) {
+      payload.gate_device_id = selectedGate.id;
+      payload.gate_device_code = selectedGate.device_code;
+      payload.gate_device_name = selectedGate.device_name;
+      payload.gate_destination_id = selectedGate.destination_id;
+      payload.gate_hmac_key = selectedGate.hmac_key || 'passify_secret_key_123';
+    }
+    return JSON.stringify(payload);
+  }, [officer, serverHost, selectedGate]);
 
   const handleCopyAll = () => {
     const text = `Kredensial Petugas Passify:\nUsername: ${officer.username}\nKata Sandi: ${officer.generated_password || '(Tersimpan)'}`;
@@ -543,6 +556,27 @@ function OfficerCredentialModal({ officer, onClose }) {
           </button>
         </div>
 
+        {/* Gate Pairing Selector */}
+        {devices && devices.length > 0 && (
+          <div className="w-full mb-3 text-left">
+            <label className="block text-[11px] font-bold text-gray-700 dark:text-gray-300 mb-1">
+              Pairing Gerbang Sekaligus (Opsional):
+            </label>
+            <select
+              value={selectedGateId}
+              onChange={(e) => setSelectedGateId(e.target.value)}
+              className="w-full text-xs rounded-xl border border-gray-200 dark:border-white/10 p-2 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none"
+            >
+              <option value="">-- Hanya Login (Tanpa Pairing Gerbang) --</option>
+              {devices.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.device_name} ({d.device_code})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* QR Display */}
         {officer.generated_password ? (
           <div className="p-4 bg-white rounded-2xl border-2 border-dashed border-emerald-400 shadow-inner flex flex-col items-center mb-3">
@@ -552,8 +586,10 @@ function OfficerCredentialModal({ officer, onClose }) {
               level="M"
               includeMargin={true}
             />
-            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 mt-2">
-              Scan untuk Login Instan di HP
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 mt-2 text-center">
+              {selectedGate
+                ? `Scan untuk Login & Pairing (${selectedGate.device_code})`
+                : 'Scan untuk Login Instan di HP'}
             </span>
           </div>
         ) : (
@@ -605,7 +641,7 @@ function OfficerCredentialModal({ officer, onClose }) {
           <p className="leading-relaxed text-blue-900">
             1. Buka aplikasi Passify di HP petugas.<br />
             2. Di halaman login, klik tombol <strong>"Scan QR Login Petugas"</strong>.<br />
-            3. Arahkan kamera ke QR Code di atas untuk masuk langsung tanpa ketik sandi.
+            3. Arahkan kamera ke QR Code di atas{selectedGate ? ' untuk langsung masuk & terhubung ke gerbang.' : ' untuk masuk langsung tanpa ketik sandi.'}
           </p>
         </div>
 
@@ -1615,6 +1651,7 @@ export default function GatesPage() {
       {selectedCredentialOfficer && (
         <OfficerCredentialModal
           officer={selectedCredentialOfficer}
+          devices={devices}
           onClose={() => setSelectedCredentialOfficer(null)}
         />
       )}
