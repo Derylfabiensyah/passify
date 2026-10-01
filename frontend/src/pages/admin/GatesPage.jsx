@@ -307,7 +307,6 @@ function DevicePairingModal({ device, onClose }) {
 
 function AddOfficerModal({ onClose, onSuccess }) {
   const [username, setUsername] = useState('');
-  const [fullName, setFullName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
@@ -325,7 +324,6 @@ function AddOfficerModal({ onClose, onSuccess }) {
         method: 'POST',
         body: {
           username: cleanUser,
-          full_name: fullName.trim() || `Petugas ${cleanUser}`,
         },
       });
       if (res && res.data) {
@@ -377,27 +375,15 @@ function AddOfficerModal({ onClose, onSuccess }) {
             <input
               type="text"
               required
+              autoFocus
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, '-'))}
-              placeholder="contoh: gate1, petugas-utara, budi"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 font-mono focus:outline-none focus:border-emerald-600 focus:bg-white"
+              placeholder="contoh: gate1, petugas-gate, budi"
+              className="w-full bg-white border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 font-mono focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
             />
             <p className="text-[11px] text-gray-500 mt-1">
-              Petugas cukup mengetik username ini (atau scan QR) untuk login di HP scanner.
+              Hanya perlu isi username ini. Kata sandi aman akan digenerate otomatis oleh sistem.
             </p>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1.5">
-              Nama Lengkap / Pos Gerbang (Opsional)
-            </label>
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="contoh: Petugas Gerbang Utama"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:border-emerald-600 focus:bg-white"
-            />
           </div>
 
           <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-xs text-emerald-900 space-y-1">
